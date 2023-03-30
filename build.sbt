@@ -143,7 +143,7 @@ lazy val allDependencies =
 		//val kindProjector = compilerPlugin("org.typelevel" %% "kind-projector" % versionOfKindProjector)
 		//val kindProjector = "org.typelevel" %% "kind-projector" % versionOfKindProjector
 		//val kindProjector = "org.typelevel" %% "kind-projector" % versionOfKindProjector
-		//"org.typelevel" %% "kind-projector" % 
+		//"org.typelevel" %% "kind-projector" %
 		//val kindProjector = compilerPlugin("org.spire-math" %% "kind-projector" % versionOfKindProjector)
 
 		// ZIO-schema
@@ -191,6 +191,7 @@ lazy val settings =
 		wartremoverSettings ++
 		scalafmtSettings*/
 
+// Recommended scala 2.13 compiler options = https://nathankleyn.com/2019/05/13/recommended-scalac-flags-for-2-13/
 lazy val compilerOptions = Seq(
 	"-deprecation",
 	"-unchecked",
@@ -198,10 +199,13 @@ lazy val compilerOptions = Seq(
 	"-language:existentials",
 	"-language:higherKinds",
 	"-language:implicitConversions",
-	"-language:postfixOps"
+	"-language:postfixOps",
+	// TODO try putting Xnojline:off = https://hyp.is/Ard1uM71Ee2sWMf7uSXXaQ/docs.scala-lang.org/overviews/compiler-options/index.html
+
+	//"-XJline:off" // TODO trying to stop this message from appearing on REPL: warning: -Xnojline is
+// deprecated: Replaced by -Xjline:off
 	//"-Ypartial-unification" //todo got error in sbt compilation " error: bad option" why?
-	//"-encoding",
-	//"utf8"
+	//"-encoding",	//"utf8"
 )
 
 lazy val commonSettings = Seq(

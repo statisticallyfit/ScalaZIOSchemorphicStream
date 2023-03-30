@@ -1,4 +1,15 @@
+project/*
+project/.boot/*
+project/.sbtboot/*
+project/.ivy/*
+project/target/*
+project/project/*
+target/*
 .idea
+.history
+.bsp/
+
+
 .metadata
 .cache-main
 .classpath
@@ -7,8 +18,7 @@
 *.class
 *.orig
 *.log
-target/
+
 .DS_Store
 *.iml
 scalastyle-output.xml
-
