@@ -1,32 +1,33 @@
+package testingSchemaStructure
+
+
 import org.specs2.mutable.Specification
-
-
-import scala.reflect.{ClassTag, classTag}
-import scala.reflect.runtime.universe._
-
 
 import util.Util._
 
+/*import scala.reflect.{ClassTag, classTag}
+import scala.reflect.runtime.universe._
 import zio._
 import zio.schema.codec.DecodeError
 import zio.schema.{DeriveSchema, Schema, TypeId}
-import zio.stream.ZPipeline
+import zio.stream.ZPipeline*/
 
-import Example1_PaymentWireTransfer._
+
+import examples.Example1_PaymentWireTransfer._
 import Domain._
 import Domain.PaymentMethod._
 import zio.schema.Schema._
 import ManualConstruction._
-
 /**
  *
  */
-class TestZioField extends Specification {
+class SchemaOfCreditCardStructuralAnalysis extends Specification {
 
 
 
-	"function test" should {
-		"return function argument type" in {
+	"Component Test: schemaPaymentMethodCreditCard" should {
+
+		"show parameter (function) types" in {
 
 			getFuncType(typeId_creditCard) must beEqualTo("zio.schema.TypeId")
 			getShortFuncType(typeId_creditCard) must beEqualTo("TypeId")
@@ -47,6 +48,11 @@ class TestZioField extends Specification {
 
 
 			val longName4 = "(String, Int, Int) => Example1_PaymentWireTransfer.Domain.PaymentMethod.CreditCard"
+			getFuncType(construct0_creditCard) must	beEqualTo(longName4)
+			getShortFuncType(construct0_creditCard) must beEqualTo("(String, Int, Int) => CreditCard")
+
+
+			val longName5: String = "Component "
 			getFuncType(construct0_creditCard) must	beEqualTo(longName4)
 			getShortFuncType(construct0_creditCard) must beEqualTo("(String, Int, Int) => CreditCard")
 		}

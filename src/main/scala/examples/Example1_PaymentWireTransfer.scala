@@ -1,14 +1,12 @@
+package examples
+
 /**
  * SOURCE CODE = https://github.com/zio/zio-schema/blob/main/zio-schema-examples/shared/src/main/scala/dev/zio/schema/example/example1/Example1.scala
  */
 object Example1_PaymentWireTransfer {
 
-
 	import zio._
-	import zio.schema.codec.DecodeError
-	import zio.schema.{DeriveSchema, Schema, TypeId}
-	import zio.stream.ZPipeline
-
+	import zio.schema.{Schema, TypeId}
 
 	object Domain {
 		sealed trait PaymentMethod
@@ -19,16 +17,16 @@ object Example1_PaymentWireTransfer {
 
 		object PaymentMethod {
 			final case class CreditCard(number: String, expirationMonth: Int, expirationYear: Int) extends PaymentMethod
-			final case class WireTransfer(accountNumber: String, bankCode: String)                 extends PaymentMethod
+
+			final case class WireTransfer(accountNumber: String, bankCode: String) extends PaymentMethod
 		}
 	}
 
 	//import dev.zio.schema.example.example1.Domain._
 
-	import Domain._
 	import Domain.PaymentMethod._
+	import Domain._
 	import zio.schema.Schema._
-
 
 	object ManualConstruction {
 
@@ -38,7 +36,7 @@ object Example1_PaymentWireTransfer {
 			name0 = "number",
 			schema0 = Schema.primitive[String],
 			//get0: (R => A) --- (CreditCard => String)
-			get0 = (r:CreditCard) => r.number,
+			get0 = (r: CreditCard) => r.number,
 			// set0: (R, A) => R ----- (CreditCard, String) => CreditCard
 			set0 = (cc: CreditCard, s: String) => cc.copy(number = s)
 		)
@@ -70,9 +68,5 @@ object Example1_PaymentWireTransfer {
 			field03 = field3_creditCard,
 			construct0 = construct0_creditCard
 		)
-
 	}
-	import ManualConstruction._
-
-
 }
