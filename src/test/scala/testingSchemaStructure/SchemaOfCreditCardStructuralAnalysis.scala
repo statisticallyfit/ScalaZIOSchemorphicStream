@@ -13,7 +13,7 @@ import zio.schema.{DeriveSchema, Schema, TypeId}
 import zio.stream.ZPipeline*/
 
 
-import examples.Example1_PaymentWireTransfer._
+import ZioSchemaExamples.Example1_PaymentWireTransfer._
 import Domain._
 import Domain.PaymentMethod._
 import zio.schema.Schema._

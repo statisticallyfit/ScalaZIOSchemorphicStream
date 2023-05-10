@@ -51,6 +51,9 @@ lazy val global = project
 			allDependencies.zioSchemaProtobuf,
 			allDependencies.zioSchemaDerivation,
 
+			allDependencies.skeuomorph,
+			allDependencies.andyGlowScalaJsonSchema,
+
 		)
 	)
 	.aggregate(
@@ -96,7 +99,20 @@ lazy val allDependencies =
 
 		//val versionOfKindProjector = "0.13.2"
 
+		val versionOfZIO = "2.0.13"
+		val versionOfZIO_streams = "2.0.13"
+		val versionOfZIO_test = "2.0.13"
+
 		val versionOfZIO_schema = "0.4.8"
+
+		//https://github.com/higherkindness/skeuomorph
+		val versionOfSkeuomorph = "0.2.1"
+		// https://github.com/andyglow/scala-jsonschema/blob/master/src/main/paradox/overview.md
+		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
+		// https://github.com/nevillelyh/protobuf-generic
+		val versionOfProtobufGeneric = ""
+
+
 
 		val versionOfShapeless = "2.3.10"
 
@@ -147,13 +163,39 @@ lazy val allDependencies =
 		//val kindProjector = compilerPlugin("org.spire-math" %% "kind-projector" % versionOfKindProjector)
 
 		// ZIO-schema
+		val zio = "dev.zio" %% "zio" % versionOfZIO
 		val zioSchema = "dev.zio" %% "zio-schema" % versionOfZIO_schema
 		val zioSchemaJson = "dev.zio" %% "zio-schema-json" % versionOfZIO_schema
 		val zioSchemaProtobuf = "dev.zio" %% "zio-schema-protobuf" % versionOfZIO_schema
 		// Required for automatic generic derivation of schemas
 		val zioSchemaDerivation = "dev.zio" %% "zio-schema-derivation" % versionOfZIO_schema
+		val zioStream = "dev.zio" %% "zio-streams" % versionOfZIO_streams
+		val zioTest = "dev.zio" %% "zio-test" % versionOfZIO_test
 
-		// Matryoshka recursion schemes
+		// Other schema libraries
+		val skeuomorph = "io.higherkindness" %% "skeuomorph" % versionOfSkeuomorph
+
+		val andyGlowScalaJsonSchema = "com.github.andyglow" %% "scala-jsonschema" % versionOfAndyGlowScalaJsonSchema
+		val andyGlow_jsonschema_Macros = "com.github.andyglow" %% "scala-jsonschema-macros" % versionOfAndyGlowScalaJsonSchema % Provided // <-- transitive
+		// json bridge. pick one
+		val andyGlow_jsonschema_PlayJson = "com.github.andyglow" %% "scala-jsonschema-play-json" % versionOfAndyGlowScalaJsonSchema         // <-- optional
+		val andyGlow_jsonschema_SprayJson = "com.github.andyglow" %% "scala-jsonschema-spray-json" % versionOfAndyGlowScalaJsonSchema        // <-- optional
+		val andyGlow_jsonschema_CirceJson = "com.github.andyglow" %% "scala-jsonschema-circe-json" % versionOfAndyGlowScalaJsonSchema        // <-- optional
+		val andyGlow_jsonschema_Json4sJson = "com.github.andyglow" %% "scala-jsonschema-json4s-json" % versionOfAndyGlowScalaJsonSchema       // <-- optional
+		val andyGlow_jsonschema_UJson = "com.github.andyglow" %% "scala-jsonschema-ujson" % versionOfAndyGlowScalaJsonSchema             // <-- optional
+		// joda-time support
+		val andyGlow_jsonschema_Joda = "com.github.andyglow" %% "scala-jsonschema-joda-time" % versionOfAndyGlowScalaJsonSchema         // <-- optional
+		// cats support
+		val andyGlow_jsonschema_Cats = "com.github.andyglow" %% "scala-jsonschema-cats" % versionOfAndyGlowScalaJsonSchema              // <-- optional
+		// refined support
+		val andyGlow_jsonschema_Refined = "com.github.andyglow" %% "scala-jsonschema-refined" % versionOfAndyGlowScalaJsonSchema           // <-- optional
+		// enumeratum support
+		val andyGlow_jsonschema_Enumeratum = "com.github.andyglow" %% "scala-jsonschema-enumeratum" % versionOfAndyGlowScalaJsonSchema        // <-- optional
+		// zero-dependency json and jsonschema parser
+		val andyGlow_jsonschema_Parser = "com.github.andyglow" %% "scala-jsonschema-parser" % versionOfAndyGlowScalaJsonSchema             // <-- optional
+
+
+			// Matryoshka recursion schemes
 		val matryoshka = "com.slamdata" %% "matryoshka-core" % "0.21.3"
 		// TODO WARNING matryoshka is the only lib that doesn't support over scala 2.12
 

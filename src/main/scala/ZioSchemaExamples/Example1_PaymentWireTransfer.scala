@@ -1,4 +1,4 @@
-package examples
+package ZioSchemaExamples
 
 /**
  * SOURCE CODE = https://github.com/zio/zio-schema/blob/main/zio-schema-examples/shared/src/main/scala/dev/zio/schema/example/example1/Example1.scala
