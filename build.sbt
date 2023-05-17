@@ -2,7 +2,7 @@ name := "ScalaZIOSchemorphicStream"
 
 version := "0.1"
 
-scalaVersion := "2.13.10"
+scalaVersion := "2.12.17"
 
 
 //addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10")
@@ -19,30 +19,30 @@ lazy val global = project
 		settings,
 		libraryDependencies ++= commonDependencies ++ Seq(
 
-			allDependencies.scalaLibrary,
-			allDependencies.scalaCompiler,
-			allDependencies.scalaReflect,
+			//allDependencies.scalaLibrary,
+			//allDependencies.scalaCompiler,
+			//allDependencies.scalaReflect,
 
 			allDependencies.scalaCheck,
 
-			allDependencies.specs2Core,
+			//allDependencies.specs2Core,
 			allDependencies.specs2ScalaCheck,
 
 			allDependencies.scalaTest,
 
 			//allDependencies.discipline,
-			allDependencies.discipline_core,
-			allDependencies.discipline_scalatest,
-			allDependencies.discipline_specs2,
+			//allDependencies.discipline_core,
+			//allDependencies.discipline_scalatest,
+			//allDependencies.discipline_specs2,
 
 
-			allDependencies.cats_core,
-			allDependencies.cats_kernel,
-			allDependencies.cats_laws,
-			allDependencies.cats_free,
-			allDependencies.cats_macros,
-			allDependencies.cats_testkit,
-			allDependencies.cats_effects,
+			//allDependencies.cats_core,
+			//allDependencies.cats_kernel,
+			//allDependencies.cats_laws,
+			//allDependencies.cats_free,
+			//allDependencies.cats_macros,
+			//allDependencies.cats_testkit,
+			//allDependencies.cats_effects,
 
 			//allDependencies.kindProjector,
 
