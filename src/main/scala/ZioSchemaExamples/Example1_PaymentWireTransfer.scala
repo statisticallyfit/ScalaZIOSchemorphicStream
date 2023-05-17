@@ -68,5 +68,46 @@ object Example1_PaymentWireTransfer {
 			field03 = field3_creditCard,
 			construct0 = construct0_creditCard
 		)
+
+
+		// -----------------------------------------
+    val schemaPaymentMethodWireTransfer: Schema[WireTransfer] = Schema.CaseClass2[String, String, WireTransfer](
+      TypeId.parse("dev.zio.schema.example.example1.Domain.PaymentMethod.WireTransfer"),
+      field01 = Schema.Field[WireTransfer, String](
+        "accountNumber",
+        Schema.primitive[String],
+        get0 = _.accountNumber,
+        set0 = (p, v) => p.copy(accountNumber = v)
+      ),
+      field02 = Schema.Field[WireTransfer, String](
+        "bankCode",
+        Schema.primitive[String],
+        get0 = _.bankCode,
+        set0 = (p, v) => p.copy(bankCode = v)
+      ),
+      construct0 = (number, bankCode) => PaymentMethod.WireTransfer(number, bankCode)
+    )
+
+		val schemaPaymentMethod: Schema[PaymentMethod] =
+			Schema.Enum2[PaymentMethod.CreditCard, PaymentMethod.WireTransfer, PaymentMethod](
+				id = TypeId.parse("dev.zio.schema.example.example1.Domain.PaymentMethod"),
+				case1 = Case[PaymentMethod, PaymentMethod.CreditCard](
+					id = "CreditCard",
+					schema = schemaPaymentMethodCreditCard,
+					unsafeDeconstruct = pm => pm.asInstanceOf[PaymentMethod.CreditCard],
+					construct = pc => pc.asInstanceOf[PaymentMethod],
+					isCase = _.isInstanceOf[PaymentMethod.CreditCard],
+					annotations = Chunk.empty
+				),
+				case2 = Case[PaymentMethod, PaymentMethod.WireTransfer](
+					id = "WireTransfer",
+					schema = schemaPaymentMethodWireTransfer,
+					unsafeDeconstruct = pm => pm.asInstanceOf[PaymentMethod.WireTransfer],
+					construct = pc => pc.asInstanceOf[PaymentMethod],
+					isCase = _.isInstanceOf[PaymentMethod.WireTransfer],
+					annotations = Chunk.empty
+				),
+				annotations = Chunk.empty
+			)
 	}
 }

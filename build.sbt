@@ -52,8 +52,20 @@ lazy val global = project
 			allDependencies.zioSchemaDerivation,
 
 			allDependencies.skeuomorph,
-			allDependencies.andyGlowScalaJsonSchema,
 
+			allDependencies.andyGlowScalaJsonSchema,
+			allDependencies.andyGlow_jsonschema_Macros,
+			allDependencies.andyGlow_jsonschema_PlayJson,
+			allDependencies.andyGlow_jsonschema_SprayJson,
+			allDependencies.andyGlow_jsonschema_CirceJson,
+			allDependencies.andyGlow_jsonschema_Json4sJson,
+			allDependencies.andyGlow_jsonschema_UJson,
+			allDependencies.andyGlow_jsonschema_Joda,
+			allDependencies.andyGlow_jsonschema_Cats,
+			allDependencies.andyGlow_jsonschema_Refined,
+			allDependencies.andyGlow_jsonschema_Derived,
+			allDependencies.andyGlow_jsonschema_Enumeratum,
+			allDependencies.andyGlow_jsonschema_Parser,
 		)
 	)
 	.aggregate(
@@ -76,7 +88,7 @@ lazy val allDependencies =
 	new {
 
 		// Listing the versions as values
-		val versionOfScala = "2.13.10"
+		val versionOfScala = "2.12.0" //"2.13.10"
 
 		val versionOfScalaTest = "3.2.15" //"3.3.0-SNAP2"
 
@@ -105,19 +117,15 @@ lazy val allDependencies =
 
 		val versionOfZIO_schema = "0.4.8"
 
-		//https://github.com/higherkindness/skeuomorph
-		val versionOfSkeuomorph = "0.2.1"
-		// https://github.com/andyglow/scala-jsonschema/blob/master/src/main/paradox/overview.md
-		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
-		// https://github.com/nevillelyh/protobuf-generic
-		val versionOfProtobufGeneric = ""
-
-
-
 		val versionOfShapeless = "2.3.10"
 
 		val versionOfDroste = "0.9.0"
 		val versionOfMatryoshka = "0.21.3"
+
+
+
+		val versionOfSkeuomorph = "0.2.1"
+		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
 
 		//------------------
 
@@ -172,6 +180,21 @@ lazy val allDependencies =
 		val zioStream = "dev.zio" %% "zio-streams" % versionOfZIO_streams
 		val zioTest = "dev.zio" %% "zio-test" % versionOfZIO_test
 
+
+			// Matryoshka recursion schemes
+		val matryoshka = "com.slamdata" %% "matryoshka-core" % "0.21.3"
+		// TODO WARNING matryoshka is the only lib that doesn't support over scala 2.12
+
+		//Droste recursion schemes
+		val drosteCore = "io.higherkindness" %% "droste-core" % versionOfDroste
+		val drosteLaws = "io.higherkindness" %% "droste-laws" % versionOfDroste
+		val drosteMacros = "io.higherkindness" %% "droste-macros" % versionOfDroste
+		/*"io.higherkindness" %% "droste-meta" % "0.8.0",
+		"io.higherkindness" %% "droste-reftree" % "0.8.0",*/
+		val drosteScalaCheck = "io.higherkindness" %% "droste-scalacheck" % versionOfDroste
+
+
+
 		// Other schema libraries
 		val skeuomorph = "io.higherkindness" %% "skeuomorph" % versionOfSkeuomorph
 
@@ -189,23 +212,12 @@ lazy val allDependencies =
 		val andyGlow_jsonschema_Cats = "com.github.andyglow" %% "scala-jsonschema-cats" % versionOfAndyGlowScalaJsonSchema              // <-- optional
 		// refined support
 		val andyGlow_jsonschema_Refined = "com.github.andyglow" %% "scala-jsonschema-refined" % versionOfAndyGlowScalaJsonSchema           // <-- optional
+
+		val andyGlow_jsonschema_Derived = "com.github.andyglow" %% "scala-jsonschema-derived" % versionOfAndyGlowScalaJsonSchema
 		// enumeratum support
 		val andyGlow_jsonschema_Enumeratum = "com.github.andyglow" %% "scala-jsonschema-enumeratum" % versionOfAndyGlowScalaJsonSchema        // <-- optional
 		// zero-dependency json and jsonschema parser
 		val andyGlow_jsonschema_Parser = "com.github.andyglow" %% "scala-jsonschema-parser" % versionOfAndyGlowScalaJsonSchema             // <-- optional
-
-
-			// Matryoshka recursion schemes
-		val matryoshka = "com.slamdata" %% "matryoshka-core" % "0.21.3"
-		// TODO WARNING matryoshka is the only lib that doesn't support over scala 2.12
-
-		//Droste recursion schemes
-		val drosteCore = "io.higherkindness" %% "droste-core" % versionOfDroste
-		val drosteLaws = "io.higherkindness" %% "droste-laws" % versionOfDroste
-		val drosteMacros = "io.higherkindness" %% "droste-macros" % versionOfDroste
-		/*"io.higherkindness" %% "droste-meta" % "0.8.0",
-		"io.higherkindness" %% "droste-reftree" % "0.8.0",*/
-		val drosteScalaCheck = "io.higherkindness" %% "droste-scalacheck" % versionOfDroste
 
 	}
 

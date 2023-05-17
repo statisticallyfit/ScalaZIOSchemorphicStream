@@ -41,7 +41,7 @@ object PersonExample extends App {
 	val personSchema: json.Schema[Person] = Json.schema[Person]
 
 
-	println(JsonFormatter.format(AsValue.schema(someArrSchema, json.schema.Version.Draft06(id="some id here"))))
+	println(JsonFormatter.format(AsValue.schema(personSchema, json.schema.Version.Draft06(id="some id here"))))
 
 	/*
 	{

@@ -1,4 +1,3 @@
-[debug] "not up to date. inChanged = true, force = false
+[debug] not up to date. inChanged = true, force = false
 [debug] Updating ProjectRef(uri("file:/development/projects/statisticallyfit/github/learningdataflow/ScalaZIOSchemorphicStream/"), "global")...
 [debug] Done updating ProjectRef(uri("file:/development/projects/statisticallyfit/github/learningdataflow/ScalaZIOSchemorphicStream/"), "global")
-[warn] There may be incompatibilities among your library dependencies; run 'evicted' to see detailed eviction warnings.

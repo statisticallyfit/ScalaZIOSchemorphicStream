@@ -1,4 +1,0 @@
-[0m[[0m[31merror[0m] [0m[0m/development/projects/statisticallyfit/github/learningdataflow/ScalaZIOSchemorphicStream/src/main/scala/AndyGlow_ConvertScalaCaseClassToJsonSchema_Examples/PersonExample.scala:44:46: not found: value someArrSchema[0m
-[0m[[0m[31merror[0m] [0m[0m	println(JsonFormatter.format(AsValue.schema(someArrSchema, json.schema.Version.Draft06(id="some id here"))))[0m
-[0m[[0m[31merror[0m] [0m[0m	                                            ^[0m
-[0m[[0m[31merror[0m] [0m[0mone error found[0m
