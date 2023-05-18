@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="global [file:/development/projects/10_misc/ScalaZIOSchemorphicStream/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
+<module external.linked.project.id="global [file:/development/projects/statisticallyfit/github/learningdataflow/ScalaZIOSchemorphicStream/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
     <output url="file://$MODULE_DIR$/../../target/scala-2.12/classes" />
     <output-test url="file://$MODULE_DIR$/../../target/scala-2.12/test-classes" />
@@ -125,10 +125,14 @@
     <orderEntry type="library" name="sbt: org.typelevel:cats-effect-kernel_2.12:3.4.8:jar" level="project" />
     <orderEntry type="library" name="sbt: org.typelevel:cats-effect-std_2.12:3.4.8:jar" level="project" />
     <orderEntry type="library" name="sbt: org.typelevel:cats-effect_2.12:3.4.8:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:cats-free_2.12:2.7.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:cats-free_2.12:2.9.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.typelevel:cats-kernel-laws_2.12:2.9.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.typelevel:cats-kernel_2.12:2.9.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.typelevel:cats-laws_2.12:2.9.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:cats-macros_2.12:2.1.1:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.typelevel:cats-testkit_2.12:2.9.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.typelevel:discipline-core_2.12:1.5.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.typelevel:jawn-parser_2.12:1.4.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:simulacrum-scalafix-annotations_2.12:0.5.4:jar" level="project" />
     <orderEntry type="library" name="sbt: org.yaml:snakeyaml:1.33:jar" level="project" />
   </component>
 </module>

@@ -19,13 +19,13 @@ lazy val global = project
 		settings,
 		libraryDependencies ++= commonDependencies ++ Seq(
 
-			//allDependencies.scalaLibrary,
-			//allDependencies.scalaCompiler,
-			//allDependencies.scalaReflect,
+			allDependencies.scalaLibrary,
+			allDependencies.scalaCompiler,
+			allDependencies.scalaReflect,
 
 			allDependencies.scalaCheck,
 
-			//allDependencies.specs2Core,
+			allDependencies.specs2Core,
 			allDependencies.specs2ScalaCheck,
 
 			allDependencies.scalaTest,
@@ -36,13 +36,13 @@ lazy val global = project
 			//allDependencies.discipline_specs2,
 
 
-			//allDependencies.cats_core,
-			//allDependencies.cats_kernel,
-			//allDependencies.cats_laws,
-			//allDependencies.cats_free,
-			//allDependencies.cats_macros,
-			//allDependencies.cats_testkit,
-			//allDependencies.cats_effects,
+			allDependencies.cats_core,
+			allDependencies.cats_kernel,
+			allDependencies.cats_laws,
+			allDependencies.cats_free,
+			allDependencies.cats_macros,
+			allDependencies.cats_testkit,
+			allDependencies.cats_effects,
 
 			//allDependencies.kindProjector,
 
@@ -88,7 +88,7 @@ lazy val allDependencies =
 	new {
 
 		// Listing the versions as values
-		val versionOfScala = "2.12.0" //"2.13.10"
+		val versionOfScala = "2.12.17" //"2.13.10" // TODO how to use the `scalaVersion` variable above?
 
 		val versionOfScalaTest = "3.2.15" //"3.3.0-SNAP2"
 
@@ -97,9 +97,9 @@ lazy val allDependencies =
 		val versionOfSpecs2 = "4.19.2" //4.9.4
 
 		//val versionOfDiscipline = "0.11.1"
-		val versionOfDiscipline_core = "1.5.1" //"1.0.2"
-		val versionOfDiscipline_scalatest = "2.2.0" //"1.0.1"
-		val versionOfDiscipline_specs2 = "1.4.0" //"1.1.0"
+		//val versionOfDiscipline_core = "1.5.1" //"1.0.2"
+		//val versionOfDiscipline_scalatest = "2.2.0" //"1.0.1"
+		//val versionOfDiscipline_specs2 = "1.4.0" //"1.1.0"
 
 		//val versionOfSpire = "0.17.0-M1"
 
@@ -109,7 +109,7 @@ lazy val allDependencies =
 		val versionOfCats_effects = "3.4.8"
 		val versionOfCats_macros = "2.1.1"
 
-		//val versionOfKindProjector = "0.13.2"
+		//val versionOfKindProjector = "0.13.2" // TODO how to get back to using it?
 
 		val versionOfZIO = "2.0.13"
 		val versionOfZIO_streams = "2.0.13"
@@ -143,11 +143,13 @@ lazy val allDependencies =
 
 		val specs2Core = "org.specs2" %% "specs2-core" % versionOfSpecs2 % Test
 		val specs2ScalaCheck = "org.specs2" %% "specs2-scalacheck" % versionOfSpecs2 % Test
+		// TODO - difference between specs2-scalacheck and the ordinary scalacheck???
+		
 
 		//val discipline = "org.typelevel" %% "discipline" % versionOfDiscipline
-		val discipline_core = "org.typelevel" %% "discipline-core" % versionOfDiscipline_core
-		val discipline_scalatest = "org.typelevel" %% "discipline-scalatest" % versionOfDiscipline_scalatest % Test
-		val discipline_specs2 = "org.typelevel" %% "discipline-specs2" % versionOfDiscipline_specs2 % Test
+		//val discipline_core = "org.typelevel" %% "discipline-core" % versionOfDiscipline_core
+		//val discipline_scalatest = "org.typelevel" %% "discipline-scalatest" % versionOfDiscipline_scalatest % Test
+		//val discipline_specs2 = "org.typelevel" %% "discipline-specs2" % versionOfDiscipline_specs2 % Test
 
 
 		val cats_core = "org.typelevel" %% "cats-core" % versionOfCats
@@ -268,9 +270,9 @@ lazy val commonSettings = Seq(
 		//"Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
 		Resolver.sonatypeRepo("releases"),
 		Resolver.sonatypeRepo("snapshots"),
-		/*// Resolver for Rainier library
-		Resolver.bintrayRepo("rainier", "maven"),
+		// Resolver for Rainier library
+		//Resolver.bintrayRepo("rainier", "maven"),
 		// Resolver for evilplot (dependency of Rainier)
-		Resolver.bintrayRepo("cibotech", "public")*/
+		//Resolver.bintrayRepo("cibotech", "public")
 	)
 )
