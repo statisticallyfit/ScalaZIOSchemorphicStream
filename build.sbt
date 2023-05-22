@@ -47,6 +47,7 @@ lazy val global = project
 			//allDependencies.kindProjector,
 
 			allDependencies.zioSchema,
+			allDependencies.zioSchemaAvro,
 			allDependencies.zioSchemaJson,
 			allDependencies.zioSchemaProtobuf,
 			allDependencies.zioSchemaDerivation,
@@ -115,7 +116,7 @@ lazy val allDependencies =
 		val versionOfZIO_streams = "2.0.13"
 		val versionOfZIO_test = "2.0.13"
 
-		val versionOfZIO_schema = "0.4.8"
+		val versionOfZIO_schema = "0.4.11" //"0.4.8"
 
 		val versionOfShapeless = "2.3.10"
 
@@ -144,7 +145,7 @@ lazy val allDependencies =
 		val specs2Core = "org.specs2" %% "specs2-core" % versionOfSpecs2 % Test
 		val specs2ScalaCheck = "org.specs2" %% "specs2-scalacheck" % versionOfSpecs2 % Test
 		// TODO - difference between specs2-scalacheck and the ordinary scalacheck???
-		
+
 
 		//val discipline = "org.typelevel" %% "discipline" % versionOfDiscipline
 		//val discipline_core = "org.typelevel" %% "discipline-core" % versionOfDiscipline_core
@@ -175,6 +176,7 @@ lazy val allDependencies =
 		// ZIO-schema
 		val zio = "dev.zio" %% "zio" % versionOfZIO
 		val zioSchema = "dev.zio" %% "zio-schema" % versionOfZIO_schema
+		val zioSchemaAvro = "dev.zio" %% "zio-schema-avro" % versionOfZIO_schema
 		val zioSchemaJson = "dev.zio" %% "zio-schema-json" % versionOfZIO_schema
 		val zioSchemaProtobuf = "dev.zio" %% "zio-schema-protobuf" % versionOfZIO_schema
 		// Required for automatic generic derivation of schemas

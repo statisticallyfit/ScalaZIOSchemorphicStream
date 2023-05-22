@@ -31,9 +31,11 @@ object StringAndArrayExample extends App {
   import scala.language.experimental.macros
 
 
-
-  implicit val strPredef: Predef[String] = Json.auto.derived[String]
+  // TODO HELP why isn't schemea of string / integer recognized?
+  /*implicit val strPredef: Predef[String] = Json.auto.derived[String]
   implicit val strSchema: json.Schema[String] = strPredef.schema
+
+  println(JsonFormatter.format(AsValue.schema(strSchema, json.schema.Version.Draft06(id = "some str id"))))*/
     //.derivePredef[String] //Json.schema[String]//.toDefinition("my-lovely-string")
 
   implicit val someArrSchema: json.Schema[Array[String]] = Json.schema[Array[String]]
@@ -41,7 +43,6 @@ object StringAndArrayExample extends App {
   println(JsonFormatter.format(AsValue.schema(someArrSchema, json.schema.Version.Draft06(id="some id here"))))
 
 
-	// TODO HELP why isn't schemea of string / integer recognized?
 
 
   /*{
