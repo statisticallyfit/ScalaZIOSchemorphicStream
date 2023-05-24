@@ -2,7 +2,7 @@ name := "ScalaZIOSchemorphicStream"
 
 version := "0.1"
 
-scalaVersion := "2.12.17"
+scalaVersion := "2.13.10" //"2.12.17"
 
 
 //addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10")
@@ -89,7 +89,7 @@ lazy val allDependencies =
 	new {
 
 		// Listing the versions as values
-		val versionOfScala = "2.12.17" //"2.13.10" // TODO how to use the `scalaVersion` variable above?
+		val versionOfScala = "2.13.10" //"2.12.17" //"2.13.10" // TODO how to use the `scalaVersion` variable above?
 
 		val versionOfScalaTest = "3.2.15" //"3.3.0-SNAP2"
 

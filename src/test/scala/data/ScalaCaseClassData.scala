@@ -31,16 +31,23 @@ object ScalaCaseClassData {
     case object Female extends Gender
   }
 
+
   case class Company(name: String)
 
   case class Car(name: String, manufacturer: Company)
 
+
+  type FirstName = String
+  type MiddleName = Option[String]
+  type LastName = String
+  type BirthDay = java.time.LocalDateTime
+
   case class Person(
-                     firstName: String,
-                     middleName: Option[String],
-                     lastName: String,
+                     firstName: FirstName,
+                     middleName: MiddleName,
+                     lastName: LastName,
                      gender: Gender,
-                     birthDay: java.time.LocalDateTime,
+                     birthday: BirthDay,
                      company: Company,
                      cars: Seq[Car])
 }

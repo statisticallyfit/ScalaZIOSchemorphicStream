@@ -16,6 +16,8 @@ import zio.schema.codec.{JsonCodec, AvroCodec}
  */
 object EnumSpec extends App {
 
+  // TODO - avrocodec spec "union with nesting"
+
 
   // zio derivations - avro only
   val zioEnumSchema: zio.schema.Schema[Gender] = DeriveSchema.gen[Gender]
