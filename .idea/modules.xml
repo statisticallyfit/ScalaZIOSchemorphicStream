@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ScalaZIOSchemorphicStream.iml" filepath="$PROJECT_DIR$/.idea/modules/ScalaZIOSchemorphicStream.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ScalaZIOSchemorphicStream-build.iml" filepath="$PROJECT_DIR$/.idea/modules/ScalaZIOSchemorphicStream-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SchaemeowMorphism.iml" filepath="$PROJECT_DIR$/.idea/modules/SchaemeowMorphism.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SchaemeowMorphism-build.iml" filepath="$PROJECT_DIR$/.idea/modules/SchaemeowMorphism-build.iml" />
     </modules>
   </component>
 </project>

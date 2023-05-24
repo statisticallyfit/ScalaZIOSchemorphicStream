@@ -1,4 +1,4 @@
-name := "ScalaZIOSchemorphicStream"
+name := "SchaemeowMorphism"
 
 version := "0.1"
 
@@ -15,7 +15,7 @@ scalaVersion := "2.13.10" //"2.12.17"
 lazy val global = project
 	.in(file("."))
 	.settings(
-		name := "ScalaZIOSchemorphicStream",
+		name := "SchaemeowMorphism",
 		settings,
 		libraryDependencies ++= commonDependencies ++ Seq(
 
