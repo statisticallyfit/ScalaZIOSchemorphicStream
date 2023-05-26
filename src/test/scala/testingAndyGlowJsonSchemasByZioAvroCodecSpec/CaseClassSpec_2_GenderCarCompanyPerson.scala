@@ -16,7 +16,9 @@ import zio.{Chunk => ZioChunk}
 import zio.schema.{StandardType => ZioStandardType}
 
 
-
+import util.Util
+import util.UtilSchema
+import scala.reflect.runtime.universe._
 
 /**
  *
@@ -30,17 +32,22 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
   def ZioWay1_Separate = {
 
     // Deriving the zio schemas
-    //implicit val zioGenderSchema_separated: ZioSchema[Gender] = DeriveSchema.gen[Gender]
 
-    //import data.ScalaCaseClassData.Gender._
 
-    implicit val genderSchema: ZioSchema[Gender] = {
+    //val m: ZioSchema[Gender.Male.type] = DeriveSchema.gen[Gender.Male.type]
+    implicit val genderSchema: ZioSchema[Gender] = UtilSchema.makeEnum2[Gender.Male.type, Gender.Female.type, Gender](
+      s1 = DeriveSchema.gen[Gender.Male.type],
+      s2 = DeriveSchema.gen[Gender.Female.type]
+    )
+    // TODO why get error, why cannot have derive schema internally via the type?????
+
+    /*implicit val genderSchema: ZioSchema[Gender] = {
       ZioSchema.Enum2[Gender.Male.type, Gender.Female.type, Gender](
 
         id = TypeId.parse("data.ScalaCaseClassData.Gender"),
 
         case1 = ZioSchema.Case[Gender, Gender.Male.type](
-          id = "Male",
+          id = "Male", //TODO check : Gender.Male.type.toString
           schema = DeriveSchema.gen[Gender.Male.type],
           // Gender => Male.type
           unsafeDeconstruct = (gender: Gender) => gender.asInstanceOf[Gender.Male.type],
@@ -62,7 +69,7 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
         )
       )
 
-    }
+    }*/
 
 
     implicit val companySchema: ZioSchema[Company] = DeriveSchema.gen[Company]
@@ -75,9 +82,6 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
     // Constructing the zioperson schema the manual way since gives error when using the .gen way:
     //val firstNameSchema: ZioSchema[String] = DeriveSchema.gen[FirstName]
 
-
-    implicit def makeZioSchemaSeq[A](implicit schemaA: ZioSchema[A]): ZioSchema[Seq[A]] =
-    ZioSchema.Sequence[Seq[A], A, String](schemaA, _.toSeq, ZioChunk.fromIterable(_), ZioChunk.empty, "Seq")
 
 
       /**
@@ -102,6 +106,8 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
         implicit val birthdaySchema: ZioSchema[BirthDay] = ZioSchema.primitive[BirthDay]
 
 
+
+
         implicit val personSchema: ZioSchema[Person] = ZioSchema.CaseClass7[FirstName, MiddleName, LastName, Gender, BirthDay, Company, Seq[Car], Person](
 
           id0 = TypeId.parse("data.ScalaCaseClassData.Person"),
@@ -114,6 +120,10 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
             //set0: (R, A) => R ----> (Person, FirstName) => Person
             set0 = (person: Person, setFirstName: FirstName) => person.copy(firstName = setFirstName)
           ),
+          /*makeZioField[Person, FirstName](schema = firstNameSchema,
+            getFunc = _.firstName,
+            setFunc = (person: Person, setFirstName: FirstName) => person.copy(firstName = setFirstName)
+          )*/
 
           field02 = ZioSchema.Field.apply[Person, MiddleName]( // [R, A]
             name0 = "middleName",
@@ -160,7 +170,7 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
             name0 = "cars",
             //schema0 = ZioSchema.list(zioCarSchema_separated).toSeq,
             // NOTE: writing  a "Schema.seq" similar to how zio does Schema.list (from Schema.scala, line 302
-            schema0 = makeZioSchemaSeq[Car](carSchema),
+            schema0 = UtilSchema.makeZioSeqSchema[Car](carSchema),
             get0 = (p: Person) => p.cars, // R => A
             set0 = (p: Person, setNewCars: Seq[Car]) => p.copy(cars = setNewCars) // (R, A) => R
           ),
@@ -219,7 +229,12 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
         |
         |""".stripMargin
 
-    println("zio way 1 (separated)")
+    println("ZIO WAY 1 (separated):\n")
+    println(s"genderSchema = $genderSchema")
+    println(s"companySchema = $companySchema")
+    println(s"carSchema = $carSchema")
+    println(s"personSchema = $personSchema")
+    println()
     println(s"zioGenderAvroStr_separated = \n$genderAvro_str")
     println(s"zioCompanyAvroStr_separated = \n$companyAvro_str")
     println(s"zioCarAvroStr_separated = \n$carAvro_str")

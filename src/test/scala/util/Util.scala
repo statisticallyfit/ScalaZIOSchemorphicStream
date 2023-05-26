@@ -2,14 +2,11 @@ package util
 
 
 
-import scala.reflect.{ClassTag, classTag}
-import scala.reflect.runtime.universe._
-
 
 /**
  *
  */
-object Util {
+object Util /*extends App*/ {
 
 	// NOTE: treating as block / pkg name the string of letters separated by the 'separators' = the underscore or dot
 	def extractLongestRunOfLetterOrDot(accChars: List[Char],
@@ -50,6 +47,13 @@ object Util {
 	}
 
 	// ----------------------------------------
+
+
+	import scala.reflect.{ClassTag, classTag}
+	import scala.reflect.runtime.universe._
+
+
+
 	def getPackageName[T: ClassTag]: String ={
 		classTag[T].runtimeClass.getPackage match {
 			case null => ""
@@ -57,10 +61,102 @@ object Util {
 		}
 	}
 
-	def inspect[T: ClassTag: TypeTag]: String =  {
-		typeTag[T].tpe.toString.replace(getPackageName[T], "")
+	/*def getPackageName_noclass[T: TypeTag](isEnumType: Boolean = false): String = {
+		val entireNameInclPckg: Type = typeOf[T] //typeTag[T].tpe.typeSymbol
+		// e.g.
+		// val typ = typeOf[Gender.Male.type ]
+		// >> val typ: reflect.runtime.universe.Type = data.ScalaCaseClassData.Gender.Male.type
+
+		val sym : Symbol = symbolOf[T]
+		// e.g.
+		//scala>           val sym = symbolOf[Gender.Male.type ]
+		//val sym: reflect.runtime.universe.TypeSymbol = object Male
+
+		val simpleTypeName: String = sym.toString.split(' ').last
+		//          scala> val sym = symbolOf[Gender.Male.type ].toString.split(' ').last
+		//val sym: String = Male
+
+		val entireNameInclPckgSplits: Array[String] = entireNameInclPckg.toString.split('.')
+		//          scala> val ts = typ.toString.split('.')
+		//val ts: Array[String] = Array(data, ScalaCaseClassData, Gender, Male, type)
+
+		// Preparing to extract just the package name
+		// If enum type was given, then index is -1 else not
+		val i: Int = isEnumType match {
+			case true => entireNameInclPckgSplits.indexOf(simpleTypeName) - 1
+			case false => entireNameInclPckgSplits.indexOf(simpleTypeName)
+		}
+		// PROP: Example: enum type
+		//scala> val sym = symbolOf[Gender.Male.type ].toString.split(' ').last
+		//val sym: String = Male
+		//scala> val ts = typ.toString.split('.')
+		//val ts: Array[String] = Array(data, ScalaCaseClassData, Gender, Male, type)
+		//scala> val packageNameIndexLast = ts.indexOf(sym) - 1
+		//val packageNameIndexLast: Int = 2
+		// PROP: Example enum (class) type
+		//scala> val sym = symbolOf[CreditCard].toString.split(' ').last
+		//val sym: String = CreditCard
+		// scala> val ts = typeOf[CreditCard].toString.split('.')
+		//val ts: Array[String] = Array(ZioSchemaExamples, Example1_PaymentWireTransfer, Domain, PaymentMethod, CreditCard)
+		//scala> val packageNameIndexLast = ts.indexOf(sym) - 1
+		//val packageNameIndexLast: Int = 3
+
+		// Get package name
+		entireNameInclPckgSplits.take(i).mkString(".")
+
+		// TODO in case of when the object is layered it in yet another object, this method doesn't return the correct package name:
+		//Array(ZioSchemaExamples, Example1_PaymentWireTransfer, Domain, PaymentMethod, CreditCard)
+		// NOTE - for class <CreditCard, the result of this function is:
+		// scala> ts.take(ts.indexOf(sym)-1).mkString(".")
+		//val res21: String = ZioSchemaExamples.Example1_PaymentWireTransfer.Domain
+	}*/
+
+
+	// NOTE: another version of the inspectClass function except can use for type aliases or enum types which are not classes (otherwise compiler complains when using the classTag[] function
+	def inspectType[T: TypeTag]/*(isFromEnum: Boolean = false)*/: String = {
+		/*println(typeTag[T].tpe)
+		println(typeTag[T].tpe.typeSymbol)
+		println(typeTag[T].tpe.typeArgs)
+		println(typeTag[T].tpe.typeParams)
+		println(typeTag[T].tpe.typeConstructor)
+		println()
+		println(typeTag[T].getClass)
+		println(typeTag[T].getClass.getPackage)
+		println(typeTag[T].getClass.getSimpleName)
+		println(typeTag[T].getClass.getName)
+		println()
+		println(typeTag[T].tpe.getClass.getPackage)
+		println(typeTag[T].tpe.getClass)
+		println(typeTag[T].tpe.getClass.getSimpleName)
+		println(typeTag[T].tpe.getClass.getName)
+
+		val res = typeTag[T].tpe.toString
+		/*if (isFromEnum) {
+			return res.split('.').tail.head
+		}*/
+		return res*/
+
+		typeTag[T].tpe.typeSymbol.toString.split(' ').last
+	}
+	/*import data.ScalaCaseClassData._
+	println(inspectType[Gender.Male.type](isFromEnum = true))
+	println("credit card: ")
+	println(inspectType[ZioSchemaExamples.Example1_PaymentWireTransfer.Domain.PaymentMethod.CreditCard]())*/
+
+
+
+	// NOTE: if isFromEnum == true, then the type result usually after this function is something like Gender.Male.type and this function instead cleans this up to be just "Male"
+	def inspectClass[T: ClassTag: TypeTag](isFromEnum: Boolean = false): String =  {
+		val result: String = typeTag[T].tpe.toString.replace(getPackageName[T], "")
+
+		if(isFromEnum){
+			return result.split('.').tail.head
+		}
+		result
 		//.split("\\.").last
 	}
+
+
 
 	def getPackageName_obj[T: ClassTag](obj: T): String ={
 		classTag[T].runtimeClass.getPackage match {
