@@ -2,6 +2,9 @@ package testingAndyGlowJsonSchemasByZioAvroCodecSpec
 
 
 import data.ScalaCaseClassData._
+
+import org.specs2.mutable._
+
 import util.UtilSchema
 
 
@@ -9,9 +12,31 @@ import util.UtilSchema
  *
  */
 
-object PersonType {
+object PersonSchemaPrep {
 
-  object z {
+  object ByAndyGlow {
+
+    object implicits {
+
+      import com.github.andyglow.json.JsonFormatter
+      import com.github.andyglow.jsonschema.AsValue
+      import json.{Json, Schema ⇒ AndyGlowSchema}
+
+      // source = https://github.com/andyglow/scala-jsonschema#regular
+
+      // TODO why say implicit lazy val instead of just val? https://github.com/andyglow/scala-jsonschema#regular
+
+      // Defining the json schemas
+      val genderSchema: AndyGlowSchema[Gender] = Json.schema[Gender]
+
+      val companySchema: AndyGlowSchema[Company] = Json.schema[Company]
+
+      val carSchema: AndyGlowSchema[Car] = Json.schema[Car]
+    }
+  }
+
+
+  object ByZio {
     object implicits {
 
       import zio.schema.{DeriveSchema, TypeId, Schema ⇒ ZioSchema, StandardType ⇒ ZioStandardType}
@@ -21,79 +46,11 @@ object PersonType {
       val middleNameSchema: ZioSchema[MiddleName] = ZioSchema.Optional(ZioSchema.primitive(ZioStandardType.StringType)) // source: line 339 AvroCodecSpec
       val lastNameSchema: ZioSchema[LastName] = ZioSchema.primitive[LastName]
       val birthdaySchema: ZioSchema[BirthDay] = ZioSchema.primitive[BirthDay]
+
+      // TODO figure out if you really need the implicit keyword here
       implicit val genderSchema: ZioSchema[Gender] = DeriveSchema.gen[Gender]
       implicit val companySchema: ZioSchema[Company] = DeriveSchema.gen[Company]
       implicit val carSchema: ZioSchema[Car] = DeriveSchema.gen[Car]
-
-      implicit val personSchema: ZioSchema[Person] = ZioSchema.CaseClass7[FirstName, MiddleName, LastName, Gender, BirthDay, Company, Seq[Car], Person](
-
-        id0 = TypeId.parse("data.ScalaCaseClassData.Person"),
-
-        field01 = ZioSchema.Field.apply[Person, FirstName](
-          name0 = "firstName",
-          schema0 = firstNameSchema,
-          //get0: R => A ---- Person => FirstName
-          get0 = (person: Person) => person.firstName,
-          //set0: (R, A) => R ----> (Person, FirstName) => Person
-          set0 = (person: Person, setFirstName: FirstName) => person.copy(firstName = setFirstName)
-        ),
-        /*makeZioField[Person, FirstName](schema = firstNameSchema,
-          getFunc = _.firstName,
-          setFunc = (person: Person, setFirstName: FirstName) => person.copy(firstName = setFirstName)
-        )*/
-
-        field02 = ZioSchema.Field.apply[Person, MiddleName]( // [R, A]
-          name0 = "middleName",
-          schema0 = middleNameSchema,
-          //get0: R => A
-          get0 = (person: Person) => person.middleName,
-          // set0: (R, A) => R
-          set0 = (person: Person, setMiddleName: MiddleName) => person.copy(middleName = setMiddleName)
-        ),
-
-        field03 = ZioSchema.Field.apply[Person, LastName]( // [R, A]
-          name0 = "lastName",
-          schema0 = lastNameSchema,
-          //get0: R => A
-          get0 = (person: Person) => person.lastName,
-          // set0: (R, A) => R
-          set0 = (person: Person, setLastName: LastName) => person.copy(lastName = setLastName)
-        ),
-
-        field04 = ZioSchema.Field.apply[Person, Gender]( // [R, A]
-          name0 = "gender",
-          schema0 = genderSchema,
-          // get0: R => A
-          get0 = (person: Person) => person.gender,
-          // set0: (R, A) => R
-          set0 = (person: Person, setGender: Gender) => person.copy(gender = setGender)
-        ),
-
-        field05 = ZioSchema.Field.apply[Person, BirthDay]( //[R, A]
-          name0 = "birthday",
-          schema0 = birthdaySchema,
-          get0 = (person: Person) => person.birthday, // R => A
-          set0 = (person: Person, setBirthDay: BirthDay) => person.copy(birthday = setBirthDay) //(R, A) => R
-        ),
-
-        /*field06 = */ ZioSchema.Field.apply[Person, Company]( //[R, A]
-          "company",
-          companySchema,
-          get0 = (p: Person) => p.company, // R => A
-          set0 = (p: Person, setNewCompany: Company) => p.copy(company = setNewCompany) //(R, A) => R
-        ),
-
-        field07 = ZioSchema.Field.apply[Person, Seq[Car]]( //[R, A] so A = Seq[Car]
-          name0 = "cars",
-          //schema0 = ZioSchema.list(zioCarSchema_separated).toSeq,
-          // NOTE: writing  a "Schema.seq" similar to how zio does Schema.list (from Schema.scala, line 302
-          schema0 = UtilSchema.makeZioSeqSchema[Car](carSchema),
-          get0 = (p: Person) => p.cars, // R => A
-          set0 = (p: Person, setNewCars: Seq[Car]) => p.copy(cars = setNewCars) // (R, A) => R
-        ),
-
-        construct0 = (firstName, middleName, lastName, gender, birthday, company, cars) => Person(firstName, middleName, lastName, gender, birthday, company, cars) //(A1, A2, A3, A4, A5, A6, A7) => Z
-      )
 
     }
   }
@@ -101,51 +58,8 @@ object PersonType {
 }
 
 
-object CaseClassSpec_2_GenderCarCompanyPerson extends App {
+class CaseClassSpec_2_GenderCarCompanyPerson extends Specification {
 
-  object ZIOPersonSchemaDependencies {
-
-
-    /*UtilSchema.makeEnum2[Gender.Male.type, Gender.Female.type, Gender](
-      s1 = DeriveSchema.gen[Gender.Male.type],
-      s2 = DeriveSchema.gen[Gender.Female.type]
-    )*/
-    // TODO why get error, why cannot have derive schema internally via the type?????
-
-    /*implicit val genderSchema: ZioSchema[Gender] = {
-      ZioSchema.Enum2[Gender.Male.type, Gender.Female.type, Gender](
-
-        id = TypeId.parse("data.ScalaCaseClassData.Gender"),
-
-        case1 = ZioSchema.Case[Gender, Gender.Male.type](
-          id = "Male", //TODO check : Gender.Male.type.toString
-          schema = DeriveSchema.gen[Gender.Male.type],
-          // Gender => Male.type
-          unsafeDeconstruct = (gender: Gender) => gender.asInstanceOf[Gender.Male.type],
-          // Male.type => Gender
-          construct = (male: Gender.Male.type) => male.asInstanceOf[Gender],
-          // Gender => Boolean
-          isCase = (gender: Gender) => gender.isInstanceOf[Gender.Male.type]
-        ),
-
-        case2 = ZioSchema.Case[Gender, Gender.Female.type](
-          id = "Female",
-          schema = DeriveSchema.gen[Gender.Female.type],
-          // Gender => Female.type
-          unsafeDeconstruct = (gender: Gender) => gender.asInstanceOf[Gender.Female.type],
-          // Female.type => Gender
-          construct = (female: Gender.Female.type) => female.asInstanceOf[Gender],
-          // Gender => Boolean
-          isCase = (gender: Gender) => gender.isInstanceOf[Gender.Female.type]
-        )
-      )
-
-    }*/
-
-    //implicit val zioPersonSchema_separated: ZioSchema[Person] = DeriveSchema.gen[Person]
-
-    // Constructing the zioperson schema the manual way since gives error when using the .gen way:
-    //val firstNameSchema: ZioSchema[String] = DeriveSchema.gen[FirstName]
 
 
     /**
@@ -162,17 +76,17 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
     )
     */
 
-  }
-
 
 
 
   // TESTING -- ZIO way 1 (separated)
 
-  def ZioWay1_Separate = {
+  "Creating Avro string of Person class from separate Zio Schemas"   should {
 
 
-    import PersonType.z.implicits._
+    import PersonSchemaPrep.ByZio.implicits._
+
+    import zio.schema.{DeriveSchema, TypeId, Schema ⇒ ZioSchema, StandardType ⇒ ZioStandardType}
     import zio.schema.codec.AvroCodec
 
     /**
@@ -204,7 +118,75 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
           Field("employees", Schema.list(userAddressSchema), get0 = _.employees, set0 = (p, v) => p.copy(employees = v)),
         construct0 = (boss, employees) => Company(boss, employees)
       )*/
+    implicit val personSchema: ZioSchema[Person] = ZioSchema.CaseClass7[FirstName, MiddleName, LastName, Gender, BirthDay, Company, Seq[Car], Person](
 
+      id0 = TypeId.parse("data.ScalaCaseClassData.Person"),
+
+      field01 = ZioSchema.Field.apply[Person, FirstName](
+        name0 = "firstName",
+        schema0 = firstNameSchema,
+        //get0: R => A ---- Person => FirstName
+        get0 = (person: Person) => person.firstName,
+        //set0: (R, A) => R ----> (Person, FirstName) => Person
+        set0 = (person: Person, setFirstName: FirstName) => person.copy(firstName = setFirstName)
+      ),
+      /*makeZioField[Person, FirstName](schema = firstNameSchema,
+        getFunc = _.firstName,
+        setFunc = (person: Person, setFirstName: FirstName) => person.copy(firstName = setFirstName)
+      )*/
+
+      field02 = ZioSchema.Field.apply[Person, MiddleName]( // [R, A]
+        name0 = "middleName",
+        schema0 = middleNameSchema,
+        //get0: R => A
+        get0 = (person: Person) => person.middleName,
+        // set0: (R, A) => R
+        set0 = (person: Person, setMiddleName: MiddleName) => person.copy(middleName = setMiddleName)
+      ),
+
+      field03 = ZioSchema.Field.apply[Person, LastName]( // [R, A]
+        name0 = "lastName",
+        schema0 = lastNameSchema,
+        //get0: R => A
+        get0 = (person: Person) => person.lastName,
+        // set0: (R, A) => R
+        set0 = (person: Person, setLastName: LastName) => person.copy(lastName = setLastName)
+      ),
+
+      field04 = ZioSchema.Field.apply[Person, Gender]( // [R, A]
+        name0 = "gender",
+        schema0 = genderSchema,
+        // get0: R => A
+        get0 = (person: Person) => person.gender,
+        // set0: (R, A) => R
+        set0 = (person: Person, setGender: Gender) => person.copy(gender = setGender)
+      ),
+
+      field05 = ZioSchema.Field.apply[Person, BirthDay]( //[R, A]
+        name0 = "birthday",
+        schema0 = birthdaySchema,
+        get0 = (person: Person) => person.birthday, // R => A
+        set0 = (person: Person, setBirthDay: BirthDay) => person.copy(birthday = setBirthDay) //(R, A) => R
+      ),
+
+      field06 = ZioSchema.Field.apply[Person, Company]( //[R, A]
+        name0 = "company",
+        schema0 = companySchema,
+        get0 = (p: Person) => p.company, // R => A
+        set0 = (p: Person, setNewCompany: Company) => p.copy(company = setNewCompany) //(R, A) => R
+      ),
+
+      field07 = ZioSchema.Field.apply[Person, Seq[Car]]( //[R, A] so A = Seq[Car]
+        name0 = "cars",
+        //schema0 = ZioSchema.list(zioCarSchema_separated).toSeq,
+        // NOTE: writing  a "Schema.seq" similar to how zio does Schema.list (from Schema.scala, line 302
+        schema0 = UtilSchema.makeZioSeqSchema[Car](carSchema),
+        get0 = (p: Person) => p.cars, // R => A
+        set0 = (p: Person, setNewCars: Seq[Car]) => p.copy(cars = setNewCars) // (R, A) => R
+      ),
+
+      construct0 = (firstName, middleName, lastName, gender, birthday, company, cars) => Person(firstName, middleName, lastName, gender, birthday, company, cars) //(A1, A2, A3, A4, A5, A6, A7) => Z
+    )
 
     // Getting the avro strings
     val genderAvro: Either[String, String] = AvroCodec.encode(genderSchema)
@@ -219,10 +201,85 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
     val personAvro: Either[String, String] = AvroCodec.encode(personSchema)
     val personAvro_str: String = personAvro.right.get
 
-    val expectedAvro_str: String =
+    val expectedPersonAvro_str: String =
       """
-        |
-        |""".stripMargin
+        |{
+        |  "type": "record",
+        |  "name": "Person",
+        |  "fields": [
+        |    {
+        |      "name": "firstName",
+        |      "type": "string"
+        |    },
+        |    {
+        |      "name": "middleName",
+        |      "type": [
+        |        "null",
+        |        "string"
+        |      ]
+        |    },
+        |    {
+        |      "name": "lastName",
+        |      "type": "string"
+        |    },
+        |    {
+        |      "name": "gender",
+        |      "type": [
+        |        {
+        |          "type": "record",
+        |          "name": "Male",
+        |          "fields": []
+        |        },
+        |        {
+        |          "type": "record",
+        |          "name": "Female",
+        |          "fields": []
+        |        }
+        |      ]
+        |    },
+        |    {
+        |      "name": "birthday",
+        |      "type": {
+        |        "type": "string",
+        |        "zio.schema.codec.stringType": "localDateTime"
+        |      }
+        |    },
+        |    {
+        |      "name": "company",
+        |      "type": {
+        |        "type": "record",
+        |        "name": "Company",
+        |        "fields": [
+        |          {
+        |            "name": "name",
+        |            "type": "string"
+        |          }
+        |        ]
+        |      }
+        |    },
+        |    {
+        |      "name": "cars",
+        |      "type": {
+        |        "type": "array",
+        |        "items": {
+        |          "type": "record",
+        |          "name": "Car",
+        |          "fields": [
+        |            {
+        |              "name": "name",
+        |              "type": "string"
+        |            },
+        |            {
+        |              "name": "manufacturer",
+        |              "type": "Company"
+        |            }
+        |          ]
+        |        }
+        |      }
+        |    }
+        |  ]
+        |}
+        |""".stripMargin.trim()
 
     println("ZIO WAY 1 (separated):\n")
     println(s"genderSchema = $genderSchema")
@@ -235,6 +292,13 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
     println(s"zioCarAvroStr_separated = \n$carAvro_str")
     println(s"zioPersonAvroStr_separated = \n$personAvro_str")
     //assert(zioPersonAvroStr_inlined.equals(expectedPersonAvroStr_inlined), "test: zio 1, inlined")
+
+    "Person Avro string generated from Person schema written the manual way should match the expected Person Avro string" in {
+
+      personAvro_str shouldEqual expectedPersonAvro_str
+    }
+
+    // TODO add tests to compare the fields in the strings between avro/json (like where the meta fields differ)
   }
 
 
@@ -266,7 +330,7 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
 
   // TESTING --- Andy glow way 1 (inlined) ------------------------------------------------------------------
 
-  def AndyGlowWay1_Inlined = {
+  "Creating Json string of Person class from inlined Andy Glow Schemas" should {
 
 
     import com.github.andyglow.json.JsonFormatter
@@ -285,107 +349,113 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
     println(s"personSchema = $personSchema")
     println(s"personJson_str = $personJson_str")
 
-    val expectedJson_str: String =
-      """
-        |{
-        |  "$schema": "http://json-schema.org/draft-04/schema#",
-        |  "type": "object",
-        |  "additionalProperties": false,
-        |  "properties": {
-        |    "middleName": {
-        |      "type": "string"
-        |    },
-        |    "cars": {
-        |      "type": "array",
-        |      "items": {
-        |        "type": "object",
-        |        "additionalProperties": false,
-        |        "properties": {
-        |          "name": {
-        |            "type": "string"
-        |          },
-        |          "manufacturer": {
-        |            "type": "object",
-        |            "additionalProperties": false,
-        |            "properties": {
-        |              "name": {
-        |                "type": "string"
-        |              }
-        |            },
-        |            "required": [
-        |              "name"
-        |            ]
-        |          }
-        |        },
-        |        "required": [
-        |          "name",
-        |          "manufacturer"
-        |        ]
-        |      }
-        |    },
-        |    "company": {
-        |      "type": "object",
-        |      "additionalProperties": false,
-        |      "properties": {
-        |        "name": {
-        |          "type": "string"
-        |        }
-        |      },
-        |      "required": [
-        |        "name"
-        |      ]
-        |    },
-        |    "lastName": {
-        |      "type": "string"
-        |    },
-        |    "firstName": {
-        |      "type": "string"
-        |    },
-        |    "birthDay": {
-        |      "type": "string",
-        |      "format": "date-time"
-        |    },
-        |    "gender": {
-        |      "type": "string",
-        |      "enum": [
-        |        "Male",
-        |        "Female"
-        |      ]
-        |    }
-        |  },
-        |  "required": [
-        |    "company",
-        |    "lastName",
-        |    "birthDay",
-        |    "gender",
-        |    "firstName",
-        |    "cars"
-        |  ]
-        |}""".stripMargin.trim()
+
+
+
+    "Person Json string generated from Person schema written the automatic way should match the expected Person Json string" in {
+
+      val expectedPersonJson_str: String =
+        """
+          |{
+          |  "$schema": "http://json-schema.org/draft-04/schema#",
+          |  "type": "object",
+          |  "description": "Source: JsonCodecSpec.scala",
+          |  "additionalProperties": false,
+          |  "properties": {
+          |    "birthday": {
+          |      "type": "string",
+          |      "format": "date-time"
+          |    },
+          |    "middleName": {
+          |      "type": "string"
+          |    },
+          |    "cars": {
+          |      "type": "array",
+          |      "items": {
+          |        "type": "object",
+          |        "additionalProperties": false,
+          |        "properties": {
+          |          "name": {
+          |            "type": "string"
+          |          },
+          |          "manufacturer": {
+          |            "type": "object",
+          |            "additionalProperties": false,
+          |            "properties": {
+          |              "name": {
+          |                "type": "string"
+          |              }
+          |            },
+          |            "required": [
+          |              "name"
+          |            ]
+          |          }
+          |        },
+          |        "required": [
+          |          "name",
+          |          "manufacturer"
+          |        ]
+          |      }
+          |    },
+          |    "firstName": {
+          |      "type": "string"
+          |    },
+          |    "gender": {
+          |      "type": "string",
+          |      "enum": [
+          |        "Male",
+          |        "Female"
+          |      ]
+          |    },
+          |    "company": {
+          |      "type": "object",
+          |      "additionalProperties": false,
+          |      "properties": {
+          |        "name": {
+          |          "type": "string"
+          |        }
+          |      },
+          |      "required": [
+          |        "name"
+          |      ]
+          |    },
+          |    "lastName": {
+          |      "type": "string"
+          |    }
+          |  },
+          |  "required": [
+          |    "company",
+          |    "birthday",
+          |    "lastName",
+          |    "firstName",
+          |    "gender",
+          |    "cars"
+          |  ]
+          |}""".stripMargin.trim()
+
+
+      personJson_str shouldEqual expectedPersonJson_str
+
+    }
   }
 
 
   // TESTING --- Andy glow way 2 (regular way, or the way of separated definitions)
-  def AndyGlowWay2_Separate = {
+  "Creating Json string of Person class from separate Andy Glow Schemas" should {
 
     import com.github.andyglow.json.JsonFormatter
     import com.github.andyglow.jsonschema.AsValue
     import json.{Json, Schema ⇒ AndyGlowSchema}
 
+    import PersonSchemaPrep.ByAndyGlow.implicits._
+
     // source = https://github.com/andyglow/scala-jsonschema#regular
 
-    // TODO why say implicit lazy val instead of just val? https://github.com/andyglow/scala-jsonschema#regular
-
-    // Defining the json schemas
-    val genderSchema: AndyGlowSchema[Gender] = Json.schema[Gender]
-
-    val companySchema: AndyGlowSchema[Company] = Json.schema[Company]
-
-    val carSchema: AndyGlowSchema[Car] = Json.schema[Car]
+    // Step 1: create the person schema, using the implicit declarations (imported)
 
     val personSchema: AndyGlowSchema[Person] = Json.schema[Person]
 
-    // Defining the json strings
+    // Step 2: Defining the json strings for all the schemas
     val genderJson_str: String = JsonFormatter.format(
       AsValue.schema(genderSchema, json.schema.Version.Draft04())
     )
@@ -393,7 +463,7 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
       AsValue.schema(companySchema, json.schema.Version.Draft04())
     )
     val carJson_str: String = JsonFormatter.format(
-      AsValue.schema(personSchema, json.schema.Version.Draft04())
+      AsValue.schema(carSchema, json.schema.Version.Draft04())
     )
     val personJson_str: String = JsonFormatter.format(
       AsValue.schema(personSchema, json.schema.Version.Draft04())
@@ -412,90 +482,92 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
     println(s"personJson_str = $personJson_str")
 
 
-    val expectedJson_str: String =
-      """
-        |{
-        |  "$schema": "http://json-schema.org/draft-04/schema#",
-        |  "type": "object",
-        |  "additionalProperties": false,
-        |  "properties": {
-        |    "middleName": {
-        |      "type": "string"
-        |    },
-        |    "cars": {
-        |      "type": "array",
-        |      "items": {
-        |        "$ref": "#/definitions/com.github.andyglow.jsonschema.ExampleMsg.Car"
-        |      }
-        |    },
-        |    "company": {
-        |      "$ref": "#/definitions/com.github.andyglow.jsonschema.ExampleMsg.Company"
-        |    },
-        |    "lastName": {
-        |      "type": "string"
-        |    },
-        |    "firstName": {
-        |      "type": "string"
-        |    },
-        |    "birthDay": {
-        |      "type": "string",
-        |      "format": "date-time"
-        |    },
-        |    "gender": {
-        |      "$ref": "#/definitions/com.github.andyglow.jsonschema.ExampleMsg.Gender"
-        |    }
-        |  },
-        |  "required": [
-        |    "company",
-        |    "lastName",
-        |    "birthDay",
-        |    "gender",
-        |    "firstName",
-        |    "cars"
-        |  ],
-        |  "definitions": {
-        |    "com.github.andyglow.jsonschema.ExampleMsg.Company": {
-        |      "type": "object",
-        |      "additionalProperties": false,
-        |      "properties": {
-        |        "name": {
-        |          "type": "string"
-        |        }
-        |      },
-        |      "required": [
-        |        "name"
-        |      ]
-        |    },
-        |    "com.github.andyglow.jsonschema.ExampleMsg.Car": {
-        |      "type": "object",
-        |      "additionalProperties": false,
-        |      "properties": {
-        |        "name": {
-        |          "type": "string"
-        |        },
-        |        "manufacturer": {
-        |          "$ref": "#/definitions/com.github.andyglow.jsonschema.ExampleMsg.Company"
-        |        }
-        |      },
-        |      "required": [
-        |        "name",
-        |        "manufacturer"
-        |      ]
-        |    },
-        |    "com.github.andyglow.jsonschema.ExampleMsg.Gender": {
-        |      "type": "string",
-        |      "enum": [
-        |        "Male",
-        |        "Female"
-        |      ]
-        |    }
-        |  }
-        |}""".stripMargin.trim()
+    "Person Json string generated from Person schema written the automatic way should match the expected Person Json string" in {
+
+
+      val expectedPersonJson_str: String =
+        """
+          |{
+          |  "$schema": "http://json-schema.org/draft-04/schema#",
+          |  "type": "object",
+          |  "description": "Source: JsonCodecSpec.scala",
+          |  "additionalProperties": false,
+          |  "properties": {
+          |    "birthday": {
+          |      "type": "string",
+          |      "format": "date-time"
+          |    },
+          |    "middleName": {
+          |      "type": "string"
+          |    },
+          |    "cars": {
+          |      "type": "array",
+          |      "items": {
+          |        "type": "object",
+          |        "additionalProperties": false,
+          |        "properties": {
+          |          "name": {
+          |            "type": "string"
+          |          },
+          |          "manufacturer": {
+          |            "type": "object",
+          |            "additionalProperties": false,
+          |            "properties": {
+          |              "name": {
+          |                "type": "string"
+          |              }
+          |            },
+          |            "required": [
+          |              "name"
+          |            ]
+          |          }
+          |        },
+          |        "required": [
+          |          "name",
+          |          "manufacturer"
+          |        ]
+          |      }
+          |    },
+          |    "firstName": {
+          |      "type": "string"
+          |    },
+          |    "gender": {
+          |      "type": "string",
+          |      "enum": [
+          |        "Male",
+          |        "Female"
+          |      ]
+          |    },
+          |    "company": {
+          |      "type": "object",
+          |      "additionalProperties": false,
+          |      "properties": {
+          |        "name": {
+          |          "type": "string"
+          |        }
+          |      },
+          |      "required": [
+          |        "name"
+          |      ]
+          |    },
+          |    "lastName": {
+          |      "type": "string"
+          |    }
+          |  },
+          |  "required": [
+          |    "company",
+          |    "birthday",
+          |    "lastName",
+          |    "firstName",
+          |    "gender",
+          |    "cars"
+          |  ]
+          |}""".stripMargin.trim()
+
+
+      personJson_str shouldEqual expectedPersonJson_str
+    }
   }
 
 
-  ZioWay1_Separate
-  //ZioWay2_Inlined
-  AndyGlowWay1_Inlined
-  AndyGlowWay2_Separate
 }
