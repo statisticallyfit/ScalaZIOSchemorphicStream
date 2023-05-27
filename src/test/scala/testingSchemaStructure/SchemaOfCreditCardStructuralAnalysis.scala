@@ -3,8 +3,6 @@ package testingSchemaStructure
 
 import org.specs2.mutable.Specification
 
-import util.Util._
-
 /*import scala.reflect.{ClassTag, classTag}
 import scala.reflect.runtime.universe._
 import zio._

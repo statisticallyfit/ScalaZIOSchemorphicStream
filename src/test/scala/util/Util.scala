@@ -46,6 +46,21 @@ object Util /*extends App*/ {
 		replacements
 	}
 
+
+
+	/*
+	 * Replace _root_.java.lang.String.... etc with simple name String
+	 *
+	 * Example:
+	 * input = Right(final case class User(name: _root_.java.lang.String, favorite_number: _root_.scala.Option[_root_.scala.Int], favorite_color: _root_.scala.Option[_root_.java.lang.String]))
+	 * output =
+	 */
+	def cleanScalaTypeNames(str: String): String = {
+		str.replace("_root_.java.lang.", "")
+			.replace("_root_.scala.", "")
+			.replace("_root_.", "")
+	}
+
 	// ----------------------------------------
 
 
