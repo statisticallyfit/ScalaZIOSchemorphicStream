@@ -24,5 +24,6 @@ object ScalaEnumData {
                      gender: Gender,
                      birthDay: java.time.LocalDateTime,
                      company: Company,
-                     cars: Seq[Car])
+                     cars: Seq[Car]
+                   )
 }

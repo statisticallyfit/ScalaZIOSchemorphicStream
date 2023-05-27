@@ -69,6 +69,6 @@ object SharedTestData {
 
     // NOTE: returning an Enum3 (zio) containing the three cases.
 
-    Schema.Enum3(TypeId.Structural, caseA, caseB, caseC/*, Chunk(s)*/)
+    Schema.Enum3(TypeId.Structural, caseA, caseB, caseC /*, Chunk(s)*/)
   }
 }

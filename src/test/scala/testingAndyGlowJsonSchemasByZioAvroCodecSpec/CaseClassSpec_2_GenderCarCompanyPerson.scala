@@ -1,52 +1,43 @@
 package testingAndyGlowJsonSchemasByZioAvroCodecSpec
 
 
-
 import data.ScalaCaseClassData._
 
 import util.{Util, UtilSchema}
-import scala.reflect.runtime.universe._
+
 
 /**
  *
  */
 
+object PersonType {
+  object implicits {
+
+    import zio.schema.{StandardType => ZioStandardType}
+    import zio.schema.{DeriveSchema, TypeId, Schema => ZioSchema}
+
+    val firstNameSchema: ZioSchema[FirstName] = ZioSchema.primitive[FirstName]
+    val middleNameSchema: ZioSchema[MiddleName] = ZioSchema.Optional(ZioSchema.primitive(ZioStandardType.StringType)) // source: line 339 AvroCodecSpec
+    val lastNameSchema: ZioSchema[LastName] = ZioSchema.primitive[LastName]
+    val birthdaySchema: ZioSchema[BirthDay] = ZioSchema.primitive[BirthDay]
+    implicit val genderSchema: ZioSchema[Gender] = DeriveSchema.gen[Gender]
+    implicit val companySchema: ZioSchema[Company] = DeriveSchema.gen[Company]
+    implicit val carSchema: ZioSchema[Car] = DeriveSchema.gen[Car]
+  }
+}
 
 
-
-
-object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
-
-
+object CaseClassSpec_2_GenderCarCompanyPerson extends App {
 
   object ZIOPersonSchemaDependencies {
 
     import zio.schema.{DeriveSchema, TypeId, Schema => ZioSchema}
-    import zio.schema.codec.{AvroCodec, JsonCodec}
-
-    //import zio.schema.Schema.Field
-    import zio.{Chunk => ZioChunk}
-    import zio.schema.{StandardType => ZioStandardType}
 
 
-
-    object PersonSchemaArgs {
-      implicit val firstNameSchema: ZioSchema[FirstName] = ZioSchema.primitive[FirstName]
-      implicit val middleNameSchema: ZioSchema[MiddleName] = ZioSchema.Optional(ZioSchema.primitive(ZioStandardType.StringType)) // source: line 339 AvroCodecSpec
-      implicit val lastNameSchema: ZioSchema[LastName] = ZioSchema.primitive[LastName]
-      implicit val birthdaySchema: ZioSchema[BirthDay] = ZioSchema.primitive[BirthDay]
-    }
-
-
-
-    // Deriving the zio schemas
-
-
-    //val m: ZioSchema[Gender.Male.type] = DeriveSchema.gen[Gender.Male.type]
-    implicit val genderSchema: ZioSchema[Gender] = UtilSchema.makeEnum2[Gender.Male.type, Gender.Female.type, Gender](
+    /*UtilSchema.makeEnum2[Gender.Male.type, Gender.Female.type, Gender](
       s1 = DeriveSchema.gen[Gender.Male.type],
       s2 = DeriveSchema.gen[Gender.Female.type]
-    )
+    )*/
     // TODO why get error, why cannot have derive schema internally via the type?????
 
     /*implicit val genderSchema: ZioSchema[Gender] = {
@@ -79,12 +70,6 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
 
     }*/
 
-
-    implicit val companySchema: ZioSchema[Company] = DeriveSchema.gen[Company]
-
-    implicit val carSchema: ZioSchema[Car] = DeriveSchema.gen[Car]
-
-
     //implicit val zioPersonSchema_separated: ZioSchema[Person] = DeriveSchema.gen[Person]
 
     // Constructing the zioperson schema the manual way since gives error when using the .gen way:
@@ -115,19 +100,12 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
   def ZioWay1_Separate = {
 
 
-    import zio.schema.{DeriveSchema, TypeId, Schema => ZioSchema}
+    import zio.schema.{TypeId, Schema => ZioSchema}
     import zio.schema.codec.{AvroCodec, JsonCodec}
-
-    //import zio.schema.Schema.Field
-    import zio.{Chunk => ZioChunk}
-    import zio.schema.{StandardType => ZioStandardType}
-
-
-
     import ZIOPersonSchemaDependencies._
-    import ZIOPersonSchemaDependencies.PersonSchemaArgs._
+    import PersonType.implicits._
 
-     implicit val personSchema: ZioSchema[Person] = ZioSchema.CaseClass7[FirstName, MiddleName, LastName, Gender, BirthDay, Company, Seq[Car], Person](
+    implicit val personSchema: ZioSchema[Person] = ZioSchema.CaseClass7[FirstName, MiddleName, LastName, Gender, BirthDay, Company, Seq[Car], Person](
 
       id0 = TypeId.parse("data.ScalaCaseClassData.Person"),
 
@@ -178,9 +156,9 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
         set0 = (person: Person, setBirthDay: BirthDay) => person.copy(birthday = setBirthDay) //(R, A) => R
       ),
 
-      field06 = ZioSchema.Field.apply[Person, Company]( //[R, A]
-        name0 = "company",
-        schema0 = companySchema,
+      /*field06 = */ZioSchema.Field.apply[Person, Company]( //[R, A]
+        "company",
+        companySchema,
         get0 = (p: Person) => p.company, // R => A
         set0 = (p: Person, setNewCompany: Company) => p.copy(company = setNewCompany) //(R, A) => R
       ),
@@ -197,36 +175,35 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
       construct0 = (firstName, middleName, lastName, gender, birthday, company, cars) => Person(firstName, middleName, lastName, gender, birthday, company, cars) //(A1, A2, A3, A4, A5, A6, A7) => Z
     )
 
-        /**
-         * NOTE: schemaCustomer has PaymentMethod trait in parameter type list (like person schema has Gender trait in type parameter list)
-         * Source = from zio's Example 1
-         */
-        /*val schemaCustomer: Schema[Customer] = Schema.CaseClass2[Person, PaymentMethod, Customer](
-          TypeId.parse("dev.Zioexample.example1.Domain.Customer"),
-          field01 =
-            Schema.Field[Customer, Person]("person", schemaPerson, get0 = _.person, set0 = (p, v) => p.copy(person = v)),
-          field02 = Schema.Field[Customer, PaymentMethod](
-            "paymentMethod",
-            schemaPaymentMethod,
-            get0 = _.paymentMethod,
-            set0 = (p, v) => p.copy(paymentMethod = v)
-          ),
-          construct0 = (person, paymentMethod) => Customer(person, paymentMethod)
-        )*/
+    /**
+     * NOTE: schemaCustomer has PaymentMethod trait in parameter type list (like person schema has Gender trait in type parameter list)
+     * Source = from zio's Example 1
+     */
+    /*val schemaCustomer: Schema[Customer] = Schema.CaseClass2[Person, PaymentMethod, Customer](
+      TypeId.parse("dev.Zioexample.example1.Domain.Customer"),
+      field01 =
+        Schema.Field[Customer, Person]("person", schemaPerson, get0 = _.person, set0 = (p, v) => p.copy(person = v)),
+      field02 = Schema.Field[Customer, PaymentMethod](
+        "paymentMethod",
+        schemaPaymentMethod,
+        get0 = _.paymentMethod,
+        set0 = (p, v) => p.copy(paymentMethod = v)
+      ),
+      construct0 = (person, paymentMethod) => Customer(person, paymentMethod)
+    )*/
 
-        /**
-         * NOTE; inspiration reason: companySchema has list of user address objects in type parameter list, like person has list of cars in type parameter list.
-         * source: from zio Example 6 Reified Optics
-         */
-        /*implicit val companySchema: CaseClass2[User, List[UserAddress], Company] =
-          Schema.CaseClass2[User, List[UserAddress], Company](
-            TypeId.parse("dev.Zioexample.example6.Domain.Company"),
-            field01 = Field("boss", userSchema, get0 = _.boss, set0 = (p, v) => p.copy(boss = v)),
-            field02 =
-              Field("employees", Schema.list(userAddressSchema), get0 = _.employees, set0 = (p, v) => p.copy(employees = v)),
-            construct0 = (boss, employees) => Company(boss, employees)
-          )*/
-
+    /**
+     * NOTE; inspiration reason: companySchema has list of user address objects in type parameter list, like person has list of cars in type parameter list.
+     * source: from zio Example 6 Reified Optics
+     */
+    /*implicit val companySchema: CaseClass2[User, List[UserAddress], Company] =
+      Schema.CaseClass2[User, List[UserAddress], Company](
+        TypeId.parse("dev.Zioexample.example6.Domain.Company"),
+        field01 = Field("boss", userSchema, get0 = _.boss, set0 = (p, v) => p.copy(boss = v)),
+        field02 =
+          Field("employees", Schema.list(userAddressSchema), get0 = _.employees, set0 = (p, v) => p.copy(employees = v)),
+        construct0 = (boss, employees) => Company(boss, employees)
+      )*/
 
 
     // Getting the avro strings
@@ -287,17 +264,15 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
   }*/
 
 
-
   // TESTING --- Andy glow way 1 (inlined) ------------------------------------------------------------------
 
-  def AndyGlowWay1_Inlined  = {
+  def AndyGlowWay1_Inlined = {
 
 
     import com.github.andyglow.json.JsonFormatter
     import com.github.andyglow.jsonschema.AsValue
     import json._
     import json.{Json, Schema => AndyGlowSchema}
-
 
 
     // source = https://github.com/andyglow/scala-jsonschema#in-lined
@@ -392,7 +367,7 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
 
 
   // TESTING --- Andy glow way 2 (regular way, or the way of separated definitions)
-  def AndyGlowWay2_Separate  = {
+  def AndyGlowWay2_Separate = {
 
     import com.github.andyglow.json.JsonFormatter
     import com.github.andyglow.jsonschema.AsValue
@@ -519,9 +494,6 @@ object CaseClassSpec_2_GenderCarCompanyPerson  extends App {
         |  }
         |}""".stripMargin.trim()
   }
-
-
-
 
 
   ZioWay1_Separate

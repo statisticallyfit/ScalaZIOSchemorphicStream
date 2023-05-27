@@ -49,5 +49,6 @@ object ScalaCaseClassData {
                      gender: Gender,
                      birthday: BirthDay,
                      company: Company,
-                     cars: Seq[Car])
+                     cars: Seq[Car]
+                   )
 }

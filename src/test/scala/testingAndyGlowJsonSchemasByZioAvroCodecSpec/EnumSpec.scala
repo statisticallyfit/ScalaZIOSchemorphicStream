@@ -29,10 +29,9 @@ object EnumSpec extends App {
   val zioEnumAvroStr: String = zioEnumAvro.right.get
 
 
-
   // TODO male comes first in the declaration (data) so why does female come first in the result from zio?
   val expectedAvroStr: String = """[{"type":"record","name":"Female","fields":[]},{"type":"record","name":"Male","fields":[]}]""".stripMargin.trim()
- // """[{"type":"record","name":"Male","fields":[]},{"type":"record","name":"Female","fields":[]}]""" //.stripMargin.trim()
+  // """[{"type":"record","name":"Male","fields":[]},{"type":"record","name":"Female","fields":[]}]""" //.stripMargin.trim()
 
   /*println(s"zioenum avro str\n ${zioEnumAvroStr}")
   println("expected\n" + expectedAvroStr)
@@ -42,8 +41,6 @@ object EnumSpec extends App {
 
   //println(zioEnumAvroStr == expectedAvroStr)
   assert(zioEnumAvroStr.equals(expectedAvroStr))
-
-
 
 
   // Andy glow derivations - json only

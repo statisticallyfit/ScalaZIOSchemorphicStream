@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/10_misc.SchaemeowMorphism.iml" filepath="$PROJECT_DIR$/.idea/modules/10_misc.SchaemeowMorphism.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/SchaemeowMorphism.iml" filepath="$PROJECT_DIR$/.idea/modules/SchaemeowMorphism.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/SchaemeowMorphism-build.iml" filepath="$PROJECT_DIR$/.idea/modules/SchaemeowMorphism-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/project.SchaemeowMorphism-build.iml" filepath="$PROJECT_DIR$/.idea/modules/project.SchaemeowMorphism-build.iml" />
     </modules>
   </component>
 </project>

@@ -1,12 +1,12 @@
 package TEMP_Zio_JsonCodecSpecTryOuts
 
 
-
 import zio.json.{JsonEncoder, EncoderOps}
 import zio.schema.{DeriveSchema, Schema, StandardType}
 import zio.schema.codec.JsonCodec._
 import zio.schema.codec.JsonCodec
 import zio.stream.ZPipeline
+
 
 /**
  *
@@ -30,11 +30,12 @@ object temp_zio_jsoncodecspectryout extends App {
 
   import Domain._
 
+
   // NOTE: Making the schemas
   val schemaPerson: Schema[Person] = DeriveSchema.gen[Person]
 
   val schemaEnum: Schema.Enum3[String, String, String, String] = SharedTestData.makeSchemaEnumSimple
-    //SharedTestData.staticAnnotationToSchemaEnum(JsonAnnotations.name("MyEnum"))
+  //SharedTestData.staticAnnotationToSchemaEnum(JsonAnnotations.name("MyEnum"))
 
   val schemaString: Schema[String] = Schema.Primitive(StandardType.StringType)
   //val schemaString2: Schema[String] = DeriveSchema.gen[String]
