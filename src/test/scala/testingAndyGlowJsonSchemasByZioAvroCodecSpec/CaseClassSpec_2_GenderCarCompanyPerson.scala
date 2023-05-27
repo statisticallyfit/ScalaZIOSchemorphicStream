@@ -2,8 +2,7 @@ package testingAndyGlowJsonSchemasByZioAvroCodecSpec
 
 
 import data.ScalaCaseClassData._
-
-import util.{Util, UtilSchema}
+import util.UtilSchema
 
 
 /**
@@ -11,27 +10,100 @@ import util.{Util, UtilSchema}
  */
 
 object PersonType {
-  object implicits {
 
-    import zio.schema.{StandardType => ZioStandardType}
-    import zio.schema.{DeriveSchema, TypeId, Schema => ZioSchema}
+  object z {
+    object implicits {
 
-    val firstNameSchema: ZioSchema[FirstName] = ZioSchema.primitive[FirstName]
-    val middleNameSchema: ZioSchema[MiddleName] = ZioSchema.Optional(ZioSchema.primitive(ZioStandardType.StringType)) // source: line 339 AvroCodecSpec
-    val lastNameSchema: ZioSchema[LastName] = ZioSchema.primitive[LastName]
-    val birthdaySchema: ZioSchema[BirthDay] = ZioSchema.primitive[BirthDay]
-    implicit val genderSchema: ZioSchema[Gender] = DeriveSchema.gen[Gender]
-    implicit val companySchema: ZioSchema[Company] = DeriveSchema.gen[Company]
-    implicit val carSchema: ZioSchema[Car] = DeriveSchema.gen[Car]
+      import zio.schema.{DeriveSchema, TypeId, Schema ⇒ ZioSchema, StandardType ⇒ ZioStandardType}
+
+
+      val firstNameSchema: ZioSchema[FirstName] = ZioSchema.primitive[FirstName]
+      val middleNameSchema: ZioSchema[MiddleName] = ZioSchema.Optional(ZioSchema.primitive(ZioStandardType.StringType)) // source: line 339 AvroCodecSpec
+      val lastNameSchema: ZioSchema[LastName] = ZioSchema.primitive[LastName]
+      val birthdaySchema: ZioSchema[BirthDay] = ZioSchema.primitive[BirthDay]
+      implicit val genderSchema: ZioSchema[Gender] = DeriveSchema.gen[Gender]
+      implicit val companySchema: ZioSchema[Company] = DeriveSchema.gen[Company]
+      implicit val carSchema: ZioSchema[Car] = DeriveSchema.gen[Car]
+
+      implicit val personSchema: ZioSchema[Person] = ZioSchema.CaseClass7[FirstName, MiddleName, LastName, Gender, BirthDay, Company, Seq[Car], Person](
+
+        id0 = TypeId.parse("data.ScalaCaseClassData.Person"),
+
+        field01 = ZioSchema.Field.apply[Person, FirstName](
+          name0 = "firstName",
+          schema0 = firstNameSchema,
+          //get0: R => A ---- Person => FirstName
+          get0 = (person: Person) => person.firstName,
+          //set0: (R, A) => R ----> (Person, FirstName) => Person
+          set0 = (person: Person, setFirstName: FirstName) => person.copy(firstName = setFirstName)
+        ),
+        /*makeZioField[Person, FirstName](schema = firstNameSchema,
+          getFunc = _.firstName,
+          setFunc = (person: Person, setFirstName: FirstName) => person.copy(firstName = setFirstName)
+        )*/
+
+        field02 = ZioSchema.Field.apply[Person, MiddleName]( // [R, A]
+          name0 = "middleName",
+          schema0 = middleNameSchema,
+          //get0: R => A
+          get0 = (person: Person) => person.middleName,
+          // set0: (R, A) => R
+          set0 = (person: Person, setMiddleName: MiddleName) => person.copy(middleName = setMiddleName)
+        ),
+
+        field03 = ZioSchema.Field.apply[Person, LastName]( // [R, A]
+          name0 = "lastName",
+          schema0 = lastNameSchema,
+          //get0: R => A
+          get0 = (person: Person) => person.lastName,
+          // set0: (R, A) => R
+          set0 = (person: Person, setLastName: LastName) => person.copy(lastName = setLastName)
+        ),
+
+        field04 = ZioSchema.Field.apply[Person, Gender]( // [R, A]
+          name0 = "gender",
+          schema0 = genderSchema,
+          // get0: R => A
+          get0 = (person: Person) => person.gender,
+          // set0: (R, A) => R
+          set0 = (person: Person, setGender: Gender) => person.copy(gender = setGender)
+        ),
+
+        field05 = ZioSchema.Field.apply[Person, BirthDay]( //[R, A]
+          name0 = "birthday",
+          schema0 = birthdaySchema,
+          get0 = (person: Person) => person.birthday, // R => A
+          set0 = (person: Person, setBirthDay: BirthDay) => person.copy(birthday = setBirthDay) //(R, A) => R
+        ),
+
+        /*field06 = */ ZioSchema.Field.apply[Person, Company]( //[R, A]
+          "company",
+          companySchema,
+          get0 = (p: Person) => p.company, // R => A
+          set0 = (p: Person, setNewCompany: Company) => p.copy(company = setNewCompany) //(R, A) => R
+        ),
+
+        field07 = ZioSchema.Field.apply[Person, Seq[Car]]( //[R, A] so A = Seq[Car]
+          name0 = "cars",
+          //schema0 = ZioSchema.list(zioCarSchema_separated).toSeq,
+          // NOTE: writing  a "Schema.seq" similar to how zio does Schema.list (from Schema.scala, line 302
+          schema0 = UtilSchema.makeZioSeqSchema[Car](carSchema),
+          get0 = (p: Person) => p.cars, // R => A
+          set0 = (p: Person, setNewCars: Seq[Car]) => p.copy(cars = setNewCars) // (R, A) => R
+        ),
+
+        construct0 = (firstName, middleName, lastName, gender, birthday, company, cars) => Person(firstName, middleName, lastName, gender, birthday, company, cars) //(A1, A2, A3, A4, A5, A6, A7) => Z
+      )
+
+    }
   }
+
 }
 
 
 object CaseClassSpec_2_GenderCarCompanyPerson extends App {
 
   object ZIOPersonSchemaDependencies {
-
-    import zio.schema.{DeriveSchema, TypeId, Schema => ZioSchema}
 
 
     /*UtilSchema.makeEnum2[Gender.Male.type, Gender.Female.type, Gender](
@@ -100,80 +172,8 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
   def ZioWay1_Separate = {
 
 
-    import zio.schema.{TypeId, Schema => ZioSchema}
-    import zio.schema.codec.{AvroCodec, JsonCodec}
-    import ZIOPersonSchemaDependencies._
-    import PersonType.implicits._
-
-    implicit val personSchema: ZioSchema[Person] = ZioSchema.CaseClass7[FirstName, MiddleName, LastName, Gender, BirthDay, Company, Seq[Car], Person](
-
-      id0 = TypeId.parse("data.ScalaCaseClassData.Person"),
-
-      field01 = ZioSchema.Field.apply[Person, FirstName](
-        name0 = "firstName",
-        schema0 = firstNameSchema,
-        //get0: R => A ---- Person => FirstName
-        get0 = (person: Person) => person.firstName,
-        //set0: (R, A) => R ----> (Person, FirstName) => Person
-        set0 = (person: Person, setFirstName: FirstName) => person.copy(firstName = setFirstName)
-      ),
-      /*makeZioField[Person, FirstName](schema = firstNameSchema,
-        getFunc = _.firstName,
-        setFunc = (person: Person, setFirstName: FirstName) => person.copy(firstName = setFirstName)
-      )*/
-
-      field02 = ZioSchema.Field.apply[Person, MiddleName]( // [R, A]
-        name0 = "middleName",
-        schema0 = middleNameSchema,
-        //get0: R => A
-        get0 = (person: Person) => person.middleName,
-        // set0: (R, A) => R
-        set0 = (person: Person, setMiddleName: MiddleName) => person.copy(middleName = setMiddleName)
-      ),
-
-      field03 = ZioSchema.Field.apply[Person, LastName]( // [R, A]
-        name0 = "lastName",
-        schema0 = lastNameSchema,
-        //get0: R => A
-        get0 = (person: Person) => person.lastName,
-        // set0: (R, A) => R
-        set0 = (person: Person, setLastName: LastName) => person.copy(lastName = setLastName)
-      ),
-
-      field04 = ZioSchema.Field.apply[Person, Gender]( // [R, A]
-        name0 = "gender",
-        schema0 = genderSchema,
-        // get0: R => A
-        get0 = (person: Person) => person.gender,
-        // set0: (R, A) => R
-        set0 = (person: Person, setGender: Gender) => person.copy(gender = setGender)
-      ),
-
-      field05 = ZioSchema.Field.apply[Person, BirthDay]( //[R, A]
-        name0 = "birthday",
-        schema0 = birthdaySchema,
-        get0 = (person: Person) => person.birthday, // R => A
-        set0 = (person: Person, setBirthDay: BirthDay) => person.copy(birthday = setBirthDay) //(R, A) => R
-      ),
-
-      /*field06 = */ZioSchema.Field.apply[Person, Company]( //[R, A]
-        "company",
-        companySchema,
-        get0 = (p: Person) => p.company, // R => A
-        set0 = (p: Person, setNewCompany: Company) => p.copy(company = setNewCompany) //(R, A) => R
-      ),
-
-      field07 = ZioSchema.Field.apply[Person, Seq[Car]]( //[R, A] so A = Seq[Car]
-        name0 = "cars",
-        //schema0 = ZioSchema.list(zioCarSchema_separated).toSeq,
-        // NOTE: writing  a "Schema.seq" similar to how zio does Schema.list (from Schema.scala, line 302
-        schema0 = UtilSchema.makeZioSeqSchema[Car](carSchema),
-        get0 = (p: Person) => p.cars, // R => A
-        set0 = (p: Person, setNewCars: Seq[Car]) => p.copy(cars = setNewCars) // (R, A) => R
-      ),
-
-      construct0 = (firstName, middleName, lastName, gender, birthday, company, cars) => Person(firstName, middleName, lastName, gender, birthday, company, cars) //(A1, A2, A3, A4, A5, A6, A7) => Z
-    )
+    import PersonType.z.implicits._
+    import zio.schema.codec.AvroCodec
 
     /**
      * NOTE: schemaCustomer has PaymentMethod trait in parameter type list (like person schema has Gender trait in type parameter list)
@@ -271,8 +271,7 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
 
     import com.github.andyglow.json.JsonFormatter
     import com.github.andyglow.jsonschema.AsValue
-    import json._
-    import json.{Json, Schema => AndyGlowSchema}
+    import json.{Json, Schema ⇒ AndyGlowSchema}
 
 
     // source = https://github.com/andyglow/scala-jsonschema#in-lined
@@ -371,8 +370,7 @@ object CaseClassSpec_2_GenderCarCompanyPerson extends App {
 
     import com.github.andyglow.json.JsonFormatter
     import com.github.andyglow.jsonschema.AsValue
-    import json._
-    import json.{Json, Schema => AndyGlowSchema}
+    import json.{Json, Schema ⇒ AndyGlowSchema}
 
     // source = https://github.com/andyglow/scala-jsonschema#regular
 
