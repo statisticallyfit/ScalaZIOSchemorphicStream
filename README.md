@@ -1,16 +1,30 @@
 # Roadmap of Tasks
 
-### [1] Compare keywords between Avro and Json schemas
-**Reason:** to understand better how to convert between  `Avro` and `Json` schemas.
-**Description:** Analyze the keywords of both `Avro` and `Json` schemas and compare / contrast them. Must categorize differences in syntax and neutralize them when converting between the schemas.
+
+### [1] Compare the different kinds of implementations for each schema language within all three libraries
+
 **Task component ideas:**
-* (meta-task) compare between json schemas using **Draft06** and **Draft04** etc (source: Andy Glow's `scala-jsonschema` library).
-* (meta-task) make a log of all the keywords in `Avro` string (from `zio-schema`) versus in `Json` string (from Andy Glow's `scala-jsonschema`) (e.g. `name`, `type`, `record`... etc)
-* (meta-task) put `hyp.is` link to `Json` schema keywords (defined in an online tutorial of how to write `Json` schema), in the empty code test of the difference between `Json`/`Avro` schema keywords.
-* (example-task) `middleName` field in `Person` class from Andy Glow library when printed as `Json` string, has type `String` whereas the equivalent `Avro` string has type `null`-or-`string` because its scala type is `Option[String]`.
+* compare `scala-jsonschema`'s `Json` **schema** with `skeuomorph`'s `Json` **schema**.
+* compare `zio` **schema** with `skeuomorph` **schema** (with `scala-json-schema*?).
+* compare `zio`'s `Avro` **schema** with `skeuomorph`'s `Avro` **schema**.
+
+**Reason:** to compare schemas and to compare avro schemas and to compare json schemas across libraries.
 
 
-### [2] Create tests documenting how Andy Glow's `scala-jsonschema` creates schemas for scala types.
+### [2] Compare keywords between Avro and Json schemas
+
+**Reason:** to understand better how to convert/morph between  `Avro` and `Json` schemas.
+
+**Description:** Analyze the syntax of both `Avro` and `Json` schemas and compare / contrast them. Must categorize differences in syntax and bridge them.
+
+**Task component ideas:**
+* `#task` compare json schemas using **Draft06** and **Draft04** etc (source: Andy Glow's `scala-jsonschema` library).
+* `#task` make a log of all the syntax differences in `Avro` (canonically formatted) string (from `zio-schema`) versus in `Json` string (from `scala-jsonschema`) (e.g. `name`, `type`, `record`... etc)
+Put `hyp.is` link to `Json` schema keywords (defined in an online tutorial of how to write `Json` schema), in the empty code test of the difference between `Json`/`Avro` schema keywords.
+* `#task` `middleName` field in `Person` class from Andy Glow library when printed as `Json` string, has type `String` whereas the equivalent `Avro` string has type `null`-or-`string` because its scala type is `Option[String]`.
+
+
+### [3] Create tests documenting how Andy Glow's `scala-jsonschema` creates schemas for scala types.
 **Description:** create tests describing how Andy Glow's library converts scala type into `Json` schemas, using `zio`'s [`AvroCodecSpec`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/test/scala-2/zio/schema/codec/AvroCodecSpec.scala) and [`DeriveSchemaSpec`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-derivation/shared/src/test/scala/zio/schema/DeriveSchemaSpec.scala) as template / inspiration.
 **Reason:** to have a catalog of tests that show how each scala type gets converted differently in `Json` versus `Avro`.
 **Task component ideas:**
@@ -20,16 +34,7 @@
 
 
 
-### [3] Add `Specs2` framework to do the testing
-
-### [4] Compare the different kinds of schemas within all three libraries
-
-**Task component ideas:**
-* compare `zio` **schema** with `skeuomorph` **schema** (with Andy Glow's `scala-json` **schema**?).
-* compare `zio`'s `Avro` **schema** with `skeuomorph`'s `Avro` **schema**.
-* compare Andy Glow's `scala-jsonschema`'s `Json` **schema** with `skeuomorph`'s `Json` **schema**.
-
-**Reason:** to compare schemas and to compare avro schemas and to compare json schemas across libraries.
+### [4] Add `Specs2` framework to do the testing
 
 ### [5] Study `skeuomorph` library in depth:
 **Reasons:**
