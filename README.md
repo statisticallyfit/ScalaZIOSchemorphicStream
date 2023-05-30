@@ -55,17 +55,30 @@
 * scala case class --> json string (andy glow)
 * scala case class --> avro string (zio)
 * avro string <--> json string (skeuomorph??)
+* [json schema (skeuomorph)](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94) <--> json string
+
+NOTE: 
+- S = schema
+- K = skeuomorph 
+- A = avro string
+- Z = zio
+- C = scala case class
+- J = json string
+- I = circe
+- G = Andy Glow
+
 
 ```mermaid
 flowchart TD
-    SK(Skeuomorph's Avro Schema) -->|skeuomorph: toJson| J(Json String)
-    SK(Skeuomorph's Avro Schema) -->|skeuomorph --???| A(Avro String)
-    SA(apache's SchemaAvro) -->|skeuomorph: fromAvro - line 181| SK(Skeuomorph's Avro Schema)
+    SK(Skeuomorph's Avro Schema - AvroF) -->|skeuomorph: toJson| SIJ(io.circe's Json)
+    SIJ(io.circe's Json) -->|skeuomorph: render - line 94| SJ(Skeuomorph's Json Schema - JsonSchemaF)
+    SK(Skeuomorph's Avro Schema - AvroF) -->|skeuomorph --???| A(Avro String)
+    SA(apache's SchemaAvro) -->|skeuomorph: fromAvro - line 181| SK(Skeuomorph's Avro Schema - AvroF)
     SZ(SchemaZIO) -->|zio-schema| SA(apache's SchemaAvro)
     SA(apache's SchemaAvro) -->|zio-schema| A(Avro String)
     SA(apache's SchemaAvro) -->|skeuomorph -- ???| C(Scala Case Class / Type)
     A(Avro String) -->|skeuomorph| C(Scala Case Class / Type)
-    C(Scala Case Class / Type) -->|AndyGlow| SJ(Andy Glow's Json Schema)
-    SJ(Andy Glow's Json Schema) -->|AndyGlow| J(Json String)
+    C(Scala Case Class / Type) -->|AndyGlow| SGJ(Andy Glow's Json Schema)
+    SGJ(Andy Glow's Json Schema) -->|AndyGlow| J(Json String)
 
 ```

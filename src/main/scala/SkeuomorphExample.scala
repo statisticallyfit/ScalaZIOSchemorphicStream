@@ -29,6 +29,7 @@ object SkeuomorphExample extends App {
   import cats.implicits._
   import scala.meta._
 
+  import higherkindness.skeuomorph.avro.AvroF
 
   val definition =
     """
