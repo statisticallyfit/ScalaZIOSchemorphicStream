@@ -100,6 +100,40 @@ class Convert_ApacheAvroSchema_to_SkeuomorphAvroSchema extends Specification wit
       case sch => throw new IllegalArgumentException(s"ApacheAvroSchema ${sch} not handled")
     }
 
+  def getSchema(sch: ApacheAvroSchema): Algebra[SkeuomorphAvroSchema, ApacheAvroSchema] =
+    Algebra { // F[B] --> B === AvroF[Schema] -> Schema
+
+      case SkeuomorphAvroSchema.TNull() => ApacheAvroSchema.create(sch.getType) // sch.getType // should_== ApacheAvroSchema.Type.NULL
+      case SkeuomorphAvroSchema.TBoolean() => ApacheAvroSchema.create(sch.getType)//sch.getType // should_== ApacheAvroSchema.Type.BOOLEAN
+      case SkeuomorphAvroSchema.TInt() => ApacheAvroSchema.create(sch.getType) //should_== ApacheAvroSchema.Type.INT
+      case SkeuomorphAvroSchema.TLong() => ApacheAvroSchema.create(sch.getType)//should_== ApacheAvroSchema.Type.LONG
+      case SkeuomorphAvroSchema.TFloat() => ApacheAvroSchema.create(sch.getType) //should_== ApacheAvroSchema.Type.FLOAT
+      case SkeuomorphAvroSchema.TDouble() => ApacheAvroSchema.create(sch.getType)//should_== ApacheAvroSchema.Type.DOUBLE
+      case SkeuomorphAvroSchema.TBytes() => ApacheAvroSchema.create(sch.getType) //should_== ApacheAvroSchema.Type.BYTES
+      case SkeuomorphAvroSchema.TString() => ApacheAvroSchema.create(sch.getType) //should_== ApacheAvroSchema.Type.STRING
+
+      case SkeuomorphAvroSchema.TNamedType(_, _) => ApacheAvroSchema.create(sch.getType)//false
+      case SkeuomorphAvroSchema.TArray(_) => ApacheAvroSchema.create(sch.getType) //should_== ApacheAvroSchema.Type.ARRAY
+      case SkeuomorphAvroSchema.TMap(_) => ApacheAvroSchema.create(sch.getType) //should_== ApacheAvroSchema.Type.MAP
+      case SkeuomorphAvroSchema.TRecord(name, namespace, _, doc, fields) => ApacheAvroSchema.create(sch.getType)
+        /*(sch.getName should_== name)
+          .and(sch.getNamespace should_== namespace.getOrElse(""))
+          .and(sch.getDoc should_== doc.getOrElse(""))
+          .and(
+            sch.getFields.asScala.toList.map(f => (f.name, f.doc)) should_== fields
+              .map(f => (f.name, f.doc.getOrElse("")))
+          )*/
+
+      case SkeuomorphAvroSchema.TEnum(_, _, _, _, _) => ApacheAvroSchema.create(sch.getType)//true
+      case SkeuomorphAvroSchema.TUnion(_) => ApacheAvroSchema.create(sch.getType)//true
+      case SkeuomorphAvroSchema.TFixed(_, _, _, _) => ApacheAvroSchema.create(sch.getType)//true
+      case sch => throw new IllegalArgumentException(s"ApacheAvroSchema ${sch} not handled")
+    }
+
+  def myConvertSchema: ApacheAvroSchema ⇒ SkeuomorphAvroSchema = (schema: ApacheAvroSchema) ⇒ {
+    scheme.hylo(getSchema(schema), SkeuomorphAvroSchema.fromAvro)
+  }
+
 
   def convertSchema: Prop = {
     Prop.forAll { (schema: ApacheAvroSchema) =>

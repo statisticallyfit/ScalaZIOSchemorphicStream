@@ -25,8 +25,11 @@ Put `hyp.is` link to `Json` schema keywords (defined in an online tutorial of ho
 
 
 ### [3] Create tests documenting how Andy Glow's `scala-jsonschema` creates schemas for scala types.
+
 **Description:** create tests describing how Andy Glow's library converts scala type into `Json` schemas, using `zio`'s [`AvroCodecSpec`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/test/scala-2/zio/schema/codec/AvroCodecSpec.scala) and [`DeriveSchemaSpec`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-derivation/shared/src/test/scala/zio/schema/DeriveSchemaSpec.scala) as template / inspiration.
+
 **Reason:** to have a catalog of tests that show how each scala type gets converted differently in `Json` versus `Avro`.
+
 **Task component ideas:**
 * do tests for `enum` type
 * do tests for `case class` type
