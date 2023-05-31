@@ -24,6 +24,7 @@ lazy val global = project
       allDependencies.scalaReflect,
 
       allDependencies.scalaCheck,
+      allDependencies.scalaCheckCats,
 
       allDependencies.specs2Core,
       allDependencies.specs2ScalaCheck,
@@ -95,6 +96,8 @@ lazy val allDependencies =
 
     val versionOfScalaCheck = "1.17.0"
 
+    val versionOfScalaCheckCats = "0.3.2"
+
     val versionOfSpecs2 = "4.19.2" //4.9.4
 
     //val versionOfDiscipline = "0.11.1"
@@ -140,6 +143,9 @@ lazy val allDependencies =
     val scalaTest = "org.scalatest" %% "scalatest" % versionOfScalaTest % Test
 
     val scalaCheck = "org.scalacheck" %% "scalacheck" % versionOfScalaCheck % Test
+    // https://mvnrepository.com/artifact/io.chrisdavenport/cats-scalacheck
+    val scalaCheckCats = "io.chrisdavenport" %% "cats-scalacheck" % "0.3.2" % Test
+
 
     val specs2Core = "org.specs2" %% "specs2-core" % versionOfSpecs2 % Test
     val specs2ScalaCheck = "org.specs2" %% "specs2-scalacheck" % versionOfSpecs2 % Test

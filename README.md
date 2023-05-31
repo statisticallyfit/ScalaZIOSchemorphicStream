@@ -72,6 +72,21 @@ NOTE:
 - I = circe
 - G = Andy Glow
 
+Representations: 
+- **Json string**
+  - output of: Andy Glow's `scala-jsonschema` library
+  - output of: `skeuomorph` library
+- **Json schema (ADT)** 
+  - Andy Glow's library `scala-jsonschema`
+  - `io.circe` library's `Json`
+  - `skeuomorph` library's `JsonSchemaF`
+- **Avro string**
+  - output of: `zio-schema` library
+  - output of: `skeuomorph` library
+- **Avro schema (ADT)**
+  - `zio-schema` library's `Schema` (TODO check)
+  - `org.apache.avro` library's `Schema` 
+  - `skeuomorph` library's `AvroF` 
 
 ```mermaid
 flowchart TD
