@@ -4,9 +4,10 @@
 ### [1] Compare the different kinds of implementations for each schema language within all three libraries
 
 **Task component ideas:**
-* compare `scala-jsonschema`'s `Json` **schema** with `skeuomorph`'s `Json` **schema**.
-* compare `zio` **schema** with `skeuomorph` **schema** (with `scala-json-schema*?).
-* compare `zio`'s `Avro` **schema** with `skeuomorph`'s `Avro` **schema**.
+* Json: compare `scala-jsonschema`'s `Json` **schema** with `skeuomorph`'s `Json` **schema**.
+* Schema: compare "schema" ADT structures: compare `zio` **schema** (`Schema`) with `skeuomorph` **schema** (`AvroF`) with Wiem El Abadine's **schema** [(`SchemaF`)](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/1-schema.scala#L11-L22).
+* Avro: compare `zio`'s `Avro` **schema** with `skeuomorph`'s `Avro` **schema** with [Wiem El Abadine's `Avro` **schema**](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L92).
+* Protobuf: compare [`skeuomorph`'s `ProtobufF` **schema**](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/protobuf/schema.scala#L61-L93) with [FortySevenDegrees' `ProtobufF` **schema**](https://github.com/statisticallyfit/ScalaCategoryTheory/blob/master/src/main/scala/RecursionSchemeTutorials/FortySevenDegrees/ProtobufDrosteExample/proto/ProtobufF.scala) with [`zio`'s `Protobuf` **schema**](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-protobuf/shared/src/main/scala/zio/schema/codec/ProtobufCodec.scala).
 
 **Reason:** to compare schemas and to compare avro schemas and to compare json schemas across libraries.
 
@@ -24,7 +25,7 @@ Put `hyp.is` link to `Json` schema keywords (defined in an online tutorial of ho
 * `#task` `middleName` field in `Person` class from Andy Glow library when printed as `Json` string, has type `String` whereas the equivalent `Avro` string has type `null`-or-`string` because its scala type is `Option[String]`.
 
 
-### [3] Create tests documenting how Andy Glow's `scala-jsonschema` creates schemas for scala types.
+### [3] Create tests documenting how Andy Glow's `scala-jsonschema` creates ADTs for scala types.
 
 **Description:** create tests describing how Andy Glow's library converts scala type into `Json` schemas, using `zio`'s [`AvroCodecSpec`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/test/scala-2/zio/schema/codec/AvroCodecSpec.scala) and [`DeriveSchemaSpec`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-derivation/shared/src/test/scala/zio/schema/DeriveSchemaSpec.scala) as template / inspiration.
 
@@ -57,6 +58,8 @@ Put `hyp.is` link to `Json` schema keywords (defined in an online tutorial of ho
 * to create seamless conversion between strings, wherever they come from.
 
 **Task component ideas:**
+* [Wiem El Abadine's `SchemaF`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/1-schema.scala#L11-L22) <--> zio's `Schema` <--> Skeuomorph's `AvroF`
+* [zio's `Schema` --> apache's `SchemaAvro`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L49-L212)
 * zio's / apache's SchemaAvro --> Avro String (zio)
 * Avro String --> scala case class (skeuomorph)
 * zio's / apache's SchemaAvro --> skeuomorph's Schema Avro (AvroF) (skeuomorph)
