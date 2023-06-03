@@ -33,6 +33,7 @@ object Compare_SchemaADTs extends App {
       // TODO check how to create simple record (non-named) in apache avro? https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L211-L215
         //import ApacheAvroSchema.{Field ⇒ ApacheField}
       // TODO Help to create apache avro field because it requires a schemaavro as parameter while the skeuo doesn't take schema and passing it in the algebra function is weird (repetitive / cheating)
+      // NOTE look here field2Field = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L44
       /*case SkeuomorphAvroSchema.TRecord(name, namespaceOpt, aliases, docOpt, fields) ⇒ ApacheAvroSchema.createRecord(fields)
 
       val r = new ApacheField()
