@@ -6,32 +6,35 @@
 
 **Task component ideas:**
 
-* Schema (string-schema-language-independent ADT scala structures): compare different libraries' implementations of ADTs to build a **schema**:
+* **Schema (string-schema-language-independent ADT scala structures)**: compare different libraries' implementations of ADTs to build a **schema**:
   * `zio` library: [`Schema[_]`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema/shared/src/main/scala/zio/schema/Schema.scala#L287-L373)
    
-  * Wiem El Abadine library: [`SchemaF`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/1-schema.scala#L11-L22).
+  * **Wiem El Abadine library**: [`SchemaF`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/1-schema.scala#L11-L22).
   
  
-* Json: compare different libraries' implementations of ADTs to build a `Json` **schema**:
+* **Json**: compare different libraries' implementations of ADTs to build a `Json` **schema**:
   * `zio` library:  
-    * [`def jsonEncoder`, `def jsonDecoder`, `def jsonCodec`](https://github.com/statisticallyfit/zio-schema/blob/main/zio-schema-json/shared/src/main/scala/zio/schema/codec/JsonCodec.scala#L90-L97)
-    * [`def primitiveCodec`](https://github.com/statisticallyfit/zio-schema/blob/main/zio-schema-json/shared/src/main/scala/zio/schema/codec/JsonCodec.scala#L115)
-    * `object JsonEncoder`: [`def encode`, `def schemaEncoder`, `def transformEncoder`, `def dynamicEncoder`, `def enumEncoder`, `def recordEncoder`](https://github.com/statisticallyfit/zio-schema/blob/main/zio-schema-json/shared/src/main/scala/zio/schema/codec/JsonCodec.scala#L150-L159)
-    * `object JsonDecoder`: [`def decode`, `def schemaDecoder`, __, `def dynamicDecoder`, `def enumDecoder`, `def recordDecoder`](https://github.com/statisticallyfit/zio-schema/blob/main/zio-schema-json/shared/src/main/scala/zio/schema/codec/JsonCodec.scala#L436-L452)
+    * type-level conversions: 
+      * ???
+    * value-level conversions:
+      * [`def jsonEncoder`, `def jsonDecoder`, `def jsonCodec`](https://github.com/statisticallyfit/zio-schema/blob/main/zio-schema-json/shared/src/main/scala/zio/schema/codec/JsonCodec.scala#L90-L97)
+      * [`def primitiveCodec`](https://github.com/statisticallyfit/zio-schema/blob/main/zio-schema-json/shared/src/main/scala/zio/schema/codec/JsonCodec.scala#L115)
+      * `object JsonEncoder`: [`def encode`, `def schemaEncoder`, `def transformEncoder`, `def dynamicEncoder`, `def enumEncoder`, `def recordEncoder`](https://github.com/statisticallyfit/zio-schema/blob/main/zio-schema-json/shared/src/main/scala/zio/schema/codec/JsonCodec.scala#L150-L159)
+      * `object JsonDecoder`: [`def decode`, `def schemaDecoder`, __, `def dynamicDecoder`, `def enumDecoder`, `def recordDecoder`](https://github.com/statisticallyfit/zio-schema/blob/main/zio-schema-json/shared/src/main/scala/zio/schema/codec/JsonCodec.scala#L436-L452)
     
   * Andy Glow `scala-jsonschema` library: [`Schema`](https://github.com/andyglow/scala-jsonschema#in-lined)
    
   * `skeuomorph` library: [`JsonSchemaF`](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L27).
 
 
-* Avro: compare different libraries' implementations of ADTs to build an `Avro` **schema**:
+* **Avro**: compare different libraries' implementations of ADTs to build an `Avro` **schema**:
   * `zio` library: `Schema[_]`
   * `org.apache.avro` library: `SchemaAvro`
   * `skeuomorph` library: `AvroF` 
   * [Wiem El Abadine's library: `SchemaF[_]`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L92).
 
    
-* Protobuf: compare ...
+* **Protobuf**: compare ...
   * `zio` library: [`ProtobufCodec`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-protobuf/shared/src/main/scala/zio/schema/codec/ProtobufCodec.scala) 
   * `skeuomorph` library: [`ProtobufF`](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/protobuf/schema.scala#L61-L93) 
   * 47degrees blog: [`ProtobufF`](https://github.com/statisticallyfit/ScalaCategoryTheory/blob/master/src/main/scala/RecursionSchemeTutorials/FortySevenDegrees/ProtobufDrosteExample/proto/ProtobufF.scala) 
@@ -59,20 +62,31 @@
 
 
 **LOG OF CONVERSIONS FOUND:**
-* Schema ADT:
-* Avro:
-  * `zio` <--> `org.apache.avro`
+* Schema ADT: -- none, must do myself
+* **Avro**:
+  * `zio` <--> `org.apache.avro` (EXECUTE)
     * [zio's `Schema[_]` --> org.apache.avro's `SchemaAvro`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L33-L34) (function `def encodeToApacheAvro`)
     * [org.apache.avro's `SchemaAvro` to zio's `Schema[_]`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L49-L212) (function `def toZioSchema`)
+  * `zio` <--> `skeuomorph` 
+    * `zio`'s `Schema[_]` --> `skeuomorph`s `AvroF`
+    * `skeuomorph`'s `AvroF` --> `zio`'s `Schema[_]`
+  * `zio` --> `Avro` string
+    * `def encode` --- TODO left off here
   * [Wiem El Abadine's `SchemaF`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/1-schema.scala#L11-L22) <--> zio's `Schema` <--> Skeuomorph's `AvroF`
   * 
-* Json:
-  * `zio` <--> `Json` string
-    * `zio`'s `JsonEncoder` and `JsonDecoder` conversion back and forth to `Json` string: [`def fromJson, def toJson`](https://zio.dev/guides/tutorials/encode-and-decode-json-data/)
-    * [`def fromJson`, `def toJson`](https://github.com/zio/zio-json/blob/c036622e17f50da663c010b13d4f3e5b65dbfb10/zio-json/shared/src/main/scala/zio/json/package.scala#L22-L43)
-    * [`JsonType`](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/main/scala/zio/json/ast/JsonType.scala#L40)
-    * [`Json` ast](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/main/scala/zio/json/ast/ast.scala)
-* Protobuf:
+* **Json**:
+  * `zio` library:
+    * `Schema` <--> `Json` string
+      * `zio`'s `JsonEncoder` and `JsonDecoder` conversion back and forth to `Json` string: [`def fromJson, def toJson`](https://zio.dev/guides/tutorials/encode-and-decode-json-data/)
+      * [`def fromJson`, `def toJson`](https://github.com/zio/zio-json/blob/c036622e17f50da663c010b13d4f3e5b65dbfb10/zio-json/shared/src/main/scala/zio/json/package.scala#L22-L43)
+      * [`JsonType`](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/main/scala/zio/json/ast/JsonType.scala#L40)
+      * [`Json` ast](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/main/scala/zio/json/ast/ast.scala)
+      * 
+  * `skeuomorph` library:
+    * `JsonSchemaF` --> `io.circe.Json` [(`def render: Algebra[JsonSchemaF, Json]`)](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94)
+    * 
+
+* **Protobuf**:
 * 
 * zio's / apache's SchemaAvro --> Avro String (zio)
 * Avro String --> scala case class (skeuomorph)
