@@ -6,13 +6,13 @@
 
 **Task component ideas:**
 
-* **Schema (string-schema-language-independent ADT scala structures)**: compare different libraries' implementations of ADTs to build a **schema**:
+* **Schema (string-schema-language-independent ADT scala structures)**: compare different libraries' implementations of ADTs for **schema**:
   * `zio` library: [`Schema[_]`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema/shared/src/main/scala/zio/schema/Schema.scala#L287-L373)
    
   * **Wiem El Abadine library**: [`SchemaF`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/1-schema.scala#L11-L22).
   
  
-* **Json**: compare different libraries' implementations of ADTs to build a `Json` **schema**:
+* **Json**: compare different libraries' implementations of ADTs for `Json` **schema**:
   * `zio` library:  
     * type-level conversions: 
       * ???
@@ -27,14 +27,14 @@
   * `skeuomorph` library: [`JsonSchemaF`](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L27).
 
 
-* **Avro**: compare different libraries' implementations of ADTs to build an `Avro` **schema**:
+* **Avro**: compare different libraries' implementations of ADTs for `Avro` **schema**:
   * `zio` library: `Schema[_]`
   * `org.apache.avro` library: `SchemaAvro`
   * `skeuomorph` library: `AvroF` 
-  * [Wiem El Abadine's library: `SchemaF[_]`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L92).
+  * Wiem El Abadine's library: [`SchemaF[_]`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L92).
 
    
-* **Protobuf**: compare ...
+* **Protobuf**: compare different libraries' implementations of ADTs for `Protobuf` **schema**:
   * `zio` library: [`ProtobufCodec`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-protobuf/shared/src/main/scala/zio/schema/codec/ProtobufCodec.scala) 
   * `skeuomorph` library: [`ProtobufF`](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/protobuf/schema.scala#L61-L93) 
   * 47degrees blog: [`ProtobufF`](https://github.com/statisticallyfit/ScalaCategoryTheory/blob/master/src/main/scala/RecursionSchemeTutorials/FortySevenDegrees/ProtobufDrosteExample/proto/ProtobufF.scala) 
@@ -58,22 +58,38 @@
 * to create seamless conversion between strings, wherever they come from.
 
 **Task component ideas:**
-* 
+
 
 
 **LOG OF CONVERSIONS FOUND:**
+
 * Schema ADT: -- none, must do myself
+ 
+ 
 * **Avro**:
-  * `zio` <--> `org.apache.avro` (EXECUTE)
-    * [zio's `Schema[_]` --> org.apache.avro's `SchemaAvro`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L33-L34) (function `def encodeToApacheAvro`)
-    * [org.apache.avro's `SchemaAvro` to zio's `Schema[_]`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L49-L212) (function `def toZioSchema`)
-  * `zio` <--> `skeuomorph` 
-    * `zio`'s `Schema[_]` --> `skeuomorph`s `AvroF`
-    * `skeuomorph`'s `AvroF` --> `zio`'s `Schema[_]`
-  * `zio` --> `Avro` string
-    * `def encode` --- TODO left off here
-  * [Wiem El Abadine's `SchemaF`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/1-schema.scala#L11-L22) <--> zio's `Schema` <--> Skeuomorph's `AvroF`
-  * 
+   
+  * **ADT conversions:**
+    * <u>`zio` <--> `org.apache.avro`</u>
+      * <span style="color: green">**# TODO_EXECUTE**</span> `zio`'s `Schema[_]` --> `org.apache.avro`'s `SchemaAvro`: [(function `def encodeToApacheAvro`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L33-L34)
+      * <span style="color: green">**# TODO_EXECUTE**</span> `org.apache.avro`'s `SchemaAvro` --> `zio`'s `Schema[_]`: [(function `def toZioSchema`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L49-L212)
+       
+    * <u>`zio` <--> `skeuomorph`</u> 
+      * <span style="color: red;">**# TODO_NOT_FOUND**</span> `zio`'s `Schema[_]` -->  `skeuomorph`s `AvroF`: _____________________
+      * <span style="color: red;">**# TODO_NOT_FOUND**</span>`skeuomorph`'s `AvroF` --> `zio`'s `Schema[_]`: _____________________
+    
+    * <u>`skeuomorph` <--> `org.apache.avro` </u> 
+      * <span style="color: green">**# TODO_EXECUTE**</span> `org.apache.avro`'s `SchemaAvro` --> `skeuomorph`'s `AvroF`: [(function `def fromAvro: Coalgebra[AvroF, SchemaAvro]`)](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L178-L187)
+      * <span style="color: green">**# TODO_EXECUTE**</span> `skeuomorph`'s `AvroF` --> `org.apache.avro`'s `SchemaAvro`: ________ 
+        * closest find is [function `def checkSchema: Algebra[AvroF, Boolean]` and function `def convertSchema`](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/avro/AvroSchemaSpec.scala#L35-L42)
+       
+  * **String conversions:**
+    * <span style="color: green">**# TODO_EXECUTE**</span> <u>`zio` --> `Avro` string</u>: [(function `def encode`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L30-L31)
+
+    * <u>(`skeuomorph`) Scala case class --> `Avro` string</u>: _______     
+    * <span style="color: green">**# TODO_EXECUTE**</span> <u>(`skeuomorph`) `Avro` string --> Scala case class</u>: [`scheme.hylo`, `fromAvro`, `printSchemaAsScala` example](https://hyp.is/928atAU0Ee6NDuOwQg_iUA/higherkindness.github.io/skeuomorph/docs/)
+     
+    * [Wiem El Abadine's `SchemaF`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/1-schema.scala#L11-L22) <--> zio's `Schema` <--> Skeuomorph's `AvroF`
+    * 
 * **Json**:
   * `zio` library:
     * `Schema` <--> `Json` string

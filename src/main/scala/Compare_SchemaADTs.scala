@@ -79,6 +79,10 @@ object Compare_SchemaADTs extends App {
   val strApache: ApacheAvroSchema = ApacheAvroSchema.create(ApacheAvroSchema.Type.STRING)
   val enumApache: ApacheAvroSchema = ApacheAvroSchema.createEnum("Color", "doc", "namespace", List("red", "yellow", "blue").asJava)
 
+  import matryoshka.patterns.EnvT
+  // TODO left off here check what is EnvT lower https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L94
+
+
   // Apache avro schema
   println(s"apache avro string: $strApache")
   println(s"apache avro enum: $enumApache")

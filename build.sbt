@@ -2,7 +2,7 @@ name := "SchaemeowMorphism"
 
 version := "0.1"
 
-scalaVersion := "2.13.10" //"2.12.17"
+scalaVersion := "2.12.17" //"2.13.10" //"2.12.17"
 
 
 //addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10")
@@ -16,7 +16,7 @@ lazy val global = project
   .in(file("."))
   .settings(
     name := "SchaemeowMorphism",
-    settings,
+    mysettings,
     libraryDependencies ++= commonDependencies ++ Seq(
 
       allDependencies.scalaLibrary,
@@ -45,13 +45,24 @@ lazy val global = project
       allDependencies.cats_testkit,
       allDependencies.cats_effects,
 
+      allDependencies.shapeless,
       //allDependencies.kindProjector,
 
+      allDependencies.zio,
       allDependencies.zioSchema,
       allDependencies.zioSchemaAvro,
       allDependencies.zioSchemaJson,
       allDependencies.zioSchemaProtobuf,
       allDependencies.zioSchemaDerivation,
+      allDependencies.zioStream,
+      allDependencies.zioTest,
+
+      allDependencies.matryoshka,
+
+      allDependencies.drosteCore,
+      allDependencies.drosteLaws,
+      allDependencies.drosteMacros,
+      allDependencies.drosteScalaCheck,
 
       allDependencies.skeuomorph,
 
@@ -90,7 +101,7 @@ lazy val allDependencies =
   new {
 
     // Listing the versions as values
-    val versionOfScala = "2.13.10" //"2.12.17" //"2.13.10" // TODO how to use the `scalaVersion` variable above?
+    val versionOfScala = "2.12.17" //"2.13.10" //"2.12.17" //"2.13.10" // TODO how to use the `scalaVersion` variable above?
 
     val versionOfScalaTest = "3.2.15" //"3.3.0-SNAP2"
 
@@ -247,7 +258,7 @@ lazy val commonDependencies = Seq(
 
 // SETTINGS
 
-lazy val settings =
+lazy val mysettings =
   commonSettings /*++
 		wartremoverSettings ++
 		scalafmtSettings*/
@@ -271,13 +282,13 @@ lazy val compilerOptions = Seq(
 
 lazy val commonSettings = Seq(
   scalacOptions ++= compilerOptions,
-  resolvers ++= Seq(
+  resolvers ++= (Resolver.sonatypeOssRepos("releases") ++ Resolver.sonatypeOssRepos("snapshots"))/*Seq(
     //"Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
-    Resolver.sonatypeRepo("releases"),
-    Resolver.sonatypeRepo("snapshots"),
+    Resolver.sonatypeOssRepos("releases"), //Resolver.sonatypeRepo("releases"),
+    Resolver.sonatypeRepo("snapshots") //Resolver.sonatypeRepo("snapshots"),
     // Resolver for Rainier library
     //Resolver.bintrayRepo("rainier", "maven"),
     // Resolver for evilplot (dependency of Rainier)
     //Resolver.bintrayRepo("cibotech", "public")
-  )
+  )*/
 )
