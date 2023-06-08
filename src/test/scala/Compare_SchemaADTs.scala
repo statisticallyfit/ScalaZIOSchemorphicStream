@@ -1,9 +1,8 @@
-import scala.collection.immutable.ListMap
-import org.apache.avro.{Schema ⇒ ApacheAvroSchema}
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SkeuomorphAvroSchema}
 import higherkindness.droste._
 import higherkindness.droste.data.Fix
 import higherkindness.droste.syntax.all._
+import higherkindness.skeuomorph.avro.{AvroF ⇒ SkeuomorphAvroSchema}
+import org.apache.avro.{Schema ⇒ ApacheAvroSchema}
 
 /*import matryoshka._
 // NOTE: need this to avoid error of "No implicits found for Corecursive[T]" when doing anamorphism
@@ -79,8 +78,20 @@ object Compare_SchemaADTs extends App {
   val strApache: ApacheAvroSchema = ApacheAvroSchema.create(ApacheAvroSchema.Type.STRING)
   val enumApache: ApacheAvroSchema = ApacheAvroSchema.createEnum("Color", "doc", "namespace", List("red", "yellow", "blue").asJava)
 
-  import matryoshka.patterns.EnvT
-  // TODO left off here check what is EnvT lower https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L94
+  //import matryoshka.patterns.EnvT
+  //import matryoshka.patterns.EnvT
+  import matryoshka._
+  import patterns.EnvT
+  type Path = List[String]
+  trait SchemaF[A]
+  type Labelled[A] = EnvT[Path, SchemaF, A]
+
+  def labelledToSchema: Algebra[Labelled, ApacheAvroSchema] = { envT =>
+
+    val path: Seq[String] = envT.ask
+    val low: SchemaF[ApacheAvroSchema] = envT.lower
+  }
+    // TODO left off here check what is EnvT lower https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L94
 
 
   // Apache avro schema
@@ -103,6 +114,15 @@ object Compare_SchemaADTs extends App {
   val enumApacheBack: ApacheAvroSchema = scheme.cata(avroFToApache).apply(enumSkeuo) // assert is equal to enumApache
   println(s"enumApacheBack = $enumApacheBack")
 
+
+  println("\nPrinting apache avro from zio")
+  import zio.schema.DeriveSchema
+  import zio.schema.codec.AvroCodec
+
+
+  val schema = DeriveSchema.gen[SpecTestData.CaseObjectsOnlyAdt]
+  val result = AvroCodec.encode(schema)
+  val adt = AvroCodec.encodeToApacheAvro(schema)
 
   // TODO left off here - plan idea outlined here:
   // 1) start from wiem el abadine's schemaF to learn to print out the schema from schmeaF using hylomorphism (trick: migrate matryoshka to droste) since hylo is different.
