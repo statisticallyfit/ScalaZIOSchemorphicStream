@@ -120,9 +120,10 @@ object Compare_SchemaADTs extends App {
   import zio.schema.codec.AvroCodec
 
 
-  val schema = DeriveSchema.gen[SpecTestData.CaseObjectsOnlyAdt]
+  // TODO left off here - use another case class (fruit banana example)
+  /*val schema = DeriveSchema.gen[SpecTestData.CaseObjectsOnlyAdt]
   val result = AvroCodec.encode(schema)
-  val adt = AvroCodec.encodeToApacheAvro(schema)
+  val adt = AvroCodec.encodeToApacheAvro(schema)*/
 
   // TODO left off here - plan idea outlined here:
   // 1) start from wiem el abadine's schemaF to learn to print out the schema from schmeaF using hylomorphism (trick: migrate matryoshka to droste) since hylo is different.

@@ -7,11 +7,21 @@
 **Task component ideas:**
 
 * **Schema (string-schema-language-independent ADT scala structures)**: compare different libraries' implementations of ADTs for **schema**:
-  * ZIO library: [`Schema[_]`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema/shared/src/main/scala/zio/schema/Schema.scala#L287-L373)
+  * ZIO library: 
+    * [`Schema[_]` trait](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema/shared/src/main/scala/zio/schema/Schema.scala#L375-L454) (has `Field`, `Record`, `Fixed`, etc)
+    * `Schema[_]` construction examples (`CaseClass2`, `Enum`, etc) in [DeriveSchemaSpec.scala](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-derivation/shared/src/test/scala/zio/schema/DeriveSchemaSpec.scala#L300)
    
-  * Wiem El Abadine library: [`SchemaF`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/1-schema.scala#L11-L22).
-  
- 
+  * WIEMAB library: [`SchemaF`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/1-schema.scala#L11-L22).
+
+    
+* **Avro**: compare different libraries' implementations of ADTs for `Avro` **schema**:
+    * :x: ZIO library
+    * APACHE library: `SchemaAvro`
+    * SKEUO library: `AvroF[_]`
+    * :x: WIEMAB's library
+        * NOTE: found that only APACHE and SKEUO contain schema-ADTs for the `Avro` language - the rest have just generic **schema**s.
+
+
 * **Json**: compare different libraries' implementations of ADTs for `Json` **schema**:
   * ZIO library:  
     * type-level conversions: 
@@ -22,98 +32,105 @@
       * `object JsonEncoder`: [`def encode`, `def schemaEncoder`, `def transformEncoder`, `def dynamicEncoder`, `def enumEncoder`, `def recordEncoder`](https://github.com/statisticallyfit/zio-schema/blob/main/zio-schema-json/shared/src/main/scala/zio/schema/codec/JsonCodec.scala#L150-L159)
       * `object JsonDecoder`: [`def decode`, `def schemaDecoder`, __, `def dynamicDecoder`, `def enumDecoder`, `def recordDecoder`](https://github.com/statisticallyfit/zio-schema/blob/main/zio-schema-json/shared/src/main/scala/zio/schema/codec/JsonCodec.scala#L436-L452)
     
-  * Andy Glow `scala-jsonschema` library: [`Schema`](https://github.com/andyglow/scala-jsonschema#in-lined)
+  * ANDY GLOW library: [`json.Schema`](https://github.com/andyglow/scala-jsonschema#in-lined)
    
   * SKEUO library: [`JsonSchemaF`](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L27)
 
-
-* **Avro**: compare different libraries' implementations of ADTs for `Avro` **schema**:
-  * ZIO library: `Schema[_]`
-  * APACHE library: `SchemaAvro`
-  * SKEUO library: `AvroF[_]` 
-  * Wiem El Abadine's library: [`SchemaF[_]`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L92).
 
    
 * **Protobuf**: compare different libraries' implementations of ADTs for `Protobuf` **schema**:
   * ZIO library: [`ProtobufCodec`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-protobuf/shared/src/main/scala/zio/schema/codec/ProtobufCodec.scala) 
   * SKEUO library: [`ProtobufF`](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/protobuf/schema.scala#L61-L93) 
-  * 47degrees blog: [`ProtobufF`](https://github.com/statisticallyfit/ScalaCategoryTheory/blob/master/src/main/scala/RecursionSchemeTutorials/FortySevenDegrees/ProtobufDrosteExample/proto/ProtobufF.scala) 
+  * 47DEG: [`ProtobufF`](https://github.com/statisticallyfit/ScalaCategoryTheory/blob/master/src/main/scala/RecursionSchemeTutorials/FortySevenDegrees/ProtobufDrosteExample/proto/ProtobufF.scala) 
   
 
 
 **LIST OF LIBRARIES USED**:
-- `zio-schema`
-- skeuomorph
-- Andy Glow's `scala-jsonschema`
-- [Wiem el Abadine's matryoshka/schema/avro implementations](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L92)
-- [blog 47degrees' `ProtobufF`](https://github.com/statisticallyfit/ScalaCategoryTheory/blob/master/src/main/scala/RecursionSchemeTutorials/FortySevenDegrees/ProtobufDrosteExample/proto/ProtobufF.scala)
+- `zio-schema` (ZIO)
+- `skeuomorph` (SKEUO)
+- Andy Glow's `scala-jsonschema` (ANDY GLOW)
+- Wiem El Abadine's matryoshka/schema/avro implementations (WIEMAB)
+- blog 47degrees' `ProtobufF` library (47DEG)
 
 
 
 
-### [2] Do round trip conversions
+### [2] Do round trip conversions between schemas and strings (within / between libraries)
 
 **Reasons:**
 * to create seamless conversion between schemas, wherever they come from.
 * to create seamless conversion between strings, wherever they come from.
 
-**Task component ideas:**
+**Task component ideas (brief):**
+- avro <--> avro
+  - adt <--> adt
+  - adt <--> string
+- json <--> json
+  - adt <--> adt
+  - adt <--> string
+- avro <--> json
+  - adt <--> adt
+  - adt <--> string 
+- protobuf <--> protobuf
+  - ...
+- protobuf <--> avro
+  - ...
+- protobuf <--> json
+  - ...
 
 
+**Task component ideas (long, with links):**
 
-**LOG OF CONVERSIONS FOUND:**
-
- 
 * **Avro**:
    
   * **ADT conversions:**
     * <u>ZIO <--> APACHE</u>
-      * :warning: ZIO's `Schema[_]` --> APACHE's `SchemaAvro`: [(function `def encodeToApacheAvro`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L33-L34)
-      * :warning:  APACHE's `SchemaAvro` --> ZIO's `Schema[_]`: [(function `def toZioSchema`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L49-L212)
+      * :large_blue_circle: ZIO's `Schema[_]` --> APACHE's `SchemaAvro`: [(function `def encodeToApacheAvro`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L33-L34)
+      * :large_blue_circle:  APACHE's `SchemaAvro` --> ZIO's `Schema[_]`: [(function `def toZioSchema`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L49-L212)
        
     * <u>ZIO <--> SKEUO</u> 
       * :x: ZIO's `Schema[_]` -->  SKEUOs `AvroF[_]`: _____________________
       * :x: SKEUO's `AvroF[_]` --> ZIO's `Schema[_]`: _____________________
     
     * <u>SKEUO <--> APACHE </u> 
-      * :warning: APACHE's `SchemaAvro` --> SKEUO's `AvroF[_]`: [(function `def fromAvro: Coalgebra[AvroF[_], SchemaAvro]`)](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L178-L187)
-      * :warning: SKEUO's `AvroF[_]` --> APACHE's `SchemaAvro`: ________ 
+      * :large_blue_circle: APACHE's `SchemaAvro` --> SKEUO's `AvroF[_]`: [(function `def fromAvro: Coalgebra[AvroF[_], SchemaAvro]`)](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L178-L187)
+      * :large_blue_circle: SKEUO's `AvroF[_]` --> APACHE's `SchemaAvro`: ________ 
         * closest find is [function `def checkSchema: Algebra[AvroF[_], Boolean]` and function `def convertSchema`](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/avro/AvroSchemaSpec.scala#L35-L42)
          
-    * <u>Wiem El Abadine <--> APACHE</u>
-      * :warning: [Wiem El Abadine's `SchemaF[_]` --> APACHE's `SchemaAvro`]
+    * <u>WIEMAB <--> APACHE</u>
+      * :large_blue_circle: [WIEMAB's `SchemaF[_]` --> APACHE's `SchemaAvro`]
   
         * [using `def labelledToSchema: Algebra[Labelled, SchemaAvro]` (has type `Labelled[SchemaAvro] => SchemaAvro`)](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L92-L111)
         * [using `def schemaFToAvro[T](schemaF: T)(implicit T: Recursive.Aux[T, SchemaF]): SchemaAvro`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L118-L119)
         * [using registry `def toAvro[T](schemaF: T)(implicit T: Recursive.Aux[T, SchemaF]): SchemaAvro`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L182-L183)
        
-      * :warning: APACHE's `SchemaAvro` --> Wiem El Abadine's `SchemaF[_]`: ([function `def avroToSchemaF: CoalgebraM[Option, SchemaF, SchemaAvro]`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L188-L206))
+      * :large_blue_circle: APACHE's `SchemaAvro` --> WIEMAB's `SchemaF[_]`: ([function `def avroToSchemaF: CoalgebraM[Option, SchemaF, SchemaAvro]`](https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L188-L206))
        
-    * <u>Wiem El Abadine <--> ZIO</u>
-      * Wiem El Abadine's `SchemaF[_]` --> ZIO's `Schema[_]
-      * ZIO's `Schema[_] --> Wiem El Abadine's `SchemaF[_]`
+    * <u>WIEMAB <--> ZIO</u>
+      * :large_blue_circle:  WIEMAB's `SchemaF[_]` --> ZIO's `Schema[_]`
+      * ZIO's `Schema[_]` --> WIEMAB's `SchemaF[_]`
        
-    * :x: <u>Wiem El Abadine <--> SKEUO</u>
-        * Wiem El Abadine's `SchemaF[_]` --> SKEUO's `AvroF[_]`
-        * SKEUO's `SchemaF[_]` --> Wiem El Abadine's `SchemaF[_]`
+    * :x: <u>WIEMAB <--> SKEUO</u>
+        * WIEMAB's `SchemaF[_]` --> SKEUO's `AvroF[_]`
+        * SKEUO's `SchemaF[_]` --> WIEMAB's `SchemaF[_]`
        
 
 
   * **String conversions:**
     * <u>Scala case class --> `Avro` string</u>: 
 
-      * :warning: (ZIO) [(function `def encode`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L30-L31)
+      * :large_blue_circle: (ZIO) [(function `def encode`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L30-L31)
 
-      * :warning: (SKEUO)  _______ 
+      * :large_blue_circle: (SKEUO)  _______ 
        
-      * :warning: (Wiem El Abadine)  ______
+      * :large_blue_circle: (WIEMAB)  ______
  
     * <u>`Avro` string --> Scala case class</u>:
       * :x: ~~ZIO~~
        
-      * :warning: (SKEUO)  [`scheme.hylo`, `fromAvro`, `printSchemaAsScala` example](https://hyp.is/928atAU0Ee6NDuOwQg_iUA/higherkindness.github.io/skeuomorph/docs/)
+      * :large_blue_circle: (SKEUO)  [`scheme.hylo`, `fromAvro`, `printSchemaAsScala` example](https://hyp.is/928atAU0Ee6NDuOwQg_iUA/higherkindness.github.io/skeuomorph/docs/)
        
-      * :x: ~~Wiem El Abadine~~
+      * :x: ~~WIEMAB~~
      
     
      
@@ -122,31 +139,42 @@
   * **ADT conversions:**
   * 
     * :x: SKEUO's `JsonSchemaF` <--> ZIO's `Json` schema ADTs.
-      * :x: compare: SKEUO's `JsonEncoder`[file](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonEncoders.scala) | [tests](https://github.com/higherkindness/skeuomorph/tree/main/src/test/scala/higherkindness/skeuomorph/openapi) with ZIO's `JsonEncoder`[file](https://github.com/zio/zio-json/tree/series/2.x/zio-json/shared/src/main/scala/zio/json) | [tests](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/test/scala/zio/json/EncoderSpec.scala)
-      * :x: compare: [SKEUO's `JsonDecoder`](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonDecoders.scala) with [ZIO's `JsonDecoder`](https://github.com/zio/zio-json/tree/series/2.x/zio-json/shared/src/main/scala/zio/json)
+      * :x: compare: SKEUO's `JsonEncoder`[file](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonEncoders.scala) | [tests-NOLINK](https://github.com/higherkindness/skeuomorph/tree/main/src/test/scala/higherkindness/skeuomorph/openapi) with ZIO's `JsonEncoder`[file](https://github.com/zio/zio-json/tree/series/2.x/zio-json/shared/src/main/scala/zio/json) | [tests](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/test/scala/zio/json/EncoderSpec.scala)
+      * :x: compare: SKEUO's `JsonDecoder` [file](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonDecoders.scala) | [tests](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/JsonSchemaDecoderSpecification.scala) with ZIO's `JsonDecoder` [file](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/main/scala/zio/json/JsonDecoder.scala) | [tests](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/test/scala/zio/json/DecoderSpec.scala)
        
-    * :x: SKEUO's `JsonSchemaF` <--> Andy Glow's `scala-jsonschema`
+    * :x: SKEUO's `JsonSchemaF` <--> ANDY GLOW's `json.Schema`
+ 
    
 
   * **String conversions:**
      
     * SKEUO library:
-        * :warning: `JsonSchemaF` --> `io.circe.Json` [(`def render: Algebra[JsonSchemaF, Json]`)](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94)
-         
+        * `JsonSchemaF` <--> `io.circe.Json` 
+          * :large_blue_circle: `JsonSchemaF` --> `io.circle.Json`: [`def render: Algebra[JsonSchemaF, Json]`](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94)
+          * :x: `io.circe.Json` --> `JsonSchemaF`: _____
+
         * (simple types) `JsonSchemaF` <--> `Json` string 
-          * :warning: `JsonSchemaF` --> `Json` string: [print json fixed tests examples](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/JsonSchemaPrintSpecification.scala#L21-L35)
-          * :warning: `Json` string --> `JsonSchemaF` [print json fixed tests examples](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/JsonSchemaDecoderSpecification.scala)
-           
-        * :warning: `Json` string (value-level) --> Scala case class [using Decoder and Encoder](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/OpenApiDecoderSpecification.scala)
+          * :large_blue_circle: `JsonSchemaF` --> `Json` string: [print json fixed tests examples](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/JsonSchemaPrintSpecification.scala#L21-L35)
+          * :large_blue_circle: `Json` string --> `JsonSchemaF` [print json fixed tests examples](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/JsonSchemaDecoderSpecification.scala)
+          
+        * Scala case class / types <--> `Json` string (value-level)
+          * :large_blue_circle: Scala case class / types --> `Json` string 
+            * [using `def toJson`, and `def toJsonAST` in `EncoderSpec.scala`](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/test/scala/zio/json/EncoderSpec.scala)
+             
+          * :large_blue_circle: `Json` string --> Scala case class / types 
+            * [using Decoder and Encoder](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/OpenApiDecoderSpecification.scala)
+          
+            * [using `def fromJson` in ``DecoderSpec.scala`](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/test/scala/zio/json/CodecSpec.scala)
+            * [using `def fromJson` in `CodecSpec.scala` file](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/test/scala/zio/json/CodecSpec.scala)
          
         * :question: [nested objects](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/NestedObjectSpecification.scala)
      
-    * Andy Glow `scala-jsonschema` library: 
-      * :warning: [`json.Schema[_]` --> `Json` string](https://github.com/andyglow/scala-jsonschema#in-lined)
+    * ANDY GLOW library: 
+      * :large_blue_circle: [`json.Schema[_]` --> `Json` string](https://github.com/andyglow/scala-jsonschema#in-lined)
     
     * ZIO library:
         * :x: <u>ZIO `Json` schema ADT <--> `Json` string: </u>
-          * ZIO's `JsonEncoder` and `JsonDecoder` conversion back and forth to `Json` string: [`def fromJson, def toJson`](https://zio.dev/guides/tutorials/encode-and-decode-json-data/)
+          * ZIO's **tutorial guide** of `JsonEncoder` / `JsonDecoder` conversion <-->> `Json` string: [using functions `def fromJson, def toJson`](https://zio.dev/guides/tutorials/encode-and-decode-json-data/)
           * [`def fromJson`, `def toJson`](https://github.com/zio/zio-json/blob/c036622e17f50da663c010b13d4f3e5b65dbfb10/zio-json/shared/src/main/scala/zio/json/package.scala#L22-L43)
           * [`JsonType`](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/main/scala/zio/json/ast/JsonType.scala#L40)
           * [`Json` ast](https://github.com/zio/zio-json/blob/series/2.x/zio-json/shared/src/main/scala/zio/json/ast/ast.scala)
@@ -192,7 +220,7 @@ Representations:
     - :heavy_check_mark: `zio-schema` library's `Schema[_]` 
     - :heavy_check_mark: APACHE library's `SchemaAvro`
     - :heavy_check_mark: SKEUO library's `AvroF[_]`
-    - :heavy_check_mark: Wiem El Abadine library's `SchemaF[_]`
+    - :heavy_check_mark: WIEMAB library's `SchemaF[_]`
 - **Protobuf string**:
   - :question: `zio-schema` library 
 - **Protobuf schema (ADT)**
@@ -202,8 +230,8 @@ Representations:
 flowchart TD
     SK(SKEUO's Avro Schema: AvroF) -->|SKEUO: toJson| SIJ(io.circe's Json)
     SIJ(io.circe's Json) -->|SKEUO: render - line 94| SJ(SKEUO's Json Schema - JsonSchemaF)
-    SK(Skeuomorph's Avro Schema: AvroF) -->|SKEUO --???| A(Avro String)
-    SA(APACHE's SchemaAvro) -->|SKEUO: fromAvro - line 181| SK(Skeuomorph's Avro Schema: AvroF)
+    SK(SKEUO's Avro Schema: AvroF) -->|SKEUO --???| A(Avro String)
+    SA(APACHE's SchemaAvro) -->|SKEUO: fromAvro - line 181| SK(SKEUO's Avro Schema: AvroF)
     SZ(SchemaZIO) -->|ZIO| SA(APACHE's SchemaAvro)
     SA(APACHE's SchemaAvro) -->|ZIO| A(Avro String)
     SA(APACHE's SchemaAvro) -->|SKEUO -- ???| C(Scala Case Class / Type)
@@ -257,7 +285,7 @@ Put `hyp.is` link to `Json` schema keywords (defined in an online tutorial of ho
 #### [TASK: 4b] Create tests documenting conversion of `Json` schema-ADT into `Json` string. 
 
 * [SKEUO: `JsonSchemaF` --> `Json` string](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94-L127)
-* [Andy Glow's `scala-jsonschema`: `Schema` -->  `Json` string](https://github.com/andyglow/scala-jsonschema#in-lined)
+* [ANDY GLOW: `Schema` -->  `Json` string](https://github.com/andyglow/scala-jsonschema#in-lined)
 
 
 #### [TASK: 4c] Create tests documenting conversion of `Protobuf` schema-ADT into `Protobuf` string.
