@@ -1,4 +1,4 @@
-package data
+package testData
 
 import zio.schema.{DeriveSchema, Schema}
 import zio.schema.annotation.noDiscriminator
@@ -51,4 +51,19 @@ object ScalaCaseClassData {
                      company: Company,
                      cars: Seq[Car]
                    )
+
+
+
+
+
+  // -----------------------------------------------------------------
+
+  case class Basket[T](item: T)
+
+  abstract class Fruit
+  abstract class Citrus extends Fruit
+  case class Apple() extends Fruit
+  case class Banana() extends Fruit
+  case class Tangelo() extends Citrus
+  case class Grapefruit() extends Citrus
 }

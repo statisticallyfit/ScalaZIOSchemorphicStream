@@ -5,7 +5,7 @@ import com.github.andyglow.json.JsonFormatter
 import com.github.andyglow.jsonschema.AsValue
 import json.{Json, Schema}
 
-import data.ScalaCaseClassData._
+import testData.ScalaCaseClassData._
 
 import zio.json.JsonEncoder
 import zio.schema.DeriveSchema

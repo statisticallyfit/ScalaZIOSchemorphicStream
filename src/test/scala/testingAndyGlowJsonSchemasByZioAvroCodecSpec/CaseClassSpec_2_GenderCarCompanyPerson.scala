@@ -1,7 +1,7 @@
 package testingAndyGlowJsonSchemasByZioAvroCodecSpec
 
 
-import data.ScalaCaseClassData._
+import testData.ScalaCaseClassData._
 
 import org.specs2.mutable._
 

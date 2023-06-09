@@ -78,21 +78,6 @@ object Compare_SchemaADTs extends App {
   val strApache: ApacheAvroSchema = ApacheAvroSchema.create(ApacheAvroSchema.Type.STRING)
   val enumApache: ApacheAvroSchema = ApacheAvroSchema.createEnum("Color", "doc", "namespace", List("red", "yellow", "blue").asJava)
 
-  //import matryoshka.patterns.EnvT
-  //import matryoshka.patterns.EnvT
-  import matryoshka._
-  import patterns.EnvT
-  type Path = List[String]
-  trait SchemaF[A]
-  type Labelled[A] = EnvT[Path, SchemaF, A]
-
-  def labelledToSchema: Algebra[Labelled, ApacheAvroSchema] = { envT =>
-
-    val path: Seq[String] = envT.ask
-    val low: SchemaF[ApacheAvroSchema] = envT.lower
-  }
-    // TODO left off here check what is EnvT lower https://github.com/wi101/recursion-schemes-lc2018/blob/master/src/main/scala/solutions/2-avro.scala#L94
-
 
   // Apache avro schema
   println(s"apache avro string: $strApache")
@@ -115,15 +100,26 @@ object Compare_SchemaADTs extends App {
   println(s"enumApacheBack = $enumApacheBack")
 
 
-  println("\nPrinting apache avro from zio")
+  // --------------------------------------------------------------------------------------------------------------------------------
+
+  println("\n----------------------------------------------------------------")
+  println("Printing : scala case class --> zio schema --> apache avro string ")
   import zio.schema.DeriveSchema
+  import zio.schema.{Schema ⇒ ZioSchema}
   import zio.schema.codec.AvroCodec
+  import testData.ScalaCaseClassData._
+
 
 
   // TODO left off here - use another case class (fruit banana example)
-  /*val schema = DeriveSchema.gen[SpecTestData.CaseObjectsOnlyAdt]
-  val result = AvroCodec.encode(schema)
-  val adt = AvroCodec.encodeToApacheAvro(schema)*/
+  val schema: ZioSchema[Tangelo] = DeriveSchema.gen[Tangelo]
+  val adt: Either[String, ApacheAvroSchema] = AvroCodec.encodeToApacheAvro(schema)
+  val result: Either[String, String] = AvroCodec.encode(schema)
+
+  println(s"zioschema tangelo = $schema")
+  println(s"avro adt tangelo (apache) = $adt")
+  println(s"avro string tangelo = $result")
+
 
   // TODO left off here - plan idea outlined here:
   // 1) start from wiem el abadine's schemaF to learn to print out the schema from schmeaF using hylomorphism (trick: migrate matryoshka to droste) since hylo is different.

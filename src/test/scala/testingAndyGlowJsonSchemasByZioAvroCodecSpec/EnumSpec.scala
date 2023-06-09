@@ -4,7 +4,7 @@ import com.github.andyglow.json.JsonFormatter
 import com.github.andyglow.jsonschema.AsValue
 import json.{Json, Schema}
 
-import data.ScalaEnumData._
+import testData.ScalaEnumData._
 
 import zio.json.JsonEncoder
 import zio.schema.DeriveSchema
