@@ -32,7 +32,7 @@ object Compare_SchemaADTs extends App {
 
 
   def avroFToApache: Algebra[SchemaSkeuoAvro, SchemaApacheAvro] =
-    Algebra {
+    Algebra { // Algebra[Skeuo, Apache] --------->  Skeuo[Apache] => Apache
       case SchemaSkeuoAvro.TNull() => SchemaApacheAvro.create(SchemaApacheAvro.Type.NULL)
       case SchemaSkeuoAvro.TBoolean() => SchemaApacheAvro.create(SchemaApacheAvro.Type.BOOLEAN)
       case SchemaSkeuoAvro.TInt() => SchemaApacheAvro.create(SchemaApacheAvro.Type.INT)
@@ -41,6 +41,42 @@ object Compare_SchemaADTs extends App {
       case SchemaSkeuoAvro.TDouble() => SchemaApacheAvro.create(SchemaApacheAvro.Type.DOUBLE)
       case SchemaSkeuoAvro.TBytes() =>  SchemaApacheAvro.create(SchemaApacheAvro.Type.BYTES)
       case SchemaSkeuoAvro.TString() => SchemaApacheAvro.create(SchemaApacheAvro.Type.STRING)
+      //SchemaApacheAvro.createArray(apacheSchema.getElementType)
+      // TODO figure out why inner part is INT and not array because it is supposed to be array since it is the schema inside.
+      // NOTE: see here `toJson` seems like inner part is INT = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L249
+      case SchemaSkeuoAvro.TArray(apacheSchema: SchemaApacheAvro) ⇒ {
+        println("Inside avroFToApache ARRAY converter: ")
+        println(s"apacheSchema = $apacheSchema")
+        println(s"apacheSchema.getType = ${apacheSchema.getType}")
+        SchemaApacheAvro.createArray(apacheSchema)
+      }
+      /*apacheSchema.getType match {
+        case n @ SchemaApacheAvro.Type.NULL ⇒ SchemaApacheAvro.createArray(SchemaApacheAvro.create(n))
+        case b @ SchemaApacheAvro.Type.BOOLEAN ⇒ SchemaApacheAvro.createArray(SchemaApacheAvro.create(b))
+        case i @ SchemaApacheAvro.Type.INT ⇒ {
+          println(s"apacheSchema = $apacheSchema")
+          SchemaApacheAvro.createArray(SchemaApacheAvro.create(i))
+        }
+        case l @ SchemaApacheAvro.Type.LONG ⇒ SchemaApacheAvro.createArray(SchemaApacheAvro.create(l))
+        case f @ SchemaApacheAvro.Type.FLOAT ⇒ SchemaApacheAvro.createArray(SchemaApacheAvro.create(f))
+        case d @ SchemaApacheAvro.Type.DOUBLE ⇒ SchemaApacheAvro.createArray(SchemaApacheAvro.create(d))
+        case by @ SchemaApacheAvro.Type.BYTES ⇒ SchemaApacheAvro.createArray(SchemaApacheAvro.create(by))
+        case s @ SchemaApacheAvro.Type.STRING ⇒ SchemaApacheAvro.createArray(SchemaApacheAvro.create(s))
+        case SchemaApacheAvro.Type.MAP ⇒ SchemaApacheAvro.createArray(SchemaApacheAvro.createMap(apacheSchema.getValueType))
+        case SchemaApacheAvro.Type.ARRAY ⇒ SchemaApacheAvro.createArray(SchemaApacheAvro.createArray(apacheSchema.getElementType))
+        case SchemaApacheAvro.Type.RECORD ⇒ {
+          val a: SchemaApacheAvro = apacheSchema
+          /*val res: SchemaApacheAvro = SchemaApacheAvro.createArray(SchemaApacheAvro.createRecord(a.getName, a.getDoc, a.getNamespace, a.isError, a.getFields))*/
+          val res2 = SchemaApacheAvro.createArray(a)
+          res2
+        } //createRecord(String name, String doc, String namespace, boolean isError, List<Field> fields)
+        case SchemaApacheAvro.Type.ENUM ⇒ {
+          val a = apacheSchema
+          //val ea: SchemaApacheAvro = apacheSchema.asInstanceOf[SchemaApacheAvro.Type.ENUM]
+          SchemaApacheAvro.createArray(SchemaApacheAvro.createEnum(a.getName, a.getDoc, a.getNamespace, a.getEnumSymbols))
+        }
+          //createEnum(String name, String doc, String namespace, List<String> values)
+      }*/
 
       // TODO check how to create simple record (non-named) in apache avro? https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L211-L215
       //import SchemaApacheAvro.{Field ⇒ ApacheField}
@@ -119,7 +155,9 @@ object Compare_SchemaADTs extends App {
 
   import testUtil.utilZio.ApacheToZioFunctions._
   val arrayZio: Either[String, Any] = apacheAvroSchemaToZioSchema(arrayApache)
+  val arrayZio2: Either[String, ZioSchema[_]] = AvroCodec.decodeFromApacheAvro(arrayApache)
   println(s"(ARRAY ZIO-ADT): zio avro array = $arrayZio")
+  println(s"(ARRAY ZIO-ADT): zio avro array = $arrayZio2")
 
 
   val enumSkeuo: Fix[SchemaSkeuoAvro] = scheme.ana(SchemaSkeuoAvro.fromAvro).apply(enumApache)
@@ -127,10 +165,12 @@ object Compare_SchemaADTs extends App {
   println(s"skeuo avro enum unfix: ${enumSkeuo.unfix}")
 
   // inverse:
+  val schemeCata: Fix[SchemaSkeuoAvro] ⇒ SchemaApacheAvro = scheme.cata(avroFToApache)
+
   val strApacheBack: SchemaApacheAvro = scheme.cata(avroFToApache).apply(strSkeuo)
   println(s"strApacheBack = $strApacheBack ")
-  /*val arrayApacheBack: SchemaApacheAvro = scheme.cata(avroFToApache).apply(arraySkeuo)
-  println(s"arrayApacheBack = $arrayApacheBack")*/
+  val arrayApacheBack: SchemaApacheAvro = scheme.cata(avroFToApache).apply(arraySkeuo)
+  println(s"arrayApacheBack = $arrayApacheBack")
   val enumApacheBack: SchemaApacheAvro = scheme.cata(avroFToApache).apply(enumSkeuo) // assert is equal to enumApache
   println(s"enumApacheBack = $enumApacheBack")
 
