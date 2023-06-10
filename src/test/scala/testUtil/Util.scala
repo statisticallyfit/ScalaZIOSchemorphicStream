@@ -1,4 +1,4 @@
-package util
+package testUtil
 
 
 /**
@@ -23,6 +23,8 @@ object Util /*extends App*/ {
     }
   }
 
+  //TODO put tests
+  //TODO write purpose
   def extractContinue(accRuns: List[String], traversalList: List[Char]): List[String] = {
     if (traversalList.isEmpty) return accRuns
 

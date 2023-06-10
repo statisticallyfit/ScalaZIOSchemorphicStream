@@ -86,6 +86,7 @@
 
 **Task component ideas (long, with links):**
 
+note: use [`hasSameSchemaStructure`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema/shared/src/test/scala/zio/schema/SchemaAssertions.scala) for comparing schemas
 
 * **Schema (string-schema-language-independent ADT scala structures)**: 
  
@@ -131,7 +132,9 @@
 
   * **String conversions:**
     * <u>`Avro` schema ADT <--> `Avro` string </u>:
-      * :x: ZIO:
+      * ZIO:
+        * ZIO's `ZioSchema` --> `Avro` string: 
+          * :large_blue_circle: see tests for [`Enum`, `UnionWithNesting`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/test/scala-2/zio/schema/codec/AvroCodecSpec.scala#L109-L140), and `CaseObjects..Adt` etc. in [`AvroCodecSpec.scala`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/test/scala-2/zio/schema/codec/AvroCodecSpec.scala)
       * APACHE: 
       * SKEUO:
         * SKEUO's `AvroF` <--> `Avro` string: 
@@ -139,7 +142,9 @@
        
     * <u>Scala case class / types --> `Avro` string</u>: 
 
-      * :large_blue_circle: (ZIO) [(function `def encode`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L30-L31)
+      * ZIO: 
+        * :large_blue_circle: [(function `def encode`)](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/main/scala/zio/schema/codec/AvroCodec.scala#L30-L31)
+        * :large_blue_circle: [see tests in `AvroCodecSpec.scala`](https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-avro/shared/src/test/scala-2/zio/schema/codec/AvroCodecSpec.scala#L61-L89)
 
       * :large_blue_circle: (SKEUO)  _______ 
        
@@ -187,6 +192,7 @@
           * :large_blue_circle: `Json` string --> SKEUO's `JsonSchemaF` [print json fixed tests examples](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/JsonSchemaDecoderSpecification.scala)
        
       * ZIO:    
+        * TODO left off here look at jsoncodecspec = https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-json/shared/src/test/scala-2/zio/schema/codec/JsonCodecSpec.scala
         * :x: <u>ZIO's json schema or encoder/decoder <--> `Json` string </u>
           * [**tutorial guide** of `JsonEncoder` / `JsonDecoder` conversion <-->> `Json` string: using functions `def fromJson, def toJson`](https://zio.dev/guides/tutorials/encode-and-decode-json-data/)
           * [`def fromJson`, `def toJson`](https://github.com/zio/zio-json/blob/c036622e17f50da663c010b13d4f3e5b65dbfb10/zio-json/shared/src/main/scala/zio/json/package.scala#L22-L43)
@@ -234,6 +240,16 @@
  
   * **Avro <--> Json:**
    
+    * **ADT conversions:**
+     
+      * SKEUO:
+       
+        * SKEUO's `AvroF` schema --> `io.circe.Json` string (?): 
+          * [function `def toJson: Algebra[AvroF, Json]`](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L238-L303)
+          * [using catamorphism of the `def toJson` algebra yields exact types: `val avroToJson: Fix[AvroF] ⇒ Json = scheme.cata(AvroF.toJson)`](https://github.com/higherkindness/skeuomorph/blob/1b0b7316899e50be8812edcd02ff88d75693a53a/src/main/scala/higherkindness/skeuomorph/avro/Protocol.scala#LL45C46-L45C46)
+         
+      * ZIO:
+   
   * **Avro <--> Protobuf:**
    
   * **Json <--> Protobuf:**
@@ -251,7 +267,6 @@
 
 * avro string <--> json string (skeuomorph??)
 * [SKEUO `Avro` schema --> `io.circe.Json` string](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L238-L303)
-* [json schema (skeuomorph)](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94) <--> json string
 
 NOTE:
 - S = schema

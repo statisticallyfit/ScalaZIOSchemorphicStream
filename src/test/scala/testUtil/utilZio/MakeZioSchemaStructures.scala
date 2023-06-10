@@ -1,17 +1,17 @@
-package util
+package testUtil.utilZio
 
+import testUtil.Util
+import zio.schema.{TypeId, Schema ⇒ ZioSchema}
+import zio.{Chunk ⇒ ZioChunk}
 
-import zio.schema.{DeriveSchema, TypeId, Schema => ZioSchema}
-import zio.{Chunk => ZioChunk}
-
-import scala.reflect.{ClassTag, classTag}
+import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
 
 /**
  *
  */
-object UtilSchema {
+object MakeZioSchemaStructures {
 
 
   implicit def makeZioSeqSchema[A](implicit schemaA: ZioSchema[A]): ZioSchema[Seq[A]] =

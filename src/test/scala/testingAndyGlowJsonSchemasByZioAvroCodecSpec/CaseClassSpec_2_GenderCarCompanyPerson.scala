@@ -2,10 +2,8 @@ package testingAndyGlowJsonSchemasByZioAvroCodecSpec
 
 
 import testData.ScalaCaseClassData._
-
 import org.specs2.mutable._
-
-import util.UtilSchema
+import testUtil.utilZio.MakeZioSchemaStructures
 
 
 /**
@@ -180,7 +178,7 @@ class CaseClassSpec_2_GenderCarCompanyPerson extends Specification {
         name0 = "cars",
         //schema0 = ZioSchema.list(zioCarSchema_separated).toSeq,
         // NOTE: writing  a "Schema.seq" similar to how zio does Schema.list (from Schema.scala, line 302
-        schema0 = UtilSchema.makeZioSeqSchema[Car](carSchema),
+        schema0 = MakeZioSchemaStructures.makeZioSeqSchema[Car](carSchema),
         get0 = (p: Person) => p.cars, // R => A
         set0 = (p: Person, setNewCars: Seq[Car]) => p.copy(cars = setNewCars) // (R, A) => R
       ),

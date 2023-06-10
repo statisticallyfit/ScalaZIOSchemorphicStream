@@ -1,8 +1,10 @@
 import higherkindness.droste._
 import higherkindness.droste.data.Fix
 import higherkindness.droste.syntax.all._
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SkeuomorphAvroSchema}
-import org.apache.avro.{Schema ⇒ ApacheAvroSchema}
+import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaSkeuoAvro}
+
+import io.circe.Json
+
 
 /*import matryoshka._
 // NOTE: need this to avoid error of "No implicits found for Corecursive[T]" when doing anamorphism
@@ -10,30 +12,41 @@ import org.apache.avro.{Schema ⇒ ApacheAvroSchema}
 import matryoshka.data._
 import matryoshka.implicits._*/
 
+import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
+import org.apache.avro.LogicalTypes
+
+import zio.schema._
+import zio.schema.DeriveSchema
+import zio.schema.{Schema ⇒ ZioSchema, StandardType ⇒ ZioStandardType}
+import zio.schema.codec.AvroCodec
 
 import scala.jdk.CollectionConverters._
+
+
+import testData.ScalaCaseClassData._
 
 /**
  *
  */
 object Compare_SchemaADTs extends App {
 
-  def avroFToApache: Algebra[SkeuomorphAvroSchema, ApacheAvroSchema] =
+
+  def avroFToApache: Algebra[SchemaSkeuoAvro, SchemaApacheAvro] =
     Algebra {
-      case SkeuomorphAvroSchema.TNull() => ApacheAvroSchema.create(ApacheAvroSchema.Type.NULL)
-      case SkeuomorphAvroSchema.TBoolean() => ApacheAvroSchema.create(ApacheAvroSchema.Type.BOOLEAN)
-      case SkeuomorphAvroSchema.TInt() => ApacheAvroSchema.create(ApacheAvroSchema.Type.INT)
-      case SkeuomorphAvroSchema.TLong() => ApacheAvroSchema.create(ApacheAvroSchema.Type.LONG)
-      case SkeuomorphAvroSchema.TFloat() => ApacheAvroSchema.create(ApacheAvroSchema.Type.FLOAT)
-      case SkeuomorphAvroSchema.TDouble() => ApacheAvroSchema.create(ApacheAvroSchema.Type.DOUBLE)
-      case SkeuomorphAvroSchema.TBytes() =>  ApacheAvroSchema.create(ApacheAvroSchema.Type.BYTES)
-      case SkeuomorphAvroSchema.TString() => ApacheAvroSchema.create(ApacheAvroSchema.Type.STRING)
+      case SchemaSkeuoAvro.TNull() => SchemaApacheAvro.create(SchemaApacheAvro.Type.NULL)
+      case SchemaSkeuoAvro.TBoolean() => SchemaApacheAvro.create(SchemaApacheAvro.Type.BOOLEAN)
+      case SchemaSkeuoAvro.TInt() => SchemaApacheAvro.create(SchemaApacheAvro.Type.INT)
+      case SchemaSkeuoAvro.TLong() => SchemaApacheAvro.create(SchemaApacheAvro.Type.LONG)
+      case SchemaSkeuoAvro.TFloat() => SchemaApacheAvro.create(SchemaApacheAvro.Type.FLOAT)
+      case SchemaSkeuoAvro.TDouble() => SchemaApacheAvro.create(SchemaApacheAvro.Type.DOUBLE)
+      case SchemaSkeuoAvro.TBytes() =>  SchemaApacheAvro.create(SchemaApacheAvro.Type.BYTES)
+      case SchemaSkeuoAvro.TString() => SchemaApacheAvro.create(SchemaApacheAvro.Type.STRING)
 
       // TODO check how to create simple record (non-named) in apache avro? https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L211-L215
-        //import ApacheAvroSchema.{Field ⇒ ApacheField}
+      //import SchemaApacheAvro.{Field ⇒ ApacheField}
       // TODO Help to create apache avro field because it requires a schemaavro as parameter while the skeuo doesn't take schema and passing it in the algebra function is weird (repetitive / cheating)
       // NOTE look here field2Field = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L44
-      /*case SkeuomorphAvroSchema.TRecord(name, namespaceOpt, aliases, docOpt, fields) ⇒ ApacheAvroSchema.createRecord(fields)
+      /*case SchemaSkeuoAvro.TRecord(name, namespaceOpt, aliases, docOpt, fields) ⇒ SchemaApacheAvro.createRecord(fields)
 
       val r = new ApacheField()
       ApacheField()*/
@@ -42,12 +55,12 @@ object Compare_SchemaADTs extends App {
 
       // TODO create union = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L248-L254
 
-      // TODO // case SkeuomorphAvroSchema.TNamedType(_, _) => false
+      // TODO // case SchemaSkeuoAvro.TNamedType(_, _) => false
       // TODO array = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L238
-      /*case SkeuomorphAvroSchema.TArray(_) => ApacheAvroSchema.Type.ARRAY
+      /*case SchemaSkeuoAvro.TArray(_) => SchemaApacheAvro.Type.ARRAY
       // TODO create map = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L243
-      case SkeuomorphAvroSchema.TMap(_) => ApacheAvroSchema.Type.MAP
-      case SkeuomorphAvroSchema.TRecord(name, namespace, _, doc, fields) =>
+      case SchemaSkeuoAvro.TMap(_) => SchemaApacheAvro.Type.MAP
+      case SchemaSkeuoAvro.TRecord(name, namespace, _, doc, fields) =>
         (sch.getName should_== name)
           .and(sch.getNamespace should_== namespace.getOrElse(""))
           .and(sch.getDoc should_== doc.getOrElse(""))
@@ -57,46 +70,68 @@ object Compare_SchemaADTs extends App {
           )*/
 
       // Enum schema = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L232-L235
-      case SkeuomorphAvroSchema.TEnum(name, namespace, aliases, doc, symbols) => ApacheAvroSchema.createEnum(name,
+      case SchemaSkeuoAvro.TEnum(name, namespace, aliases, doc, symbols) => SchemaApacheAvro.createEnum(name,
         doc.getOrElse("NO DOC"),
         namespace.getOrElse("NO NAMESPACE"),
         symbols.asJava
       )
       // TODO check meaning of aliases vs. symbols - which contains the enum subcases?
 
-      //case SkeuomorphAvroSchema.TUnion(_) => true
+      //case SchemaSkeuoAvro.TUnion(_) => true
 
       // TODO - how to match correctly?
       // source apache fixed = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L258
-      case SkeuomorphAvroSchema.TFixed(name, namespaceOpt, aliases, size) =>  ApacheAvroSchema.createFixed(name, "NO DOC", namespaceOpt.getOrElse("NO SPACE"), size)
+      case SchemaSkeuoAvro.TFixed(name, namespaceOpt, aliases, size) =>  SchemaApacheAvro.createFixed(name, "NO DOC", namespaceOpt.getOrElse("NO SPACE"), size)
 
       case sch => throw new IllegalArgumentException(s"Schema ${sch} not handled")
-  }
+    }
 
 
 
-  val strApache: ApacheAvroSchema = ApacheAvroSchema.create(ApacheAvroSchema.Type.STRING)
-  val enumApache: ApacheAvroSchema = ApacheAvroSchema.createEnum("Color", "doc", "namespace", List("red", "yellow", "blue").asJava)
+
+  val strApache: SchemaApacheAvro = SchemaApacheAvro.create(SchemaApacheAvro.Type.STRING)
+
+  val intApache: SchemaApacheAvro = SchemaApacheAvro.create(SchemaApacheAvro.Type.INT)
+  val arrayApache: SchemaApacheAvro = SchemaApacheAvro.createArray(intApache)
+
+  val enumApache: SchemaApacheAvro = SchemaApacheAvro.createEnum("Color", "doc", "namespace", List("red", "yellow", "blue").asJava)
 
 
   // Apache avro schema
-  println(s"apache avro string: $strApache")
-  println(s"apache avro enum: $enumApache")
-  println(s"enumApache.toString = ${enumApache.toString}")
+  println(s"apache avro String (string): $strApache")
+  println(s"(ARRAY AVRO APACHE-STRING) apache avro Array (string): $arrayApache")
+  println(s"apache avro Enum (string): $enumApache")
 
-  // apacheavroschema --> skeuomorph avro schema
-  val strSkeuo: Fix[SkeuomorphAvroSchema] = scheme.ana(SkeuomorphAvroSchema.fromAvro).apply(strApache)
+  // SchemaApacheAvro --> skeuomorph avro schema
+  // NOTE noting the types here when applying ana / cata morphisms
+  val schemeAna: SchemaApacheAvro ⇒ Fix[SchemaSkeuoAvro] = scheme.ana(SchemaSkeuoAvro.fromAvro)
+  val avroToJson: Fix[SchemaSkeuoAvro] ⇒ Json = scheme.cata(SchemaSkeuoAvro.toJson)
+
+  // NOTE: not implemented in skeuo code
+  //println(s"ENUM JSON: enumApache -> skeuoAvro -> Json circe = ${avroToJson(schemeAna(enumApache))}")
+  println(s"(ARRAY JSON CIRCE): arrayApache -> arraySkeuo adt -> array Json circe: ${avroToJson(schemeAna(arrayApache))}")
+
+  val strSkeuo: Fix[SchemaSkeuoAvro] = scheme.ana(SchemaSkeuoAvro.fromAvro).apply(strApache)
   println(s"skeuo avro string = $strSkeuo")
-  println(s"skeuo avro string (toString) = ${strSkeuo.toString}")
 
-  val enumSkeuo: Fix[SkeuomorphAvroSchema] = scheme.ana(SkeuomorphAvroSchema.fromAvro).apply(enumApache)
+  val arraySkeuo: Fix[SchemaSkeuoAvro] = scheme.ana(SchemaSkeuoAvro.fromAvro).apply(arrayApache)
+  println(s"(ARRAY AVRO SKEUO-ADT): skeuo avro array = $arraySkeuo")
+
+  import testUtil.utilZio.ApacheToZioFunctions._
+  val arrayZio: Either[String, Any] = apacheAvroSchemaToZioSchema(arrayApache)
+  println(s"(ARRAY ZIO-ADT): zio avro array = $arrayZio")
+
+
+  val enumSkeuo: Fix[SchemaSkeuoAvro] = scheme.ana(SchemaSkeuoAvro.fromAvro).apply(enumApache)
   println(s"skeuo avro enum: ${enumSkeuo.toString}")
   println(s"skeuo avro enum unfix: ${enumSkeuo.unfix}")
 
   // inverse:
-  val strApacheBack: ApacheAvroSchema = scheme.cata(avroFToApache).apply(strSkeuo)
+  val strApacheBack: SchemaApacheAvro = scheme.cata(avroFToApache).apply(strSkeuo)
   println(s"strApacheBack = $strApacheBack ")
-  val enumApacheBack: ApacheAvroSchema = scheme.cata(avroFToApache).apply(enumSkeuo) // assert is equal to enumApache
+  /*val arrayApacheBack: SchemaApacheAvro = scheme.cata(avroFToApache).apply(arraySkeuo)
+  println(s"arrayApacheBack = $arrayApacheBack")*/
+  val enumApacheBack: SchemaApacheAvro = scheme.cata(avroFToApache).apply(enumSkeuo) // assert is equal to enumApache
   println(s"enumApacheBack = $enumApacheBack")
 
 
@@ -104,16 +139,11 @@ object Compare_SchemaADTs extends App {
 
   println("\n----------------------------------------------------------------")
   println("Printing : scala case class --> zio schema --> apache avro string ")
-  import zio.schema.DeriveSchema
-  import zio.schema.{Schema ⇒ ZioSchema}
-  import zio.schema.codec.AvroCodec
-  import testData.ScalaCaseClassData._
-
 
 
   // TODO left off here - use another case class (fruit banana example)
   val schema: ZioSchema[Tangelo] = DeriveSchema.gen[Tangelo]
-  val adt: Either[String, ApacheAvroSchema] = AvroCodec.encodeToApacheAvro(schema)
+  val adt: Either[String, SchemaApacheAvro] = AvroCodec.encodeToApacheAvro(schema)
   val result: Either[String, String] = AvroCodec.encode(schema)
 
   println(s"zioschema tangelo = $schema")
