@@ -2,6 +2,7 @@ import higherkindness.droste._
 import higherkindness.droste.data.Fix
 import higherkindness.droste.syntax.all._
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaSkeuoAvro}
+import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldSkeuo}
 
 import io.circe.Json
 
@@ -13,6 +14,7 @@ import matryoshka.data._
 import matryoshka.implicits._*/
 
 import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
+import org.apache.avro.Schema.{Field ⇒ FieldApache}
 import org.apache.avro.LogicalTypes
 
 import zio.schema._
@@ -32,22 +34,39 @@ object Compare_SchemaADTs extends App {
 
 
   def avroFToApache: Algebra[SchemaSkeuoAvro, SchemaApacheAvro] =
-    Algebra { // Algebra[Skeuo, Apache] --------->  Skeuo[Apache] => Apache
+    Algebra { // Algebra[Skeuo, Apache] ----- MEANING ---->  Skeuo[Apache] => Apache
+
       case SchemaSkeuoAvro.TNull() => SchemaApacheAvro.create(SchemaApacheAvro.Type.NULL)
+
       case SchemaSkeuoAvro.TBoolean() => SchemaApacheAvro.create(SchemaApacheAvro.Type.BOOLEAN)
+
       case SchemaSkeuoAvro.TInt() => SchemaApacheAvro.create(SchemaApacheAvro.Type.INT)
+
       case SchemaSkeuoAvro.TLong() => SchemaApacheAvro.create(SchemaApacheAvro.Type.LONG)
+
       case SchemaSkeuoAvro.TFloat() => SchemaApacheAvro.create(SchemaApacheAvro.Type.FLOAT)
+
       case SchemaSkeuoAvro.TDouble() => SchemaApacheAvro.create(SchemaApacheAvro.Type.DOUBLE)
+
       case SchemaSkeuoAvro.TBytes() =>  SchemaApacheAvro.create(SchemaApacheAvro.Type.BYTES)
+
       case SchemaSkeuoAvro.TString() => SchemaApacheAvro.create(SchemaApacheAvro.Type.STRING)
-      //SchemaApacheAvro.createArray(apacheSchema.getElementType)
-      // TODO figure out why inner part is INT and not array because it is supposed to be array since it is the schema inside.
-      // NOTE: see here `toJson` seems like inner part is INT = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L249
+
+
+
+      /**
+       * Apache array = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L238
+       *
+       * HELP: figure out why inner part is INT and not array because it is supposed to be array since it is the schema inside.
+       *
+       * HELP: see here `toJson` seems like inner part is INT = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L249
+       */
       case SchemaSkeuoAvro.TArray(apacheSchema: SchemaApacheAvro) ⇒ {
+
         println("Inside avroFToApache ARRAY converter: ")
         println(s"apacheSchema = $apacheSchema")
         println(s"apacheSchema.getType = ${apacheSchema.getType}")
+
         SchemaApacheAvro.createArray(apacheSchema)
       }
       /*apacheSchema.getType match {
@@ -78,7 +97,39 @@ object Compare_SchemaADTs extends App {
           //createEnum(String name, String doc, String namespace, List<String> values)
       }*/
 
-      // TODO check how to create simple record (non-named) in apache avro? https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L211-L215
+
+
+      /**
+       * NOTE: (?) Apache's Named Record == skeuomorph's TNamedType
+       * SOURCE = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L211
+       */
+      case SchemaSkeuoAvro.TNamedType(namespace: String, name: String) ⇒ {
+        SchemaApacheAvro.createRecord(name, "NO DOC", namespace, /*isError =*/false)
+      }
+
+      /**
+       * NOTE: Apache's Named Record with Fields == skeuomorph's TRecord
+       * SOURCE = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L222-L225
+        */
+      case SchemaSkeuoAvro.TRecord(name: String,
+        namespace: Option[String],
+        aliases: List[String],
+        doc: Option[String],
+        fields: List[SchemaSkeuoAvro.Field[SchemaApacheAvro]]) ⇒ {
+
+        // Skeuo Order = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L61-L64
+        // Apache Order = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L530
+
+        // Skeuo Field = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L75-L90
+        // Apache Field = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L507-L697
+
+        // Skeuo converts ApacheField to SkeuoField = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L37-L51
+
+        val field1: FieldSkeuo[SchemaApacheAvro] = fields.head
+        val field_tpe: SchemaApacheAvro = field1.tpe
+
+      }
+
       //import SchemaApacheAvro.{Field ⇒ ApacheField}
       // TODO Help to create apache avro field because it requires a schemaavro as parameter while the skeuo doesn't take schema and passing it in the algebra function is weird (repetitive / cheating)
       // NOTE look here field2Field = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L44
@@ -86,8 +137,6 @@ object Compare_SchemaADTs extends App {
 
       val r = new ApacheField()
       ApacheField()*/
-      // Named record = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L217-L225
-      // TODO is the apache named record == skeuomorph's TNamedType ? https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L211
 
       // TODO create union = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L248-L254
 
