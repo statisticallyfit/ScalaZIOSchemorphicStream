@@ -1,4 +1,4 @@
-package testUtil.utilZio
+package testUtil.utilZioApache
 
 
 import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
@@ -16,13 +16,13 @@ import zio.schema.codec.AvroPropMarker
 object ImplicitSchemaExtensionClasses {
 
 
-  implicit private[utilZio] class SchemaExtensions(schema: ZioSchema[_]) {
+  implicit private[utilZioApache] class SchemaExtensions(schema: ZioSchema[_]) {
 
     def addAllAnnotations(annotations: Chunk[Any]): ZioSchema[_] =
       annotations.foldLeft(schema)((schema, annotation) => schema.annotate(annotation))
   }
 
-  implicit private[utilZio] class SchemaAvroExtensions(schemaAvro: SchemaApacheAvro) {
+  implicit private[utilZioApache] class SchemaAvroExtensions(schemaAvro: SchemaApacheAvro) {
 
     def addMarkerProp(propMarker: AvroPropMarker): SchemaApacheAvro = {
       schemaAvro.addProp(propMarker.propName, propMarker.value)

@@ -1,10 +1,13 @@
 import higherkindness.droste._
 import higherkindness.droste.data.Fix
 import higherkindness.droste.syntax.all._
+
+
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaSkeuoAvro}
-import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldSkeuo}
+import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldSkeuo, Order ⇒ OrderSkeuo}
 
 import io.circe.Json
+
 
 
 /*import matryoshka._
@@ -15,6 +18,7 @@ import matryoshka.implicits._*/
 
 import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
 import org.apache.avro.Schema.{Field ⇒ FieldApache}
+import org.apache.avro.Schema.Field.{Order ⇒ OrderApache}
 import org.apache.avro.LogicalTypes
 
 import zio.schema._
@@ -23,9 +27,11 @@ import zio.schema.{Schema ⇒ ZioSchema, StandardType ⇒ ZioStandardType}
 import zio.schema.codec.AvroCodec
 
 import scala.jdk.CollectionConverters._
-
+import java.util
 
 import testData.ScalaCaseClassData._
+
+import testUtil.utilSkeuoApache.FieldAndOrderConversions._
 
 /**
  *
@@ -111,11 +117,11 @@ object Compare_SchemaADTs extends App {
        * NOTE: Apache's Named Record with Fields == skeuomorph's TRecord
        * SOURCE = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L222-L225
         */
-      case SchemaSkeuoAvro.TRecord(name: String,
-        namespace: Option[String],
+      case SchemaSkeuoAvro.TRecord(skeuoName: String,
+        skeuoNamespace: Option[String],
         aliases: List[String],
-        doc: Option[String],
-        fields: List[SchemaSkeuoAvro.Field[SchemaApacheAvro]]) ⇒ {
+        skeuoDoc: Option[String],
+        skeuoFields: List[FieldS[SchemaApacheAvro]]) ⇒ {
 
         // Skeuo Order = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L61-L64
         // Apache Order = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L530
@@ -123,36 +129,25 @@ object Compare_SchemaADTs extends App {
         // Skeuo Field = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L75-L90
         // Apache Field = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L507-L697
 
-        // Skeuo converts ApacheField to SkeuoField = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L37-L51
+        // field2Field: Skeuo converts ApacheField to SkeuoField = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L37-L51
 
-        val field1: FieldSkeuo[SchemaApacheAvro] = fields.head
-        val field_tpe: SchemaApacheAvro = field1.tpe
+        // order2Order: Skeuo converts ApacheOrder to SkeuoOrder = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L37-L42
+
+
+        // Create the record
+        // HELP: apache has `isError` while skeuo does not and skeuo has `aliases` while apache does not.... how to fix?
+        //  TODO saying isError = true if aliases is empty, else false ??
+
+        SchemaApacheAvro.createRecord(skeuoName, skeuoDoc.getOrElse("NO DOC"), skeuoNamespace.getOrElse("NO NAMESPACE"), /*isError =*/aliases.isEmpty, skeuoFields.map(f ⇒ field2Field_SA(f)).asJava)
 
       }
 
-      //import SchemaApacheAvro.{Field ⇒ ApacheField}
-      // TODO Help to create apache avro field because it requires a schemaavro as parameter while the skeuo doesn't take schema and passing it in the algebra function is weird (repetitive / cheating)
-      // NOTE look here field2Field = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L44
-      /*case SchemaSkeuoAvro.TRecord(name, namespaceOpt, aliases, docOpt, fields) ⇒ SchemaApacheAvro.createRecord(fields)
-
-      val r = new ApacheField()
-      ApacheField()*/
 
       // TODO create union = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L248-L254
 
-      // TODO // case SchemaSkeuoAvro.TNamedType(_, _) => false
-      // TODO array = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L238
-      /*case SchemaSkeuoAvro.TArray(_) => SchemaApacheAvro.Type.ARRAY
       // TODO create map = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L243
-      case SchemaSkeuoAvro.TMap(_) => SchemaApacheAvro.Type.MAP
-      case SchemaSkeuoAvro.TRecord(name, namespace, _, doc, fields) =>
-        (sch.getName should_== name)
-          .and(sch.getNamespace should_== namespace.getOrElse(""))
-          .and(sch.getDoc should_== doc.getOrElse(""))
-          .and(
-            sch.getFields.asScala.toList.map(f => (f.name, f.doc)) should_== fields
-              .map(f => (f.name, f.doc.getOrElse("")))
-          )*/
+      //case SchemaSkeuoAvro.TMap(_) => SchemaApacheAvro.Type.MAP
+
 
       // Enum schema = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L232-L235
       case SchemaSkeuoAvro.TEnum(name, namespace, aliases, doc, symbols) => SchemaApacheAvro.createEnum(name,
@@ -202,7 +197,7 @@ object Compare_SchemaADTs extends App {
   val arraySkeuo: Fix[SchemaSkeuoAvro] = scheme.ana(SchemaSkeuoAvro.fromAvro).apply(arrayApache)
   println(s"(ARRAY AVRO SKEUO-ADT): skeuo avro array = $arraySkeuo")
 
-  import testUtil.utilZio.ApacheToZioFunctions._
+  import testUtil.utilZioApache.ApacheToZioFunctions._
   val arrayZio: Either[String, Any] = apacheAvroSchemaToZioSchema(arrayApache)
   val arrayZio2: Either[String, ZioSchema[_]] = AvroCodec.decodeFromApacheAvro(arrayApache)
   println(s"(ARRAY ZIO-ADT): zio avro array = $arrayZio")

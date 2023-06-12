@@ -1,4 +1,4 @@
-package testUtil.utilZio
+package testUtil.utilZioApache
 
 import testUtil.Util
 import zio.schema.{TypeId, Schema ⇒ ZioSchema}

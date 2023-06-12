@@ -1,4 +1,4 @@
-package testUtil.utilZio
+package testUtil.utilZioApache
 
 
 import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
@@ -24,7 +24,7 @@ import scala.annotation.StaticAnnotation
 import scala.collection.immutable.ListMap
 
 
-import testUtil.utilZio.ImplicitSchemaExtensionClasses._
+import testUtil.utilZioApache.ImplicitSchemaExtensionClasses._
 
 /**
  * Purpose of this file: Copying the code from zio's function here bcause in zio it is PRIVATE (cannot call)
