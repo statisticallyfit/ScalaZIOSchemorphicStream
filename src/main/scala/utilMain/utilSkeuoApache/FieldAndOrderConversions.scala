@@ -1,4 +1,4 @@
-package testUtil.utilSkeuoApache
+package utilMain.utilSkeuoApache
 
 
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaSkeuoAvro}

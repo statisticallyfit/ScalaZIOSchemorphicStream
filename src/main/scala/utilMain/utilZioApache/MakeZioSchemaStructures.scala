@@ -1,6 +1,6 @@
-package testUtil.utilZioApache
+package utilMain.utilZioApache
 
-import testUtil.Util
+import utilMain.Util
 import zio.schema.{TypeId, Schema ⇒ ZioSchema}
 import zio.{Chunk ⇒ ZioChunk}
 

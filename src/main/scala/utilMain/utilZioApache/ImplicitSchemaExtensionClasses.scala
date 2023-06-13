@@ -1,4 +1,4 @@
-package testUtil.utilZioApache
+package utilMain.utilZioApache
 
 
 import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
