@@ -1,0 +1,6 @@
+/**
+ *
+ */
+class AvroToAvro_ZioToApacheSchemaConversionSpecs {
+
+}
