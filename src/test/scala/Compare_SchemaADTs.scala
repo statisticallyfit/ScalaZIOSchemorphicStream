@@ -1,11 +1,11 @@
+import cats.data.NonEmptyList
+
+
 import higherkindness.droste._
 import higherkindness.droste.data.Fix
 import higherkindness.droste.syntax.all._
-
-
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaSkeuoAvro}
 import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldSkeuo, Order ⇒ OrderSkeuo}
-
 import io.circe.Json
 
 
@@ -17,6 +17,7 @@ import matryoshka.data._
 import matryoshka.implicits._*/
 
 import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
+import org.apache.avro.{LogicalType => LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache}
 import org.apache.avro.Schema.{Field ⇒ FieldApache}
 import org.apache.avro.Schema.Field.{Order ⇒ OrderApache}
 import org.apache.avro.LogicalTypes
@@ -33,12 +34,22 @@ import testData.ScalaCaseClassData._
 
 import testUtil.utilSkeuoApache.FieldAndOrderConversions._
 
+
+
+// TODO temp:
+import org.scalatest.Assertions._
+
 /**
  *
  */
 object Compare_SchemaADTs extends App {
 
-
+  def isValidated(logicalType: LogicalTypeApache, schemaArg: SchemaApacheAvro): Boolean = {
+    val thrown = intercept[IllegalArgumentException] {
+      logicalType.validate(schemaArg)
+    }
+    thrown.getMessage.isEmpty
+  }
   def avroFToApache: Algebra[SchemaSkeuoAvro, SchemaApacheAvro] =
     Algebra { // Algebra[Skeuo, Apache] ----- MEANING ---->  Skeuo[Apache] => Apache
 
@@ -58,6 +69,11 @@ object Compare_SchemaADTs extends App {
 
       case SchemaSkeuoAvro.TString() => SchemaApacheAvro.create(SchemaApacheAvro.Type.STRING)
 
+
+      /**
+       * Apache Map Type = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L243
+       */
+      case SchemaSkeuoAvro.TMap(sch: SchemaApacheAvro) => SchemaApacheAvro.createMap(sch)
 
 
       /**
@@ -106,7 +122,7 @@ object Compare_SchemaADTs extends App {
 
 
       /**
-       * NOTE: (?) Apache's Named Record == skeuomorph's TNamedType
+       * Apache's Named Record == skeuomorph's TNamedType
        * SOURCE = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L211
        */
       case SchemaSkeuoAvro.TNamedType(namespace: String, name: String) ⇒ {
@@ -114,7 +130,7 @@ object Compare_SchemaADTs extends App {
       }
 
       /**
-       * NOTE: Apache's Named Record with Fields == skeuomorph's TRecord
+       * Apache's Named Record with Fields == skeuomorph's TRecord
        * SOURCE = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L222-L225
         */
       case SchemaSkeuoAvro.TRecord(skeuoName: String,
@@ -136,32 +152,103 @@ object Compare_SchemaADTs extends App {
 
         // Create the record
         // HELP: apache has `isError` while skeuo does not and skeuo has `aliases` while apache does not.... how to fix?
-        //  TODO saying isError = true if aliases is empty, else false ??
+        //  TODO say by default that this record is NOT an error type? = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L364
 
-        SchemaApacheAvro.createRecord(skeuoName, skeuoDoc.getOrElse("NO DOC"), skeuoNamespace.getOrElse("NO NAMESPACE"), /*isError =*/aliases.isEmpty, skeuoFields.map(f ⇒ field2Field_SA(f)).asJava)
+        val recordSchema: SchemaApacheAvro = SchemaApacheAvro.createRecord(skeuoName, skeuoDoc.getOrElse("NO DOC"), skeuoNamespace.getOrElse("NO NAMESPACE"), /*isError =*/false, skeuoFields.map(f ⇒ field2Field_SA(f)).asJava)
 
+        aliases.foreach(a ⇒ recordSchema.addAlias(a))
+
+        recordSchema
       }
 
 
-      // TODO create union = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L248-L254
+      /**
+       * Apache Union Type = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L248-L254
+       */
+      case SchemaSkeuoAvro.TUnion(schemaList: NonEmptyList[SchemaApacheAvro]) ⇒ {
+        SchemaApacheAvro.createUnion(schemaList.toList.asJava)
+      }
 
-      // TODO create map = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L243
-      //case SchemaSkeuoAvro.TMap(_) => SchemaApacheAvro.Type.MAP
+      /**
+       * Apache Enum schema = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L232-L235
+       *
+       * HELP: Skeuo has 'aliases' while apache does not -- meaning? - check meaning of aliases vs. symbols - which contains the enum subcases?
+       */
+      case SchemaSkeuoAvro.TEnum(name, namespaceOpt, aliases, docOpt, symbols) => {
+        val enumSchema = SchemaApacheAvro.createEnum(name,
+          docOpt.getOrElse("NO DOC"),
+          namespaceOpt.getOrElse("NO NAMESPACE"),
+          symbols.asJava
+        )
+
+        aliases.foreach(a ⇒ enumSchema.addAlias(a))
+
+        enumSchema
+      }
+
+      /**
+       * apache fixed = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L258
+       * HELP: apache has `doc` while skeuo does not
+       * TODO CHECK IF MY IMPLEMENTATION IS CORREC: skeuo has `aliases` while apache does not --- construct Fixed first then addAliases = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L233
+       * NOTE: skeup has `namespaceOption` while apache has `space`` -- they are the same (namespace wrapped in option)
+       */
+      case SchemaSkeuoAvro.TFixed(name, namespaceOpt, aliases, size) =>  {
+        val fixedSchema: SchemaApacheAvro = SchemaApacheAvro.createFixed(name, "NO DOC", namespaceOpt.getOrElse("NO SPACE (from namespace)"), size)
+
+        aliases.foreach(a => fixedSchema.addAlias(a))
+
+        fixedSchema
+      }
 
 
-      // Enum schema = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L232-L235
-      case SchemaSkeuoAvro.TEnum(name, namespace, aliases, doc, symbols) => SchemaApacheAvro.createEnum(name,
-        doc.getOrElse("NO DOC"),
-        namespace.getOrElse("NO NAMESPACE"),
-        symbols.asJava
-      )
-      // TODO check meaning of aliases vs. symbols - which contains the enum subcases?
 
-      //case SchemaSkeuoAvro.TUnion(_) => true
+      // Logical Types: Date, Time, Decimal etc
 
-      // TODO - how to match correctly?
-      // source apache fixed = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L258
-      case SchemaSkeuoAvro.TFixed(name, namespaceOpt, aliases, size) =>  SchemaApacheAvro.createFixed(name, "NO DOC", namespaceOpt.getOrElse("NO SPACE"), size)
+      case SchemaSkeuoAvro.TDate() => {
+        val intSchema: SchemaApacheAvro = SchemaApacheAvro.create(SchemaApacheAvro.Type.INT)
+        val dateLogicalType: LogicalTypeApache = LogicalTypesApache.date()
+        assert(/*dateLogicalType.validate(intSchema)*/isValidated(dateLogicalType, intSchema),
+          s"${dateLogicalType.getName} Logical Type uses ${intSchema.getType} schema only") // check if compatible
+
+        val dateSchema: SchemaApacheAvro = dateLogicalType.addToSchema(intSchema)
+
+        dateSchema
+      }
+      case SchemaSkeuoAvro.TTimeMillis() ⇒ {
+
+        val intSchema: SchemaApacheAvro = SchemaApacheAvro.create(SchemaApacheAvro.Type.INT)
+        val millisLogicalType: LogicalTypeApache = LogicalTypesApache.timeMillis()
+        assert(isValidated(millisLogicalType, intSchema), s"${millisLogicalType.getName} Logical Type uses ${intSchema.getType} schema only") // check if compatible
+
+        val millisSchema: SchemaApacheAvro = millisLogicalType.addToSchema(intSchema)
+
+        millisSchema
+      }
+
+      case SchemaSkeuoAvro.TTimestampMillis() => {
+
+        val longSchema: SchemaApacheAvro = SchemaApacheAvro.create(SchemaApacheAvro.Type.LONG)
+        val timestampMillisLogicalType: LogicalTypeApache = LogicalTypesApache.timestampMillis()
+        assert(isValidated(timestampMillisLogicalType, longSchema), s"${timestampMillisLogicalType.getName} Logical Type uses ${longSchema.getType} schema only") // check if compatible
+
+        val timestampMillisSchema: SchemaApacheAvro = timestampMillisLogicalType.addToSchema(longSchema)
+
+        timestampMillisSchema
+      }
+
+      case SchemaSkeuoAvro.TDecimal(precision: Int, scale: Int) ⇒ {
+
+        val fixedSchema: SchemaApacheAvro = SchemaApacheAvro.createFixed("decimal_fixed", "doc_decimal_fixed", "decimal_namespace", 5)
+        // TODO is this OK?
+
+        val decimalLogicalType: LogicalTypeApache = LogicalTypesApache.decimal(precision, scale)
+        assert(isValidated(decimalLogicalType, fixedSchema), s"${decimalLogicalType.getName} Logical Type uses ${fixedSchema.getType} schema only") // check if compatible
+
+        val decimalSchema: SchemaApacheAvro = decimalLogicalType.addToSchema(fixedSchema)
+
+        decimalSchema
+      }
+
 
       case sch => throw new IllegalArgumentException(s"Schema ${sch} not handled")
     }
