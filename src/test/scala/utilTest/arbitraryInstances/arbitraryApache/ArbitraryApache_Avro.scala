@@ -16,7 +16,11 @@ import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
 
 
 /**
+ * Purpose - copying this here from skeuomorph's test folder because:
+ * 	1. cannot access skeuomorph's test folder contents.
+ *        2. also need to add to these instances by creating instances for Skeuo's types too.
  *
+ * NOTE: file source == https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/instances.scala
  */
 object ArbitraryApache_Avro {
 	

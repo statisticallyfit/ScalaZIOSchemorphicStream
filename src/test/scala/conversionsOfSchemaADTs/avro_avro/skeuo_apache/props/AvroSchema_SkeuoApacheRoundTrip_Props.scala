@@ -37,3 +37,15 @@ import org.specs2.specification.core.SpecStructure
 import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache.{apacheToSkeuoAvroSchema, skeuoToApacheAvroSchema}
 import conversionsOfSchemaStrings.avro_json.Skeuo_JsonCirce.{skeuoAvroSchemaToJsonString, jsonStringToSkeuoAvroSchema, avroSchemaToJsonString}
 
+
+
+class AvroSchema_SkeuoApacheRoundTrip_Props extends Specification with ScalaCheck {
+	
+	// TODO import instances = https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/avro/AvroSchemaSpec.scala#L20
+	
+	def is: SpecStructure =
+		s2"""
+			Converting between Skeuomorph and Apache libraries' avro schema ADTs (using property-based testing)
+		"""
+	
+}

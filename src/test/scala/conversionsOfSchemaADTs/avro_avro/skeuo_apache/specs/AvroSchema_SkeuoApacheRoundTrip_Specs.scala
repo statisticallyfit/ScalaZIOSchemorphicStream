@@ -33,11 +33,32 @@ import conversionsOfSchemaStrings.avro_json.Skeuo_JsonCirce.{skeuoAvroSchemaToJs
  */
 class AvroSchema_SkeuoApacheRoundTrip_Specs extends Specification with ScalaCheck  {
 
+	// OUTPUT:
+	/*
+	apache avro String (string): "string"
+	(ARRAY AVRO APACHE-STRING) apache avro Array (string): {"type":"array","items":"int"}
+	apache avro Enum (string): {"type":"enum","name":"Color","namespace":"namespace","doc":"doc","symbols":["red","yellow","blue"]}
+	(ARRAY JSON CIRCE): arrayApache -> arraySkeuo adt -> array Json circe: {
+	"type" : "array",
+	"items" : "Int"
+	}
+	skeuo avro string = TString()
+	(ARRAY AVRO SKEUO-ADT): skeuo avro array = TArray(TInt())
+	skeuo avro enum: TEnum(Color,Some(namespace),List(),Some(doc),List(red, yellow, blue))
+	skeuo avro enum unfix: TEnum(Color,Some(namespace),List(),Some(doc),List(red, yellow, blue))
+	strApacheBack = "string"
+	Inside avroFToApache ARRAY converter:
+	apacheSchema = "int"
+	apacheSchema.getType = INT
+	arrayApacheBack = {"type":"array","items":"int"}
+	enumApacheBack = {"type":"enum","name":"Color","namespace":"namespace","doc":"doc","symbols":["red","yellow","blue"]}
+	 */
 
+	// TODO import instances = https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/avro/AvroSchemaSpec.scala#L20
 
 	def is: SpecStructure =
 		s2"""
-			Converting between Skeuomorph and Apache libraries' avro schema ADTs
+			Converting between Skeuomorph and Apache libraries' avro schema ADTs (using spec-example-based-testing)
 		  """
 
 
