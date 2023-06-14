@@ -42,7 +42,14 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends Specification with ScalaChec
 	"type" : "array",
 	"items" : "Int"
 	}
+	Printing long function type = org.apache.avro.Schema => higherkindness.droste.data.Fix[higherkindness.skeuomorph.avro.AvroF]
+	Printing short function type = SchemaApacheAvro => Fix[SchemaSkeuoAvro]
+	FUNC TYPE: apacheToSkeuoAvroSchema: SchemaApacheAvro => Fix[SchemaSkeuoAvro]
+	Printing long function type = higherkindness.droste.data.Fix[higherkindness.skeuomorph.avro.AvroF] => io.circe.Json
+	Printing short function type = Fix[SchemaSkeuoAvro] => io.circe.Json
+	FUNC TYPE: avroSchemaToJsonString: Fix[SchemaSkeuoAvro] => io.circe.Json
 	skeuo avro string = TString()
+	CHECK TRUE TSTRING: true
 	(ARRAY AVRO SKEUO-ADT): skeuo avro array = TArray(TInt())
 	skeuo avro enum: TEnum(Color,Some(namespace),List(),Some(doc),List(red, yellow, blue))
 	skeuo avro enum unfix: TEnum(Color,Some(namespace),List(),Some(doc),List(red, yellow, blue))
@@ -63,7 +70,7 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends Specification with ScalaChec
 
 
 
-
+	import utilTest.Util
 	import testData.schemaData.avroData.apacheData.ApacheAvroSchemaData._
 	
 	// TODO next steps:
@@ -85,10 +92,25 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends Specification with ScalaChec
 	// NOTE: not implemented in skeuo code
 	//println(s"ENUM JSON: enumApache -> skeuoAvro -> Json circe = ${avroToJson(schemeAna(enumApache))}")
 	println(s"(ARRAY JSON CIRCE): arrayApache -> arraySkeuo adt -> array Json circe: ${avroSchemaToJsonString(apacheToSkeuoAvroSchema(arrayApache))}")
+	
+	val keepPckgs = Some(List("io.circe.Json"))
+	val classesToSubs = Some(Map("AvroF" → "SchemaSkeuoAvro", "Schema" → "SchemaApacheAvro"))
+	
+	val ts = Util.getShortFuncType(apacheToSkeuoAvroSchema, keepPckgs, classesToSubs)
+	//type TR = Util.inspectFunc_Type(apacheToSkeuoAvroSchema)
+	/*
+	//import scala.reflect.runtime.universe._
+	type TR = ts.asInstanceOf[Type]
+	type TC = SchemaApacheAvro => Fix[SchemaSkeuoAvro]*/
+	println(s"FUNC TYPE: apacheToSkeuoAvroSchema: ${ts}")
+	//println(s"FUNC TYPE as TYPE: apacheToSkeuoAvroSchema: ${t == tc}")
+	
+	println(s"FUNC TYPE: avroSchemaToJsonString: ${Util.getShortFuncType(avroSchemaToJsonString, keepPckgs, classesToSubs)}")
 
 	//scheme.ana(SchemaSkeuoAvro.fromAvro).apply(strApache)
 	val strSkeuo: Fix[SchemaSkeuoAvro] = apacheToSkeuoAvroSchema(strApache)
 	println(s"skeuo avro string = $strSkeuo")
+	println(s"CHECK TRUE TSTRING: ${strSkeuo == SchemaSkeuoAvro.TString()}")
 
 	// scheme.ana(SchemaSkeuoAvro.fromAvro).apply(arrayApache)
 	val arraySkeuo: Fix[SchemaSkeuoAvro] = apacheToSkeuoAvroSchema(arrayApache)
