@@ -4,12 +4,14 @@ package conversionsOfSchemaADTs.avro_avro.skeuo_apache.specs
 import higherkindness.droste._
 import higherkindness.droste.data.Fix
 import higherkindness.droste.syntax.all._
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaSkeuoAvro}
+import higherkindness.droste.implicits._
+
+import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
 
 
 
 
-import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
+import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
 ///import org.apache.avro.{LogicalType => LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache}
 
 
@@ -19,19 +21,27 @@ import scala.jdk.CollectionConverters._
 import testData.ScalaCaseClassData._
 
 
-import org.scalacheck._
-import org.specs2._
-import org.specs2.specification.core.SpecStructure
+//import org.scalacheck._
+//import org.specs2._
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should._
+//import org.specs2.specification.core.SpecStructure
 
 
-import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache.{apacheToSkeuoAvroSchema, skeuoToApacheAvroSchema}
-import conversionsOfSchemaStrings.avro_json.Skeuo_JsonCirce.{skeuoAvroSchemaToJsonString, jsonStringToSkeuoAvroSchema, avroSchemaToJsonString}
+import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache._ //{apacheToSkeuoAvroSchema, skeuoToApacheAvroSchema}
+import conversionsOfSchemaStrings.avro_json.Skeuo_JsonCirce._
+//{skeuoAvroSchemaToJsonString, jsonStringToSkeuoAvroSchema, avroSchemaToJsonString}
 
 
+import utilTest.Util
+
+import testData.schemaData.avroData.apacheData.ApacheAvroSchemaData._
+import testData.GeneralTestData._
 /**
  *
  */
-class AvroSchema_SkeuoApacheRoundTrip_Specs extends Specification with ScalaCheck  {
+class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
+	//extends mutable.Specification /*with ScalaCheck */ {
 
 	// OUTPUT:
 	/*
@@ -43,11 +53,11 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends Specification with ScalaChec
 	"items" : "Int"
 	}
 	Printing long function type = org.apache.avro.Schema => higherkindness.droste.data.Fix[higherkindness.skeuomorph.avro.AvroF]
-	Printing short function type = SchemaApacheAvro => Fix[SchemaSkeuoAvro]
-	FUNC TYPE: apacheToSkeuoAvroSchema: SchemaApacheAvro => Fix[SchemaSkeuoAvro]
+	Printing short function type = SchemaAvro_Apache => Fix[SchemaAvro_Skeuo]
+	FUNC TYPE: apacheToSkeuoAvroSchema: SchemaAvro_Apache => Fix[SchemaAvro_Skeuo]
 	Printing long function type = higherkindness.droste.data.Fix[higherkindness.skeuomorph.avro.AvroF] => io.circe.Json
-	Printing short function type = Fix[SchemaSkeuoAvro] => io.circe.Json
-	FUNC TYPE: avroSchemaToJsonString: Fix[SchemaSkeuoAvro] => io.circe.Json
+	Printing short function type = Fix[SchemaAvro_Skeuo] => io.circe.Json
+	FUNC TYPE: avroSchemaToJsonString: Fix[SchemaAvro_Skeuo] => io.circe.Json
 	skeuo avro string = TString()
 	CHECK TRUE TSTRING: true
 	(ARRAY AVRO SKEUO-ADT): skeuo avro array = TArray(TInt())
@@ -63,57 +73,117 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends Specification with ScalaChec
 
 	// TODO import instances = https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/avro/AvroSchemaSpec.scala#L20
 
-	def is: SpecStructure =
-		s2"""
-			Converting between Skeuomorph and Apache libraries' avro schema ADTs (using spec-example-based-testing)
-		  """
+	//TODO when testing isvalidated for logical types apache, must use assertthrows = https://www.scalatest.org/user_guide/selecting_a_style
+	
+	// TODO: checking doesnot compile or does not typecheck = https://hyp.is/ARIQjgsXEe6YspfkWnX0nA/www.scalatest.org/user_guide/using_matchers
 
-
-
-	import utilTest.Util
-	import testData.schemaData.avroData.apacheData.ApacheAvroSchemaData._
 	
 	// TODO next steps:
 	// 1) add more apache-avro-schema data
 	// 2) run this file, get the results, assert as printed
 	// 3) do the PROPS with scalacheck
-
+	
+	// TODO check containword / existword / haveword operations when comparing more complicated schemas, just in case the contents are not in the same order.
+	
+	// shouldBe a [Type] - source = https://hyp.is/U-0D0gsREe6sV2tTo6rVyg/www.scalatest.org/user_guide/using_matchers
+	
 	// Apache avro schema
-	println(s"apache avro String (string): $strApache")
+	//println(s"apache avro String (string): $strApache")
+	"Converting skeuomorph's Avro Schema-ADT to org.apache.avro's Avro Schema ADT" when {
+		
+		"String" should {
+			"start as Apache (avro schema)" in {
+				
+				strApache should be (SchemaAvro_Apache.create(SchemaAvro_Apache.Type.STRING))
+				strApache shouldBe a [SchemaAvro_Apache]
+				
+				// NOTE: double quotes because avro schema prints the quotes
+				strApache.toString should be ("\"string\"") // checks value
+				strApache.toString shouldBe a [String] // checks type
+			}
+			
+			"convert from Apache -> Skeuo (Avro Schema)" in {
+				val strSkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(strApache)
+				
+				strSkeuo shouldEqual SchemaAvro_Skeuo.TString()
+				strSkeuo shouldBe a [ SchemaAvro_Skeuo[_] ] // TODO: interesting, Fix type is invisible???
+				//strSkeuo shouldBe a [ Fix[_] ] //runtime erases type parameters
+				
+				Util.getFuncTypeSubs(strSkeuo) shouldEqual "Fix[SchemaAvro_Skeuo]"
+			}
+			
+			"convert from Apache -> Skeuo (avro schema) using anamorphism of a coalgebra" in {
+				
+				Util.getFuncTypeSubs(coalgebra_ApacheSkeuo) shouldEqual "Coalgebra[SchemaAvro_Skeuo, SchemaAvro_Apache]"
+				
+				val funcTypeAnamorphismOfCoalgebra: String = Util.getFuncTypeSubs(scheme.ana(coalgebra_ApacheSkeuo).apply(_))
+				
+				val funcTypeApacheToSkeuo: String = Util.getFuncTypeSubs(apacheToSkeuoAvroSchema)
+				
+				funcTypeApacheToSkeuo shouldEqual "SchemaAvro_Apache => Fix[SchemaAvro_Skeuo]"
+				funcTypeAnamorphismOfCoalgebra shouldEqual funcTypeApacheToSkeuo
+				//apacheToSkeuoAvroSchema shouldBe [(SchemaAvro_Apache ⇒ SchemaAvro_Skeuo[_]) ]
+				
+			}
+			
+			"convert from Skeuo -> Apache (avro schema) --- ROUND-TRIP" in {
+				val strSkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(strApache)
+				
+				val strApacheBack: SchemaAvro_Apache = skeuoToApacheAvroSchema(strSkeuo)
+				
+				strSkeuo shouldEqual SchemaAvro_Skeuo.TString()
+				strApacheBack shouldEqual "string"
+				strApache shouldEqual strApacheBack
+				
+				def apacheRoundTrip: SchemaAvro_Apache ⇒ SchemaAvro_Apache = skeuoToApacheAvroSchema compose apacheToSkeuoAvroSchema
+				
+				def skeuoRoundTrip: Fix[SchemaAvro_Skeuo] ⇒ Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema compose skeuoToApacheAvroSchema
+				
+				apacheRoundTrip(strApache) should be (strApache)
+				skeuoRoundTrip(strSkeuo) should be (strSkeuo)
+				
+				apacheRoundTrip shouldBe [ SchemaAvro_Apache ⇒ SchemaAvro_Apache ]
+				Util.getFuncTypeSubs(apacheRoundTrip) shouldEqual "SchemaAvro_Apache ⇒ SchemaAvro_Apache"
+				
+				skeuoRoundTrip shouldBe [ SchemaAvro_Skeuo[_] ⇒ SchemaAvro_Skeuo[_] ]
+				Util.getFuncTypeSubs(skeuoRoundTrip) shouldEqual "SchemaAvro_Skeuo[SchemaAvro_Apache] ⇒ SchemaAvro_Skeuo[SchemaAvro_Apache]"
+			}
+			
+			"convert from Skeuo -> Apache (avro schema) using catamorphism of an algebra" in {
+				
+				Util.getFuncTypeSubs(algebra_SkeuoApache) shouldEqual "Algebra[SchemaAvro_Skeuo, SchemaAvro_Apache]"
+				
+				val funcTypeCatamorphismOfAlgebra: String = Util.getFuncTypeSubs(scheme.cata(algebra_SkeuoApache).apply(_))
+				
+				val funcTypeSkeuoToApache: String = Util.getFuncTypeSubs(skeuoToApacheAvroSchema)
+				
+				funcTypeSkeuoToApache shouldEqual "Fix[SchemaAvro_Skeuo] ⇒ SchemaAvro_Apache "
+				funcTypeCatamorphismOfAlgebra shouldEqual funcTypeSkeuoToApache
+			}
+		}
+		
+	}
+	println(s"STRING: strApache.toString == 'string': ${strApache.toString == "string"}")
 	println(s"(ARRAY AVRO APACHE-STRING) apache avro Array (string): $arrayApache")
 	println(s"apache avro Enum (string): $enumApache")
 
-	// SchemaApacheAvro --> skeuomorph avro schema
+	// SchemaAvro_Apache --> skeuomorph avro schema
 	// NOTE noting the types here when applying ana / cata morphisms
-	/*val schemeAna: SchemaApacheAvro ⇒ Fix[SchemaSkeuoAvro] = scheme.ana(SchemaSkeuoAvro.fromAvro)
-	val avroToJson: Fix[SchemaSkeuoAvro] ⇒ Json = scheme.cata(SchemaSkeuoAvro.toJson)*/
+	/*val schemeAna: SchemaAvro_Apache ⇒ Fix[SchemaAvro_Skeuo] = scheme.ana(SchemaAvro_Skeuo.fromAvro)
+	val avroToJson: Fix[SchemaAvro_Skeuo] ⇒ Json = scheme.cata(SchemaAvro_Skeuo.toJson)*/
 
 
 	// NOTE: not implemented in skeuo code
 	//println(s"ENUM JSON: enumApache -> skeuoAvro -> Json circe = ${avroToJson(schemeAna(enumApache))}")
 	println(s"(ARRAY JSON CIRCE): arrayApache -> arraySkeuo adt -> array Json circe: ${avroSchemaToJsonString(apacheToSkeuoAvroSchema(arrayApache))}")
 	
-	val keepPckgs = Some(List("io.circe.Json"))
-	val classesToSubs = Some(Map("AvroF" → "SchemaSkeuoAvro", "Schema" → "SchemaApacheAvro"))
 	
-	val ts = Util.getShortFuncType(apacheToSkeuoAvroSchema, keepPckgs, classesToSubs)
-	//type TR = Util.inspectFunc_Type(apacheToSkeuoAvroSchema)
-	/*
-	//import scala.reflect.runtime.universe._
-	type TR = ts.asInstanceOf[Type]
-	type TC = SchemaApacheAvro => Fix[SchemaSkeuoAvro]*/
-	println(s"FUNC TYPE: apacheToSkeuoAvroSchema: ${ts}")
-	//println(s"FUNC TYPE as TYPE: apacheToSkeuoAvroSchema: ${t == tc}")
 	
-	println(s"FUNC TYPE: avroSchemaToJsonString: ${Util.getShortFuncType(avroSchemaToJsonString, keepPckgs, classesToSubs)}")
+	println(s"FUNC TYPE: avroSchemaToJsonString: ${Util.getFuncTypeSubs(avroSchemaToJsonString, keepPckgs, classesToSubs)}")
 
-	//scheme.ana(SchemaSkeuoAvro.fromAvro).apply(strApache)
-	val strSkeuo: Fix[SchemaSkeuoAvro] = apacheToSkeuoAvroSchema(strApache)
-	println(s"skeuo avro string = $strSkeuo")
-	println(s"CHECK TRUE TSTRING: ${strSkeuo == SchemaSkeuoAvro.TString()}")
 
-	// scheme.ana(SchemaSkeuoAvro.fromAvro).apply(arrayApache)
-	val arraySkeuo: Fix[SchemaSkeuoAvro] = apacheToSkeuoAvroSchema(arrayApache)
+	// scheme.ana(SchemaAvro_Skeuo.fromAvro).apply(arrayApache)
+	val arraySkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(arrayApache)
 	println(s"(ARRAY AVRO SKEUO-ADT): skeuo avro array = $arraySkeuo")
 
 
@@ -121,22 +191,21 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends Specification with ScalaChec
 
 
 
-	// scheme.ana(SchemaSkeuoAvro.fromAvro).apply(enumApache)
+	// scheme.ana(SchemaAvro_Skeuo.fromAvro).apply(enumApache)
 	// scheme.ana(coalgebra_ApacheSkeuo).apply(enumApache)
-	val enumSkeuo: Fix[SchemaSkeuoAvro] = apacheToSkeuoAvroSchema(enumApache)
+	val enumSkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(enumApache)
 	println(s"skeuo avro enum: ${enumSkeuo.toString}")
 	println(s"skeuo avro enum unfix: ${enumSkeuo.unfix}")
 
 	// inverse:
 
 	//scheme.cata(algebra_SkeuoApache).apply(strSkeuo)
-	val strApacheBack: SchemaApacheAvro = skeuoToApacheAvroSchema(strSkeuo)
-	println(s"strApacheBack = $strApacheBack ")
+	
 	//scheme.cata(algebra_SkeuoApache).apply(arraySkeuo)
-	val arrayApacheBack: SchemaApacheAvro = skeuoToApacheAvroSchema(arraySkeuo)
+	val arrayApacheBack: SchemaAvro_Apache = skeuoToApacheAvroSchema(arraySkeuo)
 	println(s"arrayApacheBack = $arrayApacheBack")
 	//scheme.cata(algebra_SkeuoApache).apply(enumSkeuo)
-	val enumApacheBack: SchemaApacheAvro = skeuoToApacheAvroSchema(enumSkeuo)
+	val enumApacheBack: SchemaAvro_Apache = skeuoToApacheAvroSchema(enumSkeuo)
 	println(s"enumApacheBack = $enumApacheBack")
 
 
@@ -147,7 +216,7 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends Specification with ScalaChec
 	// TODO left off here - plan idea outlined here:
 	// 1) start from wiem el abadine's schemaF to learn to print out the schema from schmeaF using hylomorphism (trick: migrate matryoshka to droste) since hylo is different.
 	// 2) feed it values see print out
-	// 3) adapt to the skeuomorph AvroF -> SchemaApacheAvro
+	// 3) adapt to the skeuomorph AvroF -> SchemaAvro_Apache
 	// 4) feed THAT values
 	// 5) see the differences between the schema (#1)
 	// 5) see how the avro string gets printed from the schema

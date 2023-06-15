@@ -247,7 +247,7 @@ object Util /*extends App*/ {
 	//error//def inspectFunc_T[T](f: T)(implicit tag: TypeTag[T]): T = tag.tpe.asInstanceOf[T]
 	
 	// Nicer name
-	def getFuncType[T: TypeTag](f: T): String = {
+	def getLongFuncType[T: TypeTag](f: T): String = {
 		val funcTypeStr: String = inspectFunc_str[T](f)
 		println(s"Printing long function type = ${funcTypeStr}")
 		
@@ -258,12 +258,22 @@ object Util /*extends App*/ {
 							   keepPckgs: Option[List[String]] = None,
 							   classesToSubs: Option[Map[String, String]] = None): String = {
 		
-		val shortFuncTypeStr: String = replacePkgWithClass(classNameWithPckgNames = getFuncType[T](f), keepPckgs, classesToSubs)
+		val shortFuncTypeStr: String = replacePkgWithClass(classNameWithPckgNames = getLongFuncType[T](f), keepPckgs, classesToSubs)
 		
 		println(s"Printing short function type = ${shortFuncTypeStr}")
 		
 		shortFuncTypeStr
 	}
+	
+	def getFuncType[T: TypeTag](f: T,
+						   keepPckgs: Option[List[String]] = None,
+						   classesToSubs: Option[Map[String, String]] = None): String =
+		getShortFuncType(f, keepPckgs, classesToSubs)
+		
+	
+	// Making shortcut to not have to pass in these 'keepPckgs' and 'classesToSubstitute' values all the time within the schema tests:
+	import testData.GeneralTestData.{keepPckgs, classesToSubs}
+	def getFuncTypeSubs[T: TypeTag](f: T): String = getShortFuncType(f, keepPckgs, classesToSubs)
 	
 	/*val fs2 = "(scala.zio.pkg1.pk2.pkg3.Enum3[A,B, C, D], scala.zio.pkg3.pkg4.CaseClass5[A1, A2, A3, A4, A5]) => scala.zio.pkg8.pkg9.CaseClass3[R, A, S]"*/
 	

@@ -248,7 +248,7 @@ object Skeuo_Apache {
 		}
 	
 	
-	
+	// TODO change names: SchemaAvro_Apache etc
 	
 	def skeuoToApacheAvroSchema: Fix[SchemaSkeuoAvro] ⇒ SchemaApacheAvro = scheme.cata(algebra_SkeuoApache).apply(_)
 	
