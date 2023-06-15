@@ -89,6 +89,44 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
 	
 	// Apache avro schema
 	//println(s"apache avro String (string): $strApache")
+	
+	"Morphism conversions" when {
+		"anamorphism should extract inner type of coalgebra" in {
+			
+			// type-check -- for coalgebra
+			Util.getFuncTypeSubs(coalgebra_ApacheSkeuo) shouldEqual "Coalgebra[SchemaAvro_Skeuo,SchemaAvro_Apache]"
+			coalgebra_ApacheSkeuo shouldBe a[Coalgebra[SchemaAvro_Skeuo, SchemaAvro_Apache]]
+			
+			
+			// type-check -- for the extracted coalgebra type
+			val funcTypeAnamorphismOfCoalgebra: String = Util.getFuncTypeSubs(scheme.ana(coalgebra_ApacheSkeuo).apply(_))
+			val funcTypeApacheToSkeuo: String = Util.getFuncTypeSubs(apacheToSkeuoAvroSchema)
+			
+			funcTypeApacheToSkeuo shouldEqual "SchemaAvro_Apache => Fix[SchemaAvro_Skeuo]"
+			funcTypeAnamorphismOfCoalgebra shouldEqual funcTypeApacheToSkeuo
+			
+			scheme.ana(coalgebra_ApacheSkeuo) shouldBe a[SchemaAvro_Apache => SchemaAvro_Skeuo[_]]
+			apacheToSkeuoAvroSchema shouldBe a[SchemaAvro_Apache => SchemaAvro_Skeuo[_]]
+			
+		}
+		"catamorphism should extract inner type of algebra" in {
+			// type-check -- for algebra
+			Util.getFuncTypeSubs(algebra_SkeuoApache) shouldEqual "Algebra[SchemaAvro_Skeuo,SchemaAvro_Apache]"
+			algebra_SkeuoApache shouldBe a[Algebra[SchemaAvro_Skeuo, SchemaAvro_Apache]]
+			
+			
+			// type-check -- for the extracted algebra type
+			val funcTypeCatamorphismOfAlgebra: String = Util.getFuncTypeSubs(scheme.cata(algebra_SkeuoApache).apply(_))
+			val funcTypeSkeuoToApache: String = Util.getFuncTypeSubs(skeuoToApacheAvroSchema)
+			
+			funcTypeSkeuoToApache shouldEqual "Fix[SchemaAvro_Skeuo] => SchemaAvro_Apache"
+			funcTypeCatamorphismOfAlgebra shouldEqual funcTypeSkeuoToApache
+			
+			scheme.cata(algebra_SkeuoApache) shouldBe a[SchemaAvro_Skeuo[_] => SchemaAvro_Apache]
+			skeuoToApacheAvroSchema shouldBe a[SchemaAvro_Skeuo[_] => SchemaAvro_Apache]
+		}
+	}
+	
 	"Converting skeuomorph's Avro Schema-ADT to org.apache.avro's Avro Schema ADT" when {
 		
 		"String" should {
@@ -104,47 +142,34 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
 				strApache.toString shouldBe a [String] // checks type
 			}
 			
-			"convert from Apache -> Skeuo (Avro Schema)" in {
+			"convert from Apache -> Skeuo (Avro Schema) using anamorphism of coalgebra" in {
+				
+				
+				// type-check -- for coalgebra
+				coalgebra_ApacheSkeuo shouldBe a[Coalgebra[SchemaAvro_Skeuo, SchemaAvro_Apache]]
+				scheme.ana(coalgebra_ApacheSkeuo) shouldBe a[SchemaAvro_Apache => SchemaAvro_Skeuo[_]]
+				apacheToSkeuoAvroSchema shouldBe a[SchemaAvro_Apache => SchemaAvro_Skeuo[_]]
+				
+				Util.getFuncTypeSubs(apacheToSkeuoAvroSchema) shouldEqual "SchemaAvro_Apache => Fix[SchemaAvro_Skeuo]"
+				Util.getFuncTypeSubs(scheme.ana(coalgebra_ApacheSkeuo).apply(_)) shouldEqual "SchemaAvro_Apache => Fix[SchemaAvro_Skeuo]"
+				
+				
+				// value-check --- for conversion result
 				val strSkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(strApache)
 				
-				// value-check
 				strSkeuo shouldEqual SchemaAvro_Skeuo.TString()
 				strSkeuo.toString shouldEqual "TString()"
 				
-				//type -check
+				//type -check --- for conversion result
 				Util.getFuncTypeSubs(strSkeuo) shouldEqual "Fix[SchemaAvro_Skeuo]"
-				strSkeuo shouldBe a[SchemaAvro_Skeuo[_]] // TODO: interesting, Fix type is invisible???
+				strSkeuo shouldBe a[SchemaAvro_Skeuo[_]]
+				
+				// NOTE: interesting, Fix type is invisible???
 				//strSkeuo shouldBe a [ Fix[_] ] //runtime erases type parameters
 			}
 			
-			"convert from Apache -> Skeuo (avro schema) using anamorphism of a coalgebra" in {
-				
-				// type-check
-				coalgebra_ApacheSkeuo shouldBe a [Coalgebra[SchemaAvro_Skeuo, SchemaAvro_Apache]]
-				Util.getFuncTypeSubs(coalgebra_ApacheSkeuo) shouldEqual "Coalgebra[SchemaAvro_Skeuo,SchemaAvro_Apache]"
-				
-				
-				val funcTypeAnamorphismOfCoalgebra: String = Util.getFuncTypeSubs(scheme.ana(coalgebra_ApacheSkeuo).apply(_))
-				val funcTypeApacheToSkeuo: String = Util.getFuncTypeSubs(apacheToSkeuoAvroSchema)
-				
-				scheme.ana(coalgebra_ApacheSkeuo) shouldBe a [SchemaAvro_Apache => SchemaAvro_Skeuo[_]] // TODO how to get this type correct?
-				apacheToSkeuoAvroSchema shouldBe a [SchemaAvro_Apache => SchemaAvro_Skeuo[_]]
-				
-				funcTypeApacheToSkeuo shouldEqual "SchemaAvro_Apache => Fix[SchemaAvro_Skeuo]"
-				funcTypeAnamorphismOfCoalgebra shouldEqual funcTypeApacheToSkeuo
-				
-				
-				// TODO - cannot find out why getting this error for above code:
-				// NOTE: figured it out - must use the '=>' arrow instead of the '⇒' arrow
-				/*
-				...ra[SchemaAvro_Skeuo,[]SchemaAvro_Apache]" did not equal "...ra[SchemaAvro_Skeuo,[ ]SchemaAvro_Apache]"
-				ScalaTestFailureLocation: conversionsOfSchemaADTs.avro_avro.skeuo_apache.specs.AvroSchema_SkeuoApacheRoundTrip_Specs at (AvroSchema_SkeuoApacheRoundTrip_Specs.scala:117)
-				Expected :"...ra[SchemaAvro_Skeuo,[ ]SchemaAvro_Apache]"
-				 */
-				
-			}
-			
-			"convert from Skeuo -> Apache (avro schema) --- ROUND-TRIP" in {
+			// TODO refactor this fucntion to show cata-ana-hylo (type and value checks)
+			"convert from Skeuo -> Apache (avro schema) using hylomorphism --- ROUND-TRIP" in {
 				val strSkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(strApache)
 				strSkeuo shouldEqual SchemaAvro_Skeuo.TString()
 				
@@ -172,17 +197,9 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
 				Util.getFuncTypeSubs(skeuoRoundTrip) shouldEqual "SchemaAvro_Skeuo[SchemaAvro_Apache] => SchemaAvro_Skeuo[SchemaAvro_Apache]"
 			}
 			
-			"convert from Skeuo -> Apache (avro schema) using catamorphism of an algebra" in {
-				
-				Util.getFuncTypeSubs(algebra_SkeuoApache) shouldEqual "Algebra[SchemaAvro_Skeuo, SchemaAvro_Apache]"
-				
-				val funcTypeCatamorphismOfAlgebra: String = Util.getFuncTypeSubs(scheme.cata(algebra_SkeuoApache).apply(_))
-				
-				val funcTypeSkeuoToApache: String = Util.getFuncTypeSubs(skeuoToApacheAvroSchema)
-				
-				funcTypeSkeuoToApache shouldEqual "Fix[SchemaAvro_Skeuo] ⇒ SchemaAvro_Apache "
-				funcTypeCatamorphismOfAlgebra shouldEqual funcTypeSkeuoToApache
-			}
+			
+			
+			
 		}
 		
 	}
