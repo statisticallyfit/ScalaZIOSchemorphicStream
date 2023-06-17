@@ -120,7 +120,7 @@ object Skeuo_Apache {
 			 * SOURCE = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L211
 			 */
 			case SchemaSkeuoAvro.TNamedType(namespace: String, name: String) ⇒ {
-				SchemaApacheAvro.createRecord(name, "NO DOC", namespace, /*isError =*/ false)
+				SchemaApacheAvro.createRecord(name, null/*"NO DOC"*/, namespace, /*isError =*/ false)
 			}
 			
 			/**
@@ -148,7 +148,7 @@ object Skeuo_Apache {
 				// HELP: apache has `isError` while skeuo does not and skeuo has `aliases` while apache does not.... how to fix?
 				//  TODO say by default that this record is NOT an error type? = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L364
 				
-				val recordSchema: SchemaApacheAvro = SchemaApacheAvro.createRecord(skeuoName, skeuoDoc.getOrElse("NO DOC"), skeuoNamespace.getOrElse("NO NAMESPACE"), /*isError =*/ false, skeuoFields.map(f ⇒ field2Field_SA(f)).asJava)
+				val recordSchema: SchemaApacheAvro = SchemaApacheAvro.createRecord(skeuoName, skeuoDoc.getOrElse(null/*"NO DOC"*/), skeuoNamespace.getOrElse(null/*"NO NAMESPACE"*/), /*isError =*/ false, skeuoFields.map(f ⇒ field2Field_SA(f)).asJava)
 				
 				aliases.foreach(a ⇒ recordSchema.addAlias(a))
 				
@@ -170,8 +170,8 @@ object Skeuo_Apache {
 			 */
 			case SchemaSkeuoAvro.TEnum(name, namespaceOpt, aliases, docOpt, symbols) => {
 				val enumSchema = SchemaApacheAvro.createEnum(name,
-					docOpt.getOrElse("NO DOC"),
-					namespaceOpt.getOrElse("NO NAMESPACE"),
+					docOpt.orNull,
+					namespaceOpt.getOrElse(null/*"NO NAMESPACE"*/),
 					symbols.asJava
 				)
 				
@@ -187,7 +187,7 @@ object Skeuo_Apache {
 			 * NOTE: skeup has `namespaceOption` while apache has `space`` -- they are the same (namespace wrapped in option)
 			 */
 			case SchemaSkeuoAvro.TFixed(name, namespaceOpt, aliases, size) => {
-				val fixedSchema: SchemaApacheAvro = SchemaApacheAvro.createFixed(name, "NO DOC", namespaceOpt.getOrElse("NO SPACE (from namespace)"), size)
+				val fixedSchema: SchemaApacheAvro = SchemaApacheAvro.createFixed(name, null/*"NO DOC"*/, namespaceOpt.getOrElse(null/*"NO SPACE (from namespace)"*/), size)
 				
 				aliases.foreach(a => fixedSchema.addAlias(a))
 				

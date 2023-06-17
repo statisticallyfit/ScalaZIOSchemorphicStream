@@ -53,6 +53,18 @@ object try_AvroToSkeuo_tatidatafile extends App {
 	
 	// Convert .avsc to schema-avro
 	val parsedAvroSchemaFromFile: SchemaAvro_Apache = new SchemaAvro_Apache.Parser().parse(avroFileObj)
+	val mpprintout = Map("getDoc" → parsedAvroSchemaFromFile.getDoc,
+		"getFields" → parsedAvroSchemaFromFile.getFields,
+		"getField(\"manufacturer\")" → parsedAvroSchemaFromFile.getField("sensor_type"),
+		"field doc" → parsedAvroSchemaFromFile.getField("sensor_type").doc(),
+		"field order" → parsedAvroSchemaFromFile.getField("sensor_type").order(),
+		"field schema" → parsedAvroSchemaFromFile.getField("sensor_type").schema(),
+		"field aliases" → parsedAvroSchemaFromFile.getField("sensor_type").aliases(),
+		"field defaultval" → parsedAvroSchemaFromFile.getField("sensor_type").defaultVal(),
+		"field hasdefaultval" → parsedAvroSchemaFromFile.getField("sensor_type").hasDefaultValue,
+		"field objectprops" → parsedAvroSchemaFromFile.getField("sensor_type").getObjectProps
+	)
+	println(mpprintout)
 	
 	// Convert apache schema -> skeuo schema
 	val skeuoSchema: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(parsedAvroSchemaFromFile)
@@ -70,6 +82,7 @@ object try_AvroToSkeuo_tatidatafile extends App {
 	println(s"apache avro schema to SKEUO schema = ${skeuoSchema}")
 	println(s"skeuo -> apache back: $avroBack")
 	
-	
+	println(s"apache schema == apache back: ${parsedAvroSchemaFromFile == avroBack}")
+	println(s" (str) apache schema == apache back: ${parsedAvroSchemaFromFile.toString == avroBack.toString}")
 	
 }
