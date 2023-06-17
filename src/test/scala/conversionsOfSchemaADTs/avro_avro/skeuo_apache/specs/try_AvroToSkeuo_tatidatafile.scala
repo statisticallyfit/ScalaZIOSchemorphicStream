@@ -57,6 +57,9 @@ object try_AvroToSkeuo_tatidatafile extends App {
 	// Convert apache schema -> skeuo schema
 	val skeuoSchema: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(parsedAvroSchemaFromFile)
 	
+	// Converting backward
+	val avroBack: SchemaAvro_Apache = skeuoToApacheAvroSchema(skeuoSchema)
+	
 	// Get reference to source object so can close again when done reading the file contents
 	val srcObj: BufferedSource = Source.fromFile(avroFile)
 	val avroStr: String = srcObj.getLines().mkString
@@ -65,6 +68,8 @@ object try_AvroToSkeuo_tatidatafile extends App {
 	println(s"original avro string = ${avroStr}")
 	println(s"converted avro string to APACHE SCHEMA = ${parsedAvroSchemaFromFile}")
 	println(s"apache avro schema to SKEUO schema = ${skeuoSchema}")
+	println(s"skeuo -> apache back: $avroBack")
+	
 	
 	
 }
