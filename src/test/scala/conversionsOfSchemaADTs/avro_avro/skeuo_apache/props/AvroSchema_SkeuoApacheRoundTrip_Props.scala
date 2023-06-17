@@ -48,4 +48,7 @@ class AvroSchema_SkeuoApacheRoundTrip_Props extends Specification with ScalaChec
 			Converting between Skeuomorph and Apache libraries' avro schema ADTs (using property-based testing)
 		"""
 	
+	
+	//scheme.hylo(algebra_SkeuoApache, coalgebra_ApacheSkeuo) shouldBe a[SchemaAvro_Apache => SchemaAvro_Apache] // TODO idea prop-check - assert that apacheroundtrip meets the hylomorphism laws
+	
 }
