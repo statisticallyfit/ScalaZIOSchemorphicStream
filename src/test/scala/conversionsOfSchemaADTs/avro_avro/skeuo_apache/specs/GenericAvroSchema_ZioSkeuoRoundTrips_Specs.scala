@@ -58,7 +58,7 @@ class GenericAvroSchema_ZioSkeuoRoundTrips_Specs extends Specification with Scal
 	
 	
 	//val arrayZio: Either[String, Any] = apacheAvroSchemaToZioSchema(arrayApache)
-	val arrayZio2: Either[String, ZioSchema[_]] = AvroCodec.decodeFromApacheAvro(arrayIntApache)
+	val arrayZio2: Either[String, ZioSchema[_]] = AvroCodec.decodeFromApacheAvro(arrayIntSchema_Apache)
 	//println(s"(ARRAY ZIO-ADT): zio avro array = $arrayZio")
 	println(s"(ARRAY ZIO-ADT): zio avro array = $arrayZio2")
 

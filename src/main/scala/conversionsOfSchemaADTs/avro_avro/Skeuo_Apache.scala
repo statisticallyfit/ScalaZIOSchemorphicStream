@@ -36,7 +36,7 @@ object Skeuo_Apache {
 	 *
 	 * @return
 	 */
-	def coalgebra_ApacheSkeuo: Coalgebra[SchemaAvro_Skeuo, SchemaAvro_Apache] = SchemaAvro_Skeuo.fromAvro
+	def coalgebra_ApacheToSkeuo: Coalgebra[SchemaAvro_Skeuo, SchemaAvro_Apache] = SchemaAvro_Skeuo.fromAvro
 	
 	
 	/**
@@ -45,7 +45,7 @@ object Skeuo_Apache {
 	 *
 	 * @return
 	 */
-	def algebra_SkeuoApache: Algebra[SchemaAvro_Skeuo, SchemaAvro_Apache] =
+	def algebra_SkeuoToApache: Algebra[SchemaAvro_Skeuo, SchemaAvro_Apache] =
 		Algebra { // Algebra[Skeuo, Apache] ----- MEANING ---->  Skeuo[Apache] => Apache
 			
 			case SchemaAvro_Skeuo.TNull() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.NULL)
@@ -187,7 +187,7 @@ object Skeuo_Apache {
 			 * NOTE: skeup has `namespaceOption` while apache has `space`` -- they are the same (namespace wrapped in option)
 			 */
 			case SchemaAvro_Skeuo.TFixed(name, namespaceOpt, aliases, size) => {
-				val fixedSchema: SchemaAvro_Apache = SchemaAvro_Apache.createFixed(name, null/*"NO DOC"*/, namespaceOpt.getOrElse(null/*"NO SPACE (from namespace)"*/), size)
+				val fixedSchema: SchemaAvro_Apache = SchemaAvro_Apache.createFixed(name, null/*"NO DOC"*/, namespaceOpt.orNull, size)
 				
 				aliases.foreach(a => fixedSchema.addAlias(a))
 				
@@ -201,10 +201,13 @@ object Skeuo_Apache {
 			case SchemaAvro_Skeuo.TDate() => {
 				val intSchema: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.INT)
 				val dateLogicalType: LogicalTypeApache = LogicalTypesApache.date()
+				
 				assert(/*dateLogicalType.validate(intSchema)*/ isValidated(dateLogicalType, intSchema),
 					s"${dateLogicalType.getName} Logical Type uses ${intSchema.getType} schema only") // check if compatible
 				
 				val dateSchema: SchemaAvro_Apache = dateLogicalType.addToSchema(intSchema)
+				
+				assert(dateSchema == intSchema) // the int schema was altered (warning: state change!)
 				
 				dateSchema
 			}
@@ -212,6 +215,7 @@ object Skeuo_Apache {
 				
 				val intSchema: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.INT)
 				val millisLogicalType: LogicalTypeApache = LogicalTypesApache.timeMillis()
+				
 				assert(isValidated(millisLogicalType, intSchema), s"${millisLogicalType.getName} Logical Type uses ${intSchema.getType} schema only") // check if compatible
 				
 				val millisSchema: SchemaAvro_Apache = millisLogicalType.addToSchema(intSchema)
@@ -223,6 +227,7 @@ object Skeuo_Apache {
 				
 				val longSchema: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.LONG)
 				val timestampMillisLogicalType: LogicalTypeApache = LogicalTypesApache.timestampMillis()
+				
 				assert(isValidated(timestampMillisLogicalType, longSchema), s"${timestampMillisLogicalType.getName} Logical Type uses ${longSchema.getType} schema only") // check if compatible
 				
 				val timestampMillisSchema: SchemaAvro_Apache = timestampMillisLogicalType.addToSchema(longSchema)
@@ -232,7 +237,7 @@ object Skeuo_Apache {
 			
 			case SchemaAvro_Skeuo.TDecimal(precision: Int, scale: Int) ⇒ {
 				
-				val fixedSchema: SchemaAvro_Apache = SchemaAvro_Apache.createFixed("decimal_fixed", "doc_decimal_fixed", "decimal_namespace", 5)
+				val fixedSchema: SchemaAvro_Apache = SchemaAvro_Apache.createFixed("Fixed (schema) for Decimal (logical type)", null/*"doc_decimal_fixed"*/, null, /*"decimal_namespace"*/ 0)
 				// TODO is this OK?
 				
 				val decimalLogicalType: LogicalTypeApache = LogicalTypesApache.decimal(precision, scale)
@@ -250,12 +255,12 @@ object Skeuo_Apache {
 	
 	// TODO change names: SchemaAvro_Apache etc
 	
-	def skeuoToApacheAvroSchema: Fix[SchemaAvro_Skeuo] ⇒ SchemaAvro_Apache = scheme.cata(algebra_SkeuoApache).apply(_)
+	def skeuoToApacheAvroSchema: Fix[SchemaAvro_Skeuo] ⇒ SchemaAvro_Apache = scheme.cata(algebra_SkeuoToApache).apply(_)
 	
 	
 	
 	
-	def apacheToSkeuoAvroSchema: SchemaAvro_Apache ⇒ Fix[SchemaAvro_Skeuo] = scheme.ana(coalgebra_ApacheSkeuo).apply(_)
+	def apacheToSkeuoAvroSchema: SchemaAvro_Apache ⇒ Fix[SchemaAvro_Skeuo] = scheme.ana(coalgebra_ApacheToSkeuo).apply(_)
 	
 	
 	
