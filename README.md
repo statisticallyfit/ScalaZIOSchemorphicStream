@@ -181,15 +181,20 @@ note: use [`hasSameSchemaStructure`](https://github.com/zio/zio-schema/blob/4e1e
          
         * :large_blue_circle: SKEUO's `JsonSchemaF` --> `io.circe.Json`: [`def render: Algebra[JsonSchemaF, Json]`](https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94)
        
-        * :question: `io.circe.Json` --> SKEUO's `JsonSchemaF`
+        * :question: `io.circe.Json` --> SKEUO's `JsonSchemaF` [roundtrip codec using circe](https://github.com/higherkindness/skeuomorph/blob/ae486ecec9392ac0d7a56942a43e24990db1de25/src/test/scala/higherkindness/skeuomorph/openapi/OpenApiSchemaSpec.scala#L56) from `OpenApiSchemaSpec.scala`
        
     * <u>`Json` schema ADT <--> `Json` string</u>
        
       * SKEUO:    
          
         * (simple types) SKEUO's `JsonSchemaF` <--> `Json` string 
-          * :large_blue_circle: SKEUO's `JsonSchemaF` --> `Json` string: [print json fixed tests examples](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/JsonSchemaPrintSpecification.scala#L21-L35)
-          * :large_blue_circle: `Json` string --> SKEUO's `JsonSchemaF` [print json fixed tests examples](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/JsonSchemaDecoderSpecification.scala)
+          * :large_blue_circle: SKEUO's `JsonSchemaF` --> `Json` string: [json fixed tests examples](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/JsonSchemaPrintSpecification.scala#L21-L35) from `JsonSchemaPrintSpecification.scala`
+          * :large_blue_circle: `Json` string --> SKEUO's `JsonSchemaF` [json fixed tests examples](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/JsonSchemaDecoderSpecification.scala) from `JsonSchemaDecoderSpecification.scala`
+           
+        * (entire types) SKEUO's `JsonSchemaF` <--> `Json` string 
+          * :question: SKEUO's `JsonSchemaF` --> `Json` string
+          * :large_blue_circle: `Json` string --> SKEUO's `JsonSchemaF`: [using `io.circe.Json`'s `Decoder[A].decodeJson()`](https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/OpenApiDecoderSpecification.scala#L53-L79) from `OpenApiDecoderSpecification.scala`
+      
        
       * ZIO:    
         * TODO left off here look at jsoncodecspec = https://github.com/zio/zio-schema/blob/4e1e00193a59e5d3465fbb76433be5e680df21d7/zio-schema-json/shared/src/test/scala-2/zio/schema/codec/JsonCodecSpec.scala

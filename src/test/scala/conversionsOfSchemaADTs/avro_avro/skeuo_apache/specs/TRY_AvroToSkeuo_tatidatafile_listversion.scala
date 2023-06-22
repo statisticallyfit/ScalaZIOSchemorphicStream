@@ -40,7 +40,7 @@ import scala.io.Source
 /**
  *
  */
-object try_AvroToSkeuo_tatidatafile extends App {
+object TRY_AvroToSkeuo_tatidatafile_listversion extends App {
 
 	
 	val filePath: String = "/development/projects/statisticallyfit/github/learningdataflow/SchaemeowMorphism/src/test/scala/testData/testDataPrivateTati/asset-schemas/sdp-asset-schemas-luftdaten/src/main/airquality/lft.aq_msm/lft.aq_msm.datasource/avro/"
