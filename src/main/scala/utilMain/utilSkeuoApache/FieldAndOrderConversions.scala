@@ -38,11 +38,11 @@ object FieldAndOrderConversions {
 		(fieldS: FieldS[SchemaApacheAvro]) ⇒ {
 			//val t: util.List[String] = fieldS.aliases.asJava
 			
-			val fieldApache_name: String = fieldS.name
-			val fieldApache_schema: SchemaApacheAvro = fieldS.tpe
+			val fName: String = fieldS.name
+			val fSchema: SchemaApacheAvro = fieldS.tpe
 			//val fieldApache_doc: String = fieldS.doc.getOrElse("") //("NO DOC")
-			val fieldApache_doc = null
-			val fieldApache_defaultValue = null // NOTE: put assumption that null means it does not appear when printed in the Apache Schema
+			val fDoc: Null = null
+			val fDefaultValue: Null = null // NOTE: put assumption that null means it does not appear when printed in the Apache Schema
 			// Functions references:
 			// 	validateDefault (in Schema.java of org.apache)
 			// 	isValidDefault (in Schema.java of org.apache)
@@ -51,9 +51,9 @@ object FieldAndOrderConversions {
 			//: JsonNodeType = JsonNodeType.STRING // TODO temporary to make the string test pass.
 				//FieldApache.NULL_DEFAULT_VALUE
 			//val fieldApache_defaultValue: util.List[String] = fieldS.aliases.asJava // HELP: apache has no 'aliases' while skeuo does and skeuo has no 'default value' while apache does -- are they the same?
-			val fieldApache_order: OrderA = order2Order_SA(fieldS.order.getOrElse(OrderSkeuo.Ignore))
+			val fOrder: OrderA = order2Order_SA(fieldS.order.getOrElse(OrderSkeuo.Ignore))
 			
-			new FieldApache(fieldApache_name, fieldApache_schema, fieldApache_doc, fieldApache_defaultValue, fieldApache_order)
+			new FieldApache(fName, fSchema, fDoc, fDefaultValue, fOrder)
 		}
 	
 }

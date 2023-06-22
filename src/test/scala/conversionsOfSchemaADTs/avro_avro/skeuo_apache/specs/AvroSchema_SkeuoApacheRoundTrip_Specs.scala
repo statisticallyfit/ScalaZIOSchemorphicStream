@@ -132,13 +132,13 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
 			"start as Apache (avro schema)" in {
 				
 				// value-check
-				strApache should equal (SchemaAvro_Apache.create(SchemaAvro_Apache.Type.STRING))
+				strSchema_A should equal (SchemaAvro_Apache.create(SchemaAvro_Apache.Type.STRING))
 				// NOTE: double quotes because avro schema prints the quotes
-				strApache.toString should equal("\"string\"") // checks value
+				strSchema_A.toString should equal("\"string\"") // checks value
 				
 				// type-check
-				strApache shouldBe a [SchemaAvro_Apache]
-				strApache.toString shouldBe a [String] // checks type
+				strSchema_A shouldBe a [SchemaAvro_Apache]
+				strSchema_A.toString shouldBe a [String] // checks type
 			}
 			
 			"convert from Apache -> Skeuo (Avro Schema) using anamorphism of coalgebra" in {
@@ -154,14 +154,14 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
 				
 				
 				// value-check --- for conversion result
-				val strSkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(strApache)
+				val strSchema_S: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(strSchema_A)
 				
-				strSkeuo shouldEqual SchemaAvro_Skeuo.TString()
-				strSkeuo.toString shouldEqual "TString()"
+				strSchema_S shouldEqual SchemaAvro_Skeuo.TString()
+				strSchema_S.toString shouldEqual "TString()"
 				
 				//type -check --- for conversion result
-				Util.getFuncTypeSubs(strSkeuo) shouldEqual "Fix[SchemaAvro_Skeuo]"
-				strSkeuo shouldBe a[SchemaAvro_Skeuo[_]]
+				Util.getFuncTypeSubs(strSchema_S) shouldEqual "Fix[SchemaAvro_Skeuo]"
+				strSchema_S shouldBe a[SchemaAvro_Skeuo[_]]
 				
 				// NOTE: interesting, Fix type is invisible???
 				//strSkeuo shouldBe a [ Fix[_] ] //runtime erases type parameters
@@ -180,7 +180,7 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
 				
 				
 				// value-check --- for conversion result
-				val strSkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(strApache)
+				val strSkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(strSchema_A)
 				strSkeuo shouldEqual SchemaAvro_Skeuo.TString()
 				strSkeuo.toString shouldEqual "TString()"
 				
@@ -218,11 +218,11 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
 				
 				
 				//----------------------
-				val strSkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(strApache)
+				val strSkeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(strSchema_A)
 				
 				
 				// value-check --- of conversion
-				apacheRoundTrip(strApache) should equal (strApache)
+				apacheRoundTrip(strSchema_A) should equal (strSchema_A)
 				skeuoRoundTrip(strSkeuo) should equal (strSkeuo)
 				
 				// type-check --- of conversion
@@ -236,6 +236,7 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
 			}
 		}
 		
+		// -----------------------------------------------------------------------------------------------
 		
 		"Array" should {
 			
@@ -244,10 +245,12 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
 				
 				// value-check
 				arrayIntApache should equal(SchemaAvro_Apache.createArray(arrayIntApache.getElementType))
+				arrayStrApache should equal(SchemaAvro_Apache.createArray(strSchema_A))
 				// NOTE: double quotes because avro schema prints the quotes
 				arrayIntApache.toString should equal("{\"type\":\"array\",\"items\":\"int\"}")
 				
-				// TODO why this error?: ')' expected but string literal found.
+				// NOTE: with triple quotes this error is fixed:
+				//  (previous) error:  ')' expected but string literal found.
 				arrayIntApache.toString shouldEqual s"""{\"type\":\"array\",\"items\":${arrayIntApache.getElementType.toString}}"""
 				
 				
@@ -349,7 +352,7 @@ class AvroSchema_SkeuoApacheRoundTrip_Specs extends AnyWordSpec with Matchers {
 			}
 		}
 	}
-	println(s"STRING: strApache.toString == 'string': ${strApache.toString == "string"}")
+	println(s"STRING: strSchema_A.toString == 'string': ${strSchema_A.toString == "string"}")
 	println(s"(ARRAY AVRO APACHE-STRING) apache avro Array (string): $arrayIntApache")
 	println(s"apache avro Enum (string): $enumApache")
 

@@ -65,11 +65,6 @@ object Skeuo_Apache {
 			case SchemaAvro_Skeuo.TString() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.STRING)
 			
 			
-			/**
-			 * Apache Map Type = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L243
-			 */
-			case SchemaAvro_Skeuo.TMap(sch: SchemaAvro_Apache) => SchemaAvro_Apache.createMap(sch)
-			
 			
 			/**
 			 * Apache array = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L238
@@ -113,6 +108,11 @@ object Skeuo_Apache {
 			}
 				//createEnum(String name, String doc, String namespace, List<String> values)
 			}*/
+			
+			/**
+			 * Apache Map Type = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L243
+			 */
+			case SchemaAvro_Skeuo.TMap(sch: SchemaAvro_Apache) => SchemaAvro_Apache.createMap(sch)
 			
 			
 			/**
