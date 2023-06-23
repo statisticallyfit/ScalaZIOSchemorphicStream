@@ -266,8 +266,8 @@ object Skeuo_Apache {
 	
 	
 	
-	def apacheRoundTrip: SchemaAvro_Apache ⇒ SchemaAvro_Apache = skeuoToApacheAvroSchema compose apacheToSkeuoAvroSchema
+	def roundTrip_ApacheAvroToApacheAvro: SchemaAvro_Apache ⇒ SchemaAvro_Apache = skeuoToApacheAvroSchema compose apacheToSkeuoAvroSchema
 	
-	def skeuoRoundTrip: Fix[SchemaAvro_Skeuo] ⇒ Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema compose skeuoToApacheAvroSchema
+	def roundTrip_SkeuoAvroToSkeuoAvro: Fix[SchemaAvro_Skeuo] ⇒ Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema compose skeuoToApacheAvroSchema
 	
 }

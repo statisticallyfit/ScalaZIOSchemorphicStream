@@ -11,6 +11,7 @@ import scala.util.control.Exception._
  */
 object ValidateUtil {
 	def isValidated(logicalType: LogicalTypeApache, schemaArg: SchemaApacheAvro): Boolean = {
+		
 		val wasThrown: Option[Unit] = catching(classOf[IllegalArgumentException]) opt { logicalType.validate(schemaArg) }
 		
 		wasThrown match {

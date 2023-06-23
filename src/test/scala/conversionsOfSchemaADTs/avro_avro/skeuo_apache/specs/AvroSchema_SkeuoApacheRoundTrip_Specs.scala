@@ -222,17 +222,17 @@ class AvroSchema_SkeuoApacheRoundTrip_Skeuopecs extends AnyWordSpec with Matcher
 				
 				
 				// value-check --- of conversion
-				apacheRoundTrip(strSchema_Apache) should equal (strSchema_Apache)
-				skeuoRoundTrip(strSchema_Skeuo) should equal (strSchema_Skeuo)
+				roundTrip_ApacheAvroToApacheAvro(strSchema_Apache) should equal (strSchema_Apache)
+				roundTrip_SkeuoAvroToSkeuoAvro(strSchema_Skeuo) should equal (strSchema_Skeuo)
 				
 				// type-check --- of conversion
-				apacheRoundTrip shouldBe a [SchemaAvro_Apache => SchemaAvro_Apache]
+				roundTrip_ApacheAvroToApacheAvro shouldBe a [SchemaAvro_Apache => SchemaAvro_Apache]
 				scheme.hylo(algebra_SkeuoToApache, coalgebra_ApacheToSkeuo) shouldBe a [SchemaAvro_Apache => SchemaAvro_Apache]
-				Util.getFuncTypeSubs(apacheRoundTrip) shouldEqual "SchemaAvro_Apache => SchemaAvro_Apache"
+				Util.getFuncTypeSubs(roundTrip_ApacheAvroToApacheAvro) shouldEqual "SchemaAvro_Apache => SchemaAvro_Apache"
 				
-				skeuoRoundTrip shouldBe a [SchemaAvro_Skeuo[_] => SchemaAvro_Skeuo[_]]
+				roundTrip_SkeuoAvroToSkeuoAvro shouldBe a [SchemaAvro_Skeuo[_] => SchemaAvro_Skeuo[_]]
 				(apacheToSkeuoAvroSchema compose skeuoToApacheAvroSchema) shouldBe a [SchemaAvro_Skeuo[_] => SchemaAvro_Skeuo[_]]
-				Util.getFuncTypeSubs(skeuoRoundTrip) shouldEqual "Fix[SchemaAvro_Skeuo] => Fix[SchemaAvro_Skeuo]"
+				Util.getFuncTypeSubs(roundTrip_SkeuoAvroToSkeuoAvro) shouldEqual "Fix[SchemaAvro_Skeuo] => Fix[SchemaAvro_Skeuo]"
 			}
 		}
 		
@@ -351,17 +351,17 @@ class AvroSchema_SkeuoApacheRoundTrip_Skeuopecs extends AnyWordSpec with Matcher
 				val arrayIntSchema_Skeuo: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(arrayIntSchema_Apache)
 				
 				// value-check --- of conversion
-				apacheRoundTrip(arrayIntSchema_Apache) should equal(arrayIntSchema_Apache)
-				skeuoRoundTrip(arrayIntSchema_Skeuo) should equal(arrayIntSchema_Skeuo)
+				roundTrip_ApacheAvroToApacheAvro(arrayIntSchema_Apache) should equal(arrayIntSchema_Apache)
+				roundTrip_SkeuoAvroToSkeuoAvro(arrayIntSchema_Skeuo) should equal(arrayIntSchema_Skeuo)
 				
 				// type-check --- of conversion
-				apacheRoundTrip shouldBe a [SchemaAvro_Apache => SchemaAvro_Apache]
+				roundTrip_ApacheAvroToApacheAvro shouldBe a [SchemaAvro_Apache => SchemaAvro_Apache]
 				scheme.hylo(algebra_SkeuoToApache, coalgebra_ApacheToSkeuo) shouldBe a [SchemaAvro_Apache => SchemaAvro_Apache]
-				Util.getFuncTypeSubs(apacheRoundTrip) shouldEqual "SchemaAvro_Apache => SchemaAvro_Apache"
+				Util.getFuncTypeSubs(roundTrip_ApacheAvroToApacheAvro) shouldEqual "SchemaAvro_Apache => SchemaAvro_Apache"
 				
-				skeuoRoundTrip shouldBe a [SchemaAvro_Skeuo[_] => SchemaAvro_Skeuo[_]]
+				roundTrip_SkeuoAvroToSkeuoAvro shouldBe a [SchemaAvro_Skeuo[_] => SchemaAvro_Skeuo[_]]
 				(apacheToSkeuoAvroSchema compose skeuoToApacheAvroSchema) shouldBe a [SchemaAvro_Skeuo[_] => SchemaAvro_Skeuo[_]]
-				Util.getFuncTypeSubs(skeuoRoundTrip) shouldEqual "Fix[SchemaAvro_Skeuo] => Fix[SchemaAvro_Skeuo]"
+				Util.getFuncTypeSubs(roundTrip_SkeuoAvroToSkeuoAvro) shouldEqual "Fix[SchemaAvro_Skeuo] => Fix[SchemaAvro_Skeuo]"
 			}
 		}
 	}
