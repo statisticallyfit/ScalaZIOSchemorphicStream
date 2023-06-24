@@ -109,20 +109,37 @@ object TRY_AvroToSkeuo_tatidatafile extends App {
 		parsedApache == avroBack
 	}
 	
+
 	
-	val filePath: String = "/development/projects/statisticallyfit/github/learningdataflow/SchaemeowMorphism/src/test/scala/testData/testDataPrivateTati/asset-schemas/sdp-asset-schemas-luftdaten/src/main/airquality/lft.aq_msm/lft.aq_msm.datasource/avro/"
 	
-	// TODO how to concat files resulting from the avro-tools' conversion of .avdl to .avsc?
-	val fileType: String = ".avsc"
-	val names: List[String] = List("Aq_Msm", "Location", "Sensor", "Sensor_type", "Sensordatavalues_record")
 	
 	
 	val skeuoTstampmillis: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(timestampMillisSchema)
 	println(s"apache tstamp = ${timestampMillisSchema}")
 	println(s"skeuo tstamp = $skeuoTstampmillis")
 	println(s"apache round trip tstamp = ${roundTrip_ApacheAvroToApacheAvro(timestampMillisSchema)}")
+	println("\nend tstamp")
 	
-	println(s"Aq_Msm round trip avdl-skeuo-apache: ${roundTripAvdlSkeuoApache(fileName = names.head)}")
+	
+	
+	// TODO how to concat files resulting from the avro-tools' conversion of .avdl to .avsc?
+	val fileType: String = ".avsc"
+	val names: List[String] = List("Aq_Msm", "Location", "Sensor", "Sensor_type", "Sensordatavalues_record")
+	val filePath: String = "/development/projects/statisticallyfit/github/learningdataflow/SchaemeowMorphism/src/test/scala/testData/testDataPrivateTati/asset-schemas/sdp-asset-schemas-luftdaten/src/main/airquality/lft.aq_msm/lft.aq_msm.datasource/avro/"
+	
+	
+	println(s"\n\nAq_Msm round trip avdl-skeuo-apache: \n")
+	
+	println(s"\n${names(0)}")
+	println(roundTripAvdlSkeuoApache(fileName = names.head))
+	println(s"\n${names(1)}")
+	println(roundTripAvdlSkeuoApache(fileName = names(1)))
+	println(s"\n${names(2)}")
+	println(roundTripAvdlSkeuoApache(fileName = names(2)))
+	println(s"\n${names(3)}")
+	println(roundTripAvdlSkeuoApache(fileName = names(3)))
+	println(s"\n${names(4)}")
+	println(roundTripAvdlSkeuoApache(fileName = names(4)))
 	//println(names.indices.map(i ⇒ roundTripAvdlSkeuoApache(fileName = names(i))))
 	
 }
