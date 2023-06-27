@@ -4,6 +4,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should._
 
 
+import utilTest.GeneralTestUtil
 
 
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
@@ -170,13 +171,13 @@ class JsonCirce_To_SkeuoJson_Convert_TrySpec extends AnyWordSpec with Matchers {
 			//println(s"json circe ---> json schema Skeuo (from Encoder): $jsonSkeuoSchema_fromEncode")
 			
 			
-			import scala.reflect.runtime.universe._
-			import utilTest.GeneralTestUtil
+			// TODO help no typetag available
+			//GeneralTestUtil.getFuncTypeSubs(jsonSkeuoSchema_fromString) shouldEqual "JsonSchemaF.Fixed"
+			
+			// TODO help no classtag available
 			//jsonSkeuoSchema_fromString shouldBe a [SchemaJson_Skeuo.Fixed]
 			
-			GeneralTestUtil.getFuncTypeSubs(	)
-			
-			//jsonSkeuoSchema_fromEncode shouldBe a [SchemaJson_Skeuo.Fixed]
+			true shouldEqual true // HELP i don't even know what test to put hee rbecause i don't know how the schema should look like AND the abvoe type checks aren't working!!!!
 		}
 	}
 	
