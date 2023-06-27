@@ -52,6 +52,8 @@ object Skeuo_Apache {
 			
 			case SchemaAvro_Skeuo.TBoolean() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.BOOLEAN)
 			
+			case SchemaAvro_Skeuo.TString() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.STRING)
+			
 			case SchemaAvro_Skeuo.TInt() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.INT)
 			
 			case SchemaAvro_Skeuo.TLong() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.LONG)
@@ -61,8 +63,6 @@ object Skeuo_Apache {
 			case SchemaAvro_Skeuo.TDouble() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.DOUBLE)
 			
 			case SchemaAvro_Skeuo.TBytes() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.BYTES)
-			
-			case SchemaAvro_Skeuo.TString() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.STRING)
 			
 			
 			

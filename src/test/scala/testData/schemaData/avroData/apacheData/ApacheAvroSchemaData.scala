@@ -34,21 +34,25 @@ object ApacheAvroSchemaData  {
 	
 	
 	// Array schemas
-	val arrayStrSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(strSchema_Apache)
-	val arrayIntSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(intSchema_Apache)
 	val arrayNullSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(nullSchema_Apache)
 	val arrayBooleanSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(booleanSchema_Apache)
+	val arrayStrSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(strSchema_Apache)
+	val arrayIntSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(intSchema_Apache)
 	val arrayLongSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(longSchema_Apache)
 	val arrayFloatSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(floatSchema_Apache)
 	val arrayDoubleSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(doubleSchema_Apache)
 	val arrayBytesSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(bytesSchema_Apache)
+	
 	val array3IntSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(SchemaAvro_Apache.createArray(SchemaAvro_Apache.createArray(intSchema_Apache)))
+	val array2IntSchema_Apache: SchemaAvro_Apache = array3IntSchema_Apache.getElementType
+	
+	
 	
 	//Map schema
-	val mapStrSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(strSchema_Apache)
-	val mapIntSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(intSchema_Apache)
 	val mapNullSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(nullSchema_Apache)
 	val mapBooleanSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(booleanSchema_Apache)
+	val mapStrSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(strSchema_Apache)
+	val mapIntSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(intSchema_Apache)
 	val mapLongSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(longSchema_Apache)
 	val mapFloatSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(floatSchema_Apache)
 	val mapDoubleSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(doubleSchema_Apache)

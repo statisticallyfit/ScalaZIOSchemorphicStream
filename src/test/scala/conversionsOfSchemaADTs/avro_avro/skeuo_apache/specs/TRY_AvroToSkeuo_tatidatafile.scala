@@ -30,7 +30,7 @@ import conversionsOfSchemaStrings.avro_json.Skeuo_JsonCirce._
 //{skeuoAvroSchemaToJsonString, jsonStringToSkeuoAvroSchema, avroSchemaToJsonString}
 
 
-import utilTest.Util
+import utilTest.GeneralTestUtil
 
 import testData.schemaData.avroData.apacheData.ApacheAvroSchemaData._
 import testData.GeneralTestData._

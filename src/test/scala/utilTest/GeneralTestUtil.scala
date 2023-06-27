@@ -4,7 +4,7 @@ package utilTest
 /**
  *
  */
-object Util /*extends App*/ {
+object GeneralTestUtil /*extends App*/ {
 	
 	// NOTE: treating as block / pkg name the string of letters separated by the 'separators' = the underscore or dot
 	def extractLongestRunOfLetterOrDot(

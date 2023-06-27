@@ -17,7 +17,7 @@ import Domain._
 import Domain.PaymentMethod._
 import zio.schema.Schema._
 import ManualConstruction._
-import utilTest.Util._
+import utilTest.GeneralTestUtil._
 
 
 /**

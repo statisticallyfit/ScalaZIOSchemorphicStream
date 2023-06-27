@@ -38,7 +38,7 @@ object Skeuo_JsonCirce {
 	 *
 	 * @return
 	 */
-	def algebra_Skeuo_JsonCirce: Algebra[SchemaSkeuoAvro, Json] = SchemaSkeuoAvro.toJson
+	def algebra_SkeuoToJsonCirce: Algebra[SchemaSkeuoAvro, Json] = SchemaSkeuoAvro.toJson
 	
 	/**
 	 * Coalgebra type is:
@@ -46,17 +46,17 @@ object Skeuo_JsonCirce {
 	 *
 	 * @return
 	 */
-	def coalgebra_JsonCirce_Skeuo: Coalgebra[SchemaSkeuoAvro, Json] = ??? // TODO must build it
+	def coalgebra_JsonCirceToSkeuo: Coalgebra[SchemaSkeuoAvro, Json] = ??? // TODO must build it
 	
 	
 	
-	def skeuoAvroSchemaToJsonString: Fix[SchemaSkeuoAvro] ⇒ Json = scheme.cata(algebra_Skeuo_JsonCirce).apply(_)
+	def skeuoAvroSchemaToJsonCirce: Fix[SchemaSkeuoAvro] ⇒ Json = scheme.cata(algebra_SkeuoToJsonCirce).apply(_)
 	
 	// Simpler name
-	def avroSchemaToJsonString = skeuoAvroSchemaToJsonString
+	//def avroSchemaToJsonCirce = skeuoAvroSchemaToJsonCirce
 	
 	
-	def jsonStringToSkeuoAvroSchema: Json ⇒ Fix[SchemaSkeuoAvro] = scheme.ana(coalgebra_JsonCirce_Skeuo).apply(_)
+	def jsonCirceToSkeuoAvroSchema: Json ⇒ Fix[SchemaSkeuoAvro] = scheme.ana(coalgebra_JsonCirceToSkeuo).apply(_)
 	
 	
 	
