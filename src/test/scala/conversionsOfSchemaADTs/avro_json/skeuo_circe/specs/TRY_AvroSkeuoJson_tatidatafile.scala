@@ -17,6 +17,8 @@ import higherkindness.skeuomorph.openapi.JsonSchemaF.Fixed
 import io.circe.Decoder.Result
 import io.circe.Encoder._
 import io.circe.{Encoder, Decoder, DecodingFailure, Json ⇒ JsonCirce}
+import io.circe.syntax._
+
 
 import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
 
