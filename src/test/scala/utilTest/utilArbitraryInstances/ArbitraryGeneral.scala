@@ -1,4 +1,4 @@
-package utilTest.arbitraryInstances
+package utilTest.utilArbitraryInstances
 
 import java.util.UUID
 

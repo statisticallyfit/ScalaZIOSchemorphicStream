@@ -19,9 +19,7 @@ import cats.syntax.all._
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
 import higherkindness.skeuomorph.openapi.JsonDecoders._
 import higherkindness.skeuomorph.openapi.JsonSchemaF.Fixed
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
 
-import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
 
 
 object minihelpers {
@@ -135,29 +133,28 @@ class JsonCirce_To_SkeuoJson_Convert_TrySpec extends AnyWordSpec with Matchers {
 		"given decoder of Json Circe to Json Schema (skeuo)" in {
 			
 			
-			val strJsonSchemaRaw =
+			val strJsonSchemaRaw = // sensor_type
 				"""
 				  |{
-				  |  "sensor_type": {
-				  |    "type": "object",
-				  |    "properties": {
-				  |      "manufacturer": {
-				  |        "type": "string"
-				  |      },
-				  |      "name": {
-				  |        "type": "string"
-				  |      },
-				  |      "id": {
-				  |        "type": "integer"
-				  |      }
+				  |  "type": "object",
+				  |  "properties": {
+				  |    "manufacturer": {
+				  |      "type": "string"
 				  |    },
-				  |    "required": [
-				  |      "manufacturer",
-				  |      "name",
-				  |      "id"
-				  |    ]
-				  |  }
+				  |    "name": {
+				  |      "type": "string"
+				  |    },
+				  |    "id": {
+				  |      "type": "integer"
+				  |    }
+				  |  },
+				  |  "required": [
+				  |    "manufacturer",
+				  |    "name",
+				  |    "id"
+				  |  ]
 				  |}
+				  |
 				  |""".stripMargin
 			
 			
