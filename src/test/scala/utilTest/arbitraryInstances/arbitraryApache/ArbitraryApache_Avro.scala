@@ -1,4 +1,4 @@
-package utilTest.utilArbitraryInstances.arbitraryApache
+package utilTest.arbitraryInstances.arbitraryApache
 
 import cats.data.NonEmptyList
 import cats.syntax.all._
@@ -7,7 +7,7 @@ import cats.syntax.all._
 import org.scalacheck._
 import org.scalacheck.cats.implicits._
 
-import utilTest.utilArbitraryInstances.ArbitraryGeneral._
+import utilTest.arbitraryInstances.ArbitraryGeneral._
 
 import scala.jdk.CollectionConverters._
 

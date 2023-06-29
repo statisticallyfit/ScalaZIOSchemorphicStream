@@ -73,13 +73,13 @@ object Skeuo_Apache {
 			 *
 			 * HELP: see here `toJson` seems like inner part is INT = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L249
 			 */
-			case SchemaAvro_Skeuo.TArray(apacheSchema: SchemaAvro_Apache) ⇒ {
+			case SchemaAvro_Skeuo.TArray(innerItemSchema: SchemaAvro_Apache) ⇒ {
 				
 				println("Inside avroFToApache ARRAY converter: ")
-				println(s"apacheSchema = $apacheSchema")
-				println(s"apacheSchema.getType = ${apacheSchema.getType}")
+				println(s"apacheSchema = $innerItemSchema")
+				println(s"apacheSchema.getType = ${innerItemSchema.getType}")
 				
-				SchemaAvro_Apache.createArray(apacheSchema)
+				SchemaAvro_Apache.createArray(innerItemSchema)
 			}
 			/*apacheSchema.getType match {
 			case n @ SchemaAvro_Apache.Type.NULL ⇒ SchemaAvro_Apache.createArray(SchemaAvro_Apache.create(n))
@@ -112,7 +112,7 @@ object Skeuo_Apache {
 			/**
 			 * Apache Map Type = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L243
 			 */
-			case SchemaAvro_Skeuo.TMap(sch: SchemaAvro_Apache) => SchemaAvro_Apache.createMap(sch)
+			case SchemaAvro_Skeuo.TMap(innerItemSchema: SchemaAvro_Apache) => SchemaAvro_Apache.createMap(innerItemSchema)
 			
 			
 			/**

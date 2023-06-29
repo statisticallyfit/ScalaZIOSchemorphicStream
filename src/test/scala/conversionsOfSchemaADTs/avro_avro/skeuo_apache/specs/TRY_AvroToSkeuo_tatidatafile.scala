@@ -26,8 +26,7 @@ import org.scalatest.matchers.should._
 
 
 import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache._ //{apacheToSkeuoAvroSchema, skeuoToApacheAvroSchema}
-import conversionsOfSchemaStrings.avro_json.Skeuo_JsonCirce._
-//{skeuoAvroSchemaToJsonString, jsonStringToSkeuoAvroSchema, avroSchemaToJsonString}
+
 
 
 import utilTest.GeneralTestUtil

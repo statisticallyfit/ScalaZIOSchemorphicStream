@@ -1,4 +1,4 @@
-package utilTest.utilArbitraryInstances.arbitrarySkeuo
+package utilTest.arbitraryInstances.arbitrarySkeuo
 
 
 
@@ -17,7 +17,7 @@ import org.scalacheck.cats.implicits._
 
 import scala.jdk.CollectionConverters._
 
-import utilTest.utilArbitraryInstances.ArbitraryGeneral._
+import utilTest.arbitraryInstances.ArbitraryGeneral._
 
 
 /**

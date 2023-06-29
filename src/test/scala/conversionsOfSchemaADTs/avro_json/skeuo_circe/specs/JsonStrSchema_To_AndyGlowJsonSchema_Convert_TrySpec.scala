@@ -2,50 +2,39 @@ package conversionsOfSchemaADTs.avro_json.skeuo_circe.specs
 
 
 
-import org.scalatest.featurespec.AnyFeatureSpec //wordspec.{AnyWordSpec}
+import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.GivenWhenThen
 import org.scalatest.matchers.should._
 
-import com.github.andyglow.json.{ParseJson, Value}
 
 //import com.github.andyglow.jsonschema.ParseJsonSchema
 // HELP replacing with mine (copied) because need that makeType function
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseJsonSchema
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseJsonSchema._
+import conversionsOfSchemaStrings.json_json.RawJsonSchemaStr_To_AndyGlowJsonSchemaADT.parseType
 
-import com.github.andyglow.scalamigration._
+
 import json.{Schema ⇒ SchemaJson_AndyGlow}
-import SchemaJson_AndyGlow._ // for the `boolean`, `string` types etc.
+import SchemaJson_AndyGlow._
+
 
 // HELP replacing with mine (copied) because cannot import since this is in his tests folder
 //import com.github.andyglow.testsupport._
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.testsupport._
+import utilTest.utilJson.utilAndyGlow.testsupportForTryValue._ // for the .value thing
 
 
 
 import scala.util.Try
 
 
-object parseHelper {
-	def parseType(x: String): Try[SchemaJson_AndyGlow[_]] = {
-		
-		//val firstPart: Try[Value.obj] = (ParseJson(x) find { case e: Value.obj => e })
-		
-		(ParseJson(x) find { case e: Value.obj => e }) flatMap ParseJsonSchema.makeType
-	}
-}
-import parseHelper._
-
 /**
  *
  */
 class JsonStrSchema_To_AndyGlowJsonSchema_Convert_TrySpec extends AnyFeatureSpec with GivenWhenThen with Matchers {
 
-	feature("Convert raw json schema string (basic primitives)") {
+	Feature("Convert raw json schema string (basic primitives)") {
 		
 	
 		
-		scenario("string"){
+		Scenario("string"){
 			
 			Given("a json schema (single string)")
 			val jsonSchemaStr: String =
@@ -69,8 +58,8 @@ class JsonStrSchema_To_AndyGlowJsonSchema_Convert_TrySpec extends AnyFeatureSpec
 		
 	}
 	
-	feature("Converting raw json schema string (entire)") {
-		scenario("entire schema string") {
+	Feature("Converting raw json schema string (entire)") {
+		Scenario("entire schema string") {
 			
 			Given("an entire json schema-string")
 			val sampleSchemaJsonRaw: String = // sensor_type

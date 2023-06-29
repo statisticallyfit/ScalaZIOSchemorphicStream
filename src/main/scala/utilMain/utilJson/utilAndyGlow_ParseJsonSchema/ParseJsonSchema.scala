@@ -1,4 +1,4 @@
-package utilTest.utilJson.utilAndyGlow_ParseJsonSchema
+package utilMain.utilJson.utilAndyGlow_ParseJsonSchema
 
 //package com.github.andyglow.jsonschema
 
@@ -66,7 +66,7 @@ object ParseJsonSchema {
 		val tpe = x.value.str("type")
 		val title = x.value.str("title")
 		
-		def makeStrOrEnum = x.value.arr("enum") match {
+		def makeStrOrEnum: Try[SchemaJson_AndyGlow[String]] = x.value.arr("enum") match {
 			case None => makeStr
 			case Some(arr) =>
 				tpe.map(_.toLowerCase) match {
