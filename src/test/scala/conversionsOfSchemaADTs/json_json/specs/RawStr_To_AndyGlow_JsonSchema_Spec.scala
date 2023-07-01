@@ -1,26 +1,25 @@
-package conversionsOfSchemaADTs.avro_json.skeuo_circe.specs
+package conversionsOfSchemaADTs.json_json.specs
 
 
 
-import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.GivenWhenThen
+import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
 
 
 //import com.github.andyglow.jsonschema.ParseJsonSchema
 // HELP replacing with mine (copied) because need that makeType function
-import conversionsOfSchemaStrings.json_json.RawJsonSchemaStr_To_AndyGlowJsonSchemaADT.parseType
-
 
 import json.{Schema ⇒ SchemaJson_AndyGlow}
 import SchemaJson_AndyGlow._
 
 
+
 // HELP replacing with mine (copied) because cannot import since this is in his tests folder
 //import com.github.andyglow.testsupport._
-import utilTest.utilJson.utilAndyGlow.testsupportForTryValue._ // for the .value thing
-
-
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.testsupportForTryValue._
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseJsonSchema_RawToGlowADT.parseType
+import utilTest.GeneralTestUtil // TODO print the types for each result (look at RawStr_ ... file below)
 
 import scala.util.Try
 
@@ -28,7 +27,7 @@ import scala.util.Try
 /**
  *
  */
-class JsonStrSchema_To_AndyGlowJsonSchema_Convert_TrySpec extends AnyFeatureSpec with GivenWhenThen with Matchers {
+class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers {
 
 	Feature("Convert raw json schema string (basic primitives)") {
 		
@@ -54,6 +53,9 @@ class JsonStrSchema_To_AndyGlowJsonSchema_Convert_TrySpec extends AnyFeatureSpec
 			result shouldEqual `string`
 			
 			println(s"result simple string = $result")
+			
+			
+			
 		}
 		
 	}

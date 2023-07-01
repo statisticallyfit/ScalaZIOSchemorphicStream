@@ -1,24 +1,15 @@
-package conversionsOfSchemaADTs.avro_json.skeuo_circe.specs
-
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.should._
-
-import utilTest.GeneralTestUtil
-
-
-import io.circe.Encoder._
-import io.circe.{Decoder, DecodingFailure, Encoder, ParsingFailure, Json ⇒ JsonCirce}
-import io.circe.syntax._
-import io.circe.parser.decode
-import io.circe.parser._
-import io.circe.Error
-
+package conversionsOfSchemaADTs.json_json.specs
 
 import cats.syntax.all._
-
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
 import higherkindness.skeuomorph.openapi.JsonDecoders._
 import higherkindness.skeuomorph.openapi.JsonSchemaF.Fixed
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
+import io.circe.Encoder._
+import io.circe.parser._
+import io.circe.syntax._
+import io.circe.{Decoder, Encoder, Error, ParsingFailure, Json ⇒ JsonCirce}
+import org.scalatest.matchers.should._
+import org.scalatest.wordspec.AnyWordSpec
 
 
 
@@ -87,7 +78,7 @@ object minihelpers {
 		// PROOF circe cannot convert a schema = https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/OpenApiDecoderSpecification.scala#L209-L247
 	}
 }
-import minihelpers._
+import conversionsOfSchemaADTs.json_json.specs.minihelpers._
 
 /**
  *

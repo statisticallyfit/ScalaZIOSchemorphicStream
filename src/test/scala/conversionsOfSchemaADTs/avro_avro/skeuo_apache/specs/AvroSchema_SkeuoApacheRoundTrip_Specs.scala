@@ -28,7 +28,7 @@ import org.scalatest.matchers.should._
 
 
 import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache._ //{apacheToSkeuoAvroSchema, skeuoToApacheAvroSchema}
-import conversionsOfSchemaStrings.avro_json.Skeuo_JsonCirce._
+//import conversionsOfSchemaStrings.avro_json.Skeuo_JsonCirce._
 //{skeuoAvroSchemaToJsonString, jsonStringToSkeuoAvroSchema, avroSchemaToJsonString}
 
 
@@ -425,11 +425,11 @@ class AvroSchema_SkeuoApacheRoundTrip_Skeuopecs extends AnyWordSpec with Matcher
 
 	// NOTE: not implemented in skeuo code
 	//println(s"ENUM JSON: enumApache -> skeuoAvro -> Json circe = ${avroToJson(schemeAna(enumApache))}")
-	println(s"(ARRAY JSON CIRCE): arrayApache -> arraySkeuo adt -> array Json circe: ${skeuoAvroSchemaToJsonCirce(apacheToSkeuoAvroSchema(arrayIntSchema_Apache))}")
+	//println(s"(ARRAY JSON CIRCE): arrayApache -> arraySkeuo adt -> array Json circe: ${skeuoAvroSchemaToJsonCirce(apacheToSkeuoAvroSchema(arrayIntSchema_Apache))}")
 	
 	
 	
-	println(s"FUNC TYPE: avroSchemaToJsonString: ${GeneralTestUtil.getFuncTypeSubs(skeuoAvroSchemaToJsonCirce, keepPckgs, classesToSubs)}")
+	//println(s"FUNC TYPE: avroSchemaToJsonString: ${GeneralTestUtil.getFuncTypeSubs(skeuoAvroSchemaToJsonCirce, keepPckgs, classesToSubs)}")
 
 
 	// scheme.ana(SchemaAvro_Skeuo.fromAvro).apply(arrayApache)
