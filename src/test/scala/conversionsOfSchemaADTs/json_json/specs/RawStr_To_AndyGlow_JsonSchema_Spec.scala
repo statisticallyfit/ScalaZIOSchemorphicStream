@@ -7,33 +7,33 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
 
 
-//import com.github.andyglow.jsonschema.ParseJsonSchema
-// HELP replacing with mine (copied) because need that makeType function
-
-import json.{Schema ⇒ SchemaJson_AndyGlow}
-import SchemaJson_AndyGlow._
-
-
-
 // HELP replacing with mine (copied) because cannot import since this is in his tests folder
 //import com.github.andyglow.testsupport._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.testsupportForTryValue._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseJsonSchema_RawToGlowADT.parseType
-import utilTest.GeneralTestUtil // TODO print the types for each result (look at RawStr_ ... file below)
+import utilTest.GeneralTestUtil
+
+
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+
+import json.{Schema ⇒ JsonSchema_G}
+import JsonSchema_G._
 
 import scala.util.Try
+
+import scala.reflect.runtime.universe._
 
 
 /**
  *
  */
 class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers {
-
+	
+	
 	Feature("Convert raw json schema string (basic primitives)") {
 		
-	
 		
-		Scenario("string"){
+		Scenario("string") {
 			
 			Given("a json schema (single string)")
 			val jsonSchemaStr: String =
@@ -42,23 +42,76 @@ class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenTh
 				  |  "type": "string"
 				  |}
 				  |""".stripMargin
-				  
+			
 			
 			When("parsing")
-			val result: SchemaJson_AndyGlow[_] = parseType(jsonSchemaStr).value
+			val result: JsonSchema_G[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `string` (schema-adt from andy glow)")
-			result shouldBe a [SchemaJson_AndyGlow[_]]
-			result should not be a [String] // has been converted
+			result shouldBe a[JsonSchema_G[_]]
+			result should not be a[String] // has been converted
 			result shouldEqual `string`
 			
-			println(s"result simple string = $result")
 			
+			println(s"result simple string = $result")
+			println(s"typeOf[result.type] = ${typeOf[result.type]}")
+			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
 			
 			
 		}
 		
+		
+		Scenario("integer") {
+			Given("a json schema (single integer)")
+			val jsonSchemaStr: String =
+				"""
+				  |{
+				  |  "type": "integer"
+				  |}
+				  |""".stripMargin
+			
+			
+			When("parsing")
+			val result: JsonSchema_G[_] = parseType(jsonSchemaStr).value
+			
+			Then("result should be `integer` (schema-adt from andy glow)")
+			result shouldBe a[JsonSchema_G[_]]
+			result should not be a[String] // has been converted
+			result shouldEqual `integer`
+			
+			println(s"result simple integer = $result")
+			println(s"typeOf[result.type] = ${typeOf[result.type]}")
+			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+		}
+		
+		Scenario("array") {
+			Given("a json schema (single array)")
+			val jsonSchemaStr: String =
+				"""{
+				  | "type": "array",
+				  | "items": {
+				  |   "type": "string"
+				  | }
+				  |}
+				""".stripMargin
+			
+			
+			When("parsing")
+			val result: JsonSchema_G[_] = parseType(jsonSchemaStr).value
+			
+			Then("result should be `array` (schema-adt from andy glow)")
+			result shouldBe a[JsonSchema_G[_]]
+			result should not be a[String] // has been converted
+			result shouldEqual `array`(`string`)
+			
+			println(s"result simple array = $result")
+			//println(s"typeOf[result.type] = ${typeOf[result.type]}")
+			//println(s"typetag = ${implicitly[TypeTag[]]}")
+			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+		}
+		
 	}
+	
 	
 	Feature("Converting raw json schema string (entire)") {
 		Scenario("entire schema string") {
@@ -88,113 +141,18 @@ class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenTh
 				  |""".stripMargin
 			
 			When("parsing")
-			val resultTry: Try[SchemaJson_AndyGlow[_]] = parseType(sampleSchemaJsonRaw)
-			val result: SchemaJson_AndyGlow[_] = resultTry.value
+			val resultTry: Try[JsonSchema_G[_]] = parseType(sampleSchemaJsonRaw)
+			val result: JsonSchema_G[_] = resultTry.value
 			
 			Then("result should be a schema-adt from Andy Glow")
-			result shouldBe a[SchemaJson_AndyGlow[_]]
+			result shouldBe a[JsonSchema_G[_]]
 			result should not be a[String] // has been converted
 			
 			println(s"entire schema result = $resultTry")
 			println(s"entire schema result (without try): ${resultTry.getOrElse(None)}")
 			println(s"entire schema result (simple): $result")
+			println(s"typeOf[result.type] = ${typeOf[result.type]}")
+			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
 		}
 	}
-			/*"testing: title" in {
-				parseType {
-					"""{
-					  | "type": "string",
-					  | "title": "testing title"
-					  |}
-					""".stripMargin
-				}.value.title shouldBe Some("testing title")
-			}
-			
-			"testing: string: date" in {
-				import `string`._
-				import Format._
-				
-				val result = parseType {
-					"""{
-					  | "type": "string",
-					  | "format": "date"
-					  |}
-				""".stripMargin
-				}.value
-				
-				result shouldBe `string`(`date`)
-				
-				println(s"string: date result = $result")
-			}
-			
-			"testing: string: time" in {
-				import `string`._
-				import Format._
-				
-				parseType {
-					"""{
-					  | "type": "string",
-					  | "format": "time"
-					  |}
-				""".stripMargin
-				}.value shouldBe `string`(`time`)
-			}
-			
-			"testing: string: ipv6" in {
-				import `string`._
-				import Format._
-				
-				parseType {
-					"""{
-					  | "type": "string",
-					  | "format": "ipv6"
-					  |}
-				""".stripMargin
-				}.value shouldBe `string`(`ipv6`)
-			}
-			
-			"testing: integer" in {
-				parseType {
-					"""{
-					  | "type": "integer",
-					  |}
-				""".stripMargin
-				}.value shouldBe `integer`
-			}
-			
-			"testing: number" in {
-				parseType {
-					"""{
-					  | "type": "number",
-					  |}
-				""".stripMargin
-				}.value shouldBe `number`[Int]
-			}
-			
-			"testing: boolean" in {
-				parseType {
-					"""{
-					  | "type": "boolean",
-					  |}
-				""".stripMargin
-				}.value shouldBe `boolean`
-			}
-			
-			"testing: array" in {
-				val result: SchemaJson_AndyGlow[_] = parseType {
-					"""{
-					  | "type": "array",
-					  | "items": {
-					  |   "type": "string"
-					  | }
-					  |}
-				""".stripMargin
-				}.value
-				
-				result shouldBe `array`(`string`)
-				
-				println(s"array result = $result")*/
-			
-		
-		
 }

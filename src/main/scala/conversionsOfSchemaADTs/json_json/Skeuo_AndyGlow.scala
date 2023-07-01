@@ -42,6 +42,7 @@ object Skeuo_AndyGlow extends App {
 			//case BigDecimal ⇒ // TODO missing a lot of types on skeuo's end!
 		}*/
 		
+		
 		case JsonSchema_G.array(componentSchema: JsonSchema_G[T], unique) ⇒  {
 			
 			println(s"INSIDE array converter: glow -> skeuo")

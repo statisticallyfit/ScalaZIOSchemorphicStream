@@ -3,17 +3,9 @@ package conversionsOfSchemaADTs.json_json.specs
 
 
 
-
-import higherkindness.skeuomorph.openapi.JsonSchemaF
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
-
-
-//import com.github.andyglow.jsonschema.ParseJsonSchema
-// HELP replacing with mine (copied) because need that makeType function
-import json.{Schema ⇒ SchemaJson_AndyGlow}
-import SchemaJson_AndyGlow._
 
 
 import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
@@ -28,6 +20,7 @@ import utilTest.GeneralTestUtil
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
 
 import json.{Schema ⇒ JsonSchema_G}
+import JsonSchema_G._
 
 import scala.util.Try
 
@@ -55,10 +48,10 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			When("parsing")
-			val result: SchemaJson_AndyGlow[_] = parseType(jsonSchemaStr).value
+			val result: JsonSchema_G[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `string` (schema-adt from andy glow)")
-			result shouldBe a[SchemaJson_AndyGlow[_]]
+			result shouldBe a[JsonSchema_G[_]]
 			result should not be a[String] // has been converted
 			result shouldEqual `string`
 			
@@ -94,10 +87,10 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			When("parsing")
-			val result: SchemaJson_AndyGlow[_] = parseType(jsonSchemaStr).value
+			val result: JsonSchema_G[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `integer` (schema-adt from andy glow)")
-			result shouldBe a[SchemaJson_AndyGlow[_]]
+			result shouldBe a[JsonSchema_G[_]]
 			result should not be a[String] // has been converted
 			result shouldEqual `integer`
 			
@@ -119,10 +112,10 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			When("parsing")
-			val result: SchemaJson_AndyGlow[_] = parseType(jsonSchemaStr).value
+			val result: JsonSchema_G[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `array` (schema-adt from andy glow)")
-			result shouldBe a[SchemaJson_AndyGlow[_]]
+			result shouldBe a[JsonSchema_G[_]]
 			result should not be a[String] // has been converted
 			result shouldEqual `array`(`string`)
 			
@@ -165,11 +158,11 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 				  |""".stripMargin
 			
 			When("parsing")
-			val resultTry: Try[SchemaJson_AndyGlow[_]] = parseType(sampleSchemaJsonRaw)
-			val result: SchemaJson_AndyGlow[_] = resultTry.value
+			val resultTry: Try[JsonSchema_G[_]] = parseType(sampleSchemaJsonRaw)
+			val result: JsonSchema_G[_] = resultTry.value
 			
 			Then("result should be a schema-adt from Andy Glow")
-			result shouldBe a[SchemaJson_AndyGlow[_]]
+			result shouldBe a[JsonSchema_G[_]]
 			result should not be a[String] // has been converted
 			
 			println(s"entire schema result = $resultTry")

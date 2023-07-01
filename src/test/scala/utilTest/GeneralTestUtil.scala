@@ -37,13 +37,13 @@ object GeneralTestUtil /*extends App*/ {
 	 * Replace package names with just the class names
 	 *
 	 * @param classNameWithPckgNames = the string in which to replace the package names with just the class names (last element after dot)
-	 * @param keepPckgsOpt       = list of package names to leave untouched (no clean-up)
-	 * @param classSubstitutesMapOpt   = map of class names to substitute (example: if result after package-replacement-operation contains Elephant => Mouse and we want to replace Elephant with Kangaroo, then subClassNames == Map("Elephant" -> "Kangaroo", ...)
+	 * @param optPckgsToKeep       = list of package names to leave untouched (no clean-up)
+	 * @param optMapOfClassesToSubst   = map of class names to substitute (example: if result after package-replacement-operation contains Elephant => Mouse and we want to replace Elephant with Kangaroo, then subClassNames == Map("Elephant" -> "Kangaroo", ...)
 	 * @return
 	 */
 	def replacePkgWithClass(classNameWithPckgNames: String,
-					    keepPckgsOpt: Option[List[String]] = None,
-					    classSubstitutesMapOpt: Option[Map[String, String]] = None): String = {
+					    optPckgsToKeep: Option[List[String]] = None,
+					    optMapOfClassesToSubst: Option[Map[String, String]] = None): String = {
 		// Get the extractions
 		val pkgExtractions: List[String] = extractContinue(List(), classNameWithPckgNames.toList)
 		//println(s"EXTRACTIONS = $exs")
@@ -51,29 +51,44 @@ object GeneralTestUtil /*extends App*/ {
 		val justPkgNames: List[String] = pkgExtractions.filter(_.contains('.'))
 		
 		
-		
-		// Keeping the specified package names
-		// Now replace old dot pkg names with the last class names
-		val classNames: List[String] = keepPckgsOpt match {
-			case Some(keepPckgs: List[String]) ⇒ justPkgNames.map { pckgName ⇒ keepPckgs.contains(pckgName) match {
-				case true ⇒ pckgName // keep the entire package name
-				case false ⇒ pckgName.split('.').last // else return just the class name
-			}}
-			case None ⇒ justPkgNames.map(_.split('.').last ) // no filtering, just replace all package naems with the last name (class)
-		}
-		
 		// Now filter and replace some class names with the desired class names
-		val substitutedClassNames: List[String] = classSubstitutesMapOpt match {
-			case None ⇒ classNames // no replacements
-			case Some(classSubstitutesMap) ⇒ { // then replace the old class names with the new class names in the map
-				classNames.map((className: String) ⇒ classSubstitutesMap.get(className) match {
-					case Some(substitutionClass) ⇒ substitutionClass // replace
-					case None ⇒ className // keep the class name, no replacement
+		val subbedClassNames: List[String] = optMapOfClassesToSubst match {
+			case None ⇒ justPkgNames // no replacements
+			case Some(mapOfClassSubs) ⇒ { // then replace the old class names with the new class names in the map
+				def applyReplace(pkgName: String, mapOfClassSubs: Map[String, String]): String = {
+					mapOfClassSubs.get(pkgName/*.split('.').last*/) match {
+						case Some(subsClass) ⇒ subsClass // replace
+						case None ⇒ pkgName // keep the class name, no replacement
+					}
+				}
+				
+				
+				justPkgNames.map((pkgName: String) ⇒ optPckgsToKeep match {
+					case Some(keeps: List[String]) ⇒ keeps.contains(pkgName) match {
+						case true ⇒ pkgName
+						case false ⇒ applyReplace(pkgName, mapOfClassSubs)
+					}
+					case None ⇒ applyReplace(pkgName, mapOfClassSubs)
 				})
 			}
 		}
 		
-		val pairs: List[(String, String)] = justPkgNames.zip(substitutedClassNames)
+		
+		// Keeping the specified package names
+		// Now replace old dot pkg names with the last class names
+		val classNames: List[String] = optPckgsToKeep match {
+			case Some(pckgsToKeep: List[String]) ⇒ subbedClassNames.map { pckgName ⇒
+				pckgsToKeep.contains(pckgName) match {
+					case true ⇒ pckgName // keep the entire package name
+					case false ⇒ pckgName.split('.').last // else return just the class name
+				}
+			}
+			case None ⇒ subbedClassNames.map(_.split('.').last) // no filtering, just replace all package naems with the last name (class)
+		}
+		
+		
+		
+		val pairs: List[(String, String)] = justPkgNames.zip(classNames)
 		
 		val justClassNames: String = pairs.foldLeft(classNameWithPckgNames) { case (acc, (old, upd)) => acc.replace(old, upd) }
 		
