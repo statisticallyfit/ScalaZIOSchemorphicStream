@@ -100,6 +100,38 @@ object TEMP_GlowToSkeuo extends App  {
 		println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(schemaSkeuo)}")
 	}
 	
+	def caseArray3 = {
+		val jsonSchemaStr: String =
+			"""{
+			  | "type": "array",
+			  | "items": {
+			  |   "type": "array",
+			  |   "items": {
+			  |     "type": "array",
+			  |     "items": {
+			  |       "type": "integer"
+			  |     }
+			  |   }
+			  | }
+			  |}
+		""".stripMargin
+		
+		
+		val schemaGlow /*: JsonSchema_G[_]*/ = parseType(jsonSchemaStr).value
+		val schemaSkeuo /*: JsonSchema_S[Any]*/ = andyGlowToSkeuoJsonSchema(schemaGlow)
+		
+		
+		println("\nARRAY CASE (TRIPLE):\n")
+		
+		println(s"schemaGlow = $schemaGlow")
+		assert(schemaGlow == `array`(`array`(`array`(`integer`))))
+		println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(schemaGlow)}")
+		println(s"schemaSkeuo = $schemaSkeuo")
+		println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(schemaSkeuo)}")
+	}
+	
+	
+	// TODO composite type example: enum(number(double)) = https://github.com/andyglow/scala-jsonschema/blob/d52b2bb7d38785bc4e4545285eee7eca1e8978ce/modules/parser/src/main/scala/com/github/andyglow/jsonschema/ParseJsonSchema.scala#L63
 	
 	
 	caseString
@@ -108,6 +140,7 @@ object TEMP_GlowToSkeuo extends App  {
 	
 	caseArray
 	
+	caseArray3
 	
 	/*Feature("Converting raw json schema string (entire)") {
 		Scenario("entire schema string") {

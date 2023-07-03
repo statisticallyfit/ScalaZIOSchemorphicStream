@@ -3,6 +3,7 @@ package conversionsOfSchemaADTs.json_json
 
 
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+
 import json.{Schema ⇒ JsonSchema_G}
 import JsonSchema_G._
 
@@ -28,7 +29,15 @@ object Skeuo_AndyGlow extends App {
 		
 		case _: JsonSchema_G.`integer` ⇒ JsonSchema_S.IntegerF()
 		
-		//case _:JsonSchema_G.`number`[Float] ⇒ JsonSchema_S.FloatF() // WORKS
+		// NOTE: number takes type parameters that are in Numeric (Long, Float, Double, BigInt, BigDecimal, Byte, Short)
+		// NOTE or use Andy Glow Predef code link = https://github.com/andyglow/scala-jsonschema/blob/d52b2bb7d38785bc4e4545285eee7eca1e8978ce/core/src/main/scala/json/schema/Predef.scala#L37
+		
+		case _:JsonSchema_G.`number`[Float] ⇒ JsonSchema_S.FloatF()
+		case _:JsonSchema_G.`number`[Long] ⇒ JsonSchema_S.LongF()
+		
+		case _:JsonSchema_G.`number`[Byte] ⇒ JsonSchema_S.ByteF()
+		case _:JsonSchema_G.`number`[Int] ⇒ JsonSchema_S.IntegerF()
+		case _:JsonSchema_G.`number`[Integer] ⇒ JsonSchema_S.IntegerF()
 		
 		/*case _: JsonSchema_G.`number`[tpe] ⇒ typeOf[tpe] match {
 			case Byte ⇒ JsonSchema_S.ByteF()
@@ -52,9 +61,11 @@ object Skeuo_AndyGlow extends App {
 			val c: universe.TypeTag[JsonSchema_G[T]] = implicitly[TypeTag[JsonSchema_G[T]]]
 			println(s"entire schema type = ${c.tpe.toString}")
 			
-			// TODO not sure if this is right
+			
 			JsonSchema_S.array(andyGlowToSkeuoJsonSchema(componentSchema))
 		}
+		
+		//case JsonSchema_G.map
 		
 		
 	}

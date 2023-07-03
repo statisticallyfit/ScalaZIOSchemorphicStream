@@ -26,7 +26,7 @@ import org.specs2.specification.core.SpecStructure
 
 import testData.ScalaCaseClassData._
 import testData.schemaData.genericSchemaData.zioData.ZioGenericSchemaData._
-import testData.schemaData.avroData.apacheData.ApacheAvroSchemaData._
+import testData.schemaData.avroData.apacheData.AvroSchemaData_Apache._
 
 /**
  *

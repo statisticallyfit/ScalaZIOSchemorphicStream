@@ -34,7 +34,7 @@ import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache._ //{apacheToSkeuoAvroSche
 
 import utilTest.GeneralTestUtil
 
-import testData.schemaData.avroData.apacheData.ApacheAvroSchemaData._
+import testData.schemaData.avroData.apacheData.AvroSchemaData_Apache._
 import testData.GeneralTestData._
 /**
  *

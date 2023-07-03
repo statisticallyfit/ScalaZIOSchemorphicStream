@@ -12,7 +12,7 @@ import scala.jdk.CollectionConverters._
 /**
  *
  */
-object ApacheAvroSchemaData  {
+object AvroSchemaData_Apache  {
 	
 	// Primitive schemas
 	val strSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.STRING)
