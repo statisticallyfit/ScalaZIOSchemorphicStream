@@ -1,21 +1,20 @@
 package conversionsOfSchemaADTs.json_json.specs
 
 // NOTE: convertToAnyShouldWrapper - for the `shouldBe` part of the typecheck
-import org.scalatest.matchers.should.Matchers.{a, an, theSameInstanceAs, convertToAnyShouldWrapper}
-
+//import org.scalatest.matchers.should.Matchers.{a, an, AnyShouldWrapper, convertToAnyShouldWrapper, theSameInstanceAs}
 import org.specs2.control.Debug
+import org.specs2.execute.{AsResult, Result}
 import org.specs2.mutable.Specification
 import org.specs2.specification.dsl.mutable.GWT
 import org.specs2.specification.dsl.mutable.GivenWhenThenSyntax
 import org.specs2.specification.script.StandardDelimitedStepParsers
-
+import org.specs2.specification.{AfterEach, BeforeEach, ForEach}
 
 /*import org.scalatest.GivenWhenThen
-import org.scalatest.featurespec.AnyFeatureSpec*/
-import org.scalatest.matchers.should.Matchers
+import org.scalatest.featurespec.AnyFeatureSpec
+import org.scalatest.matchers.should.Matchers*/
 
-// import org.specs2.Specification // wanted to use 'sequential' to make tests run in order to see print stataements in order but cannot because already using scalatest (functions get mixed up)
-// NOTE using sbt now  = https://stackoverflow.com/a/15146140
+
 
 import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
 
@@ -40,16 +39,52 @@ import scala.reflect.runtime.universe._
  *
  */
 
+trait Transaction
 
-class TRYSPECS2_AndyGlow_To_Skeuo_JsonSchema_Spec extends Specification with org.specs2.specification.dsl.mutable.GWT with StandardDelimitedStepParsers with GivenWhenThenSyntax /*with Matchers */{
+trait DatabaseContext extends ForEach[Transaction] {
+	// you need to define the "foreach" method
+	def foreach[R: AsResult](f: Transaction => R): Result = {
+		val transaction = openDatabaseTransaction
+		try AsResult(f(transaction))
+		finally closeDatabaseTransaction(transaction)
+	}
+	
+	// create and close a transaction
+	def openDatabaseTransaction: Transaction = ???
+	
+	def closeDatabaseTransaction(t: Transaction) = ???
+}
+
+
+class TRYSPECS2_AndyGlow_To_Skeuo_JsonSchema_Spec extends Specification with GWT with StandardDelimitedStepParsers with GivenWhenThenSyntax with Debug with DatabaseContext /*with Matchers */{
 	
 	sequential
 	
-	"adding numbers".p
+	"adding numbers".pp
+	
+	
+	var number: Int = 0
 	
 	"Spec about multiplying numbers" should {
 		
-		"Simple case 3*2 = 6" in {
+		"Simple case 3*2 = 6" in { t : Transaction ⇒
+			
+			//def afterEach
+			def after: Any = {
+				"CASE SIMPLE: 3*2 = 6".pp
+				"statement 1a".pp
+				"statement 1b".pp
+				"statement 1c".pp
+				"statement 1d".pp
+				
+				
+				println("CASE SIMPLE: 3*2 = 6")
+				println("statement 1a")
+				println("statement 1b")
+				println("statement 1c")
+				println("statement 1d")
+			}
+			
 			Given("a first number {2}")(anInt) { two =>
 				number = two
 			}
@@ -63,22 +98,38 @@ class TRYSPECS2_AndyGlow_To_Skeuo_JsonSchema_Spec extends Specification with org
 				//number shouldEqual n
 				
 				
-				number shouldBe a[Int]
+				//number shouldBe a[Int]
+				{
+					import org.scalatest.matchers.should.Matchers.{a, an, AnyShouldWrapper, convertToAnyShouldWrapper, theSameInstanceAs}
+					
+					number shouldBe an [Int]
+				}
 				
 				number mustEqual six
 				number should be equalTo six // note must end in specs2 type of assertions (not scalatest assertion (shouldBe a _)
+				
+				
+				
 			}
 			
-			"CASE SIMPLE: 3*2 = 6".p
-			"statement 1a".p
-			"statement 1b".p
-			"statement 1c".p
-			"statement 1d".p
 		}
 	}
 	
 	"Spec about dividing numbers" should {
+		
 		"case 64 / 4" in {
+			
+			"CASE SIMPLE: 64 / 4 = 16".pp
+			"statement 2a".pp
+			"statement 2b".pp
+			"statement 2c".pp
+			"statement 2d".pp
+			println("CASE SIMPLE: 64 / 4 = 16")
+			println("statement 2a")
+			println("statement 2b")
+			println("statement 2c")
+			println("statement 2d")
+			
 			Given("a first number {64}")(anInt) { sixtyFour =>
 				number = sixtyFour
 			}
@@ -92,21 +143,17 @@ class TRYSPECS2_AndyGlow_To_Skeuo_JsonSchema_Spec extends Specification with org
 				//number shouldEqual n
 				
 				
-				number shouldBe a[Int]
+				//number shouldBe a[Int]
 				
 				number mustEqual sixteen
 				number should be equalTo sixteen // note must end in specs2 type of assertions (not scalatest assertion (shouldBe a _)
 			}
 			
-			"CASE SIMPLE: 64 / 4 = 16".p
-			"statement 2a".p
-			"statement 2b".p
-			"statement 2c".p
-			"statement 2d".p
+			
 		}
 	}
 	
-	var number = 0
+	
 }
 //class TRYSPECS2_AndyGlow_To_Skeuo_JsonSchema_Spec extends Specification with GWT with GivenWhenThenSyntax with StandardDelimitedStepParsers  with Matchers with Debug {
 //
