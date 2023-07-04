@@ -1,4 +1,4 @@
-package AndyGlow_ConvertScalaCaseClassToJsonSchema_Examples
+package Examples_AndyGlow
 
 
 import com.github.andyglow.json.JsonFormatter

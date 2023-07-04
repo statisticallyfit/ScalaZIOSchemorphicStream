@@ -1,5 +1,21 @@
 
 
+import org.apache.avro.{Schema ⇒ SchemaAvro_Apache, Protocol => AvroProtocol, _}
+
+import higherkindness.skeuomorph.mu.Transform.transformAvro
+import higherkindness.skeuomorph.mu.MuF
+import higherkindness.skeuomorph.mu.codegen
+import higherkindness.skeuomorph.avro.AvroF.fromAvro
+import higherkindness.droste._
+import higherkindness.droste.data._
+import higherkindness.droste.data.Mu._
+
+import cats.implicits._
+
+import scala.meta._
+
+
+
 
 object MiniUtil {
   def cleanScalaTypeNames(str: String): String = {
@@ -18,18 +34,6 @@ import MiniUtil._ // TODO find way to share between test and main folders
 object SkeuomorphExample extends App {
 
 
-  import org.apache.avro.{Protocol => AvroProtocol, _}
-  import higherkindness.skeuomorph.mu.Transform.transformAvro
-  import higherkindness.skeuomorph.mu.MuF
-  import higherkindness.skeuomorph.mu.codegen
-  import higherkindness.skeuomorph.avro.AvroF.fromAvro
-  import higherkindness.droste._
-  import higherkindness.droste.data._
-  import higherkindness.droste.data.Mu._
-  import cats.implicits._
-  import scala.meta._
-
-  import higherkindness.skeuomorph.avro.AvroF
 
   val definition =
     """
@@ -60,9 +64,9 @@ object SkeuomorphExample extends App {
      }
      """
 
-  val avroSchema: Schema = new Schema.Parser().parse(definition)
+  val avroSchema: SchemaAvro_Apache = new SchemaAvro_Apache.Parser().parse(definition)
 
-  val toMuSchema: Schema => Mu[MuF] =
+  val toMuSchema: SchemaAvro_Apache => Mu[MuF] =
     scheme.hylo(transformAvro[Mu[MuF]].algebra, fromAvro)
 
   val printSchemaAsScala: Mu[MuF] => Either[String, String] =
@@ -71,7 +75,7 @@ object SkeuomorphExample extends App {
   (toMuSchema >>> println)(avroSchema)
   println("=====")
   //(toMuSchema >>> printSchemaAsScala >>> println)(avroSchema)
-  //val res: Schema => Either[String, String] = toMuSchema >>> printSchemaAsScala
+  //val res: SchemaAvro_Apache => Either[String, String] = toMuSchema >>> printSchemaAsScala
   val res: Either[String, String] = (toMuSchema >>> printSchemaAsScala)(avroSchema)
 
 

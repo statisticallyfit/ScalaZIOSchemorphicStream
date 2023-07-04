@@ -10,8 +10,8 @@ import org.scalatest.matchers.should._
 // HELP replacing with mine (copied) because cannot import since this is in his tests folder
 //import com.github.andyglow.testsupport._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.testsupportForTryValue._
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseJsonSchema_RawToGlowADT.parseType
-import utilTest.GeneralTestUtil
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseStrToADT.parseType
+import utilTest.UtilTest
 
 
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
@@ -27,7 +27,7 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers with GeneralTestUtil {
+class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers with UtilTest {
 	
 	
 	Feature("Convert raw json schema string (basic primitives)") {

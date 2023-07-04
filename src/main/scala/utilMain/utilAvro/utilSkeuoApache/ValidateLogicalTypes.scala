@@ -1,7 +1,6 @@
-package utilMain.utilSkeuoApache
+package utilMain.utilAvro.utilSkeuoApache
 
-
-import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
+import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
 import org.apache.avro.{LogicalType => LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache}
 
 import scala.util.control.Exception._
@@ -13,8 +12,8 @@ import scala.util.control.Exception._
  *
  * With Option: https://hyp.is/zRgVoBKZEe6gm488OdXRDQ/alvinalexander.com/scala/scala-exception-allcatch-examples-option-try-either
  */
-object ValidateUtil {
-	def isValidated(logicalType: LogicalTypeApache, schemaArg: SchemaApacheAvro): Boolean = {
+object ValidateLogicalTypes {
+	def isValidated(logicalType: LogicalTypeApache, schemaArg: SchemaAvro_Apache): Boolean = {
 		
 		val wasThrown: Option[Unit] = catching(classOf[IllegalArgumentException]) opt { logicalType.validate(schemaArg) }
 		

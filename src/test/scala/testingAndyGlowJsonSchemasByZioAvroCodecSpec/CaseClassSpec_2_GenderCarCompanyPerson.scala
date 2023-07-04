@@ -3,7 +3,7 @@ package testingAndyGlowJsonSchemasByZioAvroCodecSpec
 
 import testData.ScalaCaseClassData._
 import org.specs2.mutable._
-import utilMain.utilZioApache.MakeZioSchemaStructures
+import utilMain.utilAvro.utilZioApache.MakeZioSchemaStructures
 
 
 /**

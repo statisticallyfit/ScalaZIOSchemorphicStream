@@ -1,12 +1,15 @@
-package utilTest
+package utilMain
 
-import org.scalatest.Informer
+//import org.scalatest.Informer
 
 
 /**
  *
  */
-trait GeneralTestUtil { this : org.scalatest.featurespec.AnyFeatureSpecLike ⇒
+
+trait UtilMain  {
+	
+	//this: org.scalatest.featurespec.AnyFeatureSpecLike ⇒
 	
 	// NOTE: treating as block / pkg name the string of letters separated by the 'separators' = the underscore or dot
 	def extractLongestRunOfLetterOrDot(
@@ -39,13 +42,15 @@ trait GeneralTestUtil { this : org.scalatest.featurespec.AnyFeatureSpecLike ⇒
 	 * Replace package names with just the class names
 	 *
 	 * @param classNameWithPckgNames = the string in which to replace the package names with just the class names (last element after dot)
-	 * @param optPckgsToKeep       = list of package names to leave untouched (no clean-up)
-	 * @param optMapOfClassesToSubst   = map of class names to substitute (example: if result after package-replacement-operation contains Elephant => Mouse and we want to replace Elephant with Kangaroo, then subClassNames == Map("Elephant" -> "Kangaroo", ...)
+	 * @param optPckgsToKeep         = list of package names to leave untouched (no clean-up)
+	 * @param optMapOfClassesToSubst = map of class names to substitute (example: if result after package-replacement-operation contains Elephant => Mouse and we want to replace Elephant with Kangaroo, then subClassNames == Map("Elephant" -> "Kangaroo", ...)
 	 * @return
 	 */
-	def replacePkgWithClass(classNameWithPckgNames: String,
-					    optPckgsToKeep: Option[List[String]] = None,
-					    optMapOfClassesToSubst: Option[Map[String, String]] = None): String = {
+	def replacePkgWithClass(
+						   classNameWithPckgNames: String,
+						   optPckgsToKeep: Option[List[String]] = None,
+						   optMapOfClassesToSubst: Option[Map[String, String]] = None
+					   ): String = {
 		// Get the extractions
 		val pkgExtractions: List[String] = extractContinue(List(), classNameWithPckgNames.toList)
 		//println(s"EXTRACTIONS = $exs")
@@ -58,7 +63,7 @@ trait GeneralTestUtil { this : org.scalatest.featurespec.AnyFeatureSpecLike ⇒
 			case None ⇒ justPkgNames // no replacements
 			case Some(mapOfClassSubs) ⇒ { // then replace the old class names with the new class names in the map
 				def applyReplace(pkgName: String, mapOfClassSubs: Map[String, String]): String = {
-					mapOfClassSubs.get(pkgName/*.split('.').last*/) match {
+					mapOfClassSubs.get(pkgName /*.split('.').last*/) match {
 						case Some(subsClass) ⇒ subsClass // replace
 						case None ⇒ pkgName // keep the class name, no replacement
 					}
@@ -87,7 +92,6 @@ trait GeneralTestUtil { this : org.scalatest.featurespec.AnyFeatureSpecLike ⇒
 			}
 			case None ⇒ subbedClassNames.map(_.split('.').last) // no filtering, just replace all package naems with the last name (class)
 		}
-		
 		
 		
 		val pairs: List[(String, String)] = justPkgNames.zip(classNames)
@@ -232,24 +236,24 @@ trait GeneralTestUtil { this : org.scalatest.featurespec.AnyFeatureSpecLike ⇒
 	//---
 	
 	def inspectFunc_print[T](f: T)(implicit tag: TypeTag[T]) = {
-		info(s"tag.tpe = ${tag.tpe}")
-		info(s"typeOf[T] = ${typeOf[T]}")
+		println(s"tag.tpe = ${tag.tpe}")
+		println(s"typeOf[T] = ${typeOf[T]}")
 	}
 	
 	def inspectObj_print[T](x: T)(implicit tag: TypeTag[T]) = {
-		info(s"tag.tpe = ${tag.tpe}")
-		info(s"tag.tpe.typeArgs = ${tag.tpe.typeArgs}")
-		info(s"tag.tpe.typeParams = ${tag.tpe.typeParams}")
-		info(s"tag.tpe.paramLists = ${tag.tpe.paramLists}")
-		info(s"tag.tpe.companion = ${tag.tpe.companion}")
+		println(s"tag.tpe = ${tag.tpe}")
+		println(s"tag.tpe.typeArgs = ${tag.tpe.typeArgs}")
+		println(s"tag.tpe.typeParams = ${tag.tpe.typeParams}")
+		println(s"tag.tpe.paramLists = ${tag.tpe.paramLists}")
+		println(s"tag.tpe.companion = ${tag.tpe.companion}")
 		
-		info(s"tag.tpe.typeSymbol = ${tag.tpe.typeSymbol}")
-		info(s"tag.tpe.typeSymbol.name = ${tag.tpe.typeSymbol.name}")
-		info(s"tag.tpe.typeSymbol.name.decoded = ${tag.tpe.typeSymbol.name.decoded}")
+		println(s"tag.tpe.typeSymbol = ${tag.tpe.typeSymbol}")
+		println(s"tag.tpe.typeSymbol.name = ${tag.tpe.typeSymbol.name}")
+		println(s"tag.tpe.typeSymbol.name.decoded = ${tag.tpe.typeSymbol.name.decoded}")
 		
-		info(s"typeOf[T] = ${typeOf[T]}")
-		info(s"typeOf[T].typeSymbol.name = ${typeOf[T].typeSymbol.name}")
-		info(s"typeOf[T].typeSymbol.name.decoded = ${typeOf[T].typeSymbol.name.decoded}")
+		println(s"typeOf[T] = ${typeOf[T]}")
+		println(s"typeOf[T].typeSymbol.name = ${typeOf[T].typeSymbol.name}")
+		println(s"typeOf[T].typeSymbol.name.decoded = ${typeOf[T].typeSymbol.name.decoded}")
 	}
 	
 	// These are the key functions for getting the functino type:
@@ -266,30 +270,37 @@ trait GeneralTestUtil { this : org.scalatest.featurespec.AnyFeatureSpecLike ⇒
 	// Nicer name
 	def getLongFuncType[T: TypeTag](f: T): String = {
 		val funcTypeStr: String = inspectFunc_str[T](f)
-		info(s"Printing long function type = ${funcTypeStr}")
+		println(s"Printing long function type = ${funcTypeStr}")
 		
 		funcTypeStr
 	}
 	
-	def getShortFuncType[T: TypeTag](f: T,
-							   keepPckgs: Option[List[String]] = None,
-							   classesToSubs: Option[Map[String, String]] = None): String = {
+	def getShortFuncType[T: TypeTag](
+								  f: T,
+								  keepPckgs: Option[List[String]] = None,
+								  classesToSubs: Option[Map[String, String]] = None
+							  ): String = {
 		
 		val shortFuncTypeStr: String = replacePkgWithClass(classNameWithPckgNames = getLongFuncType[T](f), keepPckgs, classesToSubs)
 		
-		info(s"Printing short function type = ${shortFuncTypeStr}")
+		println(s"Printing short function type = ${shortFuncTypeStr}")
 		
 		shortFuncTypeStr
 	}
 	
-	def getFuncType[T: TypeTag](f: T,
-						   keepPckgs: Option[List[String]] = None,
-						   classesToSubs: Option[Map[String, String]] = None): String =
+	def getFuncType[T: TypeTag](
+							  f: T,
+							  keepPckgs: Option[List[String]] = None,
+							  classesToSubs: Option[Map[String, String]] = None
+						  ): String =
 		getShortFuncType(f, keepPckgs, classesToSubs)
-		
+	
 	
 	// Making shortcut to not have to pass in these 'keepPckgs' and 'classesToSubstitute' values all the time within the schema tests:
-	import testData.GeneralTestData.{keepPckgs, classesToSubs}
+	
+	
+	import utilData.UtilData._
+	
 	def getFuncTypeSubs[T: TypeTag](f: T): String = getShortFuncType(f, keepPckgs, classesToSubs)
 	
 	/*val fs2 = "(scala.zio.pkg1.pk2.pkg3.Enum3[A,B, C, D], scala.zio.pkg3.pkg4.CaseClass5[A1, A2, A3, A4, A5]) => scala.zio.pkg8.pkg9.CaseClass3[R, A, S]"*/

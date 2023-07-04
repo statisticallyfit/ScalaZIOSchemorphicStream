@@ -13,14 +13,14 @@ import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
 // HELP replacing with mine (copied) because cannot import since this is in his tests folder
 //import com.github.andyglow.testsupport._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.testsupportForTryValue._
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseJsonSchema_RawToGlowADT.parseType
-import utilTest.GeneralTestUtil
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseStrToADT.parseType
+import utilTest.UtilTest
 
 
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
 
-import json.{Schema ⇒ JsonSchema_G}
-import JsonSchema_G._
+import json.{Schema ⇒ SchemaJson_Glow}
+import SchemaJson_Glow._
 
 import scala.util.Try
 
@@ -29,7 +29,7 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers with org.scalatest.Suite with GeneralTestUtil {
+class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers with UtilTest {
 	
 	
 	Feature("Convert raw json schema string (basic primitives)") {
@@ -47,10 +47,10 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			When("parsing")
-			val result: JsonSchema_G[_] = parseType(jsonSchemaStr).value
+			val result: SchemaJson_Glow[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `string` (schema-adt from andy glow)")
-			result shouldBe a[JsonSchema_G[_]]
+			result shouldBe a[SchemaJson_Glow[_]]
 			result should not be a[String] // has been converted
 			result shouldEqual `string`
 			
@@ -62,11 +62,11 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			And("converting the andy glow schema to skeuo schema")
-			val skeuoJson: JsonSchema_S[Any] = andyGlowToSkeuoJsonSchema(result) // TODO parameter instead of Any?
+			val skeuoJson: SchemaJson_Skeuo[Any] = andyGlowToSkeuoJsonSchema(result) // TODO parameter instead of Any?
 			
 			Then("result should be a skeuo adt json schema")
-			skeuoJson shouldBe a [JsonSchema_S[_]]
-			skeuoJson shouldEqual JsonSchema_S.StringF()
+			skeuoJson shouldBe a [SchemaJson_Skeuo[_]]
+			skeuoJson shouldEqual SchemaJson_Skeuo.StringF()
 			
 			info(s"skeuo Json (adt) = ${skeuoJson}")
 			info(s"skeuo Json (toString) = ${skeuoJson.toString}")
@@ -87,10 +87,10 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			When("parsing")
-			val result: JsonSchema_G[_] = parseType(jsonSchemaStr).value
+			val result: SchemaJson_Glow[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `integer` (schema-adt from andy glow)")
-			result shouldBe a[JsonSchema_G[_]]
+			result shouldBe a[SchemaJson_Glow[_]]
 			result should not be a[String] // has been converted
 			result shouldEqual `integer`
 			
@@ -114,10 +114,10 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			When("parsing")
-			val result: JsonSchema_G[_] = parseType(jsonSchemaStr).value
+			val result: SchemaJson_Glow[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `array` (schema-adt from andy glow)")
-			result shouldBe a[JsonSchema_G[_]]
+			result shouldBe a[SchemaJson_Glow[_]]
 			result should not be a[String] // has been converted
 			result shouldEqual `array`(`string`)
 			
@@ -161,11 +161,11 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 				  |""".stripMargin
 			
 			When("parsing")
-			val resultTry: Try[JsonSchema_G[_]] = parseType(sampleSchemaJsonRaw)
-			val result: JsonSchema_G[_] = resultTry.value
+			val resultTry: Try[SchemaJson_Glow[_]] = parseType(sampleSchemaJsonRaw)
+			val result: SchemaJson_Glow[_] = resultTry.value
 			
 			Then("result should be a schema-adt from Andy Glow")
-			result shouldBe a[JsonSchema_G[_]]
+			result shouldBe a[SchemaJson_Glow[_]]
 			result should not be a[String] // has been converted
 			
 			

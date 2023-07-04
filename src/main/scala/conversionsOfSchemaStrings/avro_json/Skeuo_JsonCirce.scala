@@ -50,6 +50,7 @@
 //	 * @return
 //	 */
 //	def coalgebra_JsonCirceToSkeuo: Coalgebra[SchemaSkeuoAvro, Json] = ??? // TODO must build it
+// NOTE cannot build it because Json circe is value-level while Skeuo is schema-level (generic)
 //
 //
 //
