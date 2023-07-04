@@ -1,12 +1,14 @@
 package conversionsOfSchemaADTs.json_json.specs
 
 
-
+import org.specs2
 
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
 
+// import org.specs2.Specification // wanted to use 'sequential' to make tests run in order to see print stataements in order but cannot because already using scalatest (functions get mixed up)
+// NOTE using sbt now  = https://stackoverflow.com/a/15146140
 
 import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
 
@@ -29,7 +31,7 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers {
+class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers with org.scalatest.Suite {
 	
 	
 	
@@ -56,9 +58,10 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			result shouldEqual `string`
 			
 			
-			println(s"result simple string = $result")
-			println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			info("\n\nSTRING TEST: ")
+			info(s"result simple string = $result")
+			info(s"typeOf[result.type] = ${typeOf[result.type]}")
+			info(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
 			
 			
 			And("converting the andy glow schema to skeuo schema")
@@ -66,12 +69,12 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			Then("result should be a skeuo adt json schema")
 			skeuoJson shouldBe a [JsonSchema_S[_]]
+			skeuoJson shouldEqual JsonSchema_S.StringF()
 			
-			
-			println(s"skeuo Json (adt) = ${skeuoJson}")
-			println(s"skeuo Json (toString) = ${skeuoJson.toString}")
-			println(s"typeOf[skeuoJson.type] = ${typeOf[skeuoJson.type]}")
-			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(skeuoJson)}")
+			info(s"skeuo Json (adt) = ${skeuoJson}")
+			info(s"skeuo Json (toString) = ${skeuoJson.toString}")
+			info(s"typeOf[skeuoJson.type] = ${typeOf[skeuoJson.type]}")
+			info(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(skeuoJson)}")
 		}
 		
 		
@@ -94,9 +97,11 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			result should not be a[String] // has been converted
 			result shouldEqual `integer`
 			
-			println(s"result simple integer = $result")
-			println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			
+			info("\n\nINTEGER TEST:")
+			info(s"result simple integer = $result")
+			info(s"typeOf[result.type] = ${typeOf[result.type]}")
+			info(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
 		}
 		
 		Scenario("array"){
@@ -119,10 +124,11 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			result should not be a[String] // has been converted
 			result shouldEqual `array`(`string`)
 			
-			println(s"result simple array = $result")
-			//println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			//println(s"typetag = ${implicitly[TypeTag[]]}")
-			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			info("\n\nARRAY TEST: ")
+			info(s"result simple array = $result")
+			//info(s"typeOf[result.type] = ${typeOf[result.type]}")
+			//info(s"typetag = ${implicitly[TypeTag[]]}")
+			info(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
 		}
 		
 	}
@@ -165,11 +171,13 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			result shouldBe a[JsonSchema_G[_]]
 			result should not be a[String] // has been converted
 			
-			println(s"entire schema result = $resultTry")
-			println(s"entire schema result (without try): ${resultTry.getOrElse(None)}")
-			println(s"entire schema result (simple): $result")
-			println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			
+			info("\n\nENTIRE SCHEMA TEST: ")
+			info(s"entire schema result = $resultTry")
+			info(s"entire schema result (without try): ${resultTry.getOrElse(None)}")
+			info(s"entire schema result (simple): $result")
+			info(s"typeOf[result.type] = ${typeOf[result.type]}")
+			info(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
 		}
 	}
 }

@@ -5,6 +5,7 @@ version := "0.1"
 scalaVersion := "2.12.17" //"2.13.10" //"2.12.17"
 
 
+
 //addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10")
 
 
