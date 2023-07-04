@@ -1,10 +1,12 @@
 package utilTest
 
+import org.scalatest.Informer
+
 
 /**
  *
  */
-object GeneralTestUtil /*extends App*/ {
+trait GeneralTestUtil { this : org.scalatest.featurespec.AnyFeatureSpecLike ⇒
 	
 	// NOTE: treating as block / pkg name the string of letters separated by the 'separators' = the underscore or dot
 	def extractLongestRunOfLetterOrDot(
@@ -230,24 +232,24 @@ object GeneralTestUtil /*extends App*/ {
 	//---
 	
 	def inspectFunc_print[T](f: T)(implicit tag: TypeTag[T]) = {
-		println(s"tag.tpe = ${tag.tpe}")
-		println(s"typeOf[T] = ${typeOf[T]}")
+		info(s"tag.tpe = ${tag.tpe}")
+		info(s"typeOf[T] = ${typeOf[T]}")
 	}
 	
 	def inspectObj_print[T](x: T)(implicit tag: TypeTag[T]) = {
-		println(s"tag.tpe = ${tag.tpe}")
-		println(s"tag.tpe.typeArgs = ${tag.tpe.typeArgs}")
-		println(s"tag.tpe.typeParams = ${tag.tpe.typeParams}")
-		println(s"tag.tpe.paramLists = ${tag.tpe.paramLists}")
-		println(s"tag.tpe.companion = ${tag.tpe.companion}")
+		info(s"tag.tpe = ${tag.tpe}")
+		info(s"tag.tpe.typeArgs = ${tag.tpe.typeArgs}")
+		info(s"tag.tpe.typeParams = ${tag.tpe.typeParams}")
+		info(s"tag.tpe.paramLists = ${tag.tpe.paramLists}")
+		info(s"tag.tpe.companion = ${tag.tpe.companion}")
 		
-		println(s"tag.tpe.typeSymbol = ${tag.tpe.typeSymbol}")
-		println(s"tag.tpe.typeSymbol.name = ${tag.tpe.typeSymbol.name}")
-		println(s"tag.tpe.typeSymbol.name.decoded = ${tag.tpe.typeSymbol.name.decoded}")
+		info(s"tag.tpe.typeSymbol = ${tag.tpe.typeSymbol}")
+		info(s"tag.tpe.typeSymbol.name = ${tag.tpe.typeSymbol.name}")
+		info(s"tag.tpe.typeSymbol.name.decoded = ${tag.tpe.typeSymbol.name.decoded}")
 		
-		println(s"typeOf[T] = ${typeOf[T]}")
-		println(s"typeOf[T].typeSymbol.name = ${typeOf[T].typeSymbol.name}")
-		println(s"typeOf[T].typeSymbol.name.decoded = ${typeOf[T].typeSymbol.name.decoded}")
+		info(s"typeOf[T] = ${typeOf[T]}")
+		info(s"typeOf[T].typeSymbol.name = ${typeOf[T].typeSymbol.name}")
+		info(s"typeOf[T].typeSymbol.name.decoded = ${typeOf[T].typeSymbol.name.decoded}")
 	}
 	
 	// These are the key functions for getting the functino type:
@@ -264,7 +266,7 @@ object GeneralTestUtil /*extends App*/ {
 	// Nicer name
 	def getLongFuncType[T: TypeTag](f: T): String = {
 		val funcTypeStr: String = inspectFunc_str[T](f)
-		println(s"Printing long function type = ${funcTypeStr}")
+		info(s"Printing long function type = ${funcTypeStr}")
 		
 		funcTypeStr
 	}
@@ -275,7 +277,7 @@ object GeneralTestUtil /*extends App*/ {
 		
 		val shortFuncTypeStr: String = replacePkgWithClass(classNameWithPckgNames = getLongFuncType[T](f), keepPckgs, classesToSubs)
 		
-		println(s"Printing short function type = ${shortFuncTypeStr}")
+		info(s"Printing short function type = ${shortFuncTypeStr}")
 		
 		shortFuncTypeStr
 	}

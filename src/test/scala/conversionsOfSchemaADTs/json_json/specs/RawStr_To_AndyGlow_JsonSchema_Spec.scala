@@ -27,7 +27,7 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers {
+class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers with GeneralTestUtil {
 	
 	
 	Feature("Convert raw json schema string (basic primitives)") {
@@ -55,7 +55,7 @@ class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenTh
 			
 			println(s"result simple string = $result")
 			println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			println(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
 			
 			
 		}
@@ -81,7 +81,7 @@ class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenTh
 			
 			println(s"result simple integer = $result")
 			println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			println(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
 		}
 		
 		Scenario("array") {
@@ -107,7 +107,7 @@ class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenTh
 			println(s"result simple array = $result")
 			//println(s"typeOf[result.type] = ${typeOf[result.type]}")
 			//println(s"typetag = ${implicitly[TypeTag[]]}")
-			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			println(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
 		}
 		
 	}
@@ -152,7 +152,7 @@ class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenTh
 			println(s"entire schema result (without try): ${resultTry.getOrElse(None)}")
 			println(s"entire schema result (simple): $result")
 			println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			println(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			println(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
 		}
 	}
 }

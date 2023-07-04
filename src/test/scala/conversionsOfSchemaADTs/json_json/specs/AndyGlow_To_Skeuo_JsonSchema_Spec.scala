@@ -1,9 +1,7 @@
 package conversionsOfSchemaADTs.json_json.specs
 
 
-import org.specs2
-
-import org.scalatest.GivenWhenThen
+import org.scalatest.{GivenWhenThen, Informer}
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
 
@@ -31,8 +29,7 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers with org.scalatest.Suite {
-	
+class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers with org.scalatest.Suite with GeneralTestUtil {
 	
 	
 	Feature("Convert raw json schema string (basic primitives)") {
@@ -61,7 +58,7 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			info("\n\nSTRING TEST: ")
 			info(s"result simple string = $result")
 			info(s"typeOf[result.type] = ${typeOf[result.type]}")
-			info(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			info(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
 			
 			
 			And("converting the andy glow schema to skeuo schema")
@@ -74,7 +71,7 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			info(s"skeuo Json (adt) = ${skeuoJson}")
 			info(s"skeuo Json (toString) = ${skeuoJson.toString}")
 			info(s"typeOf[skeuoJson.type] = ${typeOf[skeuoJson.type]}")
-			info(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(skeuoJson)}")
+			info(s"getFuncTypeSubs = ${getFuncTypeSubs(skeuoJson)}")
 		}
 		
 		
@@ -101,7 +98,7 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			info("\n\nINTEGER TEST:")
 			info(s"result simple integer = $result")
 			info(s"typeOf[result.type] = ${typeOf[result.type]}")
-			info(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			info(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
 		}
 		
 		Scenario("array"){
@@ -128,7 +125,7 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			info(s"result simple array = $result")
 			//info(s"typeOf[result.type] = ${typeOf[result.type]}")
 			//info(s"typetag = ${implicitly[TypeTag[]]}")
-			info(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			info(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
 		}
 		
 	}
@@ -177,7 +174,7 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			info(s"entire schema result (without try): ${resultTry.getOrElse(None)}")
 			info(s"entire schema result (simple): $result")
 			info(s"typeOf[result.type] = ${typeOf[result.type]}")
-			info(s"getFuncTypeSubs = ${GeneralTestUtil.getFuncTypeSubs(result)}")
+			info(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
 		}
 	}
 }

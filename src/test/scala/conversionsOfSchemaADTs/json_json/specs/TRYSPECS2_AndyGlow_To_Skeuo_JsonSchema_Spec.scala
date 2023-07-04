@@ -56,7 +56,8 @@ trait DatabaseContext extends ForEach[Transaction] {
 }
 
 
-class TRYSPECS2_AndyGlow_To_Skeuo_JsonSchema_Spec extends Specification with GWT with StandardDelimitedStepParsers with GivenWhenThenSyntax with Debug with DatabaseContext /*with Matchers */{
+class TRYSPECS2_AndyGlow_To_Skeuo_JsonSchema_Spec extends Specification with GWT with StandardDelimitedStepParsers
+	with GivenWhenThenSyntax with Debug /*with DatabaseContext*/ /*with Matchers */{
 	
 	sequential
 	
@@ -67,7 +68,7 @@ class TRYSPECS2_AndyGlow_To_Skeuo_JsonSchema_Spec extends Specification with GWT
 	
 	"Spec about multiplying numbers" should {
 		
-		"Simple case 3*2 = 6" in { t : Transaction ⇒
+		"Simple case 3*2 = 6" in {// t : Transaction ⇒
 			
 			//def afterEach
 			def after: Any = {
