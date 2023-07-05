@@ -11,7 +11,7 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-object MakeSchemaZIOStructures {
+object MakeZioSchemaStructures {
 
 
   implicit def makeZioSeqSchema[A](implicit schemaA: SchemaZIO[A]): SchemaZIO[Seq[A]] =

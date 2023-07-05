@@ -14,7 +14,8 @@ import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
 //import com.github.andyglow.testsupport._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.testsupportForTryValue._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseStrToADT.parseType
-import utilTest.UtilTest
+//import utilTest.UtilTest
+import utilMain.UtilMain
 
 
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
@@ -29,7 +30,7 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers with UtilTest {
+class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers {
 	
 	
 	Feature("Convert raw json schema string (basic primitives)") {
@@ -57,8 +58,7 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			info("\n\nSTRING TEST: ")
 			info(s"result simple string = $result")
-			info(s"typeOf[result.type] = ${typeOf[result.type]}")
-			info(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
+			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(result)}")
 			
 			
 			And("converting the andy glow schema to skeuo schema")
@@ -69,9 +69,7 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			skeuoJson shouldEqual SchemaJson_Skeuo.StringF()
 			
 			info(s"skeuo Json (adt) = ${skeuoJson}")
-			info(s"skeuo Json (toString) = ${skeuoJson.toString}")
-			info(s"typeOf[skeuoJson.type] = ${typeOf[skeuoJson.type]}")
-			info(s"getFuncTypeSubs = ${getFuncTypeSubs(skeuoJson)}")
+			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(skeuoJson)}")
 		}
 		
 		
@@ -97,8 +95,7 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			info("\n\nINTEGER TEST:")
 			info(s"result simple integer = $result")
-			info(s"typeOf[result.type] = ${typeOf[result.type]}")
-			info(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
+			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(result)}")
 		}
 		
 		Scenario("array"){
@@ -125,7 +122,7 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			info(s"result simple array = $result")
 			//info(s"typeOf[result.type] = ${typeOf[result.type]}")
 			//info(s"typetag = ${implicitly[TypeTag[]]}")
-			info(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
+			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(result)}")
 		}
 		
 	}
@@ -173,8 +170,7 @@ class AndyGlow_To_Skeuo_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThe
 			info(s"entire schema result = $resultTry")
 			info(s"entire schema result (without try): ${resultTry.getOrElse(None)}")
 			info(s"entire schema result (simple): $result")
-			info(s"typeOf[result.type] = ${typeOf[result.type]}")
-			info(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
+			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(result)}")
 		}
 	}
 }

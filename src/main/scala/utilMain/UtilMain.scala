@@ -7,9 +7,10 @@ package utilMain
  *
  */
 
-trait UtilMain  {
+
+
+object UtilMain {
 	
-	//this: org.scalatest.featurespec.AnyFeatureSpecLike ⇒
 	
 	// NOTE: treating as block / pkg name the string of letters separated by the 'separators' = the underscore or dot
 	def extractLongestRunOfLetterOrDot(
@@ -38,6 +39,67 @@ trait UtilMain  {
 		extractContinue(accRuns = accRuns :+ newAcc.mkString, traversalList = traversalList.drop(idx))
 	}
 	
+	
+	
+	private object ReplacePackageNameHelpers {
+		def replaceNameIgnorePckgNames(pkgName: String, mapOfClassSubs: Map[String, String]): String = {
+			
+			// NOTE: to satisfy both replacement cases:
+			//  1) json.Schema --> SchemaJson_Glow (must not split the pckName before replacing)
+			//  2) higherkindness.skeuomorph.JsonSchemaF --> JsonSchemaF --> SchemaJson_Skeuo (must split the pckgname before replacing)
+			
+			val nameToReplace: String = if (pkgName.contains('.')) pkgName else pkgName.split('.').last
+			
+			mapOfClassSubs.get(nameToReplace /*.split('.').last*/) match {
+				case Some(subsClass) ⇒ subsClass // replace
+				case None ⇒ nameToReplace // keep the class name, no replacement
+			}
+		}
+		
+		def doSubstitute(
+						 subs: Option[Map[String, String]],
+						 keeps: Option[List[String]],
+						 on: List[String]
+					 ): List[String] = {
+			
+			// Now filter and replace some class names with the desired class names
+			val subbedClassNames: List[String] = subs match {
+				case None ⇒ on // no replacements
+				case Some(mapOfClassSubs) ⇒ { // then replace the old class names with the new class names in the map
+					
+					
+					on.map((itemToSub: String) ⇒ keeps match {
+						case Some(pckgsToKeep: List[String]) ⇒ pckgsToKeep.contains(itemToSub) match {
+							case true ⇒ itemToSub
+							case false ⇒ replaceNameIgnorePckgNames(itemToSub, mapOfClassSubs)
+						}
+						case None ⇒ replaceNameIgnorePckgNames(itemToSub, mapOfClassSubs)
+					})
+				}
+			}
+			subbedClassNames
+		}
+		
+		def pickKeepers(keeps: Option[List[String]], on: List[String]): List[String] = {
+			
+			// Keeping the specified package names
+			// Now replace old dot pkg names with the last class names
+			val classNames: List[String] = keeps match {
+				case Some(pckgsToKeep: List[String]) ⇒ on.map { pckg ⇒
+					pckgsToKeep.contains(pckg) match {
+						case true ⇒ pckg // keep the entire package name
+						case false ⇒ pckg.split('.').last // else return just the class name
+					}
+				}
+				case None ⇒ on.map(_.split('.').last) // no filtering, just replace all package naems with the last name (class)
+			}
+			
+			classNames
+		}
+	}
+	import ReplacePackageNameHelpers._
+	
+	
 	/**
 	 * Replace package names with just the class names
 	 *
@@ -51,50 +113,25 @@ trait UtilMain  {
 						   optPckgsToKeep: Option[List[String]] = None,
 						   optMapOfClassesToSubst: Option[Map[String, String]] = None
 					   ): String = {
+		
+		
 		// Get the extractions
 		val pkgExtractions: List[String] = extractContinue(List(), classNameWithPckgNames.toList)
-		//println(s"EXTRACTIONS = $exs")
+		
 		// Clean up to contain only pkg names
 		val justPkgNames: List[String] = pkgExtractions.filter(_.contains('.'))
 		
 		
-		// Now filter and replace some class names with the desired class names
-		val subbedClassNames: List[String] = optMapOfClassesToSubst match {
-			case None ⇒ justPkgNames // no replacements
-			case Some(mapOfClassSubs) ⇒ { // then replace the old class names with the new class names in the map
-				def applyReplace(pkgName: String, mapOfClassSubs: Map[String, String]): String = {
-					mapOfClassSubs.get(pkgName /*.split('.').last*/) match {
-						case Some(subsClass) ⇒ subsClass // replace
-						case None ⇒ pkgName // keep the class name, no replacement
-					}
-				}
-				
-				
-				justPkgNames.map((pkgName: String) ⇒ optPckgsToKeep match {
-					case Some(keeps: List[String]) ⇒ keeps.contains(pkgName) match {
-						case true ⇒ pkgName
-						case false ⇒ applyReplace(pkgName, mapOfClassSubs)
-					}
-					case None ⇒ applyReplace(pkgName, mapOfClassSubs)
-				})
-			}
-		}
+		val sub1: List[String] = doSubstitute(optMapOfClassesToSubst, optPckgsToKeep, justPkgNames)
+		
+		val keep1: List[String] = pickKeepers(optPckgsToKeep, sub1)
+		
+		val sub2: List[String] = doSubstitute(optMapOfClassesToSubst, optPckgsToKeep, keep1)
 		
 		
-		// Keeping the specified package names
-		// Now replace old dot pkg names with the last class names
-		val classNames: List[String] = optPckgsToKeep match {
-			case Some(pckgsToKeep: List[String]) ⇒ subbedClassNames.map { pckgName ⇒
-				pckgsToKeep.contains(pckgName) match {
-					case true ⇒ pckgName // keep the entire package name
-					case false ⇒ pckgName.split('.').last // else return just the class name
-				}
-			}
-			case None ⇒ subbedClassNames.map(_.split('.').last) // no filtering, just replace all package naems with the last name (class)
-		}
 		
 		
-		val pairs: List[(String, String)] = justPkgNames.zip(classNames)
+		val pairs: List[(String, String)] = justPkgNames.zip(sub2)
 		
 		val justClassNames: String = pairs.foldLeft(classNameWithPckgNames) { case (acc, (old, upd)) => acc.replace(old, upd) }
 		
@@ -184,21 +221,23 @@ trait UtilMain  {
 	
 	// NOTE: another version of the inspectClass function except can use for type aliases or enum types which are not classes (otherwise compiler complains when using the classTag[] function
 	def inspectType[T: TypeTag] /*(isFromEnum: Boolean = false)*/ : String = {
-		/*println(typeTag[T].tpe)
-		println(typeTag[T].tpe.typeSymbol)
-		println(typeTag[T].tpe.typeArgs)
-		println(typeTag[T].tpe.typeParams)
-		println(typeTag[T].tpe.typeConstructor)
-		println()
-		println(typeTag[T].getClass)
-		println(typeTag[T].getClass.getPackage)
-		println(typeTag[T].getClass.getSimpleName)
-		println(typeTag[T].getClass.getName)
-		println()
-		println(typeTag[T].tpe.getClass.getPackage)
-		println(typeTag[T].tpe.getClass)
-		println(typeTag[T].tpe.getClass.getSimpleName)
-		println(typeTag[T].tpe.getClass.getName)
+		// TODO if you want to see the output here, return a Map and print out the result: 'tpe' -> tpe value, 'typeSymbol' -> typeSymbol etc) so no need for printing here
+		// ISSUE WITH PRINTING HERE: need it to be info() so can print sequentially if called in the tests, but here cannot call scalatest because itis main folder so cannot use info.
+		/*info(typeTag[T].tpe)
+		info(typeTag[T].tpe.typeSymbol)
+		info(typeTag[T].tpe.typeArgs)
+		info(typeTag[T].tpe.typeParams)
+		info(typeTag[T].tpe.typeConstructor)
+		info()
+		info(typeTag[T].getClass)
+		info(typeTag[T].getClass.getPackage)
+		info(typeTag[T].getClass.getSimpleName)
+		info(typeTag[T].getClass.getName)
+		info()
+		info(typeTag[T].tpe.getClass.getPackage)
+		info(typeTag[T].tpe.getClass)
+		info(typeTag[T].tpe.getClass.getSimpleName)
+		info(typeTag[T].tpe.getClass.getName)
 		
 		val res = typeTag[T].tpe.toString
 		/*if (isFromEnum) {
@@ -209,9 +248,9 @@ trait UtilMain  {
 		typeTag[T].tpe.typeSymbol.toString.split(' ').last
 	}
 	/*import data.ScalaCaseClassData._
-	println(inspectType[Gender.Male.type](isFromEnum = true))
-	println("credit card: ")
-	println(inspectType[ZioSchemaExamples.Example1_PaymentWireTransfer.Domain.PaymentMethod.CreditCard]())*/
+	info(inspectType[Gender.Male.type](isFromEnum = true))
+	info("credit card: ")
+	info(inspectType[ZioSchemaExamples.Example1_PaymentWireTransfer.Domain.PaymentMethod.CreditCard]())*/
 	
 	
 	// NOTE: if isFromEnum == true, then the type result usually after this function is something like Gender.Male.type and this function instead cleans this up to be just "Male"
@@ -235,25 +274,30 @@ trait UtilMain  {
 	
 	//---
 	
-	def inspectFunc_print[T](f: T)(implicit tag: TypeTag[T]) = {
-		println(s"tag.tpe = ${tag.tpe}")
-		println(s"typeOf[T] = ${typeOf[T]}")
+	def inspectFunc_showByMap[T](f: T)(implicit tag: TypeTag[T]): Map[String, String] = {
+		Map(
+			"tag.tpe" → s"${tag.tpe}",
+			"typeOf[T]" → s"${typeOf[T]}"
+		)
 	}
 	
-	def inspectObj_print[T](x: T)(implicit tag: TypeTag[T]) = {
-		println(s"tag.tpe = ${tag.tpe}")
-		println(s"tag.tpe.typeArgs = ${tag.tpe.typeArgs}")
-		println(s"tag.tpe.typeParams = ${tag.tpe.typeParams}")
-		println(s"tag.tpe.paramLists = ${tag.tpe.paramLists}")
-		println(s"tag.tpe.companion = ${tag.tpe.companion}")
-		
-		println(s"tag.tpe.typeSymbol = ${tag.tpe.typeSymbol}")
-		println(s"tag.tpe.typeSymbol.name = ${tag.tpe.typeSymbol.name}")
-		println(s"tag.tpe.typeSymbol.name.decoded = ${tag.tpe.typeSymbol.name.decoded}")
-		
-		println(s"typeOf[T] = ${typeOf[T]}")
-		println(s"typeOf[T].typeSymbol.name = ${typeOf[T].typeSymbol.name}")
-		println(s"typeOf[T].typeSymbol.name.decoded = ${typeOf[T].typeSymbol.name.decoded}")
+	def inspectObj_showByMap[T](obj: T)(implicit tag: TypeTag[T]): Map[String, String] = {
+		Map(
+			"tag.tpe" → s"${tag.tpe}",
+			"tag.tpe.typeArgs" → s"${tag.tpe.typeArgs}",
+			"tag.tpe.typeParams" → s"${tag.tpe.typeParams}",
+			"tag.tpe.paramLists" → s"${tag.tpe.paramLists}",
+			"tag.tpe.companion" → s"${tag.tpe.companion}",
+			
+			"tag.tpe.typeSymbol" → s"${tag.tpe.typeSymbol}",
+			"tag.tpe.typeSymbol.name" → s"${tag.tpe.typeSymbol.name}",
+			"tag.tpe.typeSymbol.name.decoded" → s"${tag.tpe.typeSymbol.name.decoded}",
+			
+			
+			"typeOf[T]" → s"${typeOf[T]}",
+			"typeOf[T].typeSymbol.name" → s"${typeOf[T].typeSymbol.name}",
+			"typeOf[T].typeSymbol.name.decoded" → s"${typeOf[T].typeSymbol.name.decoded}"
+		)
 	}
 	
 	// These are the key functions for getting the functino type:
@@ -270,7 +314,7 @@ trait UtilMain  {
 	// Nicer name
 	def getLongFuncType[T: TypeTag](f: T): String = {
 		val funcTypeStr: String = inspectFunc_str[T](f)
-		println(s"Printing long function type = ${funcTypeStr}")
+		//info(s"Printing long function type = ${funcTypeStr}")
 		
 		funcTypeStr
 	}
@@ -283,17 +327,24 @@ trait UtilMain  {
 		
 		val shortFuncTypeStr: String = replacePkgWithClass(classNameWithPckgNames = getLongFuncType[T](f), keepPckgs, classesToSubs)
 		
-		println(s"Printing short function type = ${shortFuncTypeStr}")
+		//info(s"Printing short function type = ${shortFuncTypeStr}")
 		
 		shortFuncTypeStr
 	}
 	
 	def getFuncType[T: TypeTag](
-							  f: T,
+							  f: T/*,
 							  keepPckgs: Option[List[String]] = None,
-							  classesToSubs: Option[Map[String, String]] = None
-						  ): String =
-		getShortFuncType(f, keepPckgs, classesToSubs)
+							  classesToSubs: Option[Map[String, String]] = None*/
+						  ): Map[String, String] = {
+		
+		import utilData.UtilData._
+		
+		Map(
+			"long function type" → getLongFuncType(f),
+			"short function type" → getShortFuncType(f, keepPckgs, classesToSubs)
+		)
+	}
 	
 	
 	// Making shortcut to not have to pass in these 'keepPckgs' and 'classesToSubstitute' values all the time within the schema tests:
@@ -301,9 +352,11 @@ trait UtilMain  {
 	
 	import utilData.UtilData._
 	
+	
 	def getFuncTypeSubs[T: TypeTag](f: T): String = getShortFuncType(f, keepPckgs, classesToSubs)
 	
 	/*val fs2 = "(scala.zio.pkg1.pk2.pkg3.Enum3[A,B, C, D], scala.zio.pkg3.pkg4.CaseClass5[A1, A2, A3, A4, A5]) => scala.zio.pkg8.pkg9.CaseClass3[R, A, S]"*/
 	
 	//assert(replacePkgWithClass(fs2) == "(Enum3[A,B, C, D], CaseClass5[A1, A2, A3, A4, A5]) => CaseClass3[R, A, S]")
 }
+

@@ -18,7 +18,8 @@ import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
 //import com.github.andyglow.testsupport._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.testsupportForTryValue._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseStrToADT.parseType
-import utilTest.UtilTest
+//import utilTest.UtilTest
+import utilMain.UtilMain
 
 
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
@@ -34,7 +35,7 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-class TEMP_GlowToSkeuo extends AnyFeatureSpec with GivenWhenThen with Matchers with UtilTest  {
+class TEMP_GlowToSkeuo extends AnyFeatureSpec with GivenWhenThen with Matchers   {
 
 
 	def caseString = {
@@ -56,9 +57,9 @@ class TEMP_GlowToSkeuo extends AnyFeatureSpec with GivenWhenThen with Matchers w
 
 		println(s"schemaGlow = $schemaGlow") // should equal `string`
 		assert(schemaGlow == `string`)
-		println(s"getFuncTypeSubs = ${getFuncTypeSubs(schemaGlow)}")
+		println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(schemaGlow)}")
 		println(s"schemaSkeuo = $schemaSkeuo")
-		println(s"getFuncTypeSubs = ${getFuncTypeSubs(schemaSkeuo)}")
+		println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(schemaSkeuo)}")
 	}
 
 	def caseInteger = {
@@ -79,9 +80,9 @@ class TEMP_GlowToSkeuo extends AnyFeatureSpec with GivenWhenThen with Matchers w
 
 		println(s"schemaGlow = $schemaGlow") // should equal `integer`
 		assert(schemaGlow == `integer`)
-		println(s"getFuncTypeSubs = ${getFuncTypeSubs(schemaGlow)}")
+		println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(schemaGlow)}")
 		println(s"schemaSkeuo = $schemaSkeuo")
-		println(s"getFuncTypeSubs = ${getFuncTypeSubs(schemaSkeuo)}")
+		println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(schemaSkeuo)}")
 	}
 
 	def caseArray = {
@@ -104,9 +105,9 @@ class TEMP_GlowToSkeuo extends AnyFeatureSpec with GivenWhenThen with Matchers w
 
 		println(s"schemaGlow = $schemaGlow")
 		assert(schemaGlow == `array`(`string`))
-		println(s"getFuncTypeSubs = ${getFuncTypeSubs(schemaGlow)}")
+		println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(schemaGlow)}")
 		println(s"schemaSkeuo = $schemaSkeuo")
-		println(s"getFuncTypeSubs = ${getFuncTypeSubs(schemaSkeuo)}")
+		println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(schemaSkeuo)}")
 	}
 
 	def caseArray3 = {
@@ -134,9 +135,9 @@ class TEMP_GlowToSkeuo extends AnyFeatureSpec with GivenWhenThen with Matchers w
 
 		println(s"schemaGlow = $schemaGlow")
 		assert(schemaGlow == `array`(`array`(`array`(`integer`))))
-		println(s"getFuncTypeSubs = ${getFuncTypeSubs(schemaGlow)}")
+		println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(schemaGlow)}")
 		println(s"schemaSkeuo = $schemaSkeuo")
-		println(s"getFuncTypeSubs = ${getFuncTypeSubs(schemaSkeuo)}")
+		println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(schemaSkeuo)}")
 	}
 
 
@@ -190,7 +191,7 @@ class TEMP_GlowToSkeuo extends AnyFeatureSpec with GivenWhenThen with Matchers w
 			println(s"entire schema result (without try): ${resultTry.getOrElse(None)}")
 			println(s"entire schema result (simple): $result")
 			println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			println(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
+			println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(result)}")
 		}
 	}*/
 }

@@ -11,7 +11,7 @@ import org.scalatest.matchers.should._
 //import com.github.andyglow.testsupport._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.testsupportForTryValue._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseStrToADT.parseType
-import utilTest.UtilTest
+import utilMain.UtilMain
 
 
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
@@ -27,7 +27,7 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers with UtilTest {
+class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers  {
 	
 	
 	Feature("Convert raw json schema string (basic primitives)") {
@@ -55,7 +55,7 @@ class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenTh
 			
 			println(s"result simple string = $result")
 			println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			println(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
+			println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(result)}")
 			
 			
 		}
@@ -81,7 +81,7 @@ class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenTh
 			
 			println(s"result simple integer = $result")
 			println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			println(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
+			println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(result)}")
 		}
 		
 		Scenario("array") {
@@ -107,7 +107,7 @@ class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenTh
 			println(s"result simple array = $result")
 			//println(s"typeOf[result.type] = ${typeOf[result.type]}")
 			//println(s"typetag = ${implicitly[TypeTag[]]}")
-			println(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
+			println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(result)}")
 		}
 		
 	}
@@ -152,7 +152,7 @@ class RawStr_To_AndyGlow_JsonSchema_Spec extends AnyFeatureSpec with GivenWhenTh
 			println(s"entire schema result (without try): ${resultTry.getOrElse(None)}")
 			println(s"entire schema result (simple): $result")
 			println(s"typeOf[result.type] = ${typeOf[result.type]}")
-			println(s"getFuncTypeSubs = ${getFuncTypeSubs(result)}")
+			println(s"getFuncTypeSubs = ${UtilMain.getFuncTypeSubs(result)}")
 		}
 	}
 }

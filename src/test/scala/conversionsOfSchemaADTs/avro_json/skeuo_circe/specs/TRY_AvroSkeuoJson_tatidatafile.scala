@@ -54,7 +54,7 @@
 //
 //
 ///**
-// *
+// * TODO - update this file when have finished the avroschema - json schema (skeuo both) conversion
 // */
 //object TRY_AvroSkeuoJson_tatidatafile extends App {
 //
