@@ -39,7 +39,7 @@ import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache.{apacheToSkeuoAvroSchema, 
 
 
 
-class AvroSchema_SkeuoApacheRoundTrip_Props extends Specification with ScalaCheck {
+class AvroSchema_Skeuo_Apache_RoundTrip_Props extends Specification with ScalaCheck {
 	
 	// TODO import instances = https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/avro/AvroSchemaSpec.scala#L20
 	

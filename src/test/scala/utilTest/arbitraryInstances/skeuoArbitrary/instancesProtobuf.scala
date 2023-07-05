@@ -1,4 +1,4 @@
-package utilTest.arbitraryInstances.arbitrarySkeuo
+package utilTest.arbitraryInstances.skeuoArbitrary
 
 
 import cats.data.NonEmptyList
@@ -24,7 +24,7 @@ import utilTest.arbitraryInstances.ArbitraryGeneral._
  *
  * NOTE: file source == https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/instances.scala
  */
-object ArbitrarySkeuo_Protobuf {
+object instancesProtobuf {
 	
 	
 	def protobufFMessage[T](implicit T: Arbitrary[T]): Gen[ProtobufF.TMessage[T]] = {

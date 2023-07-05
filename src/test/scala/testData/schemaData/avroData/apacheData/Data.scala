@@ -12,7 +12,7 @@ import scala.jdk.CollectionConverters._
 /**
  *
  */
-object AvroSchemaData_Apache  {
+object Data  {
 	
 	// Primitive schemas
 	val strSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.STRING)
@@ -65,7 +65,7 @@ object AvroSchemaData_Apache  {
 	
 	// Record schema
 	// TODO add aliases?
-	import testData.schemaData.avroData.apacheData.ApacheAvroFieldOrderData._
+	import testData.schemaData.avroData.apacheData.FieldOrderData._
 	
 	val recordSchema_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createRecord("Record", "doc for record", "namespace for record", /*isError =*/ false, List(strField_1_oa, strField_2_oa, strField_3_oa, strField_1_od, strField_2_od, strField_3_od, strField_1_oi, strField_2_oi, strField_3_oi, intField_1_oa, intField_2_oa, intField_3_oa, intField_1_od, intField_2_od, intField_3_od, intField_1_oi, intField_2_oi, intField_3_oi).asJava)
 	

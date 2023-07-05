@@ -34,12 +34,12 @@ import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache._ //{apacheToSkeuoAvroSche
 
 import utilMain.UtilMain
 
-import testData.schemaData.avroData.apacheData.AvroSchemaData_Apache._
-import testData.GeneralTestData._
+import testData.schemaData.avroData.apacheData.Data._
+
 /**
  *
  */
-class TODO_AvroSchema_SkeuoApacheRoundTrip_Spec extends AnyWordSpec with Matchers  { // TODO update to be FeatureSpec
+class TODO_AvroSchema_Skeuo_Apache_RoundTrip_Specs extends AnyWordSpec with Matchers  { // TODO update to be FeatureSpec
 	//extends mutable.Specification /*with ScalaCheck */ {
 
 	// OUTPUT:
@@ -89,6 +89,8 @@ class TODO_AvroSchema_SkeuoApacheRoundTrip_Spec extends AnyWordSpec with Matcher
 	// Apache avro schema
 	//println(s"apache avro String (string): $strApache")
 
+	// TODO why has errors?
+	
 	"Morphism conversions" when {
 		"anamorphism should extract inner type of coalgebra" in {
 

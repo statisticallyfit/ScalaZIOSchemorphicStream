@@ -29,7 +29,7 @@
 // */
 //class SchemaOfCreditCardStructuralAnalysis extends Specification /*with AnyFeatureSpecLike with MustThrownMatchers
 //	with ShouldThrownMatchers*/
-//	with GeneralTestUtil {
+//	{
 //
 //
 //  "Component Test: schemaPaymentMethodCreditCard" should {

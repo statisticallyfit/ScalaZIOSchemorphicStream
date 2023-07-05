@@ -4,13 +4,13 @@ package testData.schemaData.avroData.apacheData
 import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
 import org.apache.avro.Schema.{Field ⇒ Field_A}
 import org.apache.avro.Schema.Field.{Order ⇒ Order_A}
-import testData.schemaData.avroData.apacheData.AvroSchemaData_Apache._
+import testData.schemaData.avroData.apacheData.Data._
 
 
 /**
  *
  */
-object ApacheAvroFieldOrderData {
+object FieldOrderData {
 	val strField_1_oa: Field_A = new Field_A("fieldStrAscending1", strSchema_Apache, "doc-field-1", null, Order_A.ASCENDING)
 	val strField_2_oa: Field_A = new Field_A("fieldStrAscending2", strSchema_Apache, null, null, Order_A.ASCENDING)
 	val strField_3_oa: Field_A = new Field_A("fieldStrAscending3", strSchema_Apache, null, null, Order_A.ASCENDING)

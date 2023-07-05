@@ -1,4 +1,4 @@
-package utilTest.arbitraryInstances.arbitraryApache
+package utilTest.arbitraryInstances.apacheArbitrary
 
 import cats.data.NonEmptyList
 import cats.syntax.all._
@@ -22,7 +22,7 @@ import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
  *
  * NOTE: file source == https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/instances.scala
  */
-object ArbitraryApache_Avro {
+object instancesAvro {
 	
 	
 	implicit val avroSchemaArbitrary: Arbitrary[SchemaApacheAvro] = Arbitrary {

@@ -1,5 +1,4 @@
-package testData.schemaData.jsonData
-
+package testData.schemaData.jsonData.skeuoData
 
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
 
@@ -7,7 +6,7 @@ import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
 /**
  *
  */
-object JsonSchemaData_Skeuo {
+object Data {
 	
 	
 	

@@ -107,6 +107,11 @@ object UtilMain {
 	 * @param optPckgsToKeep         = list of package names to leave untouched (no clean-up)
 	 * @param optMapOfClassesToSubst = map of class names to substitute (example: if result after package-replacement-operation contains Elephant => Mouse and we want to replace Elephant with Kangaroo, then subClassNames == Map("Elephant" -> "Kangaroo", ...)
 	 * @return
+	 *
+	 *
+	 * TODO test that the following pass: (see utilData)
+	 * 	1) json.Schema ---> JsonSchema_Glow
+	 *   2) 	higherkindness.skeuomorph.openapi.JsonSchemaF[Any] ---> JsonSchema_Skeuo[Any]
 	 */
 	def replacePkgWithClass(
 						   classNameWithPckgNames: String,
@@ -126,6 +131,7 @@ object UtilMain {
 		
 		val keep1: List[String] = pickKeepers(optPckgsToKeep, sub1)
 		
+		// NOTE: key: apply substitute again for class names that have been liberated from the pckg '.', and that must be substituted (like JsonSchemaF)
 		val sub2: List[String] = doSubstitute(optMapOfClassesToSubst, optPckgsToKeep, keep1)
 		
 		

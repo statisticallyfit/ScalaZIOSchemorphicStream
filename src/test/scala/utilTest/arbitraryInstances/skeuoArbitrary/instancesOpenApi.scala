@@ -1,4 +1,4 @@
-package utilTest.arbitraryInstances.arbitrarySkeuo
+package utilTest.arbitraryInstances.skeuoArbitrary
 
 
 
@@ -27,7 +27,7 @@ import utilTest.arbitraryInstances.ArbitraryGeneral._
  *
  * NOTE: file source == https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/instances.scala
  */
-object ArbitrarySkeuo_OpenApi {
+object instancesOpenApi {
 	
 	
 	implicit def openApiArbitrary[T](implicit T: Arbitrary[T]): Arbitrary[OpenApi[T]] = {
