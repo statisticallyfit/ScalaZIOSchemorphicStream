@@ -2,10 +2,10 @@ package conversionsOfSchemaADTs.json_json
 
 
 
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
 
-import json.{Schema ⇒ JsonSchema_G}
-import JsonSchema_G._
+import json.{Schema ⇒ SchemaJson_Glow}
+import SchemaJson_Glow._
 
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
@@ -16,95 +16,95 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-object Skeuo_AndyGlow extends App {
+object Skeuo_AndyGlow {
 	
 	
-	def skeuoToAndyGlowJsonSchema[T](skeuoJsonSchema: JsonSchema_S[T]): JsonSchema_G[T] = ???
+	def skeuoToAndyGlowJsonSchema[T](skeuoJsonSchema: SchemaJson_Skeuo[T]): SchemaJson_Glow[T] = ???
 	
 	
-	def andyGlowToSkeuoJsonSchema[T](andyJsonSchema: JsonSchema_G[T])(implicit tag: TypeTag[T]): JsonSchema_S[T] = andyJsonSchema match {
+	def andyGlowToSkeuoJsonSchema[T](andyJsonSchema: SchemaJson_Glow[T])(implicit tag: TypeTag[T]): SchemaJson_Skeuo[T] = andyJsonSchema match {
 		
 		// HELP andy glow has more string sub-types available while Skeuo does not = https://github.com/andyglow/scala-jsonschema/blob/7051682e787e9358d4c542027b48da7832998213/modules/parser/src/main/scala/com/github/andyglow/jsonschema/ParseJsonSchema.scala#L129-L137
-		case _: JsonSchema_G.`string`[tpe] ⇒ JsonSchema_S.StringF()
+		case _: SchemaJson_Glow.`string`[tpe] ⇒ SchemaJson_Skeuo.StringF()
 		
-		case _: JsonSchema_G.`integer` ⇒ JsonSchema_S.IntegerF()
+		case _: SchemaJson_Glow.`integer` ⇒ SchemaJson_Skeuo.IntegerF()
 		
 		// NOTE: number takes type parameters that are in Numeric (Long, Float, Double, BigInt, BigDecimal, Byte, Short)
 		// NOTE or use Andy Glow Predef code link = https://github.com/andyglow/scala-jsonschema/blob/d52b2bb7d38785bc4e4545285eee7eca1e8978ce/core/src/main/scala/json/schema/Predef.scala#L37
 		
-		case _:JsonSchema_G.`number`[Float] ⇒ JsonSchema_S.FloatF()
-		case _:JsonSchema_G.`number`[Long] ⇒ JsonSchema_S.LongF()
+		case _:SchemaJson_Glow.`number`[Float] ⇒ SchemaJson_Skeuo.FloatF()
+		case _:SchemaJson_Glow.`number`[Long] ⇒ SchemaJson_Skeuo.LongF()
 		
-		case _:JsonSchema_G.`number`[Byte] ⇒ JsonSchema_S.ByteF()
-		case _:JsonSchema_G.`number`[Int] ⇒ JsonSchema_S.IntegerF()
-		case _:JsonSchema_G.`number`[Integer] ⇒ JsonSchema_S.IntegerF()
+		case _:SchemaJson_Glow.`number`[Byte] ⇒ SchemaJson_Skeuo.ByteF()
+		case _:SchemaJson_Glow.`number`[Int] ⇒ SchemaJson_Skeuo.IntegerF()
+		case _:SchemaJson_Glow.`number`[Integer] ⇒ SchemaJson_Skeuo.IntegerF()
 		
-		/*case _: JsonSchema_G.`number`[tpe] ⇒ typeOf[tpe] match {
-			case Byte ⇒ JsonSchema_S.ByteF()
-			case Float ⇒ JsonSchema_S.FloatF()
-			case Int ⇒ JsonSchema_S.IntegerF()
-			//case Short ⇒ JsonSchema_S.S
-			case Long ⇒ JsonSchema_S.LongF()
-			case Double ⇒ JsonSchema_S.DoubleF()
-			//case Char ⇒ JsonSchema_S.
+		/*case _: SchemaJson_Glow.`number`[tpe] ⇒ typeOf[tpe] match {
+			case Byte ⇒ SchemaJson_Skeuo.ByteF()
+			case Float ⇒ SchemaJson_Skeuo.FloatF()
+			case Int ⇒ SchemaJson_Skeuo.IntegerF()
+			//case Short ⇒ SchemaJson_Skeuo.S
+			case Long ⇒ SchemaJson_Skeuo.LongF()
+			case Double ⇒ SchemaJson_Skeuo.DoubleF()
+			//case Char ⇒ SchemaJson_Skeuo.
 			//case BigInt ⇒
 			//case BigDecimal ⇒ // TODO missing a lot of types on skeuo's end!
 		}*/
 		
 		
-		case JsonSchema_G.array(componentSchema: JsonSchema_G[T], unique) ⇒  {
+		case SchemaJson_Glow.array(componentSchema: SchemaJson_Glow[T], unique) ⇒  {
 			
 			println(s"INSIDE array converter: glow -> skeuo")
 			println(s"inner type (tag.tpe.toString) = ${tag.tpe.toString}")
 			//val a: universe.TypeTag[T] = tag
 			//val b: universe.TypeTag[T] = implicitly[TypeTag[T]]
-			val c: universe.TypeTag[JsonSchema_G[T]] = implicitly[TypeTag[JsonSchema_G[T]]]
+			val c: universe.TypeTag[SchemaJson_Glow[T]] = implicitly[TypeTag[SchemaJson_Glow[T]]]
 			println(s"entire schema type = ${c.tpe.toString}")
 			
 			
-			JsonSchema_S.array(andyGlowToSkeuoJsonSchema(componentSchema))
+			SchemaJson_Skeuo.array(andyGlowToSkeuoJsonSchema(componentSchema))
 		}
 		
-		//case JsonSchema_G.map
+		//case SchemaJson_Glow.map
 		
 		
 	}
 	
 	
-	/*def algebra_AndyGlowToSkeuo: Algebra[JsonSchema_G, JsonSchema_S] = // meaning: Andy[Skeuo[T]] => SKeuo[T]
+	/*def algebra_AndyGlowToSkeuo: Algebra[SchemaJson_Glow, SchemaJson_Skeuo] = // meaning: Andy[Skeuo[T]] => SKeuo[T]
 		Algebra {
 			
 			
 			
 			// HELP andy glow has more string sub-types available while Skeuo does not = https://github.com/andyglow/scala-jsonschema/blob/7051682e787e9358d4c542027b48da7832998213/modules/parser/src/main/scala/com/github/andyglow/jsonschema/ParseJsonSchema.scala#L129-L137
-			case JsonSchema_G.`string` ⇒ JsonSchema_S.StringF()
+			case SchemaJson_Glow.`string` ⇒ SchemaJson_Skeuo.StringF()
 			
 			
-			case JsonSchema_G.`integer` ⇒ JsonSchema_S.IntegerF()
+			case SchemaJson_Glow.`integer` ⇒ SchemaJson_Skeuo.IntegerF()
 			
 			// HELP error with the below code it says: Pattern type is incompatible with expected type, found: Schema.number.type, required: Schema[JsonSchemaF]
-			//case JsonSchema_G.`number`[_] ⇒ JsonSchema_S.FloatF()
-			//case JsonSchema_G.number[Float] ⇒ JsonSchema_S.FloatF()
-			//case JsonSchema_G.number[JsonSchema_S.Fixed] ⇒ JsonSchema_S.FloatF()
-			case JsonSchema_G.`number`[_:JsonSchema_S[_]] ⇒ JsonSchema_S.FloatF()
-			//case json.Json.schema[JsonSchema_S[_]] ⇒ JsonSchema_S.FloatF()
+			//case SchemaJson_Glow.`number`[_] ⇒ SchemaJson_Skeuo.FloatF()
+			//case SchemaJson_Glow.number[Float] ⇒ SchemaJson_Skeuo.FloatF()
+			//case SchemaJson_Glow.number[SchemaJson_Skeuo.Fixed] ⇒ SchemaJson_Skeuo.FloatF()
+			case SchemaJson_Glow.`number`[_:SchemaJson_Skeuo[_]] ⇒ SchemaJson_Skeuo.FloatF()
+			//case json.Json.schema[SchemaJson_Skeuo[_]] ⇒ SchemaJson_Skeuo.FloatF()
 			
-			//case json.Json.schema[Float] ⇒ JsonSchema_S.FloatF()
-			
-			
-			case JsonSchema_G[Float] ⇒
-			
-			val t: JsonSchema_G[Float] = json.Json.schema[Float]
-			val s: JsonSchema_G.number[Float] = JsonSchema_G.`number`[Float]
-			
-			val x: Schema.string.type = JsonSchema_G.`string`
-			val x2: JsonSchema_G[String] = JsonSchema_G.`string`
+			//case json.Json.schema[Float] ⇒ SchemaJson_Skeuo.FloatF()
 			
 			
-			JsonSchema_G.`number`[JsonSchema_S.FloatF[_]]
+			case SchemaJson_Glow[Float] ⇒
+			
+			val t: SchemaJson_Glow[Float] = json.Json.schema[Float]
+			val s: SchemaJson_Glow.number[Float] = SchemaJson_Glow.`number`[Float]
+			
+			val x: Schema.string.type = SchemaJson_Glow.`string`
+			val x2: SchemaJson_Glow[String] = SchemaJson_Glow.`string`
 			
 			
-			case JsonSchema_G.`object`[JsonSchema_S.ObjectF] ⇒ JsonSchema_S.ObjectF()
+			SchemaJson_Glow.`number`[SchemaJson_Skeuo.FloatF[_]]
+			
+			
+			case SchemaJson_Glow.`object`[SchemaJson_Skeuo.ObjectF] ⇒ SchemaJson_Skeuo.ObjectF()
 		}*/
 	
 }

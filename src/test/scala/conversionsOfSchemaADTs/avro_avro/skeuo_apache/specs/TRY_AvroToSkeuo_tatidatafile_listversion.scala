@@ -30,10 +30,11 @@ import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache._ //{apacheToSkeuoAvroSche
 //{skeuoAvroSchemaToJsonString, jsonStringToSkeuoAvroSchema, avroSchemaToJsonString}
 
 
-import utilTest.GeneralTestUtil
+//import utilTest.UtilTest
+import utilMain.UtilMain
 
-import testData.schemaData.avroData.apacheData.AvroSchemaData_Apache._
-import testData.GeneralTestData._
+import testData.schemaData.avroData.apacheData.Data._
+
 
 import java.io.File
 import scala.io.Source

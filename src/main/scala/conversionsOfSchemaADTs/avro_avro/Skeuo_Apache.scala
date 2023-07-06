@@ -1,28 +1,21 @@
 package conversionsOfSchemaADTs.avro_avro
 
 import cats.data.NonEmptyList
+
 import higherkindness.droste._
 import higherkindness.droste.data.Fix
-import higherkindness.droste.syntax.all._
+//import higherkindness.droste.syntax.all._
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
 
-
-
-
 import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
-import org.apache.avro.{LogicalType => LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache}
+import org.apache.avro.{LogicalType ⇒ LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache}
 
+import utilMain.utilAvro.utilSkeuoApache.FieldAndOrderConversions.{FieldS, field2Field_SA}
+import utilMain.utilAvro.utilSkeuoApache.ValidateLogicalTypes.isValidated
 
-import zio.schema._
-import zio.schema.DeriveSchema
-import zio.schema.{Schema ⇒ ZioSchema, StandardType ⇒ ZioStandardType} // TODO move the zio <-> apache tests in the other file
-import zio.schema.codec.AvroCodec
 
 import scala.jdk.CollectionConverters._
 
-
-import utilMain.utilSkeuoApache.FieldAndOrderConversions._
-import utilMain.utilSkeuoApache.ValidateUtil._
 
 /**
  *
