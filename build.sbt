@@ -83,6 +83,10 @@ lazy val global = project
 			
 			
 			allDependencies.avroTools_for_avdlToAvsc,
+			
+			
+			allDependencies.avro4s_core,
+			allDependencies.avro4s_json,
 		)
 	)
 	.aggregate(
@@ -146,6 +150,8 @@ lazy val allDependencies =
 		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
 		
 		val versionOfAvroTools = "1.11.1"
+		
+		val versionOfAvro4S = "4.1.1"
 		
 		//------------------
 		
@@ -246,6 +252,9 @@ lazy val allDependencies =
 		
 		// https://mvnrepository.com/artifact/org.apache.avro/avro-tools
 		val avroTools_for_avdlToAvsc = "org.apache.avro" % "avro-tools" % versionOfAvroTools
+		
+		val avro4s_core = "com.sksamuel.avro4s" %% "avro4s-core" % versionOfAvro4S
+		val avro4s_json = "com.sksamuel.avro4s" %% "avro4s-json" % versionOfAvro4S
 	}
 
 

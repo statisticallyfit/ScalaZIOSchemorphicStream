@@ -1,12 +1,10 @@
 package conversionsOfSchemaADTs.json_json.specs
 
 
-import org.scalatest.{GivenWhenThen, Informer}
+import org.scalatest.{GivenWhenThen}
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
 
-// import org.specs2.Specification // wanted to use 'sequential' to make tests run in order to see print stataements in order but cannot because already using scalatest (functions get mixed up)
-// NOTE using sbt now  = https://stackoverflow.com/a/15146140
 
 import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
 
