@@ -1,0 +1,18 @@
+@namespace("trafficflow.ctm.tf_msm.datasource")
+protocol CtmMsmInput {
+	record VisitorTypeAmount {
+		int uniqueVisitorAmount;
+	}
+
+	record Overview {
+		trafficflow.ctm.tf_msm.datasource.VisitorTypeAmount visitorTypeAmount;
+	}
+
+	record Data {
+		trafficflow.ctm.tf_msm.datasource.Overview overview;
+	}
+
+	record Tf_Msm {
+		trafficflow.ctm.tf_msm.datasource.Data data;
+	}
+}

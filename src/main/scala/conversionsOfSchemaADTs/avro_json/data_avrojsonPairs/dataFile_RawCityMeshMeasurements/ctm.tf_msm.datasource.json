@@ -1,0 +1,36 @@
+{
+  "title": "Raw CityMesh measurements schema",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "overview": {
+          "type": "object",
+          "properties": {
+            "visitorTypeAmount": {
+              "type": "object",
+              "properties": {
+                "uniqueVisitorAmount": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "uniqueVisitorAmount"
+              ]
+            }
+          },
+          "required": [
+            "visitorTypeAmount"
+          ]
+        }
+      },
+      "required": [
+        "overview"
+      ]
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "type" : "record",
+  "name" : "Tf_Msm",
+  "namespace" : "trafficflow.ctm.tf_msm.datasource",
+  "fields" : [ {
+    "name" : "data",
+    "type" : {
+      "type" : "record",
+      "name" : "Data",
+      "fields" : [ {
+        "name" : "overview",
+        "type" : {
+          "type" : "record",
+          "name" : "Overview",
+          "fields" : [ {
+            "name" : "visitorTypeAmount",
+            "type" : {
+              "type" : "record",
+              "name" : "VisitorTypeAmount",
+              "fields" : [ {
+                "name" : "uniqueVisitorAmount",
+                "type" : "int"
+              } ]
+            }
+          } ]
+        }
+      } ]
+    }
+  } ]
+}
