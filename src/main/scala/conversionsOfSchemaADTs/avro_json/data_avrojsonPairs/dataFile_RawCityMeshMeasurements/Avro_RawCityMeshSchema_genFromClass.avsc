@@ -1,0 +1,39 @@
+// Got the avro from th ezio generation
+// Prettified the avro single line to be multi-line using = https://codebeautify.org/jsonviewer/cb90daf6
+{
+  "type": "record",
+  "name": "RawCityMeshMeasurementsSchema",
+  "fields": [
+    {
+      "name": "data",
+      "type": {
+        "type": "record",
+        "name": "Data",
+        "fields": [
+          {
+            "name": "overview",
+            "type": {
+              "type": "record",
+              "name": "Overview",
+              "fields": [
+                {
+                  "name": "visitorTypeAmount",
+                  "type": {
+                    "type": "record",
+                    "name": "VisitorTypeAmount",
+                    "fields": [
+                      {
+                        "name": "uniqueVisitorAmount",
+                        "type": "int"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

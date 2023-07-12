@@ -3,7 +3,7 @@ package conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.dataFile_RawCityMes
 /**
  * Class generated from the .json schema using this online tool by cchandurkar = https://cchandurkar.github.io/json-schema-to-case-class/
  */
-object RawCityMeshMeasurementsSchema {
+object Class_RawCityMeshSchema_genFromJson {
 	
 	/**
 	 * @param data
