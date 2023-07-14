@@ -1,0 +1,1 @@
+- cchandurkar online tool only deals with 'allOf' not 'oneOf' or 'anyOf' - this file has the latter kinds - how to do the conversion???? (TODO check with andy glow if class -> schema yields same schema as original schema)

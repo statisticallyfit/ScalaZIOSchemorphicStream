@@ -1,0 +1,20 @@
+@namespace("trafficflow.ctm.tf_msm.managed")
+protocol CtmMsmInput {
+	record VisitorTypeAmount {
+		int uniqueVisitorAmount;
+	}
+
+	record Overview {
+		VisitorTypeAmount visitorTypeAmount;
+	}
+
+	record Data {
+		Overview overview;
+	}
+
+	record Tf_Msm_Managed {
+		Data data;
+		string sensorId;
+		timestamp_ms ts;
+	}
+}

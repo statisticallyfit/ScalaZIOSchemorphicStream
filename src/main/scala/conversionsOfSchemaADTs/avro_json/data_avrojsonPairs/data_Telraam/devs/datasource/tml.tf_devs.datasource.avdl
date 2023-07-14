@@ -1,0 +1,34 @@
+@namespace("trafficflow.tml.tf_devs.datasource")
+protocol TmlDevsInput {
+	record Properties {
+		// the string is a workaround for string|double (that union does not work)
+		string uptime;
+		string heavy;
+		string car;
+		string bike;
+		string pedestrian;
+		long segment_id;
+		union{null,string} last_data_package;
+		string timezone;
+		string `date`;
+		string period;
+	}
+
+	record Geometry {
+		string type;
+		array<array<array<double>>> coordinates;
+	}
+
+	record Features {
+		Geometry geometry;
+		Properties properties;
+		string type;
+	}
+
+	record Tf_Devs {
+		array<Features> features;
+		string message;
+		int status_code;
+		string type;
+	}
+}

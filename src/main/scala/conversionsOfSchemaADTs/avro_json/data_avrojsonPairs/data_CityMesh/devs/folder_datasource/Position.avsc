@@ -1,0 +1,15 @@
+{
+  "type" : "record",
+  "name" : "Position",
+  "namespace" : "trafficflow.ctm.tf_devs.datasource",
+  "fields" : [ {
+    "name" : "coordinates",
+    "type" : {
+      "type" : "array",
+      "items" : "float"
+    }
+  }, {
+    "name" : "type",
+    "type" : "string"
+  } ]
+}

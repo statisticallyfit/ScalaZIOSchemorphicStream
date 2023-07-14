@@ -1,0 +1,86 @@
+{
+  "title": "TelraamActiveSegmentsDataSchema",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "features": {
+      "type": "array",
+      "items": {
+        "title": "Features",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "properties": {
+            "title": "Properties",
+            "type": "object",
+            "required": [
+              "date",
+              "period",
+              "timezone",
+              "uptime",
+              "heavy",
+              "car",
+              "bike",
+              "pedestrian",
+              "segment_id"
+            ],
+            "properties": {
+              "bike": {
+                "title": "Any",
+                "type": "object",
+                "required": [],
+                "properties": {}
+              },
+              "car": {
+                "title": "Any",
+                "type": "object",
+                "required": [],
+                "properties": {}
+              },
+              "date": {
+                "title": "Any",
+                "type": "object",
+                "required": [],
+                "properties": {}
+              },
+              "heavy": {
+                "title": "Any",
+                "type": "object",
+                "required": [],
+                "properties": {}
+              },
+              "last_data_package": {
+                "title": "Any",
+                "type": "object",
+                "required": [],
+                "properties": {}
+              },
+              "pedestrian": {
+                "title": "Any",
+                "type": "object",
+                "required": [],
+                "properties": {}
+              },
+              "period": {
+                "type": "string"
+              },
+              "segment_id": {
+                "type": "number",
+                "format": "number"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "uptime": {
+                "title": "Any",
+                "type": "object",
+                "required": [],
+                "properties": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

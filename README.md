@@ -149,6 +149,8 @@ note: use [`hasSameSchemaStructure`](https://github.com/zio/zio-schema/blob/4e1e
       * :large_blue_circle: (SKEUO)  _______ 
        
       * :large_blue_circle: (WIEMAB)  ______
+       
+      * :question: TODO - [explore avro4s (sksamuel)](https://index.scala-lang.org/sksamuel/avro4s)
  
     * <u>`Avro` string --> Scala case class / types</u>:
       * :x: ~~ZIO~~

@@ -1,0 +1,56 @@
+{
+  "title": "Raw CityMesh devices schema",
+  "description": "Context data about CityMesh devices",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "locations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/device"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "device": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sensorName": {
+          "type": "string"
+        },
+        "position": {
+          "type": "object",
+          "properties": {
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2
+            }
+          }
+        },
+        "symbol": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "sensorName",
+        "position"
+      ]
+    }
+  }
+}

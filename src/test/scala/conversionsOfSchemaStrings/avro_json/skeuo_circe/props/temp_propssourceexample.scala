@@ -1,4 +1,4 @@
-package conversionsOfSchemaADTs.avro_json.skeuo_circe.props
+package conversionsOfSchemaStrings.avro_json.skeuo_circe.props
 
 /**
  *

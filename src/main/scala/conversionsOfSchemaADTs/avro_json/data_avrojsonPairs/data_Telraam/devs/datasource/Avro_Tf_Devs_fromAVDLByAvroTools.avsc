@@ -1,0 +1,87 @@
+{
+  "type" : "record",
+  "name" : "Tf_Devs",
+  "namespace" : "trafficflow.tml.tf_devs.datasource",
+  "fields" : [ {
+    "name" : "features",
+    "type" : {
+      "type" : "array",
+      "items" : {
+        "type" : "record",
+        "name" : "Features",
+        "fields" : [ {
+          "name" : "geometry",
+          "type" : {
+            "type" : "record",
+            "name" : "Geometry",
+            "fields" : [ {
+              "name" : "type",
+              "type" : "string"
+            }, {
+              "name" : "coordinates",
+              "type" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "array",
+                    "items" : "double"
+                  }
+                }
+              }
+            } ]
+          }
+        }, {
+          "name" : "properties",
+          "type" : {
+            "type" : "record",
+            "name" : "Properties",
+            "fields" : [ {
+              "name" : "uptime",
+              "type" : "string"
+            }, {
+              "name" : "heavy",
+              "type" : "string"
+            }, {
+              "name" : "car",
+              "type" : "string"
+            }, {
+              "name" : "bike",
+              "type" : "string"
+            }, {
+              "name" : "pedestrian",
+              "type" : "string"
+            }, {
+              "name" : "segment_id",
+              "type" : "long"
+            }, {
+              "name" : "last_data_package",
+              "type" : [ "null", "string" ]
+            }, {
+              "name" : "timezone",
+              "type" : "string"
+            }, {
+              "name" : "date",
+              "type" : "string"
+            }, {
+              "name" : "period",
+              "type" : "string"
+            } ]
+          }
+        }, {
+          "name" : "type",
+          "type" : "string"
+        } ]
+      }
+    }
+  }, {
+    "name" : "message",
+    "type" : "string"
+  }, {
+    "name" : "status_code",
+    "type" : "int"
+  }, {
+    "name" : "type",
+    "type" : "string"
+  } ]
+}

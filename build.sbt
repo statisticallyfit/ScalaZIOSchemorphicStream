@@ -81,6 +81,8 @@ lazy val global = project
 			allDependencies.andyGlow_jsonschema_Enumeratum,
 			allDependencies.andyGlow_jsonschema_Parser,
 			
+			allDependencies.saul_autoschema,
+			
 			
 			allDependencies.avroTools_for_avdlToAvsc,
 			
@@ -148,6 +150,8 @@ lazy val allDependencies =
 		
 		val versionOfSkeuomorph = "0.2.1"
 		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
+		
+		val versionOfSaulAutoschema = "1.0.4"
 		
 		val versionOfAvroTools = "1.11.1"
 		
@@ -249,6 +253,11 @@ lazy val allDependencies =
 		val andyGlow_jsonschema_Enumeratum = "com.github.andyglow" %% "scala-jsonschema-enumeratum" % versionOfAndyGlowScalaJsonSchema // <-- optional
 		// zero-dependency json and jsonschema parser
 		val andyGlow_jsonschema_Parser = "com.github.andyglow" %% "scala-jsonschema-parser" % versionOfAndyGlowScalaJsonSchema // <-- optional
+		
+		
+		
+		val saul_autoschema = "com.sauldhernandez" %% "autoschema" % versionOfSaulAutoschema
+		
 		
 		// https://mvnrepository.com/artifact/org.apache.avro/avro-tools
 		val avroTools_for_avdlToAvsc = "org.apache.avro" % "avro-tools" % versionOfAvroTools

@@ -1,0 +1,23 @@
+@namespace("trafficflow.ctm.tf_devs.datasource")
+protocol CtmDevsInput {
+	record Position {
+		array<float> coordinates;
+		string type;
+	}
+
+	record Location_record {
+		string id;
+		string name;
+		string sensorName;
+		trafficflow.ctm.tf_devs.datasource.Position position;
+		union{null, string} symbol;
+	}
+
+	record Data {
+		array<trafficflow.ctm.tf_devs.datasource.Location_record> locations;
+	}
+
+	record Tf_Devs {
+		trafficflow.ctm.tf_devs.datasource.Data data;
+	}
+}

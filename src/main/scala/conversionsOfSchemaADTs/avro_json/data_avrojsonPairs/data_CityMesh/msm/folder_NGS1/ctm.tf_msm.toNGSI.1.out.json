@@ -1,0 +1,144 @@
+{
+  "title": "CityMesh TrafficFlowObserved schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "TrafficFlowObserved"
+      ]
+    },
+    "vehicleType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Text"
+          ]
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "dateObservedFrom": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "DateTime"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "dateObserved": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "DateTime"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "intensity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Number"
+          ]
+        },
+        "value": {
+          "type": "number"
+        }
+      }
+    },
+    "areaCovered": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "geo:json"
+          ]
+        },
+        "value": {
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "https://geojson.org/schema/Polygon.json"
+            }
+          ],
+          "description": "Geoproperty. Geojson reference to the item"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Text"
+          ]
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "dataSource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Text"
+          ]
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "dateObservedTo": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "DateTime"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "required": [
+    "id",
+    "areaCovered",
+    "dateObserved",
+    "vehicleType",
+    "intensity"
+  ]
+}
+

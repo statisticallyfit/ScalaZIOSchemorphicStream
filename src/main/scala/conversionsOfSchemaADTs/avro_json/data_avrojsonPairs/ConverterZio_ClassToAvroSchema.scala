@@ -1,6 +1,6 @@
 package conversionsOfSchemaADTs.avro_json.data_avrojsonPairs
 
-import conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.dataFile_RawCityMeshMeasurements.Class_RawCityMeshSchema_genFromJson._
+import conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.dataFile_CityMesh_Tfmsm_datasource.Class_RawCityMeshSchema_fromJson._
 import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
 import zio.schema.codec.AvroCodec
 import zio.schema.{DeriveSchema, Schema ⇒ SchemaZIO}

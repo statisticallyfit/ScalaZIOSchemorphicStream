@@ -1,0 +1,91 @@
+{
+  "title": "CityMesh TrafficFlowObserved Obelisk schema",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string",
+              "const": "time"
+            },
+            {
+              "type": "string",
+              "const": "geohash"
+            },
+            {
+              "type": "string",
+              "const": "sourceId"
+            },
+            {
+              "type": "string",
+              "const": "value"
+            }
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": [
+              {
+                "type": "integer",
+                "description": "Timestamp in milliseconds"
+              },
+              {
+                "type": "string",
+                "description": "GeoHash of the location of the measurement"
+              },
+              {
+                "type": "string",
+                "description": "IoT device that made the measurement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string"
+                  },
+                  "dateObserved": {
+                    "type": "string"
+                  },
+                  "dateObservedTo": {
+                    "type": "string"
+                  },
+                  "dateObservedFrom": {
+                    "type": "string"
+                  },
+                  "intensity": {
+                    "type": "integer"
+                  },
+                  "area_covered": {
+                    "$ref": "https://geojson.org/schema/Polygon.json",
+                    "description": "Geoproperty. Geojson reference to the item"
+                  },
+                  "vehicleType": {
+                    "type": "string",
+                    "enum": [
+                      "pedestrians"
+                    ]
+                  }
+                },
+                "required": [
+                  "area_covered",
+                  "dateObserved",
+                  "intensity",
+                  "vehicleType",
+                  "dateObservedFrom",
+                  "dateObservedTo",
+                  "source"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

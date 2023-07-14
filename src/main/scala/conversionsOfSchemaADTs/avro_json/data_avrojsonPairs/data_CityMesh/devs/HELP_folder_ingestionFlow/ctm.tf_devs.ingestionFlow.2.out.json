@@ -1,0 +1,189 @@
+{
+  "title": "CityMesh devices schema",
+  "description": "Context data about CityMesh devices",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Device"
+      ]
+    },
+    "refDeviceModel": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Relationship"
+          ]
+        },
+        "value": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "adminState": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "healthState": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "areaCovered": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "geojson"
+          ]
+        },
+        "value": {
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "https://geojson.org/schema/Polygon.json"
+            }
+          ],
+          "properties": {
+            "metadata": {
+              "type": "object"
+            }
+          },
+          "description": "Geoproperty. Geojson reference to the item"
+        }
+      }
+    },
+    "maxTimeBetweenObservations": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Number"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "dateInstalled": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "DateTime"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "String"
+          ]
+        },
+        "value": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "geojson"
+          ]
+        },
+        "value": {
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "https://geojson.org/schema/Point.json"
+            }
+          ],
+          "properties": {
+            "metadata": {
+              "type": "object"
+            }
+          },
+          "description": "Geoproperty. Geojson reference to the item"
+        }
+      }
+    },
+    "category": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "StructuredValue"
+          ]
+        },
+        "value": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "required": [
+    "id",
+    "areaCovered",
+    "location",
+    "refDeviceModel"
+  ]
+}

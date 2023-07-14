@@ -1,0 +1,152 @@
+{
+  "title": "CityMesh Devices schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "batteryLevel": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Number"
+          ]
+        },
+        "value": {
+          "type": "integer",
+          "enum": [
+            -1
+          ]
+        }
+      }
+    },
+    "dateFirstUsed": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "DateTime"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "refDeviceModel": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Relationship"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "enum": [
+            "urn:ngsi-v2:cot-imec-be:devicemodel:citymesh-people-counts-virtual-device"
+          ]
+        }
+      }
+    },
+    "controlledProperty": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "List"
+          ]
+        },
+        "value": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "occupancy"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      }
+    },
+    "owner": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "List"
+          ]
+        },
+        "value": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "imec-cot"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      }
+    },
+    "deviceState": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Text"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "enum": [
+            "ok"
+          ]
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "geo:json"
+          ]
+        },
+        "value": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string",
+              "enum": [
+                "lon"
+              ]
+            },
+            {
+              "type": "string",
+              "enum": [
+                "lat"
+              ]
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    }
+  }
+}

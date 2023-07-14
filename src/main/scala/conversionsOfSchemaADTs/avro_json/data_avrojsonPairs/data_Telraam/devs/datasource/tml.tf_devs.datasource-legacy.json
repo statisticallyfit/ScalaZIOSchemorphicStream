@@ -1,0 +1,93 @@
+{
+  "title": "Telraam active segments data schema",
+  "allOf": [
+    {
+      "$ref": "https://geojson.org/schema/FeatureCollection.json"
+    }
+  ],
+  "type": "object",
+  "properties": {
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "properties": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "last_data_package": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                ]
+              },
+              "pedestrian_avg": {
+                "type": "integer"
+              },
+              "bike_avg": {
+                "type": "integer"
+              },
+              "car_avg": {
+                "type": "integer"
+              },
+              "lorry_avg": {
+                "type": "integer"
+              },
+              "typical_data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/measurement"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "pedestrian_avg",
+              "bike_avg",
+              "car_avg",
+              "lorry_avg",
+              "typical_data"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "measurement": {
+      "type": "object",
+      "properties": {
+        "hour": {
+          "type": "string"
+        },
+        "pedestrian": {
+          "type": "number"
+        },
+        "bike": {
+          "type": "number"
+        },
+        "car": {
+          "type": "number"
+        },
+        "lorry": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "hour",
+        "pedestrian",
+        "bike",
+        "car",
+        "lorry"
+      ]
+    }
+  }
+}

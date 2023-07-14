@@ -1,9 +1,9 @@
-package conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.dataFile_RawCityMeshMeasurements
+package conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.dataFile_CityMesh_Tfmsm_datasource
 
 /**
  * Class generated from the .json schema using this online tool by cchandurkar = https://cchandurkar.github.io/json-schema-to-case-class/
  */
-object Class_RawCityMeshSchema_genFromJson {
+object Class_RawCityMeshSchema_fromJson {
 	
 	/**
 	 * @param data

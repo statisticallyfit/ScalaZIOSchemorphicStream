@@ -1,0 +1,34 @@
+{
+  "type" : "record",
+  "name" : "Location_record",
+  "namespace" : "trafficflow.ctm.tf_devs.datasource",
+  "fields" : [ {
+    "name" : "id",
+    "type" : "string"
+  }, {
+    "name" : "name",
+    "type" : "string"
+  }, {
+    "name" : "sensorName",
+    "type" : "string"
+  }, {
+    "name" : "position",
+    "type" : {
+      "type" : "record",
+      "name" : "Position",
+      "fields" : [ {
+        "name" : "coordinates",
+        "type" : {
+          "type" : "array",
+          "items" : "float"
+        }
+      }, {
+        "name" : "type",
+        "type" : "string"
+      } ]
+    }
+  }, {
+    "name" : "symbol",
+    "type" : [ "null", "string" ]
+  } ]
+}
