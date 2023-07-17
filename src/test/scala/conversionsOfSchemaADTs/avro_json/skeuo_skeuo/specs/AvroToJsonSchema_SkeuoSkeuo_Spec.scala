@@ -2,7 +2,8 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 
 import higherkindness.droste.data.Fix
 import higherkindness.droste._
-import higherkindness.droste.implicits._
+import higherkindness.droste.syntax.all._
+//import higherkindness.droste.implicits._
 
 import org.scalatest.{GivenWhenThen}
 import org.scalatest.featurespec.AnyFeatureSpec
@@ -52,32 +53,17 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			val result: SchemaJson_Skeuo[Null] = avroToJson(nullAvro_Skeuo)
 			val resultC: SchemaJson_Skeuo[JsonCirce] = avroToJson[JsonCirce](nullAvro_SkeuoC)
 			
+			val resultF: SchemaJson_Skeuo[Fix[SchemaAvro_Skeuo]] = avroToJson(nullAvro_SkeuoFix.unfix)
 			
 			info(s"nullAvro_Skeuo value = $nullAvro_Skeuo")
-			
-			
-			// TODO trying to get into apache form so I can print out the Avro string version (from avro-skeuo)
-			// TODO not sure how to manipulate fixed so going to alter the function converter to be a regular non-algebra function ... ?
-			import higherkindness.droste.syntax.all._
-			import higherkindness.droste.implicits._
-			
-			
-			implicit val n: Fix[Nothing] = Fix.apply(null).asInstanceOf[Fix[Null]]
-			
-			nullAvro_Skeuo.fix
-			
-			//nonalgebra_SkeuoToApache(nullAvro_Skeuo)
-			
-			info(s"nullAvro_Apache (string) = ${skeuoToApacheAvroSchema(Fix(nullAvro_Skeuo))}")
-			
-			
-			
+			info(s"nullAvro_SkeuoFix = $nullAvro_SkeuoFix")
+			info(s"nullAvro_SkeuoFix ---> nullAvro_Apache (string) = ${skeuoToApacheAvroSchema(nullAvro_SkeuoFix)}")
 			info(s"nullJson_Skeuo value = $result")
 			info(s"func type = ${UtilMain.getFuncTypeSubs(avroToJsonFunction[Null])}")
 			info(s"value type = ${UtilMain.getFuncTypeSubs(result)}")
 			info(s"avro skeuo -> json circe (C) = ${SchemaAvro_Skeuo.toJson(nullAvro_SkeuoC)}")
 			info(s"json skeuo -> json circe (C) = ${SchemaJson_Skeuo.render(nullJson_SkeuoC)}")
-			
+			info("\n")
 			info(s"nullAvro_SkeuoC value = $nullAvro_SkeuoC")
 			info(s"nullJson_Skeuo value = $resultC")
 			info(s"func type (C) = ${UtilMain.getFuncTypeSubs(avroToJsonFunction[JsonCirce])}")
@@ -85,6 +71,13 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			info(s"avro skeuo -> json circe (C) = ${SchemaAvro_Skeuo.toJson(nullAvro_SkeuoC)}")
 			info(s"json skeuo -> json circe (C) = ${SchemaJson_Skeuo.render(nullJson_SkeuoC)}")
 			
+			
+			
+			// TODO next:
+			// 1) str -> json circe -> skeuo-json-fixed (to be able to create tests from desired string output to skeuo and then check if that skeuo is matching my generated skeuo)
+			// 2) str -> apache avro (parser!) -> skeuo-avro (create tests from desired avro string to skeuo-avro)
+			// 3) ... from 2), get skeuo-avro -> json circe (using toJson call) (reason: to get from avro-str -> json circe)
+			// 4) skeuo-json -> json circe (using render() call)
 			
 			
 			avroToJsonFunction[Null] shouldBe a [SchemaAvro_Skeuo[_] => SchemaJson_Skeuo[_]]

@@ -1,5 +1,10 @@
 package testData.schemaData.avroData.skeuoData
 
+import higherkindness.droste._
+import higherkindness.droste.data.Fix
+import higherkindness.droste.syntax.all._
+
+
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
 import SchemaAvro_Skeuo._
 import SchemaAvro_Skeuo.{Field ⇒ FieldAvro}
@@ -15,11 +20,20 @@ object Data {
 	val nullAvro_Skeuo: SchemaAvro_Skeuo[Null] = TNull()
 	val nullAvro_SkeuoC: SchemaAvro_Skeuo[Json] = TNull()
 	
-	val strAvro_Skeuo: SchemaAvro_Skeuo[String] = TString()
-	val intAvro_Skeuo: SchemaAvro_Skeuo[Int] = TInt()
+	val nullAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TNull())
 	
-	val arrayIntAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[Int]] = TArray(intAvro_Skeuo)
-	val arrayStrAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[String]] = TArray(strAvro_Skeuo)
+	val strAvro_Skeuo: SchemaAvro_Skeuo[String] = TString()
+	val strAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TString())
+	
+	val intAvro_Skeuo: SchemaAvro_Skeuo[Int] = TInt()
+	val intAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TInt())
+	
+	
+	val arrayIntAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[Int]] = TArray(TInt())
+	val arrayIntAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TArray(Fix(TInt())))
+	
+	val arrayStrAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[String]] = TArray(TString())
+	val arrayStrAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TArray(Fix(TString())))
 	
 	// NOTE; trying to copy avro schema "RawCityMesh - devs - datasource
 	// TODO what is the inner type parameter?
@@ -50,4 +64,20 @@ object Data {
 			)
 		)
 	)
+	
+	val recordStringAvro_SkeuoFix: Fix[SchemaAvro_Skeuo]  = Fix(TRecord(
+		name = "StringRecord",
+		namespace = Some("StringNamespace"),
+		aliases = List("a1", "a2"),
+		doc = None,
+		fields = List(
+			FieldAvro(
+				name = "stringField1",
+				aliases = List(),
+				doc = None,
+				order = None,
+				tpe = Fix(TString())
+			)
+		)
+	))
 }

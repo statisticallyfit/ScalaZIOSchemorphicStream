@@ -29,7 +29,7 @@ import scala.reflect.runtime.universe._
 /**
  *
  */
-class JsonSchema_Glow_To_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers {
+class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThen with Matchers {
 	
 	
 	Feature("Convert raw json schema string (basic primitives)") {
