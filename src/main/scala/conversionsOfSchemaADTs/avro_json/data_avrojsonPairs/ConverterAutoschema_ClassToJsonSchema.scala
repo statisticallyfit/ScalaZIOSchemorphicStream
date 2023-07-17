@@ -39,6 +39,7 @@ object ConverterAutoschema_ClassToJsonSchema extends App {
 	
 	import conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.data_Telraam.devs.datasource.Class_TelraamDevsDatasource_fromJson._
 	
+	import conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.data_CityMesh.devs.folder_datasource.Class_RawCityMeshContext_fromJson._
 	/*implicit val anySchema = Json.schema[Any]
 	
 	implicit val propertiesSchema: SchemaJson_Glow[Properties] = Json.schema[Properties]
@@ -51,8 +52,11 @@ object ConverterAutoschema_ClassToJsonSchema extends App {
 	//println(JsonFormatter.format(AsValue.schema(telraamJsonSchema, json.schema.Version.Draft04())))
 	// TODO test with autoschema (saul )
 	
-	val auto: JsObject = AutoSchema.createSchema[TelraamActiveSegmentsDataSchema]
-	println(s"autoschema = ${auto.toString()}")
+	val telraamJsonSchema: JsObject = AutoSchema.createSchema[TelraamActiveSegmentsDataSchema]
+	println(s"telraamJsonSchema = ${telraamJsonSchema.toString()}")
 	
+	
+	val rawCityMeshJsonSchema = AutoSchema.createSchema[RawCityMeshDevicesSchema]
+	println(s"raw city mesh json schema = ${rawCityMeshJsonSchema}")
 	//conv[TelraamActiveSegmentsDataSchema]
 }

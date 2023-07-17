@@ -4,7 +4,7 @@ import testData.ScalaCaseClassData._
 
 
 import zio.schema.DeriveSchema
-import zio.schema.{Schema ⇒ Schema_Zio, StandardType ⇒ StandardType_Zio} // TODO move the zio <-> apache tests in the other file
+import zio.schema.{Schema ⇒ SchemaGeneric_Zio, StandardType ⇒ StandardType_Zio} // TODO move the zio <-> apache tests in the other file
 
 
 
@@ -15,6 +15,6 @@ import zio.schema.{Schema ⇒ Schema_Zio, StandardType ⇒ StandardType_Zio} // 
 object Data {
 	
 	
-	val tangeloSchema_Zio: Schema_Zio[Tangelo] = DeriveSchema.gen[Tangelo]
+	val tangeloGeneric_Zio: SchemaGeneric_Zio[Tangelo] = DeriveSchema.gen[Tangelo]
 
 }

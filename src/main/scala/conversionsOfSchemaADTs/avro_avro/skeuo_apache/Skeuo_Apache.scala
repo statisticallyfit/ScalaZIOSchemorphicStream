@@ -1,18 +1,13 @@
-package conversionsOfSchemaADTs.avro_avro
+package conversionsOfSchemaADTs.avro_avro.skeuo_apache
 
 import cats.data.NonEmptyList
-
 import higherkindness.droste._
 import higherkindness.droste.data.Fix
 //import higherkindness.droste.syntax.all._
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
-
-import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
-import org.apache.avro.{LogicalType ⇒ LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache}
-
+import org.apache.avro.{LogicalType ⇒ LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache, Schema ⇒ SchemaAvro_Apache}
 import utilMain.utilAvro.utilSkeuoApache.FieldAndOrderConversions.{FieldS, field2Field_SA}
 import utilMain.utilAvro.utilSkeuoApache.ValidateLogicalTypes.isValidated
-
 
 import scala.jdk.CollectionConverters._
 
@@ -32,15 +27,19 @@ object Skeuo_Apache {
 	def coalgebra_ApacheToSkeuo: Coalgebra[SchemaAvro_Skeuo, SchemaAvro_Apache] = SchemaAvro_Skeuo.fromAvro
 	
 	
-	/**
-	 * Algebra type is:
-	 * 	Skeuo[Apache] => Apache
-	 *
-	 * @return
-	 */
-	def algebra_SkeuoToApache: Algebra[SchemaAvro_Skeuo, SchemaAvro_Apache] =
-		Algebra { // Algebra[Skeuo, Apache] ----- MEANING ---->  Skeuo[Apache] => Apache
-			
+	/*import scala.reflect.runtime.universe._
+	
+	
+	def galgebra_SkeuoToApache[T: TypeTag]: GAlgebra[SchemaAvro_Skeuo, T, SchemaAvro_Apache] = GAlgebra {
+		
+		case SchemaAvro_Skeuo.TNull() ⇒ SchemaAvro_Apache.create(SchemaAvro_Apache.Type.NULL)
+	}*/
+	
+	
+	
+	def nonalgebra_SkeuoToApache/*[T: TypeTag]*/(schemaSkeuo: SchemaAvro_Skeuo[SchemaAvro_Apache]): SchemaAvro_Apache = {
+		
+		schemaSkeuo match {
 			case SchemaAvro_Skeuo.TNull() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.NULL)
 			
 			case SchemaAvro_Skeuo.TBoolean() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.BOOLEAN)
@@ -56,7 +55,6 @@ object Skeuo_Apache {
 			case SchemaAvro_Skeuo.TDouble() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.DOUBLE)
 			
 			case SchemaAvro_Skeuo.TBytes() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.BYTES)
-			
 			
 			
 			/**
@@ -113,7 +111,7 @@ object Skeuo_Apache {
 			 * SOURCE = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L211
 			 */
 			case SchemaAvro_Skeuo.TNamedType(namespace: String, name: String) ⇒ {
-				SchemaAvro_Apache.createRecord(name, null/*"NO DOC"*/, namespace, /*isError =*/ false)
+				SchemaAvro_Apache.createRecord(name, null /*"NO DOC"*/ , namespace, /*isError =*/ false)
 			}
 			
 			/**
@@ -141,7 +139,7 @@ object Skeuo_Apache {
 				// HELP: apache has `isError` while skeuo does not and skeuo has `aliases` while apache does not.... how to fix?
 				//  TODO say by default that this record is NOT an error type? = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L364
 				
-				val recordSchema: SchemaAvro_Apache = SchemaAvro_Apache.createRecord(skeuoName, skeuoDoc.getOrElse(null/*"NO DOC"*/), skeuoNamespace.getOrElse(null/*"NO NAMESPACE"*/), /*isError =*/ false, skeuoFields.map(f ⇒ field2Field_SA(f)).asJava)
+				val recordSchema: SchemaAvro_Apache = SchemaAvro_Apache.createRecord(skeuoName, skeuoDoc.getOrElse(null /*"NO DOC"*/), skeuoNamespace.getOrElse(null /*"NO NAMESPACE"*/), /*isError =*/ false, skeuoFields.map(f ⇒ field2Field_SA(f)).asJava)
 				
 				aliases.foreach(a ⇒ recordSchema.addAlias(a))
 				
@@ -164,7 +162,7 @@ object Skeuo_Apache {
 			case SchemaAvro_Skeuo.TEnum(name, namespaceOpt, aliases, docOpt, symbols) => {
 				val enumSchema = SchemaAvro_Apache.createEnum(name,
 					docOpt.orNull,
-					namespaceOpt.getOrElse(null/*"NO NAMESPACE"*/),
+					namespaceOpt.getOrElse(null /*"NO NAMESPACE"*/),
 					symbols.asJava
 				)
 				
@@ -180,7 +178,7 @@ object Skeuo_Apache {
 			 * NOTE: skeup has `namespaceOption` while apache has `space`` -- they are the same (namespace wrapped in option)
 			 */
 			case SchemaAvro_Skeuo.TFixed(name, namespaceOpt, aliases, size) => {
-				val fixedSchema: SchemaAvro_Apache = SchemaAvro_Apache.createFixed(name, null/*"NO DOC"*/, namespaceOpt.orNull, size)
+				val fixedSchema: SchemaAvro_Apache = SchemaAvro_Apache.createFixed(name, null /*"NO DOC"*/ , namespaceOpt.orNull, size)
 				
 				aliases.foreach(a => fixedSchema.addAlias(a))
 				
@@ -230,7 +228,7 @@ object Skeuo_Apache {
 			
 			case SchemaAvro_Skeuo.TDecimal(precision: Int, scale: Int) ⇒ {
 				
-				val fixedSchema: SchemaAvro_Apache = SchemaAvro_Apache.createFixed("Fixed (schema) for Decimal (logical type)", null/*"doc_decimal_fixed"*/, null, /*"decimal_namespace"*/ 0)
+				val fixedSchema: SchemaAvro_Apache = SchemaAvro_Apache.createFixed("Fixed (schema) for Decimal (logical type)", null /*"doc_decimal_fixed"*/ , null, /*"decimal_namespace"*/ 0)
 				// TODO is this OK?
 				
 				val decimalLogicalType: LogicalTypeApache = LogicalTypesApache.decimal(precision, scale)
@@ -244,6 +242,22 @@ object Skeuo_Apache {
 			
 			case sch => throw new IllegalArgumentException(s"Schema ${sch} not handled")
 		}
+	}
+	
+	
+	/**
+	 * Algebra type is:
+	 * 	Skeuo[Apache] => Apache
+	 *
+	 * @return
+	 */
+	def algebra_SkeuoToApache: Algebra[SchemaAvro_Skeuo, SchemaAvro_Apache] =
+		Algebra { // Algebra[Skeuo, Apache] ----- MEANING ---->  Skeuo[Apache] => Apache
+			fa: SchemaAvro_Skeuo[SchemaAvro_Apache] ⇒ nonalgebra_SkeuoToApache(fa)
+			
+			
+		}
+	
 	
 	
 	// TODO change names: SchemaAvro_Apache etc

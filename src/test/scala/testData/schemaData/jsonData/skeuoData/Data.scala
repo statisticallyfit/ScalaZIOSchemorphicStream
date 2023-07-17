@@ -1,14 +1,19 @@
 package testData.schemaData.jsonData.skeuoData
 
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
+import SchemaJson_Skeuo._
 
-
+import io.circe.Json
 /**
  *
  */
 object Data {
 	
+	// TODO find out if this is correct
+	val nullJson_Skeuo: ObjectF[Nothing] = ObjectF(properties = List(), required = List())
+	
+	val nullJson_SkeuoC: SchemaJson_Skeuo[Json] = ObjectF(properties = List(), required = List())
 	
 	
-	val intSchema_Skeuo: JsonSchema_S.IntegerF[Nothing] = JsonSchema_S.IntegerF()
+	val intJson_Skeuo: IntegerF[Nothing] = IntegerF()
 }

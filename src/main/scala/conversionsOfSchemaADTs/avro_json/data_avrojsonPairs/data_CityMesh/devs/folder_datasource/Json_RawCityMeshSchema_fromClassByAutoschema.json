@@ -1,0 +1,58 @@
+{
+  "title": "RawCityMeshDevicesSchema",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "data": {
+      "title": "Data",
+      "type": "object",
+      "required": [],
+      "properties": {
+        "locations": {
+          "type": "array",
+          "items": {
+            "title": "Locations",
+            "type": "object",
+            "required": [
+              "position",
+              "sensorName",
+              "name",
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "position": {
+                "title": "Position",
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "coordinates": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "format": "number"
+                    }
+                  }
+                }
+              },
+              "sensorName": {
+                "type": "string"
+              },
+              "symbol": {
+                "title": "Any",
+                "type": "object",
+                "required": [],
+                "properties": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

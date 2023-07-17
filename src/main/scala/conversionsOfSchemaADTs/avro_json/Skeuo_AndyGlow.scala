@@ -22,6 +22,8 @@
 // */
 //object Skeuo_AndyGlow {
 //
+//	// TODO implement with TransG here too to avoid type parameter errors (lifting / lowering)
+//
 //
 //	// TODO look here avro-json map of equivalent types: https://avro.apache.org/docs/1.11.1/specification/_print/
 //
@@ -31,7 +33,7 @@
 //	type FieldG[A] = `object`.Field[A] // TODO why is FieldG[A] type parameter not used?
 //
 //	def field2Field_SkeuoGlow_TYPED[A](fieldS: FieldS[A], s: SchemaJson_Glow[_]): FieldG[A] = fieldS match {
-//		
+//
 //		case FieldS(name: String, aliases: List[String], doc: Option[String], order: Option[Order], tpe: A) ⇒ {
 //
 //			new FieldG[A](name = name, tpe = s, required = true, default = None, description = doc, rwMode = `object`.Field.RWMode.ReadWrite)
@@ -56,7 +58,7 @@
 //	 */
 //	def algebra_AvroToJson_TYPED[T: TypeTag]: Algebra[SchemaAvro_Skeuo, SchemaJson_Glow] = Algebra {
 //
-//		case TNull() ⇒
+//		case TNull() ⇒ ??? // see skeuo-avro to skeuo-json conversion file
 //		case TInt() ⇒ 	`integer`
 //		case TString() ⇒ `string`
 //		case TBoolean() ⇒ `boolean`

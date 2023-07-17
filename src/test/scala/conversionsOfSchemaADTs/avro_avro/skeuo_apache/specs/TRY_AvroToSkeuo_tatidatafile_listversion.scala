@@ -25,7 +25,7 @@ import org.scalatest.matchers.should._
 //import org.specs2.specification.core.SpecStructure
 
 
-import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache._ //{apacheToSkeuoAvroSchema, skeuoToApacheAvroSchema}
+import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._ //{apacheToSkeuoAvroSchema, skeuoToApacheAvroSchema}
 //import conversionsOfSchemaStrings.avro_json.Skeuo_JsonCirce._
 //{skeuoAvroSchemaToJsonString, jsonStringToSkeuoAvroSchema, avroSchemaToJsonString}
 

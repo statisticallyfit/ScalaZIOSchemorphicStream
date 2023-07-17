@@ -34,7 +34,7 @@ import org.specs2._
 import org.specs2.specification.core.SpecStructure
 
 
-import conversionsOfSchemaADTs.avro_avro.Skeuo_Apache.{apacheToSkeuoAvroSchema, skeuoToApacheAvroSchema}
+import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache.{apacheToSkeuoAvroSchema, skeuoToApacheAvroSchema}
 //import conversionsOfSchemaStrings.avro_json.Skeuo_JsonCirce.{skeuoAvroSchemaToJsonCirce, jsonCirceToSkeuoAvroSchema}
 
 
