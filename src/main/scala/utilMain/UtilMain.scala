@@ -12,6 +12,85 @@ package utilMain
 object UtilMain {
 	
 	
+	object implicits {
+		// implicits for string
+		implicit class StringOps(str: String) {
+			
+			/**
+			 * Matches the json circe function no spaces
+			 *
+			 * Reason: json circe prints string with space between colon while my original json file does not have space before the colon and it is too tedious to go change all my data files so just when comparing equality between rawJsonStr and circeJsonStr, I will remove spaces from both circeJsonStr and the rawJsonStr.
+			 */
+			def noSpaces(): String = {
+				str.toList.filterNot(c ⇒ c.isWhitespace).mkString
+			}
+			
+			/**
+			 * Taking a json schema str containing something like "type" : "object" and turning that into "type": "object"
+			 * @return
+			 */
+			// HELP not working
+			/*def removeSpaceBeforeColon(): String = {
+				str.replaceAll(":", ": ").replaceAll("\\s+:\\s+\"", ": \"")
+			}*/
+			
+			// TODO
+			/*
+			{
+			"type"  : "string"
+			}
+			
+			
+			
+			ULTIMATE COLON SPACE TEST:
+			
+			
+			
+			{
+			"device"  : {
+			"type" :   "object",
+			"properties": {
+				"id"     : {
+				"type" :"string"
+				},
+				"name"   : {
+				"type":    "string"
+				},
+				"sensorName" : {
+				"type"  :   "string"
+				},
+				"position"   : {
+				"type"  : "object",
+				"properties" : {
+					"coordinates"            : {
+					"type"  :     "array",
+					"items":{
+					"type"    :         "number"
+					},
+					"maxItems"  :   2,
+					"minItems" :  2
+					}
+				}
+				},
+				"symbol":{
+				"type":"null"
+				}
+			},
+			"required"   : [
+				"id",
+				"name",
+				"sensorName",
+				"position"
+			]
+			}
+			}
+			 */
+		}
+	}
+	
+	
+	
+	
 	// NOTE: treating as block / pkg name the string of letters separated by the 'separators' = the underscore or dot
 	def extractLongestRunOfLetterOrDot(
 								    accChars: List[Char],

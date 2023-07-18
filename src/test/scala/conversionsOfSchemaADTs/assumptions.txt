@@ -1,0 +1,16 @@
+
+- json schema strings use 2-tab spaces
+
+- formatting json schema strings using codebeautify (https://codebeautify.org/jsonviewer)
+
+- converting .avdl -> avro schema str using avro-tools-jar (command line)
+
+- converting case class -> avro schema str using zio
+- converting avro schema str -> case class (one at a time) using skeuomorph (TODO)
+
+
+- converting json schema str --> case class using online cchandurkar tool = https://cchandurkar.github.io/json-schema-to-case-class/ (TODO figure out how to get past its inability to convert 'anyOf' and 'oneOf')
+
+
+- converting case class -> json schema str using andy glow (TODO fix Any issue)
+- converting case class -> json schema str using autoschema (TODO compare to andy glow if has the same restrictions)

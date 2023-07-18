@@ -1,7 +1,7 @@
 package conversionsOfSchemaADTs.json_json.specs
 
 
-import org.scalatest.{GivenWhenThen}
+import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
 
@@ -10,8 +10,8 @@ import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
 
 // HELP replacing with mine (copied) because cannot import since this is in his tests folder
 //import com.github.andyglow.testsupport._
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.testsupportForTryValue._
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseStrToADT.parseType
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.testsupportForTryValue._
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.ParseStrToADT.parseType
 //import utilTest.UtilTest
 import utilMain.UtilMain
 

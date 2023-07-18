@@ -1,4 +1,4 @@
-package utilTest.utilJson.utilAndyGlow_ParseJsonSchema
+package utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr
 
 //package com.github.andyglow.jsonschema
 

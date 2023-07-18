@@ -9,8 +9,8 @@ import org.scalatest.matchers.should._
 
 // HELP replacing with mine (copied) because cannot import since this is in his tests folder
 //import com.github.andyglow.testsupport._
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.testsupportForTryValue._
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseStrToADT.parseType
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.testsupportForTryValue._
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.ParseStrToADT.parseType
 import utilMain.UtilMain
 
 

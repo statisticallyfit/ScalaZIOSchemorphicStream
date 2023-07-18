@@ -1,26 +1,26 @@
 package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 
+import cats.syntax.all._
+
 import higherkindness.droste.data.Fix
 import higherkindness.droste._
 import higherkindness.droste.syntax.all._
-//import higherkindness.droste.implicits._
+
 
 import org.scalatest.{GivenWhenThen}
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
 
 
-import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
-
-
 import utilMain.UtilMain
 
+import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo._
+import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
+
 
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
 import SchemaAvro_Skeuo._
-
-
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
 import SchemaJson_Skeuo._
 
@@ -33,13 +33,13 @@ import testData.schemaData.jsonData.skeuoData.Data._
 import scala.reflect.runtime.universe._
 
 import io.circe.{Json ⇒ JsonCirce}
+import io.circe.parser.parse
 
 /**
  *
  */
 class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThen with Matchers  {
 
-	import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
 
 	Feature("Convert skeuo-avro-adt to skeuo-json-adt (basic primitives)"){
 		
@@ -70,7 +70,6 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			info(s"value type (C) = ${UtilMain.getFuncTypeSubs(resultC)}")
 			info(s"avro skeuo -> json circe (C) = ${SchemaAvro_Skeuo.toJson(nullAvro_SkeuoC)}")
 			info(s"json skeuo -> json circe (C) = ${SchemaJson_Skeuo.render(nullJson_SkeuoC)}")
-			
 			
 			
 			// TODO next:
