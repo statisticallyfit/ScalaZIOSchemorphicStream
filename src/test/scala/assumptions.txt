@@ -1,5 +1,6 @@
 
-- json schema strings use 2-tab spaces
+- (input) json schema strings use 3-tab spaces
+- json circe (as strings) automatically use 3-tab spaces (so made inputs use 3-tabs as well)
 
 - formatting json schema strings using codebeautify (https://codebeautify.org/jsonviewer)
 

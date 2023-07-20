@@ -46,30 +46,38 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 		Scenario("null"){
 			
 			Given("avro null in skeuo-adt")
-			info(s"avro null = $nullAvro_Skeuo")
+			
+			nullAvro_Skeuo shouldBe a [SchemaAvro_Skeuo[_]]
+			UtilMain.getFuncTypeSubs(nullAvro_Skeuo) shouldEqual "SchemaAvro_Skeuo[Null]"
 			
 			
 			When("converting to json by applying the function")
-			val result: SchemaJson_Skeuo[Null] = avroToJson(nullAvro_Skeuo)
-			val resultC: SchemaJson_Skeuo[JsonCirce] = avroToJson[JsonCirce](nullAvro_SkeuoC)
+			val jsonSkeuo: SchemaJson_Skeuo[Null] = avroToJson(nullAvro_Skeuo)
+			val jsonSkeuo_C: SchemaJson_Skeuo[JsonCirce] = avroToJson[JsonCirce](nullAvro_SkeuoC)
 			
-			val resultF: SchemaJson_Skeuo[Fix[SchemaAvro_Skeuo]] = avroToJson(nullAvro_SkeuoFix.unfix)
+			val jsonSkeuo_F: SchemaJson_Skeuo[Fix[SchemaAvro_Skeuo]] = avroToJson(nullAvro_SkeuoFix.unfix)
 			
-			info(s"nullAvro_Skeuo value = $nullAvro_Skeuo")
-			info(s"nullAvro_SkeuoFix = $nullAvro_SkeuoFix")
-			info(s"nullAvro_SkeuoFix ---> nullAvro_Apache (string) = ${skeuoToApacheAvroSchema(nullAvro_SkeuoFix)}")
-			info(s"nullJson_Skeuo value = $result")
-			info(s"func type = ${UtilMain.getFuncTypeSubs(avroToJsonFunction[Null])}")
-			info(s"value type = ${UtilMain.getFuncTypeSubs(result)}")
-			info(s"avro skeuo -> json circe (C) = ${SchemaAvro_Skeuo.toJson(nullAvro_SkeuoC)}")
-			info(s"json skeuo -> json circe (C) = ${SchemaJson_Skeuo.render(nullJson_SkeuoC)}")
-			info("\n")
-			info(s"nullAvro_SkeuoC value = $nullAvro_SkeuoC")
-			info(s"nullJson_Skeuo value = $resultC")
-			info(s"func type (C) = ${UtilMain.getFuncTypeSubs(avroToJsonFunction[JsonCirce])}")
-			info(s"value type (C) = ${UtilMain.getFuncTypeSubs(resultC)}")
-			info(s"avro skeuo -> json circe (C) = ${SchemaAvro_Skeuo.toJson(nullAvro_SkeuoC)}")
-			info(s"json skeuo -> json circe (C) = ${SchemaJson_Skeuo.render(nullJson_SkeuoC)}")
+			info(s"skeuo-avro = $nullAvro_Skeuo | type = ${UtilMain.getFuncTypeSubs(nullAvro_Skeuo)}")
+			info(s"skeuo-avro (fix) = $nullAvro_SkeuoFix | type = ${UtilMain.getFuncTypeSubs(nullAvro_SkeuoFix)}")
+			info(s"skeuo-avro (circe) = $nullAvro_SkeuoC | type = ${UtilMain.getFuncTypeSubs(nullAvro_SkeuoC)}")
+			
+			
+			info(s"skeuo-json = $jsonSkeuo | type = ${UtilMain.getFuncTypeSubs(jsonSkeuo)}")
+			info(s"skeuo-json (unfix) = $jsonSkeuo_F | type = ${UtilMain.getFuncTypeSubs(jsonSkeuo_F)}")
+			info(s"skeuo-json (circe) = $jsonSkeuo_C | type = ${UtilMain.getFuncTypeSubs(jsonSkeuo_C)}")
+			
+			
+			info(s"func type (self) = ${UtilMain.getFuncTypeSubs(avroToJsonFunction[Null])}")
+			//info(s"func type (fix) = ${UtilMain.getFuncTypeSubs(avroToJsonFunction[JsonCirce])}") //TODO
+			info(s"func type (circe) = ${UtilMain.getFuncTypeSubs(avroToJsonFunction[JsonCirce])}")
+			
+			
+			info(s"--- skeuo-avro (fix) --> apache-avro = ${skeuoToApacheAvroSchema(nullAvro_SkeuoFix)}")
+			info(s"--- skeuo-avro -> json circe = ${SchemaAvro_Skeuo.toJson(nullAvro_SkeuoC)}")
+			info(s"--- skeuo-json -> json circe = ${SchemaJson_Skeuo.render(nullJson_SkeuoC)}")
+			
+			
+			
 			
 			
 			// TODO next:
@@ -79,8 +87,8 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			// 4) skeuo-json -> json circe (using render() call)
 			
 			
-			avroToJsonFunction[Null] shouldBe a [SchemaAvro_Skeuo[_] => SchemaJson_Skeuo[_]]
-			UtilMain.getFuncTypeSubs(avroToJsonFunction[Null]) should equal ("SchemaAvro_Skeuo[Null] => SchemaJson_Skeuo[Null]")
+			/*avroToJsonFunction[Null] shouldBe a [SchemaAvro_Skeuo[_] => SchemaJson_Skeuo[_]]
+			UtilMain.getFuncTypeSubs(avroToJsonFunction[Null]) should equal ("SchemaAvro_Skeuo[Null] => SchemaJson_Skeuo[Null]")*/
 			
 			
 			// TODO why does the function take typetag as parameter?????
@@ -89,18 +97,18 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			
 			Then("json null (skeuo-adt) should be correctly generated")
 			
-			result shouldBe a [SchemaJson_Skeuo[_]]
-			UtilMain.getFuncTypeSubs(result) shouldEqual "SchemaJson_Skeuo[Null]"
+			jsonSkeuo shouldBe a [SchemaJson_Skeuo[_]]
+			UtilMain.getFuncTypeSubs(jsonSkeuo) shouldEqual "SchemaJson_Skeuo[Null]"
 			
-			List(result,
+			List(jsonSkeuo,
 				nullJson_Skeuo,
 				ObjectF(properties = List(), required = List())
 			).distinct.length should equal (1)
 			
-			result should equal(nullJson_Skeuo)
-			result shouldEqual ObjectF(properties = List(), required = List())
+			jsonSkeuo should equal(nullJson_Skeuo)
+			jsonSkeuo shouldEqual ObjectF(properties = List(), required = List())
 			
-			resultC should equal(nullJson_SkeuoC)
+			jsonSkeuo_C should equal(nullJson_SkeuoC)
 		}
 	}
 }

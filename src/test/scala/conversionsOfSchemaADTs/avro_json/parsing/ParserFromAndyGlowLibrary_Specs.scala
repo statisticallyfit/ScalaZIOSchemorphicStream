@@ -7,42 +7,27 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
 
 
-import utilMain.UtilMain
-
-import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo._
-import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
-
-
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
-import SchemaAvro_Skeuo._
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
-//import SchemaJson_Skeuo._
 
 import json.{Schema ⇒ SchemaJson_Glow}
-//import SchemaJson_Glow._
+import json.schema.Version.Draft04
+import com.github.andyglow.jsonschema.AsCirce._
+//import io.circe._
+import io.circe.{Json ⇒ JsonCirce}
+import SchemaJson_Glow._
 
-
-
-import testData.schemaData.avroData.skeuoData.Data._
-import testData.schemaData.jsonData.skeuoData.Data._
-
-
-
-import scala.reflect.runtime.universe._
-
-import scala.util.Try
 
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.testsupportForTryValue._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.ParseStrToADT.parseType
 
 import utilMain.UtilMain
-
+import utilMain.UtilMain.implicits._
 
 
 /**
- *
+ * NOTE:  CONCLUSION: best use unsafeparser from skeuomorph library instead of this one.
  */
+
+
 class ParserFromAndyGlowLibrary_Specs extends AnyFeatureSpec with GivenWhenThen with Matchers {
 	
 	
@@ -52,7 +37,7 @@ class ParserFromAndyGlowLibrary_Specs extends AnyFeatureSpec with GivenWhenThen 
 		Scenario("string") {
 			
 			Given("a json schema (single string)")
-			val s: String =
+			val rawJsonStr: String =
 				"""
 				  |{
 				  |  "type": "string"
@@ -61,36 +46,218 @@ class ParserFromAndyGlowLibrary_Specs extends AnyFeatureSpec with GivenWhenThen 
 			
 			
 			When("parsing via Andy Glow library's parser ...")
-			val schemaGlow: SchemaJson_Glow[_] = parseType(s).value
-			schemaGlow shouldBe a[SchemaJson_Glow[_]]
+			
+			val schemaGlow: SchemaJson_Glow[_] = parseType(rawJsonStr).value
+			schemaGlow shouldBe a [SchemaJson_Glow[_]]
 			schemaGlow should not be a[String] // has been converted
-			schemaGlow shouldEqual SchemaJson_Glow.`string`
+			schemaGlow shouldEqual `string`
 			
 			// Now parse to json - circe
 			And("when parsing the schema-glow to Json Circe...")
 			
-			// TODO here https://github.com/search?q=repo%3Aandyglow%2Fscala-jsonschema%20circe&type=code
+			// here https://github.com/search?q=repo%3Aandyglow%2Fscala-jsonschema%20circe&type=code
+			val circeJsonStr: JsonCirce = schemaGlow.asCirce(Draft04())
+			
+			Then("result should be a Json Circe string and should match original string")
+			circeJsonStr shouldBe a [JsonCirce]
+			//circeJsonStr.cutOutSchemaRef.noSpaces shouldEqual rawJsonStr.noSpaces
+			//circeJsonStr.spaces2
 			
 			
-			Then("result should be a Json Circe string")
+			info(s"rawJsonStr = \n$rawJsonStr")
+			info(s"length = ${rawJsonStr.length}")
+			info(s"circeJsonStr = \n$circeJsonStr")
+			
+			val cut = circeJsonStr.spaces2.cutOutSchemaRef
+			info(s"circe json cut off = \n${cut.removeSpaceBeforeColon}")
+			info(s"length = ${cut.removeSpaceBeforeColon.length}")
+			
+		}
+		
+		Scenario("integer") {
+			
+			Given("a json schema (single string)")
+			val rawJsonStr: String =
+				"""
+				  |{
+				  |  "type": "integer"
+				  |}
+				  |""".stripMargin
 			
 			
+			When("parsing via Andy Glow library's parser ...")
 			
-			info("\n\nSTRING TEST: ")
-			info(s"schemaGlow = $schemaGlow")
-			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(schemaGlow)}")
+			val schemaGlow: SchemaJson_Glow[_] = parseType(rawJsonStr).value
+			schemaGlow shouldBe a[SchemaJson_Glow[_]]
+			schemaGlow should not be a[String] // has been converted
+			schemaGlow shouldEqual `integer`
+			
+			// Now parse to json - circe
+			And("when parsing the schema-glow to Json Circe...")
+			
+			// here https://github.com/search?q=repo%3Aandyglow%2Fscala-jsonschema%20circe&type=code
+			val circeJsonStr: JsonCirce = schemaGlow.asCirce(Draft04())
+			
+			Then("result should be a Json Circe string and should match original string")
+			circeJsonStr shouldBe a[JsonCirce]
+			//circeJsonStr.cutOutSchemaRef.noSpaces shouldEqual rawJsonStr.noSpaces
 			
 			
-			And("converting the andy glow schema to skeuo schema")
-			val schemaSkeuo: SchemaJson_Skeuo[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
+			info(s"rawJsonStr = \n$rawJsonStr")
+			info(s"length = ${rawJsonStr.length}")
+			info(s"circeJsonStr = \n$circeJsonStr")
+			
+			val cut = circeJsonStr.cutOutSchemaRef
+			info(s"circe json cut off = \n${cut.removeSpaceBeforeColon}")
+			info(s"length = ${cut.removeSpaceBeforeColon.length}")
+			
+		}
+		
+		
+		Scenario("array (string)") {
+			
+			Given("a json schema (single string)")
+			val rawJsonStr: String =
+				"""
+				  |{
+				  |  "type": "array",
+				  |  "items": {
+				  |    "type": "string"
+				  |  }
+				  |}
+				  |""".stripMargin
 			
 			
-			Then("result should be a skeuo adt json schema")
-			schemaSkeuo shouldBe a[SchemaJson_Skeuo[_]]
-			schemaSkeuo shouldEqual SchemaJson_Skeuo.StringF()
+			When("parsing via Andy Glow library's parser ...")
 			
-			info(s"schemaSkeuo = ${schemaSkeuo}")
-			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(schemaSkeuo)}")
+			val schemaGlow: SchemaJson_Glow[_] = parseType(rawJsonStr).value
+			schemaGlow shouldBe a[SchemaJson_Glow[_]]
+			schemaGlow should not be a[String] // has been converted
+			schemaGlow shouldEqual `array`(`string`)
+			
+			// Now parse to json - circe
+			And("when parsing the schema-glow to Json Circe...")
+			
+			// here https://github.com/search?q=repo%3Aandyglow%2Fscala-jsonschema%20circe&type=code
+			val circeJsonStr: JsonCirce = schemaGlow.asCirce(Draft04())
+			
+			Then("result should be a Json Circe string and should match original string")
+			circeJsonStr shouldBe a[JsonCirce]
+			//circeJsonStr.cutOutSchemaRef.noSpaces shouldEqual rawJsonStr.noSpaces
+			
+			
+			info(s"rawJsonStr = \n$rawJsonStr")
+			info(s"length = ${rawJsonStr.length}")
+			info(s"circeJsonStr = \n$circeJsonStr")
+			
+			val cut = circeJsonStr.cutOutSchemaRef
+			info(s"circe json cut off = \n${cut.removeSpaceBeforeColon}")
+			info(s"length = ${cut.removeSpaceBeforeColon.length}")
+			
+		}
+		
+		
+		Scenario("array(array(array(integer)))") {
+			
+			Given("a json schema (single string)")
+			val rawJsonStr: String =
+				"""
+				  |{
+				  |  "type": "array",
+				  |  "items": {
+				  |    "type": "array",
+				  |    "items": {
+				  |      "type": "array",
+				  |      "items": {
+				  |        "type": "integer"
+				  |      }
+				  |    }
+				  |  }
+				  |}
+				  |""".stripMargin
+			
+			
+			When("parsing via Andy Glow library's parser ...")
+			
+			val schemaGlow: SchemaJson_Glow[_] = parseType(rawJsonStr).value
+			schemaGlow shouldBe a[SchemaJson_Glow[_]]
+			schemaGlow should not be a[String] // has been converted
+			schemaGlow shouldEqual `array`(`array`(`array`(`integer`)))
+			
+			// Now parse to json - circe
+			And("when parsing the schema-glow to Json Circe...")
+			
+			// here https://github.com/search?q=repo%3Aandyglow%2Fscala-jsonschema%20circe&type=code
+			val circeJsonStr: JsonCirce = schemaGlow.asCirce(Draft04())
+			
+			Then("result should be a Json Circe string and should match original string")
+			circeJsonStr shouldBe a[JsonCirce]
+			//circeJsonStr.cutOutSchemaRef.noSpaces shouldEqual rawJsonStr.noSpaces
+			
+			
+			info(s"rawJsonStr = \n$rawJsonStr")
+			info(s"length = ${rawJsonStr.length}")
+			info(s"circeJsonStr = \n$circeJsonStr")
+			
+			val cut = circeJsonStr.cutOutSchemaRef
+			info(s"circe json cut off = \n${cut.removeSpaceBeforeColon}")
+			info(s"length = ${cut.removeSpaceBeforeColon.length}")
+			
+		}
+		
+		
+		
+		Scenario("record (e.g. Position)") {
+			
+			Given("a json schema (single string)")
+			val rawJsonStr: String =
+				"""
+				  |{
+				  |  "title": "Position",
+				  |  "type": "object",
+				  |  "required": [],
+				  |  "properties": {
+				  |    "coordinates": {
+				  |      "type": "array",
+				  |      "items": {
+				  |        "type": "number",
+				  |        "format": "number"
+				  |      }
+				  |    }
+				  |  }
+				  |}
+				  |""".stripMargin
+			
+			When("parsing via Andy Glow library's parser ...")
+			
+			val schemaGlow: SchemaJson_Glow[_] = parseType(rawJsonStr).value
+			schemaGlow shouldBe a[SchemaJson_Glow[_]]
+			schemaGlow should not be a[String] // has been converted
+			//TODO see what schemaglow is
+			// schemaGlow shouldEqual SchemaJson_Glow.`string`
+			
+			info(s"schema glow record = \n$schemaGlow")
+			
+			// Now parse to json - circe
+			And("when parsing the schema-glow to Json Circe...")
+			
+			// here https://github.com/search?q=repo%3Aandyglow%2Fscala-jsonschema%20circe&type=code
+			val circeJsonStr: JsonCirce = schemaGlow.asCirce(Draft04())
+			
+			Then("result should be a Json Circe string and should match original string")
+			circeJsonStr shouldBe a[JsonCirce]
+			////circeJsonStr.cutOutSchemaRef.noSpaces shouldEqual rawJsonStr.noSpaces
+			
+			
+			info(s"rawJsonStr = \n$rawJsonStr")
+			info(s"length = ${rawJsonStr.length}")
+			info(s"circeJsonStr = \n$circeJsonStr")
+			
+			val cut = circeJsonStr.cutOutSchemaRef
+			info(s"circe json cut off = \n${cut.removeSpaceBeforeColon}")
+			info(s"length = ${cut.removeSpaceBeforeColon.length}")
+			
+			// NOTE: the two strings (rawJsonStr vs. andy golw's parsed json circe str) are NOT the same - have titles in different positions, and missing some titles (like 'format').
 		}
 	}
 }

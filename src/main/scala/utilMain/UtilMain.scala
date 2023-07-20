@@ -2,7 +2,7 @@ package utilMain
 
 //import org.scalatest.Informer
 
-
+import io.circe.{Json ⇒ JsonCirce}
 /**
  *
  */
@@ -13,20 +13,86 @@ object UtilMain {
 	
 	
 	object implicits {
-		// implicits for string
+		
+		
+		
+		
 		implicit class StringOps(str: String) {
+			
+			def cutOutSchemaRef: String = implicitWorkhorse.cutOutSchemaRef(str)
+			
+			def removeSpaceBeforeColon: String = implicitWorkhorse.removeSpaceBeforeColon(str)
+			
+			def noSpaces: String = implicitWorkhorse.noSpaces(str)
+			
+		}
+		
+		
+		implicit class JsonCirceOps(jsonCirce: JsonCirce) {
+			def cutOutSchemaRef: String = implicitWorkhorse.cutOutSchemaRef(jsonCirce.toString)
+			
+			def removeSpaceBeforeColon: String = implicitWorkhorse.removeSpaceBeforeColon(jsonCirce.toString)
+		}
+		
+		
+		private object implicitWorkhorse {
+			
+			/**
+			 * Cuts out the $schema draft line from a json schema string
+			 *
+			 * @param rawJsonStr
+			 * @return
+			 */
+			def cutOutSchemaRef(str: String): String = {
+				/*val iStartRef = str.indexOf("$")
+				val iEndRef = str.indexOf("#")
+				
+				//  iStartRef - 1 to account for the quote before the $
+				// iEndRef + 1 + 1 + 1 + 1 = to account for quote, comma, newline, space ...
+				str.substring(0, iStartRef - 1) + str.substring(iEndRef + 4, str.length)*/
+				
+				val startDraft04_space = "\"$schema\" : \"http://json-schema.org/draft-04/schema#\",\n  "
+				val startDraft04 = "\"$schema\": \"http://json-schema.org/draft-04/schema#\",\n  "
+				val endDraft04_space = ",\n  \"$schema\" : \"http://json-schema.org/draft-04/schema#\""
+				val endDraft04 = ",\n  \"$schema\": \"http://json-schema.org/draft-04/schema#\""
+				
+				str
+					.replaceAllLiterally(endDraft04_space, "")
+					.replaceAllLiterally(endDraft04, "")
+					.replaceAllLiterally(startDraft04_space, "")
+					.replaceAllLiterally(startDraft04, "")
+					.stripLeading().stripTrailing()
+					
+					//.replaceAllLiterally(",\n", "")
+					//.replaceAllLiterally("\n", "")
+			}
+			
+			
+			/**
+			 * Removes the space like in "type" : "object" turns into "type": "object"
+			 *
+			 * @return
+			 */
+			def removeSpaceBeforeColon(str: String): String = {
+				str
+					.replaceAllLiterally("\" : \"", "\": \"")
+					.replaceAllLiterally("\" : {", "\": {")
+					.replaceAllLiterally("\" : [", "\": [")
+					.replaceAllLiterally("\" : ", "\": ")
+			}
 			
 			/**
 			 * Matches the json circe function no spaces
 			 *
 			 * Reason: json circe prints string with space between colon while my original json file does not have space before the colon and it is too tedious to go change all my data files so just when comparing equality between rawJsonStr and circeJsonStr, I will remove spaces from both circeJsonStr and the rawJsonStr.
 			 */
-			def noSpaces(): String = {
+			def noSpaces(str: String): String = {
 				str.toList.filterNot(c ⇒ c.isWhitespace).mkString
 			}
 			
 			/**
 			 * Taking a json schema str containing something like "type" : "object" and turning that into "type": "object"
+			 *
 			 * @return
 			 */
 			// HELP not working
@@ -84,10 +150,23 @@ object UtilMain {
 			]
 			}
 			}
-			 */
+			*/
 		}
 	}
 	
+
+	/*
+	Example:
+	BEFORE:
+	{
+	"$schema" : "http://json-schema.org/draft-04/schema#",
+	"type" : "string"
+	}
+	AFTER:
+	{
+		"type" : "string"
+	}
+	 */
 	
 	
 	

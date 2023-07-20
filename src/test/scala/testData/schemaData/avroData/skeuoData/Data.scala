@@ -9,7 +9,7 @@ import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
 import SchemaAvro_Skeuo._
 import SchemaAvro_Skeuo.{Field ⇒ FieldAvro}
 
-import io.circe.Json
+import io.circe.{Json ⇒ JsonCirce}
 
 /**
  *
@@ -18,22 +18,32 @@ object Data {
 
 	// TODO - to put strin g/ int / null in place of T? or to leave as Nothing?
 	val nullAvro_Skeuo: SchemaAvro_Skeuo[Null] = TNull()
-	val nullAvro_SkeuoC: SchemaAvro_Skeuo[Json] = TNull()
-	
+	val nullAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TNull()
 	val nullAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TNull())
 	
 	val strAvro_Skeuo: SchemaAvro_Skeuo[String] = TString()
+	val strAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TString()
 	val strAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TString())
 	
 	val intAvro_Skeuo: SchemaAvro_Skeuo[Int] = TInt()
+	val intAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TInt()
 	val intAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TInt())
 	
 	
-	val arrayIntAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[Int]] = TArray(TInt())
+	/*val arrayIntAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[Int]] = TArray(TInt())
+	val arrayIntAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TArray(TInt())
 	val arrayIntAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TArray(Fix(TInt())))
 	
 	val arrayStrAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[String]] = TArray(TString())
+	val arrayStrAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TArray(TString())
 	val arrayStrAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TArray(Fix(TString())))
+	
+	
+	val arrayIntAvro3_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[SchemaAvro_Skeuo[SchemaAvro_Skeuo[Int]]]] = TArray(TArray(TArray(TInt())))
+	val arrayIntAvro3_SkeuoC: SchemaAvro_Skeuo[SchemaAvro_Skeuo[SchemaAvro_Skeuo[SchemaAvro_Skeuo[JsonCirce]]]] = TArray(TArray(TArray(TInt())))
+	val arrayIntAvro3_SkeuoFix: Fix[SchemaAvro_Skeuo]  = Fix(TArray(Fix(TArray(Fix(TArray(Fix(TInt())))))))
+	
+	*/
 	
 	// NOTE; trying to copy avro schema "RawCityMesh - devs - datasource
 	// TODO what is the inner type parameter?

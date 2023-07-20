@@ -265,6 +265,12 @@ object Skeuo_Apache {
 	def skeuoToApacheAvroSchema: Fix[SchemaAvro_Skeuo] ⇒ SchemaAvro_Apache = scheme.cata(algebra_SkeuoToApache).apply(_)
 	
 	
+	// TODO meaning of putting [Fix] as scheme parameter?
+	// TODO is there a way to wrap with fix or unwrap fix out of it using some kind of identity from droste? (instead of ana/cata)
+	/*import higherkindness.droste.data._
+	
+	
+	val r: Fix[SchemaAvro_Skeuo] ⇒ SchemaAvro_Apache = scheme[Fix].cata(algebra_SkeuoToApache).apply(_)*/
 	
 	
 	def apacheToSkeuoAvroSchema: SchemaAvro_Apache ⇒ Fix[SchemaAvro_Skeuo] = scheme.ana(coalgebra_ApacheToSkeuo).apply(_)
