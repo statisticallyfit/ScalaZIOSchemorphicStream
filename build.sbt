@@ -4,6 +4,9 @@ version := "0.1"
 
 scalaVersion := "2.12.17" //"2.13.10" //"2.12.17"
 
+
+crossScalaVersions := Seq("2.11.11", "2.12.17")
+
 /*assumedEvictionErrorLevel := Level.Error
 //assumedVersionScheme := VersionScheme.EarlySemVer
 libraryDependencySchemes += "org.scala-lang.modules" %% "scala-java8-compat" % VersionScheme.Always*/
@@ -143,9 +146,23 @@ lazy val global = project
 			allDependencies.andyGlow_jsonschema_Parser,
 			
 			allDependencies.saul_autoschema,
-			allDependencies.opetushallitus_scalaschema,
-			allDependencies.fge_jsonschemavalidator,
+			
 			allDependencies.docless,
+			allDependencies.opetushallitus_scalaschema,
+		// Dependency (fge) for opetus hallitus - was not pulled in by itself, why?
+			allDependencies.fge_jsonschemavalidator,
+		// Dependecy (json4s-core, ast, jackson) - versioning error. If for all the json4s libs, if I don't keep
+			// the version the same, and state them explciitly here, then compiler complains with classpath error (jvalue not found)
+			// Solution source = https://stackoverflow.com/a/47669923
+			allDependencies.json4s,
+			allDependencies.json4s_jackson,
+			allDependencies.json4s_jackson_core,
+			allDependencies.json4s_core,
+			allDependencies.json4s_ast,
+			allDependencies.json4s_native,
+			allDependencies.json4s_native_core,
+			allDependencies.json4s_ext,
+			allDependencies.json4s_scalap,
 			
 			allDependencies.avroTools_for_avdlToAvsc,
 			
@@ -216,6 +233,10 @@ lazy val allDependencies =
 		
 		val versionOfSaulAutoschema = "1.0.4"
 		val versionOfOpetushallitus = "2.23.0_2.12"
+		// Try downgrading to 3.6.6 because of "NoClassDefFoundError" for Jvalue
+		// Source = https://stackoverflow.com/questions/69912882/java-lang-classnotfoundexception-org-json4s-jsonastjvalue
+		val versionOfJson4s_simple = "3.2.11" // for scala 2.11
+		val versionOfJson4s_others = "4.0.6" //"3.6.6" //3.6.6"//"4.0.6"
 		val versionofFge = "2.2.6"
 		val versionOfDocless = "0.5.0"
 		
@@ -323,9 +344,18 @@ lazy val allDependencies =
 		
 		
 		val saul_autoschema = "com.sauldhernandez" %% "autoschema" % versionOfSaulAutoschema
-		val opetushallitus_scalaschema = "com.github.Opetushallitus" % "scala-schema" % versionOfOpetushallitus
-		val fge_jsonschemavalidator = "com.github.fge" % "json-schema-validator" % versionofFge
 		val docless = "com.timeout" %% "docless" % versionOfDocless
+		val opetushallitus_scalaschema = "com.github.Opetushallitus" % "scala-schema" % versionOfOpetushallitus
+		val json4s = "org.json4s" %% "json4s" % versionOfJson4s_simple
+		val json4s_jackson = "org.json4s" %% "json4s-jackson" % versionOfJson4s_others
+		val json4s_jackson_core = "org.json4s" %% "json4s-jackson-core" % versionOfJson4s_others
+		val json4s_core = "org.json4s" %% "json4s-core" % versionOfJson4s_others
+		val json4s_ast = "org.json4s" %% "json4s-ast" % versionOfJson4s_others
+		val json4s_native = "org.json4s" %% "json4s-native" % versionOfJson4s_others
+		val json4s_native_core = "org.json4s" %% "json4s-native-core" % versionOfJson4s_others
+		val json4s_ext = "org.json4s" %% "json4s-ext" % versionOfJson4s_others
+		val json4s_scalap = "org.json4s" %% "json4s-scalap" % versionOfJson4s_others
+		val fge_jsonschemavalidator = "com.github.fge" % "json-schema-validator" % versionofFge
 		
 		// https://mvnrepository.com/artifact/org.apache.avro/avro-tools
 		val avroTools_for_avdlToAvsc = "org.apache.avro" % "avro-tools" % versionOfAvroTools
@@ -366,6 +396,7 @@ lazy val compilerOptions = Seq(
 	"-language:higherKinds",
 	"-language:implicitConversions",
 	"-language:postfixOps",
+	//"-Ylog-classpath"
 	// TODO try putting Xnojline:off = https://hyp.is/Ard1uM71Ee2sWMf7uSXXaQ/docs.scala-lang.org/overviews/compiler-options/index.html
 	
 	//"-XJline:off" // TODO trying to stop this message from appearing on REPL: warning: -Xnojline is

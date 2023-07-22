@@ -155,8 +155,10 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			// TODO HERE - using opetushallitus to take json data -> json schema
 			import scala.reflect.runtime.universe._
 			import fi.oph.scalaschema.{SchemaFactory, SchemaToJson, Schema ⇒ SchemaJson_Opetus}
+			//import org.json4s.package.JValue
+			
 			import org.json4s.jackson.JsonMethods
-			import org.json4s.jackson.JsonMethods.asJsonNode
+			import org.json4s.jackson.JsonMethods._ //asJsonNode
 			import org.json4s.JsonAST.{JObject}
 			import org.json4s.{JNull, JInt, JString, JArray}
 			
@@ -182,7 +184,9 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			}
 			import helpers._
 			
-			val nulljc = jsonSchemaOf(classOf[JNull.type])
+			// HELP left off here issue with json4s import (not for scala 2.12)
+			val nulljc: String = jsonSchemaOf(JNull.getClass)
+			//val nulljc = jsonSchemaOf(classOf[JNull.type])
 			val intjc = jsonSchemaOf[JInt]
 			val strjc = jsonSchemaOf[JString]
 			val arrjc = jsonSchemaOf[JArray]
