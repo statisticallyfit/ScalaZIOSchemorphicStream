@@ -4,7 +4,68 @@ version := "0.1"
 
 scalaVersion := "2.12.17" //"2.13.10" //"2.12.17"
 
+/*assumedEvictionErrorLevel := Level.Error
+//assumedVersionScheme := VersionScheme.EarlySemVer
+libraryDependencySchemes += "org.scala-lang.modules" %% "scala-java8-compat" % VersionScheme.Always*/
+//libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
+// NOTE: when including docless dependency, the following error occurs (after this code)
+// Solution below: https://stackoverflow.com/a/75246146
+libraryDependencySchemes ++= Seq(
+	"org.typelevel" %% "cats-core" % VersionScheme.Always,
+	"io.circe" %% "circe-parser" % VersionScheme.Always,
+	"io.circe" %% "circe-core" % VersionScheme.Always,
+	"org.typelevel" %% "cats-kernel" % VersionScheme.Always,
+	"org.typelevel" %% "cats-free" % VersionScheme.Always
+)
+/*
+sbt:SchaemeowMorphism> compile
+[error] stack trace is suppressed; run last update for the full output
+[error] (update) found version conflict(s) in library dependencies; some are suspected to be binary incompatible:
+[error]
+[error] 	* org.typelevel:cats-core_2.12:2.9.0 (early-semver) is selected over {2.6.1, 2.7.0, 0.9.0}
+[error] 	    +- schaemeowmorphism:schaemeowmorphism_2.12:0.1       (depends on 2.9.0)
+[error] 	    +- io.circe:circe-core_2.12:0.14.5                    (depends on 2.9.0)
+[error] 	    +- org.typelevel:cats-effect-kernel_2.12:3.4.8        (depends on 2.9.0)
+[error] 	    +- org.typelevel:cats-free_2.12:2.9.0                 (depends on 2.9.0)
+[error] 	    +- io.higherkindness:skeuomorph_2.12:0.2.1            (depends on 2.9.0)
+[error] 	    +- org.typelevel:cats_2.12:0.9.0                      (depends on 0.9.0)
+[error] 	    +- org.typelevel:cats-laws_2.12:0.9.0                 (depends on 0.9.0)
+[error] 	    +- org.typelevel:cats-jvm_2.12:0.9.0                  (depends on 0.9.0)
+[error] 	    +- io.higherkindness:droste-core_2.12:0.9.0           (depends on 2.7.0)
+[error] 	    +- com.github.andyglow:scala-jsonschema-cats_2.12:0.7.9 (depends on 2.6.1)
+[error]
+[error] 	* io.circe:circe-parser_2.12:0.14.5 (early-semver) is selected over {0.14.1, 0.7.0}
+[error] 	    +- io.higherkindness:skeuomorph_2.12:0.2.1            (depends on 0.14.5)
+[error] 	    +- com.timeout:docless_2.12:0.5.0                     (depends on 0.7.0)
+[error] 	    +- com.github.andyglow:scala-jsonschema-circe-json_2.12:0.7.9 (depends on 0.14.1)
+[error]
+[error] 	* io.circe:circe-core_2.12:0.14.5 (early-semver) is selected over {0.7.0, 0.14.1, 0.14.3}
+[error] 	    +- io.circe:circe-parser_2.12:0.14.5                  (depends on 0.14.5)
+[error] 	    +- io.circe:circe-jawn_2.12:0.14.5                    (depends on 0.14.5)
+[error] 	    +- io.higherkindness:skeuomorph_2.12:0.2.1            (depends on 0.14.5)
+[error] 	    +- io.circe:circe-yaml_2.12:0.14.2                    (depends on 0.14.3)
+[error] 	    +- io.circe:circe-generic_2.12:0.14.1                 (depends on 0.14.1)
+[error] 	    +- com.timeout:docless_2.12:0.5.0                     (depends on 0.7.0)
+[error] 	    +- com.github.andyglow:scala-jsonschema-circe-json_2.12:0.7.9 (depends on 0.14.1)
+[error] 	    +- com.beachape:enumeratum-circe_2.12:1.5.9           (depends on 0.7.0)
+[error]
+[error] 	* org.typelevel:cats-kernel_2.12:2.9.0 (early-semver) is selected over {0.9.0}
+[error] 	    +- schaemeowmorphism:schaemeowmorphism_2.12:0.1       (depends on 2.9.0)
+[error] 	    +- org.typelevel:cats-core_2.12:2.9.0                 (depends on 2.9.0)
+[error] 	    +- org.typelevel:cats_2.12:0.9.0                      (depends on 0.9.0)
+[error] 	    +- org.typelevel:cats-laws_2.12:0.9.0                 (depends on 0.9.0)
+[error] 	    +- org.typelevel:cats-kernel-laws_2.12:0.9.0          (depends on 0.9.0)
+[error]
+[error] 	* org.typelevel:cats-free_2.12:2.9.0 (early-semver) is selected over {2.7.0, 0.9.0}
+[error] 	    +- schaemeowmorphism:schaemeowmorphism_2.12:0.1       (depends on 2.9.0)
+[error] 	    +- org.typelevel:cats_2.12:0.9.0                      (depends on 0.9.0)
+[error] 	    +- io.higherkindness:droste-core_2.12:0.9.0           (depends on 2.7.0)
+[error]
+[error]
+[error] this can be overridden using libraryDependencySchemes or evictionErrorLevel
+
+ */
 
 //addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10")
 
@@ -82,7 +143,9 @@ lazy val global = project
 			allDependencies.andyGlow_jsonschema_Parser,
 			
 			allDependencies.saul_autoschema,
-			
+			allDependencies.opetushallitus_scalaschema,
+			allDependencies.fge_jsonschemavalidator,
+			allDependencies.docless,
 			
 			allDependencies.avroTools_for_avdlToAvsc,
 			
@@ -152,6 +215,9 @@ lazy val allDependencies =
 		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
 		
 		val versionOfSaulAutoschema = "1.0.4"
+		val versionOfOpetushallitus = "2.23.0_2.12"
+		val versionofFge = "2.2.6"
+		val versionOfDocless = "0.5.0"
 		
 		val versionOfAvroTools = "1.11.1"
 		
@@ -257,7 +323,9 @@ lazy val allDependencies =
 		
 		
 		val saul_autoschema = "com.sauldhernandez" %% "autoschema" % versionOfSaulAutoschema
-		
+		val opetushallitus_scalaschema = "com.github.Opetushallitus" % "scala-schema" % versionOfOpetushallitus
+		val fge_jsonschemavalidator = "com.github.fge" % "json-schema-validator" % versionofFge
+		val docless = "com.timeout" %% "docless" % versionOfDocless
 		
 		// https://mvnrepository.com/artifact/org.apache.avro/avro-tools
 		val avroTools_for_avdlToAvsc = "org.apache.avro" % "avro-tools" % versionOfAvroTools
@@ -308,7 +376,10 @@ lazy val compilerOptions = Seq(
 
 lazy val commonSettings = Seq(
 	scalacOptions ++= compilerOptions,
-	resolvers ++= (Resolver.sonatypeOssRepos("releases") ++ Resolver.sonatypeOssRepos("snapshots")) /*Seq(
+	resolvers ++= (Resolver.sonatypeOssRepos("releases")
+				++ Resolver.sonatypeOssRepos("snapshots")
+				++ Seq("jitpack" at "https://jitpack.io") // jitpack for opetushallitus
+		) /*Seq(
 //"Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
 Resolver.sonatypeOssRepos("releases"), //Resolver.sonatypeRepo("releases"),
 Resolver.sonatypeRepo("snapshots") //Resolver.sonatypeRepo("snapshots"),

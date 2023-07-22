@@ -28,6 +28,9 @@ import utilTest.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 
 
 /**
+ * Parsing:
+ * 1) json str -> json circe (using unsafe parse)
+ * 2) json circe -> json-skeuo (using circe's decoder)
  *
  */
 class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThen with Matchers {
@@ -72,6 +75,11 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			val skeuoCheck = StringF()
 			
 			skeuoDecodedFromCirce shouldEqual skeuoCheck
+			
+			
+			/*import higherkindness.skeuomorph.avro.AvroF
+			val da = Decoder[Fix[AvroF]].decodeJson(circeJsonStr).getOrElse(None)
+			info(s"AVRO THINGY: json circe (string) -> avro-skeuo (string) = $da")*/
 			
 			
 			info(s"raw json str = \n$rawJsonStr")

@@ -25,6 +25,8 @@ object UtilMain {
 			
 			def noSpaces: String = implicitWorkhorse.noSpaces(str)
 			
+			def removeSpaceBetweenBrackets: String = implicitWorkhorse.removeSpaceBetweenBrackets(str)
+			
 		}
 		
 		
@@ -32,6 +34,10 @@ object UtilMain {
 			def cutOutSchemaRef: String = implicitWorkhorse.cutOutSchemaRef(jsonCirce.toString)
 			
 			def removeSpaceBeforeColon: String = implicitWorkhorse.removeSpaceBeforeColon(jsonCirce.toString)
+			
+			def removeSpaceBetweenBrackets: String = implicitWorkhorse.removeSpaceBetweenBrackets(jsonCirce.toString)
+			
+			def manicure: String = implicitWorkhorse.manicure(jsonCirce.toString)
 		}
 		
 		
@@ -89,6 +95,19 @@ object UtilMain {
 			def noSpaces(str: String): String = {
 				str.toList.filterNot(c ⇒ c.isWhitespace).mkString
 			}
+			
+			
+			def removeSpaceBetweenBrackets(str: String): String = {
+				
+				str
+					.replaceAll("\\{\\s+\\}", "{}")
+					.replaceAll("\\[\\s+\\]", "[]")
+					.replaceAll("\\(\\s+\\)", "()")
+			}
+			
+			
+			def manicure(str: String): String = removeSpaceBetweenBrackets(removeSpaceBeforeColon(cutOutSchemaRef(str)))
+			
 			
 			/**
 			 * Taking a json schema str containing something like "type" : "object" and turning that into "type": "object"

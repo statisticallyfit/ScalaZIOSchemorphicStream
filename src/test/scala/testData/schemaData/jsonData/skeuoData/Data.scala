@@ -10,10 +10,9 @@ import io.circe.Json
 object Data {
 	
 	// TODO find out if this is correct
-	val nullJson_Skeuo: ObjectF[Null] = ObjectF(properties = List(), required = List())
+	val nullJson_Skeuo: SchemaJson_Skeuo[Null] = ObjectF(properties = List(), required = List())
+	val nullJson_Skeuo_C: SchemaJson_Skeuo[Json] = ObjectF(properties = List(), required = List())
 	
-	val nullJson_SkeuoC: SchemaJson_Skeuo[Json] = ObjectF(properties = List(), required = List())
 	
-	
-	val intJson_Skeuo: IntegerF[Null] = IntegerF()
+	val intJson_Skeuo: SchemaJson_Skeuo[Null] = IntegerF()
 }

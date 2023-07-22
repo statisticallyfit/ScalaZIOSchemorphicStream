@@ -18,16 +18,16 @@ object Data {
 
 	// TODO - to put strin g/ int / null in place of T? or to leave as Nothing?
 	val nullAvro_Skeuo: SchemaAvro_Skeuo[Null] = TNull()
-	val nullAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TNull()
-	val nullAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TNull())
+	val nullAvro_Skeuo_C: SchemaAvro_Skeuo[JsonCirce] = TNull()
+	val nullAvro_Skeuo_F: Fix[SchemaAvro_Skeuo] = Fix(TNull())
 	
 	val strAvro_Skeuo: SchemaAvro_Skeuo[String] = TString()
-	val strAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TString()
-	val strAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TString())
+	val strAvro_Skeuo_C: SchemaAvro_Skeuo[JsonCirce] = TString()
+	val strAvro_Skeuo_F: Fix[SchemaAvro_Skeuo] = Fix(TString())
 	
 	val intAvro_Skeuo: SchemaAvro_Skeuo[Int] = TInt()
-	val intAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TInt()
-	val intAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TInt())
+	val intAvro_Skeuo_C: SchemaAvro_Skeuo[JsonCirce] = TInt()
+	val intAvro_Skeuo_F: Fix[SchemaAvro_Skeuo] = Fix(TInt())
 	
 	
 	/*val arrayIntAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[Int]] = TArray(TInt())
