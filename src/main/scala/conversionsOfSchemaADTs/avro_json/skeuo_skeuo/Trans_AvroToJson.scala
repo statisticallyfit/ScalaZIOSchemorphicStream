@@ -36,6 +36,25 @@ import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
  */
 object Trans_AvroToJson {
 
+	def transJ/*[T: TypeTag]*/: Trans[SchemaAvro_Skeuo, SchemaJson_Skeuo, SchemaJson_Skeuo.Fixed] = Trans {
+		
+		case TNull() ⇒ ObjectF(List(), List())
+		case TInt() ⇒ IntegerF()
+		
+		case TString() ⇒ StringF()
+		
+		case TArray(inner: Fixed) ⇒ ArrayF(inner)
+		
+		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fixed]]) ⇒ {
+			
+			val ps: List[Property[Fixed]] =  fields.map((f: FieldAvro[Fixed]) ⇒ field2Property(f))
+			val rs: List[String] = fields.map(f ⇒ f.name)
+			
+			ObjectF(ps, rs)
+			
+		}
+	}
+	
 	
 	def transform_AvroToJsonSkeuo[T: TypeTag]: Trans[SchemaAvro_Skeuo, SchemaJson_Skeuo, T] = Trans {
 		

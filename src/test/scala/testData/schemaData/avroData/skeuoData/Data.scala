@@ -30,20 +30,19 @@ object Data {
 	val intAvro_Skeuo_F: Fix[SchemaAvro_Skeuo] = Fix(TInt())
 	
 	
-	/*val arrayIntAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[Int]] = TArray(TInt())
-	val arrayIntAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TArray(TInt())
-	val arrayIntAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TArray(Fix(TInt())))
+	val arrayIntAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[Int]] = TArray(TInt())
+	val arrayIntAvro_Skeuo_C: SchemaAvro_Skeuo[SchemaAvro_Skeuo[JsonCirce]] = TArray(TInt())
+	val arrayIntAvro_Skeuo_F: Fix[SchemaAvro_Skeuo] = Fix(TArray(Fix(TInt())))
 	
 	val arrayStrAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[String]] = TArray(TString())
-	val arrayStrAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TArray(TString())
-	val arrayStrAvro_SkeuoFix: Fix[SchemaAvro_Skeuo] = Fix(TArray(Fix(TString())))
+	val arrayStrAvro_Skeuo_C: SchemaAvro_Skeuo[SchemaAvro_Skeuo[JsonCirce]] = TArray(TString())
+	val arrayStrAvro_Skeuo_F: Fix[SchemaAvro_Skeuo] = Fix(TArray(Fix(TString())))
 	
 	
 	val arrayIntAvro3_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[SchemaAvro_Skeuo[SchemaAvro_Skeuo[Int]]]] = TArray(TArray(TArray(TInt())))
-	val arrayIntAvro3_SkeuoC: SchemaAvro_Skeuo[SchemaAvro_Skeuo[SchemaAvro_Skeuo[SchemaAvro_Skeuo[JsonCirce]]]] = TArray(TArray(TArray(TInt())))
-	val arrayIntAvro3_SkeuoFix: Fix[SchemaAvro_Skeuo]  = Fix(TArray(Fix(TArray(Fix(TArray(Fix(TInt())))))))
+	val arrayIntAvro3_Skeuo_C: SchemaAvro_Skeuo[SchemaAvro_Skeuo[SchemaAvro_Skeuo[SchemaAvro_Skeuo[JsonCirce]]]] = TArray(TArray(TArray(TInt())))
+	val arrayIntAvro3_Skeuo_F: Fix[SchemaAvro_Skeuo]  = Fix(TArray(Fix(TArray(Fix(TArray(Fix(TInt())))))))
 	
-	*/
 	
 	// NOTE; trying to copy avro schema "RawCityMesh - devs - datasource
 	// TODO what is the inner type parameter?

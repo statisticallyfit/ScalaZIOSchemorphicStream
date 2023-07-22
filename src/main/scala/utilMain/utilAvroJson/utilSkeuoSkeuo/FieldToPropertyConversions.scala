@@ -23,7 +23,20 @@ object FieldToPropertyConversions {
 	
 	// TODO convert avro field (skeuo) --> json property (skeuo)
 	
-	def field2Property[A: TypeTag](fieldA: FieldAvro[A]): PropertyJson[A] = fieldA match {
+	def property2Field[A/*: TypeTag*/](property: PropertyJson[A]): FieldAvro[A] = property match {
+		
+		case PropertyJson(name: String, tpe: A) ⇒ {
+			FieldAvro(
+				name = name,
+				aliases = List(),
+				doc = None,
+				order = None,
+				tpe = tpe
+			)
+		}
+	}
+	
+	def field2Property[A/*: TypeTag*/](fieldA: FieldAvro[A]): PropertyJson[A] = fieldA match {
 		
 		case FieldAvro(name: String, aliases: List[String], doc: Option[String], order: Option[Order], tpe: A) ⇒ {
 			

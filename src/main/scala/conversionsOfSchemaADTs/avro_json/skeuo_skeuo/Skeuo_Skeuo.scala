@@ -2,16 +2,18 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo
 
 import cats.data.NonEmptyList
 
+import cats.syntax.all._
+
 import higherkindness.droste._
-import higherkindness.droste.data.Fix
+import higherkindness.droste.data._
 import higherkindness.droste.syntax.all._
 import higherkindness.droste.implicits._
+import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
+import AvroSchema_S._
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import JsonSchema_S._
 
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
-import SchemaAvro_Skeuo._
-
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
-import SchemaJson_Skeuo._
+import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
 
 import scala.reflect.runtime.universe._
 
@@ -43,59 +45,148 @@ object Skeuo_Skeuo {
 	 // TODO: do all these conversions using Trans (because itis F[A => G[A]): https://github.com/higherkindness/droste/blob/76b206db3ee073aa2ecbf72d4e85d5595aabf913/modules/core/src/main/scala/higherkindness/droste/package.scala#L80
 
 	/// -----------------------------
+	
+	
+	object TransSchemaImplicits {
+		
+		/*implicit def skeuoJsonHasEmbed[T: TypeTag]: Embed[JsonSchema_S, T] = new Embed[JsonSchema_S, T] {
+			
+			// JsonSkeuo[T] => T
+			def algebra: Algebra[JsonSchema_S, T] = Algebra {
+				case IntegerF() ⇒ Int
+			}
+		}*/
+		
+		implicit def skeuoJsonHasEmbed: Embed[JsonSchema_S, Fix[AvroSchema_S]] = new Embed[JsonSchema_S, Fix[AvroSchema_S]] {
+			
+			// JsonSchema_S [ Fix[AvroSchema_S]] => Fix[AvroSchema_S]
+			def algebra: Algebra[JsonSchema_S, Fix[AvroSchema_S]] = Algebra {
+				
+				case ObjectF(List(), List()) ⇒ Fix(TNull())
+				
+				case IntegerF() ⇒ Fix(TInt())
+				
+				case StringF() ⇒ Fix(TString())
+				
+				case ArrayF(inner: Fix[AvroSchema_S]) ⇒ Fix(TArray(inner)) // TODO just inner or wrap with TArray?
+				
+				case ObjectF(props: List[Property[Fix[AvroSchema_S]]],
+					reqs: List[String]) ⇒ {
+					
+					// TODO required - where does it go?
+					// TODO - what is name of trecord?
+					
+					Fix(
+						TRecord(name = "record", namespace = None, aliases = List(), doc = None, fields = props.map(p ⇒ property2Field(p)))
+					)
+				}
+			}
+		}
+		
+		implicit def skeuoAvroHasProject: Project[AvroSchema_S, Fixed] = new Project[AvroSchema_S, Fixed] {
+			
+			def coalgebra: Coalgebra[AvroSchema_S, Fixed] = Coalgebra {
+				case Fix(ObjectF(List(), List())) ⇒ TNull()
+				
+				case Fix(IntegerF()) ⇒ TInt()
+				
+				case Fix(StringF()) ⇒ TString()
+				
+				case Fix(ArrayF(inner: Fix[JsonSchema_S])) ⇒ TArray(inner)
+				
+				case Fix(ObjectF(props: List[Property[Fix[JsonSchema_S]]],
+				reqs: List[String])) ⇒ {
+					
+					// TODO required - where does it go?
+					// TODO - what is name of trecord?
+					
+					TRecord(name = "record", namespace = None, aliases = List(), doc = None, fields = props.map(p ⇒ property2Field(p)))
+				}
+			}
+		}
+	}
+	
+	
+	
+	
 
 	// NOTE how to access Trans type (example here) = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/mu/protocol.scala#L56C36-L56C36
-	def avroToJsonFunction[T: TypeTag]: SchemaAvro_Skeuo[T] ⇒ SchemaJson_Skeuo[T] = {
-		val transVar: Trans[SchemaAvro_Skeuo, SchemaJson_Skeuo, T] = transform_AvroToJsonSkeuo[T]
+	object ByTrans {
+		def avroToJsonFunction[T: TypeTag]: AvroSchema_S[T] ⇒ JsonSchema_S[T] = {
+			val transVar: Trans[AvroSchema_S, JsonSchema_S, T] = transform_AvroToJsonSkeuo[T]
+			
+			val runner: AvroSchema_S[T] ⇒ JsonSchema_S[T] = transVar.run
+			
+			runner.apply(_)
+			
+		}
 		
-		val runner: SchemaAvro_Skeuo[T] ⇒ SchemaJson_Skeuo[T] = transVar.run
+		def avroToJson[T: TypeTag](av: AvroSchema_S[T]): JsonSchema_S[T] = transform_AvroToJsonSkeuo[T].run.apply(av)
 		
-		runner.apply(_)
 		
+		
+		
+		val c: Fix[AvroSchema_S] ⇒ Fixed = scheme.cata(transJ.algebra).apply(_)
+		
+		import TransSchemaImplicits.skeuoAvroHasProject
+		val a: Fixed ⇒ Fix[JsonSchema_S] = scheme.ana(transJ.coalgebra).apply(_)
+		
+		
+		
+		//val h: Fixed ⇒ Fixed = scheme.hylo(transJ.algebra, transJ.coalgebra)
+		
+		val avroToJson_H: Fix[AvroSchema_S] ⇒ Fix[JsonSchema_S] = a compose c
+		
+		
+		
+		/*def transFixWay[T: TypeTag] = {
+			val transVar: Trans[AvroSchema_S, JsonSchema_S, T] = transform_AvroToJsonSkeuo[T]
+			
+			val ta = transVar.algebra
+		}*/
 	}
-	def aj[T: TypeTag] = avroToJsonFunction[T]
 	
-	def avroToJson[T: TypeTag](av: SchemaAvro_Skeuo[T]): SchemaJson_Skeuo[T] = transform_AvroToJsonSkeuo[T].run.apply(av)
+	
 	
 	object ByAlgebra {
 		
 		
-		def avroToJson_Fixed: Fix[SchemaAvro_Skeuo] ⇒ SchemaJson_Skeuo.Fixed =
+		def avroToJson_Fixed: Fix[AvroSchema_S] ⇒ JsonSchema_S.Fixed =
 			scheme.cata(algebra_AvroToJsonFixed).apply(_)
 
 
-		/*def avroToJson_TYPED[T: TypeTag]: Fix[SchemaAvro_Skeuo] ⇒ SchemaJson_Skeuo[T] =
+		/*def avroToJson_TYPED[T: TypeTag]: Fix[AvroSchema_S] ⇒ JsonSchema_S[T] =
 			scheme.cata(algebra_AvroToJson_TYPED[T]).apply(_)
 
 
-		def avroToJson_UNTYPED: Fix[SchemaAvro_Skeuo] ⇒ SchemaJson_Skeuo[_] = scheme.cata(algebra_AvroToJson).apply(_)*/
+		def avroToJson_UNTYPED: Fix[AvroSchema_S] ⇒ JsonSchema_S[_] = scheme.cata(algebra_AvroToJson).apply(_)*/
 
 		// NOT GOOD - "No implicits found for Functor[AvroF[_]]
 		//def typed2[T: TypeTag] = scheme.cata(algebra2[T]).apply(_)
 
-		/*def jsonToAvro_TYPED[T: TypeTag]: Fix[SchemaJson_Skeuo] ⇒ SchemaAvro_Skeuo[T] =
+		/*def jsonToAvro_TYPED[T: TypeTag]: Fix[JsonSchema_S] ⇒ AvroSchema_S[T] =
 			scheme.cata(algebra_JsonToAvro_TYPED[T]).apply(_)
 
 
-		def jsonToAvro_UNTYPED: Fix[SchemaJson_Skeuo] ⇒ SchemaAvro_Skeuo[_] = scheme.cata(algebra_JsonToAvro).apply(_)*/
+		def jsonToAvro_UNTYPED: Fix[JsonSchema_S] ⇒ AvroSchema_S[_] = scheme.cata(algebra_JsonToAvro).apply(_)*/
 	}
 
 
 
 	object ByCoalgebra {
 
-		/*def avroToJson_TYPED[T: TypeTag]: SchemaAvro_Skeuo[T] ⇒ Fix[SchemaJson_Skeuo] =
+		/*def avroToJson_TYPED[T: TypeTag]: AvroSchema_S[T] ⇒ Fix[JsonSchema_S] =
 			scheme.ana(coalgebra_AvroToJson_TYPED[T]).apply(_)
 
 
-		def avroToJson_UNTYPED: SchemaAvro_Skeuo[_] ⇒ Fix[SchemaJson_Skeuo] =
+		def avroToJson_UNTYPED: AvroSchema_S[_] ⇒ Fix[JsonSchema_S] =
 			scheme.ana(coalgebra_AvroToJson).apply(_)*/
 
 
-		/*def jsonToAvro_TYPED[T: TypeTag]: SchemaJson_Skeuo[T] ⇒ Fix[SchemaAvro_Skeuo] =
+		/*def jsonToAvro_TYPED[T: TypeTag]: JsonSchema_S[T] ⇒ Fix[AvroSchema_S] =
 			scheme.ana(coalgebra_JsonToAvro_TYPED[T]).apply(_)
 
-		def jsonToAvro_UNTYPED: SchemaJson_Skeuo[_] ⇒ Fix[SchemaAvro_Skeuo] =
+		def jsonToAvro_UNTYPED: JsonSchema_S[_] ⇒ Fix[AvroSchema_S] =
 			scheme.ana(coalgebra_JsonToAvro).apply(_)*/
 	}
 
@@ -105,15 +196,15 @@ object Skeuo_Skeuo {
 	
 
 	// AvroF -> Json[AvroF] -> AvroF
-	//def roundTrip_AvroToAvro[T: TypeTag]: SchemaAvro_Skeuo[T] ⇒ SchemaAvro_Skeuo[T] = ByAlgebra.jsonToAvro_TYPED[T] compose ByCoalgebra.avroToJson_TYPED[T]
+	//def roundTrip_AvroToAvro[T: TypeTag]: AvroSchema_S[T] ⇒ AvroSchema_S[T] = ByAlgebra.jsonToAvro_TYPED[T] compose ByCoalgebra.avroToJson_TYPED[T]
 
-	//def roundTrip_AvroToAvro_CanonicalFix[T: TypeTag]: Fix[SchemaAvro_Skeuo] ⇒ Fix[SchemaAvro_Skeuo] = ByCoalgebra.jsonToAvro_TYPED[T] compose ByAlgebra.avroToJson_TYPED[T]
+	//def roundTrip_AvroToAvro_CanonicalFix[T: TypeTag]: Fix[AvroSchema_S] ⇒ Fix[AvroSchema_S] = ByCoalgebra.jsonToAvro_TYPED[T] compose ByAlgebra.avroToJson_TYPED[T]
 
 
 	// JsonF -> AvroF[JsonF] -> JsonF
-	//def roundTrip_JsonToJson[T: TypeTag]: SchemaJson_Skeuo[T] ⇒ SchemaJson_Skeuo[T] = ByAlgebra.avroToJson_TYPED[T] compose ByCoalgebra.jsonToAvro_TYPED[T]
+	//def roundTrip_JsonToJson[T: TypeTag]: JsonSchema_S[T] ⇒ JsonSchema_S[T] = ByAlgebra.avroToJson_TYPED[T] compose ByCoalgebra.jsonToAvro_TYPED[T]
 
-	//def roundTrip_JsonToJson_CanonicalFix[T: TypeTag]: Fix[SchemaJson_Skeuo] ⇒ Fix[SchemaJson_Skeuo] = ByCoalgebra.avroToJson_TYPED[T] compose ByAlgebra.jsonToAvro_TYPED[T]
+	//def roundTrip_JsonToJson_CanonicalFix[T: TypeTag]: Fix[JsonSchema_S] ⇒ Fix[JsonSchema_S] = ByCoalgebra.avroToJson_TYPED[T] compose ByAlgebra.jsonToAvro_TYPED[T]
 
 
 }

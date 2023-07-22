@@ -5,23 +5,30 @@ package conversionsOfSchemaADTs.avro_json.parsing
 import higherkindness.droste.data.Fix
 import higherkindness.droste._
 import higherkindness.droste.syntax.all._
+
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
+
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo._
 import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
+
 import io.circe.{Json ⇒ JsonCirce}
 import io.circe.Decoder
+import higherkindness.skeuomorph.openapi.JsonDecoders._
+
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
 import SchemaAvro_Skeuo._
-import higherkindness.skeuomorph.openapi.JsonDecoders._
+
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
 import SchemaJson_Skeuo._
-import io.circe.Decoder.Result
+
+
 import testData.schemaData.avroData.skeuoData.Data._
 import testData.schemaData.jsonData.skeuoData.Data._
 
 import scala.reflect.runtime.universe._
+
 import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
 import utilTest.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
@@ -67,7 +74,7 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(circeJsonStr)
 			
 			
 			Then("... result should match canonical json skeuo")

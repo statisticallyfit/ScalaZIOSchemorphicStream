@@ -1,30 +1,24 @@
 package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 
-import cats.syntax.all._
+//import cats.syntax.all._
 
+import higherkindness.droste._
 import higherkindness.droste.data.Fix
 import higherkindness.droste.syntax.all._
-
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
-
 import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
-
-
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo._
+import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans._
 import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
-
 import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
-
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
 import SchemaAvro_Skeuo._
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
 import SchemaJson_Skeuo._
-
+import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans
 import io.circe.{Json ⇒ JsonCirce}
-
 import testData.schemaData.avroData.skeuoData.Data._
 import testData.schemaData.jsonData.skeuoData.Data._
 
@@ -128,7 +122,7 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			
 			And("--- skeuo-avro (fix) --> apache-avro: \nThe avro-apache string should coincide with the json circe string")
 			
-			def roundTripVerify_AvroStrAndJsonCirce(avroStrStart: String, avroSkeuoMidCheck: SchemaAvro_Skeuo[JsonCirce], jsonCirceEnd: JsonCirce): Boolean = {
+			/*def roundTripVerify_AvroStrAndJsonCirce(avroStrStart: String, avroSkeuoMidCheck: SchemaAvro_Skeuo[JsonCirce], jsonCirceEnd: JsonCirce): Boolean = {
 			
 				// step 1 - parse avro str to avro-apache-schema
 				val schemaAvro_Apache: SchemaAvro_Apache = new SchemaAvro_Apache.Parser().parse(avroStrStart)
@@ -145,15 +139,17 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 				schemaJson_Circe.manicure shouldEqual jsonCirceEnd.manicure
 				
 				schemaAvro_Skeuo == avroSkeuoMidCheck && schemaJson_Circe.manicure == jsonCirceEnd.manicure
-			}
+			}*/
 			
 			
 			info(s"--- skeuo-avro (fix) --> apache-avro = ${skeuoToApacheAvroSchema(nullAvro_Skeuo_F).toString(true)}")
 			info(s"--- skeuo-avro --> skeuo-json = $jsonSkeuo")
 			info(s"--- skeuo-avro -> json circe = ${SchemaAvro_Skeuo.toJson(nullAvro_Skeuo_C).manicure}")
+			info(s"--- skeuo-json -> json circe = \n${SchemaJson_Skeuo.render(nullJson_Skeuo_C).manicure}")
+			
 			
 			// TODO HERE - using opetushallitus to take json data -> json schema
-			import scala.reflect.runtime.universe._
+			/*import scala.reflect.runtime.universe._
 			import fi.oph.scalaschema.{SchemaFactory, SchemaToJson, Schema ⇒ SchemaJson_Opetus}
 			//import org.json4s.package.JValue
 			
@@ -195,9 +191,8 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			info(s"nulljc = $nulljc")
 			info(s"intjc = $intjc")
 			info(s"strjc = $strjc")
-			info(s"arrjc = $arrjc")
+			info(s"arrjc = $arrjc")*/
 			
-			info(s"--- skeuo-json -> json circe = \n${SchemaJson_Skeuo.render(nullJson_Skeuo_C).manicure}")
 			
 			
 			// TODO HELP FIX
@@ -217,6 +212,71 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 				  |  "required": []
 				  |}
 				  |""".stripMargin)*/
+		}
+		
+		
+		Scenario("array of int") {
+			
+			Given("skeuo-avro-schema")
+			
+			
+			info(s"CHECK skeuo-fix == skeuo-simple = ${arrayIntAvro_Skeuo === arrayIntAvro_Skeuo_F}")
+			
+			/*info(s"skeuo-avro = $nullAvro_Skeuo | type = ${UtilMain.getFuncTypeSubs(nullAvro_Skeuo)}")
+			info(s"skeuo-avro (fix) = $nullAvro_SkeuoFix | type = ${UtilMain.getFuncTypeSubs(nullAvro_SkeuoFix)}")
+			info(s"skeuo-avro (circe) = $nullAvro_SkeuoC | type = ${UtilMain.getFuncTypeSubs(nullAvro_SkeuoC)}")*/
+			
+			
+			When("converting to skeuo-json-schema by applying the function")
+			
+			
+			
+			/*UtilMain.getFuncTypeSubs(avroToJsonFunction[Null]) shouldEqual "SchemaAvro_Skeuo[Null] => SchemaJson_Skeuo[Null]"
+			
+			UtilMain.getFuncTypeSubs(avroToJsonFunction[JsonCirce]) shouldEqual "SchemaAvro_Skeuo[JsonCirce] => SchemaJson_Skeuo[JsonCirce]"
+			
+			UtilMain.getFuncTypeSubs(avroToJsonFunction[Fix[SchemaAvro_Skeuo]]) shouldEqual "SchemaAvro_Skeuo[Fix[SchemaAvro_Skeuo]] => SchemaJson_Skeuo[Fix[SchemaAvro_Skeuo]]"
+			*/
+			
+			
+			Then("skeuo-json-schema should be correctly generated")
+			
+			
+			And("--- skeuo-avro (fix) --> apache-avro: \nThe avro-apache string should coincide with the json circe string")
+			
+			
+			info(s"--- skeuo-avro = $arrayIntAvro_Skeuo")
+			info(s"--- skeuo-avro (fix) --> apache-avro-str = \n${skeuoToApacheAvroSchema(arrayIntAvro_Skeuo_F).toString(true)}")
+			info(s"--- Avro To Json (H): skeuo-avro --> skeuo-json = ${avroToJson_H(arrayIntAvro_Skeuo_F)}")
+			info(s"--- check: skeuo-json = $arrayIntJson_Skeuo_F")
+			
+			
+			val myToJson: Fix[SchemaAvro_Skeuo] ⇒ JsonCirce = scheme.cata(SchemaAvro_Skeuo.toJson).apply(_)
+			val myRender: Fix[SchemaJson_Skeuo] ⇒ JsonCirce = scheme.cata(SchemaJson_Skeuo.render).apply(_)
+			
+			
+			import io.circe.Decoder
+			import higherkindness.skeuomorph.openapi.JsonDecoders._
+			import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoJsonHasEmbed
+			
+			val aj_c = myToJson(arrayIntAvro_Skeuo_F)
+			val jj_c = myRender(arrayIntJson_Skeuo_F)
+			
+			val a_c_js = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(aj_c)
+			val j_c_js = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(jj_c)
+			val a_c_as = Decoder[Fix[SchemaAvro_Skeuo]].decodeJson(aj_c)
+			
+			info(s"--- skeuo-avro -> json circe = \n${aj_c.manicure}")
+			info(s"--- skeuo-json -> json circe = \n${jj_c.manicure}")
+			
+			// TODO left off here to convert myToJson result from json-value into json-schema because now it gives Left('not well formed") error
+			
+			info(s"*** skeuo-avro -> json circe -> skeuo-json = $a_c_js")
+			info(s"*** skeuo-json -> json circe -> skeuo-json = $j_c_js")
+			info(s"*** skeuo-avro -> json-circe -> skeuo-avro = $a_c_as")
+			
+			
+			
 		}
 	}
 }
