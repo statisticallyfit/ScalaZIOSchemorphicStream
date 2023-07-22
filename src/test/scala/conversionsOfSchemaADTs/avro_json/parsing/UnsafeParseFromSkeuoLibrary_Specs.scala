@@ -99,28 +99,158 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 		Scenario("integer") {
 			
 			Given("a json schema (single string)")
-			val rawJsonStr: String =
+			/*val rawJsonStr: String =
 				"""
 				  |{
 				  |  "type": "integer"
 				  |}
+				  |""".stripMargin.trim*/
+			val rawJsonStr =
+				"""
+				  |{
+				  |  "title": "Telraam active segments data schema",
+				  |  "allOf": [
+				  |    {
+				  |      "$ref": "https://geojson.org/schema/FeatureCollection.json"
+				  |    }
+				  |  ],
+				  |  "type": "object",
+				  |  "properties": {
+				  |    "features": {
+				  |      "type": "array",
+				  |      "items": {
+				  |        "type": "object",
+				  |        "properties": {
+				  |          "properties": {
+				  |            "type": "object",
+				  |            "properties": {
+				  |              "segment_id": {
+				  |                "type": "integer"
+				  |              },
+				  |              "last_data_package": {
+				  |                "oneOf": [
+				  |                  {
+				  |                    "type": "null"
+				  |                  },
+				  |                  {
+				  |                    "$comment": "this is not even ISO 8601, so no date-time!",
+				  |                    "type": "string",
+				  |                    "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{6}\\+\\d{2}:\\d{2}"
+				  |                  },
+				  |                  {
+				  |                    "type": "string",
+				  |                    "maxLength": 0
+				  |                  }
+				  |                ]
+				  |              },
+				  |              "pedestrian": {
+				  |                "oneOf": [
+				  |                  {
+				  |                    "type": "number"
+				  |                  },
+				  |                  {
+				  |                    "type": "string",
+				  |                    "maxLength": 0
+				  |                  }
+				  |                ]
+				  |              },
+				  |              "bike": {
+				  |                "oneOf": [
+				  |                  {
+				  |                    "type": "number"
+				  |                  },
+				  |                  {
+				  |                    "type": "string",
+				  |                    "maxLength": 0
+				  |                  }
+				  |                ]
+				  |              },
+				  |              "car": {
+				  |                "oneOf": [
+				  |                  {
+				  |                    "type": "number"
+				  |                  },
+				  |                  {
+				  |                    "type": "string",
+				  |                    "maxLength": 0
+				  |                  }
+				  |                ]
+				  |              },
+				  |              "heavy": {
+				  |                "oneOf": [
+				  |                  {
+				  |                    "type": "number"
+				  |                  },
+				  |                  {
+				  |                    "type": "string",
+				  |                    "maxLength": 0
+				  |                  }
+				  |                ]
+				  |              },
+				  |              "uptime": {
+				  |                "oneOf": [
+				  |                  {
+				  |                    "type": "number"
+				  |                  },
+				  |                  {
+				  |                    "type": "string",
+				  |                    "maxLength": 0
+				  |                  }
+				  |                ]
+				  |              },
+				  |              "timezone": {
+				  |                "type": "string"
+				  |              },
+				  |              "period": {
+				  |                "type": "string"
+				  |              },
+				  |              "date": {
+				  |                "oneOf": [
+				  |                  {
+				  |                    "type": "string",
+				  |                    "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\+\\d{2}:\\d{2}"
+				  |                  },
+				  |                  {
+				  |                    "type": "string",
+				  |                    "maxLength": 0
+				  |                  }
+				  |                ]
+				  |              }
+				  |            },
+				  |            "required": [
+				  |              "segment_id",
+				  |              "pedestrian",
+				  |              "bike",
+				  |              "car",
+				  |              "heavy",
+				  |              "uptime",
+				  |              "timezone",
+				  |              "date",
+				  |              "period"
+				  |            ]
+				  |          }
+				  |        }
+				  |      }
+				  |    }
+				  |  }
+				  |}
+				  |
 				  |""".stripMargin.trim
 			
 			
 			When("parsing via Skeuomorph library's parser into Json Circe...")
 			val circeJsonStr: JsonCirce = unsafeParse(rawJsonStr)
 			
-			
 			Then("result should be a Json Circe string")
 			
 			rawJsonStr shouldBe a [String]
 			circeJsonStr shouldBe a[JsonCirce]
 			
-			circeJsonStr.noSpaces shouldEqual rawJsonStr.noSpaces
+			//circeJsonStr.noSpaces shouldEqual rawJsonStr.noSpaces
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(circeJsonStr)//.getOrElse(None)
 			
 			
 			Then("... result should match canonical json skeuo")

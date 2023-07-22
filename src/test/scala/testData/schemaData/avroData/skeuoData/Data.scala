@@ -29,6 +29,9 @@ object Data {
 	val intAvro_Skeuo_C: SchemaAvro_Skeuo[JsonCirce] = TInt()
 	val intAvro_Skeuo_F: Fix[SchemaAvro_Skeuo] = Fix(TInt())
 	
+	val arrAvro_Skeuo: SchemaAvro_Skeuo[Nothing] = TArray(TInt())
+	val arrAvro_Skeuo_C: SchemaAvro_Skeuo[JsonCirce] = TArray(TInt())
+	val arrAvro_Skeuo_F: Fix[SchemaAvro_Skeuo] = Fix(TArray(Fix(TInt())))
 	
 	/*val arrayIntAvro_Skeuo: SchemaAvro_Skeuo[SchemaAvro_Skeuo[Int]] = TArray(TInt())
 	val arrayIntAvro_SkeuoC: SchemaAvro_Skeuo[JsonCirce] = TArray(TInt())

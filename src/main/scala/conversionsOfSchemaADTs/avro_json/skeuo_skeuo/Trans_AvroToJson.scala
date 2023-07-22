@@ -60,7 +60,7 @@ object Trans_AvroToJson {
 
 		case TBytes() ⇒ ByteF[T]()
 		
-		case TArray(innerSchema: T) ⇒ ArrayF(innerSchema)
+		//HELP case TArray(innerSchema: T) ⇒ ArrayF(transform_AvroToJsonSkeuo(innerSchema))
 		
 		// TODO where does 'name' go?
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[T]]) ⇒ {

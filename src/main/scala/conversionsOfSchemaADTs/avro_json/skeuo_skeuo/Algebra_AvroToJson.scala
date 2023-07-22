@@ -79,7 +79,7 @@
 //
 //
 //
-//		case TArray(innerSchema: SchemaJson_Skeuo[T]) ⇒ ArrayF[T](innerSchema)
+//		case TArray(innerSchema: SchemaJson_Skeuo[T]) ⇒ ArrayF(innerSchema)
 //
 //		/*case TNamedType(namespace, name) ⇒ ObjectF[T]()
 //

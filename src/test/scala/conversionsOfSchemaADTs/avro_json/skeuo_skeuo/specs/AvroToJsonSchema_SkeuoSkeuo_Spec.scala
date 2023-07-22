@@ -151,9 +151,11 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			info(s"--- skeuo-avro (fix) --> apache-avro = ${skeuoToApacheAvroSchema(nullAvro_Skeuo_F).toString(true)}")
 			info(s"--- skeuo-avro --> skeuo-json = $jsonSkeuo")
 			info(s"--- skeuo-avro -> json circe = ${SchemaAvro_Skeuo.toJson(nullAvro_Skeuo_C).manicure}")
+			info(s"--- skeuo-json -> json circe = \n${SchemaJson_Skeuo.render(nullJson_Skeuo_C).manicure}")
+			
 			
 			// TODO HERE - using opetushallitus to take json data -> json schema
-			import scala.reflect.runtime.universe._
+			/*import scala.reflect.runtime.universe._
 			import fi.oph.scalaschema.{SchemaFactory, SchemaToJson, Schema ⇒ SchemaJson_Opetus}
 			//import org.json4s.package.JValue
 			
@@ -195,9 +197,9 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			info(s"nulljc = $nulljc")
 			info(s"intjc = $intjc")
 			info(s"strjc = $strjc")
-			info(s"arrjc = $arrjc")
+			info(s"arrjc = $arrjc")*/
 			
-			info(s"--- skeuo-json -> json circe = \n${SchemaJson_Skeuo.render(nullJson_Skeuo_C).manicure}")
+			
 			
 			
 			// TODO HELP FIX
@@ -217,6 +219,90 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 				  |  "required": []
 				  |}
 				  |""".stripMargin)*/
+		}
+		
+		
+		Scenario("array of int") {
+			
+			Given("skeuo-avro-schema")
+			
+			
+			info(s"CHECK skuo-fix == skeuo-simple = ${arrAvro_Skeuo === arrAvro_Skeuo_F}")
+			
+			/*info(s"skeuo-avro = $nullAvro_Skeuo | type = ${UtilMain.getFuncTypeSubs(nullAvro_Skeuo)}")
+			info(s"skeuo-avro (fix) = $nullAvro_SkeuoFix | type = ${UtilMain.getFuncTypeSubs(nullAvro_SkeuoFix)}")
+			info(s"skeuo-avro (circe) = $nullAvro_SkeuoC | type = ${UtilMain.getFuncTypeSubs(nullAvro_SkeuoC)}")*/
+			
+			
+			When("converting to skeuo-json-schema by applying the function")
+			
+			
+			
+			/*UtilMain.getFuncTypeSubs(avroToJsonFunction[Null]) shouldEqual "SchemaAvro_Skeuo[Null] => SchemaJson_Skeuo[Null]"
+			
+			UtilMain.getFuncTypeSubs(avroToJsonFunction[JsonCirce]) shouldEqual "SchemaAvro_Skeuo[JsonCirce] => SchemaJson_Skeuo[JsonCirce]"
+			
+			UtilMain.getFuncTypeSubs(avroToJsonFunction[Fix[SchemaAvro_Skeuo]]) shouldEqual "SchemaAvro_Skeuo[Fix[SchemaAvro_Skeuo]] => SchemaJson_Skeuo[Fix[SchemaAvro_Skeuo]]"
+			*/
+			
+			
+			Then("skeuo-json-schema should be correctly generated")
+			
+			
+			
+			And("--- skeuo-avro (fix) --> apache-avro: \nThe avro-apache string should coincide with the json circe string")
+			
+			
+			info(s"--- skeuo-avro (fix) --> apache-avro = ${skeuoToApacheAvroSchema(arrAvro_Skeuo_F).toString(true)}")
+			//info(s"--- skeuo-avro --> skeuo-json = $jsonSkeuo")
+			info(s"--- skeuo-avro -> json circe = ${SchemaAvro_Skeuo.toJson(arrAvro_Skeuo_C).manicure}")
+			info(s"--- skeuo-json -> json circe = \n${SchemaJson_Skeuo.render(arrJson_Skeuo_C).manicure}")
+			
+			
+		}
+		
+		/*Scenario("array ofint"){
+			
+			Given("avroschema")
+			
+			When("converting to skeuo")
+			val skeuo = avroToJson(arrAvro_Skeuo)
+			
+			
+			Then("skeuo schema should be correctly generated")
+			info(s"generated skeuo = $skeuo")
+			
+			//skeuo shouldEqual ArrayF(IntegerF())
+		}*/
+		
+		Scenario("int"){
+			import testData.schemaData.jsonData.skeuoData.Data._
+			
+			info(s"skeuo-avro= $intAvro_Skeuo")
+			info(s"skeuo-json = $intJson_Skeuo")
+			
+			val skeuoJson = avroToJson(intAvro_Skeuo)
+			info(s"avro to json result = $skeuoJson")
+			
+			val skeuoToCirce = SchemaJson_Skeuo.render(intJson_Skeuo_C)
+			info(s"render: skeuo-json -> circe-json = $skeuoToCirce")
+			info(s"avro str = ${SchemaAvro_Skeuo.toJson(intAvro_Skeuo_C)}")
+		}
+		
+		Scenario("record") {
+			
+			Given("avroschema")
+			info(s"recordAvro = $recordStringAvro_Skeuo")
+			
+			When("converting to skeuo")
+			val skeuo: SchemaJson_Skeuo[SchemaAvro_Skeuo[Nothing]] = avroToJson(recordStringAvro_Skeuo)
+			
+			
+			Then("skeuo schema should be correctly generated")
+			info(s"generated skeuo = $skeuo")
+			//info(s"render: skeuo-json --> json-circe = ${SchemaJson_Skeuo.render(skeuo)}")
+			
+			//skeuo shouldEqual ArrayF(IntegerF())
 		}
 	}
 }

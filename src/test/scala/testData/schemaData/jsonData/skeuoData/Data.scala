@@ -14,5 +14,9 @@ object Data {
 	val nullJson_Skeuo_C: SchemaJson_Skeuo[Json] = ObjectF(properties = List(), required = List())
 	
 	
-	val intJson_Skeuo: SchemaJson_Skeuo[Null] = IntegerF()
+	val intJson_Skeuo: SchemaJson_Skeuo[Int] = IntegerF()
+	val intJson_Skeuo_C: SchemaJson_Skeuo[Json] = IntegerF()
+	
+	val arrJson_Skeuo: SchemaJson_Skeuo[Nothing] = ArrayF(IntegerF())
+	val arrJson_Skeuo_C: SchemaJson_Skeuo[Json] = ArrayF(IntegerF())
 }
