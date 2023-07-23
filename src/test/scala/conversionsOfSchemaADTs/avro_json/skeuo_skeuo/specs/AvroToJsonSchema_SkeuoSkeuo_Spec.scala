@@ -247,7 +247,7 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			
 			info(s"--- skeuo-avro = $arrayIntAvro_Skeuo")
 			info(s"--- skeuo-avro (fix) --> apache-avro-str = \n${skeuoToApacheAvroSchema(arrayIntAvro_Skeuo_F).toString(true)}")
-			info(s"--- Avro To Json (H): skeuo-avro --> skeuo-json = ${avroToJson_H(arrayIntAvro_Skeuo_F)}")
+			info(s"--- Avro To Json (H): skeuo-avro --> skeuo-json = ${roundTripAvro(arrayIntAvro_Skeuo_F)}")
 			info(s"--- check: skeuo-json = $arrayIntJson_Skeuo_F")
 			
 			
@@ -257,7 +257,7 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			
 			import io.circe.Decoder
 			import higherkindness.skeuomorph.openapi.JsonDecoders._
-			import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoJsonHasEmbed
+			import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
 			
 			val aj_c = myToJson(arrayIntAvro_Skeuo_F)
 			val jj_c = myRender(arrayIntJson_Skeuo_F)

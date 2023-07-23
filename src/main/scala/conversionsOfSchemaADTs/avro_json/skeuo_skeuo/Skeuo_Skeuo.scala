@@ -57,7 +57,7 @@ object Skeuo_Skeuo {
 			}
 		}*/
 		
-		implicit def skeuoJsonHasEmbed: Embed[JsonSchema_S, Fix[AvroSchema_S]] = new Embed[JsonSchema_S, Fix[AvroSchema_S]] {
+		implicit def skeuoEmbed_JA: Embed[JsonSchema_S, Fix[AvroSchema_S]] = new Embed[JsonSchema_S, Fix[AvroSchema_S]] {
 			
 			// JsonSchema_S [ Fix[AvroSchema_S]] => Fix[AvroSchema_S]
 			def algebra: Algebra[JsonSchema_S, Fix[AvroSchema_S]] = Algebra {
@@ -83,9 +83,27 @@ object Skeuo_Skeuo {
 			}
 		}
 		
-		implicit def skeuoAvroHasProject: Project[AvroSchema_S, Fixed] = new Project[AvroSchema_S, Fixed] {
+		
+		/**
+		 * Algebra[JsonS, Fix[JsonS]] === JsonS[Fix[JsonS]] => Fix[JsonS]]
+		 *
+		 * Calling cata: Fix[JsonS] => Fix[JsonS] ???
+		 * @return
+		 */
+		/*implicit def skeuoEmbed_JJ: Embed[JsonSchema_S, Fix[JsonSchema_S]] = new Embed[JsonSchema_S, Fix[JsonSchema_S]] {
+			def algebra: Algebra[JsonSchema_S, Fix[JsonSchema_S]] = ???
+		}
+		*/
+		
+		/**
+		 * Coalgebra means:
+		 * 	Fix[JsonSchema_S] => AvroSchema_S[ Fix[JsonSchema_S] ]
+		 *
+		 * @return
+		 */
+		implicit def skeuoProject_AJ: Project[AvroSchema_S, Fix[JsonSchema_S]] = new Project[AvroSchema_S, Fix[JsonSchema_S]] {
 			
-			def coalgebra: Coalgebra[AvroSchema_S, Fixed] = Coalgebra {
+			def coalgebra: Coalgebra[AvroSchema_S, Fix[JsonSchema_S]] = Coalgebra {
 				case Fix(ObjectF(List(), List())) ⇒ TNull()
 				
 				case Fix(IntegerF()) ⇒ TInt()
@@ -126,17 +144,18 @@ object Skeuo_Skeuo {
 		
 		
 		
-		val c: Fix[AvroSchema_S] ⇒ Fixed = scheme.cata(transJ.algebra).apply(_)
+		val avroToJson_byCataTransAlg: Fix[AvroSchema_S] ⇒ Fix[JsonSchema_S] = scheme.cata(transJ.algebra).apply(_)
 		
-		import TransSchemaImplicits.skeuoAvroHasProject
-		val a: Fixed ⇒ Fix[JsonSchema_S] = scheme.ana(transJ.coalgebra).apply(_)
+		import TransSchemaImplicits.{skeuoEmbed_JA, skeuoProject_AJ} // skeuoProject_AJ
+		val jsonToAvro_byAnaTransCoalg: Fix[JsonSchema_S] ⇒ Fix[AvroSchema_S] = scheme.ana(transJ.coalgebra).apply(_)
 		
 		
 		
 		//val h: Fixed ⇒ Fixed = scheme.hylo(transJ.algebra, transJ.coalgebra)
 		
-		val avroToJson_H: Fix[AvroSchema_S] ⇒ Fix[JsonSchema_S] = a compose c
+		val roundTripAvro: Fix[AvroSchema_S] ⇒ Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg compose avroToJson_byCataTransAlg
 		
+		val roundTripJson: Fix[JsonSchema_S] ⇒ Fix[JsonSchema_S] = avroToJson_byCataTransAlg compose jsonToAvro_byAnaTransCoalg
 		
 		
 		/*def transFixWay[T: TypeTag] = {
@@ -151,7 +170,7 @@ object Skeuo_Skeuo {
 	object ByAlgebra {
 		
 		
-		def avroToJson_Fixed: Fix[AvroSchema_S] ⇒ JsonSchema_S.Fixed =
+		def avroToJson_Fixed: Fix[AvroSchema_S] ⇒ Fix[JsonSchema_S] =
 			scheme.cata(algebra_AvroToJsonFixed).apply(_)
 
 
