@@ -31,7 +31,7 @@ import scala.reflect.runtime.universe._
 
 import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
-import utilTest.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
+import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 
 
 /**
@@ -81,11 +81,11 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			val skeuoCheck = StringF()
 			
-			skeuoDecodedFromCirce shouldEqual skeuoCheck
+			skeuoDecodedFromCirce.getOrElse(None) shouldEqual skeuoCheck
 			
 			
 			/*import higherkindness.skeuomorph.avro.AvroF
-			val da = Decoder[Fix[AvroF]].decodeJson(circeJsonStr).getOrElse(None)
+			val da = Decoder[Fix[AvroF]].decodeJson(circeJsonStr)
 			info(s"AVRO THINGY: json circe (string) -> avro-skeuo (string) = $da")*/
 			
 			
@@ -127,14 +127,14 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr)
 			
 			
 			Then("... result should match canonical json skeuo")
 			
 			val skeuoCheck = IntegerF()
 			
-			skeuoDecodedFromCirce shouldEqual skeuoCheck
+			skeuoDecodedFromCirce.getOrElse(None) shouldEqual skeuoCheck
 			
 			
 			info(s"raw json str = \n$rawJsonStr")
@@ -177,14 +177,14 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr)
 			
 			
 			Then("... result should match canonical json skeuo")
 			
 			val skeuoCheck = ArrayF(StringF())
 			
-			skeuoDecodedFromCirce shouldEqual skeuoCheck
+			skeuoDecodedFromCirce.getOrElse(None) shouldEqual skeuoCheck
 			
 			
 			info(s"raw json str = \n$rawJsonStr")
@@ -235,14 +235,14 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr)
 			
 			
 			Then("... result should match canonical json skeuo")
 			
 			val skeuoCheck = ArrayF(ArrayF(ArrayF(IntegerF())))
 			
-			skeuoDecodedFromCirce shouldEqual skeuoCheck
+			skeuoDecodedFromCirce.getOrElse(None) shouldEqual skeuoCheck
 			
 			
 			
@@ -297,14 +297,14 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr)
 			
 			
 			Then("... result should match canonical json skeuo")
 			
 			val skeuoCheck: ObjectF[ArrayF[FloatF[Nothing]]] = ObjectF(properties =List(Property(name = "coordinates", tpe = ArrayF(FloatF()))),required = List())
 			
-			skeuoDecodedFromCirce shouldEqual skeuoCheck
+			skeuoDecodedFromCirce.getOrElse(None) shouldEqual skeuoCheck
 			
 			
 			info(s"raw json str = \n$rawJsonStr")
@@ -383,7 +383,7 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr)
 			
 			
 			Then("... result should match canonical json skeuo")
@@ -407,7 +407,7 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 				required = List("position", "sensorName", "name", "id")
 			)
 			
-			skeuoDecodedFromCirce shouldEqual skeuoCheck
+			skeuoDecodedFromCirce.getOrElse(None) shouldEqual skeuoCheck
 			
 			
 			info(s"raw json str = \n$rawJsonStr")
