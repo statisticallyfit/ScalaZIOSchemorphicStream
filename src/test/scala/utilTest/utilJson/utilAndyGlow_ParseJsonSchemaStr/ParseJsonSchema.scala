@@ -6,7 +6,7 @@ import java.io.{ByteArrayInputStream, InputStream}
 
 import scala.collection._
 import com.github.andyglow.json.{ParseJson, Value}
-import json.{Schema ⇒ SchemaJson_Glow}
+import json.{Schema ⇒ JsonSchema_G}
 import json.schema.validation.Instance._
 
 import scala.util.{Failure, Success, Try}
@@ -21,7 +21,7 @@ import scala.util.{Failure, Success, Try}
 object ParseJsonSchema {
 	
 	import Value._
-	import SchemaJson_Glow._
+	import JsonSchema_G._
 	
 	
 	implicit class OptionOps[T](private val x: Option[T]) extends AnyVal {
@@ -46,13 +46,13 @@ object ParseJsonSchema {
 		
 	}
 	
-	def apply(x: String): Try[SchemaJson_Glow[_]] = apply(new ByteArrayInputStream(x.getBytes))
+	def apply(x: String): Try[JsonSchema_G[_]] = apply(new ByteArrayInputStream(x.getBytes))
 	
-	def apply(x: InputStream): Try[SchemaJson_Glow[_]] = ParseJson(x) flatMap {
+	def apply(x: InputStream): Try[JsonSchema_G[_]] = ParseJson(x) flatMap {
 		apply(_)
 	}
 	
-	def apply(x: Value, checkSchema: Boolean = true): Try[SchemaJson_Glow[_]] = x match {
+	def apply(x: Value, checkSchema: Boolean = true): Try[JsonSchema_G[_]] = x match {
 		case o@obj(fields)
 			if !checkSchema || fields
 				.get("$$schema")
@@ -62,11 +62,11 @@ object ParseJsonSchema {
 		case _ => Failure(new Exception("not a json schema"))
 	}
 	
-	/*private[jsonschema] */def makeType(x: obj): Try[SchemaJson_Glow[_]] = {
+	/*private[jsonschema] */def makeType(x: obj): Try[JsonSchema_G[_]] = {
 		val tpe = x.value.str("type")
 		val title = x.value.str("title")
 		
-		def makeStrOrEnum: Try[SchemaJson_Glow[String]] = x.value.arr("enum") match {
+		def makeStrOrEnum: Try[JsonSchema_G[String]] = x.value.arr("enum") match {
 			case None => makeStr
 			case Some(arr) =>
 				tpe.map(_.toLowerCase) match {
@@ -148,8 +148,8 @@ object ParseJsonSchema {
 		title.map(t => result.map(_.withTitle(t))).getOrElse(result)
 	}
 	
-	/*private[jsonschema]*/ def parseFormat(x: String): Option[SchemaJson_Glow.`string`.Format] = {
-		import SchemaJson_Glow.`string`.Format._
+	/*private[jsonschema]*/ def parseFormat(x: String): Option[JsonSchema_G.`string`.Format] = {
+		import JsonSchema_G.`string`.Format._
 		
 		PartialFunction.condOpt(x) {
 			case "date" => `date`

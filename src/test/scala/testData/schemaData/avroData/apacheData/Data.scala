@@ -2,10 +2,10 @@ package testData.schemaData.avroData.apacheData
 
 
 
-import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
-import org.apache.avro.Schema.{Field ⇒ FieldAvro_Apache}
-import org.apache.avro.Schema.Field.{Order ⇒ Order_Apache}
-import org.apache.avro.{LogicalType => LogicalType_Apache, LogicalTypes ⇒ LogicalTypes_Apache}
+import org.apache.avro.{Schema ⇒ AvroSchema_A}
+import org.apache.avro.Schema.{Field ⇒ FieldAvro_A}
+import org.apache.avro.Schema.Field.{Order ⇒ Order_A}
+import org.apache.avro.{LogicalType => LogicalType_A, LogicalTypes ⇒ LogicalTypes_A}
 
 import scala.jdk.CollectionConverters._
 
@@ -15,51 +15,51 @@ import scala.jdk.CollectionConverters._
 object Data  {
 	
 	// Primitive schemas
-	val strAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.STRING)
+	val strAvro_A: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.STRING)
 	
-	val intAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.INT)
+	val intAvro_A: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.INT)
 	
-	val nullAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.NULL)
+	val nullAvro_A: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.NULL)
 	
-	val booleanAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.BOOLEAN)
+	val booleanAvro_A: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.BOOLEAN)
 	
-	val longAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.LONG)
+	val longAvro_A: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.LONG)
 	
-	val floatAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.FLOAT)
+	val floatAvro_A: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.FLOAT)
 	
-	val doubleAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.DOUBLE)
+	val doubleAvro_A: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.DOUBLE)
 	
-	val bytesAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.BYTES)
+	val bytesAvro_A: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.BYTES)
 	
 	
 	
 	// Array schemas
-	val arrayNullAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(nullAvro_Apache)
-	val arrayBooleanAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(booleanAvro_Apache)
-	val arrayStrAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(strAvro_Apache)
-	val arrayIntAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(intAvro_Apache)
-	val arrayLongAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(longAvro_Apache)
-	val arrayFloatAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(floatAvro_Apache)
-	val arrayDoubleAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(doubleAvro_Apache)
-	val arrayBytesAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(bytesAvro_Apache)
+	val arrayNullAvro_A: AvroSchema_A = AvroSchema_A.createArray(nullAvro_A)
+	val arrayBooleanAvro_A: AvroSchema_A = AvroSchema_A.createArray(booleanAvro_A)
+	val arrayStrAvro_A: AvroSchema_A = AvroSchema_A.createArray(strAvro_A)
+	val arrayIntAvro_A: AvroSchema_A = AvroSchema_A.createArray(intAvro_A)
+	val arrayLongAvro_A: AvroSchema_A = AvroSchema_A.createArray(longAvro_A)
+	val arrayFloatAvro_A: AvroSchema_A = AvroSchema_A.createArray(floatAvro_A)
+	val arrayDoubleAvro_A: AvroSchema_A = AvroSchema_A.createArray(doubleAvro_A)
+	val arrayBytesAvro_A: AvroSchema_A = AvroSchema_A.createArray(bytesAvro_A)
 	
-	val array3IntAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createArray(SchemaAvro_Apache.createArray(SchemaAvro_Apache.createArray(intAvro_Apache)))
-	val array2IntAvro_Apache: SchemaAvro_Apache = array3IntAvro_Apache.getElementType
+	val array3IntAvro_A: AvroSchema_A = AvroSchema_A.createArray(AvroSchema_A.createArray(AvroSchema_A.createArray(intAvro_A)))
+	val array2IntAvro_A: AvroSchema_A = array3IntAvro_A.getElementType
 	
 	
 	
 	//Map schema
-	val mapNullAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(nullAvro_Apache)
-	val mapBooleanAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(booleanAvro_Apache)
-	val mapStrAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(strAvro_Apache)
-	val mapIntAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(intAvro_Apache)
-	val mapLongAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(longAvro_Apache)
-	val mapFloatAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(floatAvro_Apache)
-	val mapDoubleAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(doubleAvro_Apache)
-	val mapBytesAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createMap(bytesAvro_Apache)
+	val mapNullAvro_A: AvroSchema_A = AvroSchema_A.createMap(nullAvro_A)
+	val mapBooleanAvro_A: AvroSchema_A = AvroSchema_A.createMap(booleanAvro_A)
+	val mapStrAvro_A: AvroSchema_A = AvroSchema_A.createMap(strAvro_A)
+	val mapIntAvro_A: AvroSchema_A = AvroSchema_A.createMap(intAvro_A)
+	val mapLongAvro_A: AvroSchema_A = AvroSchema_A.createMap(longAvro_A)
+	val mapFloatAvro_A: AvroSchema_A = AvroSchema_A.createMap(floatAvro_A)
+	val mapDoubleAvro_A: AvroSchema_A = AvroSchema_A.createMap(doubleAvro_A)
+	val mapBytesAvro_A: AvroSchema_A = AvroSchema_A.createMap(bytesAvro_A)
 	
 	// Named type schema
-	val namedTypeAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createRecord("NamedType", "doc for named type", "namespace for named type", /*isError =*/ false)
+	val namedTypeAvro_A: AvroSchema_A = AvroSchema_A.createRecord("NamedType", "doc for named type", "namespace for named type", /*isError =*/ false)
 	// TODO add aliases??
 	
 	
@@ -67,16 +67,16 @@ object Data  {
 	// TODO add aliases?
 	import testData.schemaData.avroData.apacheData.FieldOrderData._
 	
-	val recordAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createRecord("Record", "doc for record", "namespace for record", /*isError =*/ false, List(strFieldAvro_1_oa, strFieldAvro_2_oa, strFieldAvro_3_oa, strFieldAvro_1_od, strFieldAvro_2_od, strFieldAvro_3_od, strFieldAvro_1_oi, strFieldAvro_2_oi, strFieldAvro_3_oi, intFieldAvro_1_oa, intFieldAvro_2_oa, intFieldAvro_3_oa, intFieldAvro_1_od, intFieldAvro_2_od, intFieldAvro_3_od, intFieldAvro_1_oi, intFieldAvro_2_oi, intFieldAvro_3_oi).asJava)
+	val recordAvro_A: AvroSchema_A = AvroSchema_A.createRecord("Record", "doc for record", "namespace for record", /*isError =*/ false, List(strFieldAvro_1_oa, strFieldAvro_2_oa, strFieldAvro_3_oa, strFieldAvro_1_od, strFieldAvro_2_od, strFieldAvro_3_od, strFieldAvro_1_oi, strFieldAvro_2_oi, strFieldAvro_3_oi, intFieldAvro_1_oa, intFieldAvro_2_oa, intFieldAvro_3_oa, intFieldAvro_1_od, intFieldAvro_2_od, intFieldAvro_3_od, intFieldAvro_1_oi, intFieldAvro_2_oi, intFieldAvro_3_oi).asJava)
 	
 	// Union schema (union of schemas)
-	val unionAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createUnion(List(intAvro_Apache, strAvro_Apache, floatAvro_Apache, arrayIntAvro_Apache).asJava)
+	val unionAvro_A: AvroSchema_A = AvroSchema_A.createUnion(List(intAvro_A, strAvro_A, floatAvro_A, arrayIntAvro_A).asJava)
 	
 	// Enum schema
-	val enumAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createEnum("Color", "the colors of the rainbow with additional ones added in", "Color namespace string here", List("red", "orange", "yellow", "green", "pink", "magenta", "periwinkle", "tan", "jade", "blue", "indigo", "violet").asJava)
+	val enumAvro_A: AvroSchema_A = AvroSchema_A.createEnum("Color", "the colors of the rainbow with additional ones added in", "Color namespace string here", List("red", "orange", "yellow", "green", "pink", "magenta", "periwinkle", "tan", "jade", "blue", "indigo", "violet").asJava)
 
 	// Fixed schema
-	val fixedAvro_Apache: SchemaAvro_Apache = SchemaAvro_Apache.createFixed("Fixed", "doc for fixed", "namespace for fixed", 10) // TODO different sizes ? (does it matter?)
+	val fixedAvro_A: AvroSchema_A = AvroSchema_A.createFixed("Fixed", "doc for fixed", "namespace for fixed", 10) // TODO different sizes ? (does it matter?)
 	
 	
 	
@@ -85,31 +85,31 @@ object Data  {
 	
 	
 	// Date logical type schema
-	val intAvro_forDate: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.INT)
-	val dateLogicalType: LogicalType_Apache = LogicalTypes_Apache.date()
+	val intAvro_forDate: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.INT)
+	val dateLogicalType: LogicalType_A = LogicalTypes_A.date()
 	
-	val dateAvro_Apache: SchemaAvro_Apache = dateLogicalType.addToSchema(intAvro_forDate)
+	val dateAvro_A: AvroSchema_A = dateLogicalType.addToSchema(intAvro_forDate)
 	
 	
 	
 	// Time millis logical type schema
-	val intAvro_forMillis: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.INT)
-	val millisLogicalType: LogicalType_Apache = LogicalTypes_Apache.timeMillis()
+	val intAvro_forMillis: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.INT)
+	val millisLogicalType: LogicalType_A = LogicalTypes_A.timeMillis()
 	
-	val millisAvro_Apache: SchemaAvro_Apache = millisLogicalType.addToSchema(intAvro_forMillis)
+	val millisAvro_A: AvroSchema_A = millisLogicalType.addToSchema(intAvro_forMillis)
 	
 	
 	
 	// Timestamp millis logical type schema
-	val longAvro_forTimestamp: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.LONG)
+	val longAvro_forTimestamp: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.LONG)
 	
-	val timestampMillisLogicalType: LogicalType_Apache = LogicalTypes_Apache.timestampMillis()
-	val timestampMillisSchema: SchemaAvro_Apache = timestampMillisLogicalType.addToSchema(longAvro_forTimestamp)
+	val timestampMillisLogicalType: LogicalType_A = LogicalTypes_A.timestampMillis()
+	val timestampMillisSchema: AvroSchema_A = timestampMillisLogicalType.addToSchema(longAvro_forTimestamp)
 	
 	
 	
 	// Decimal logical type schema
-	val fixedAvro_forDecimal: SchemaAvro_Apache = SchemaAvro_Apache.createFixed("FixedSchemaForDecimalLogicalType", null /*"doc_decimal_fixed"*/ , null, /*"decimal_namespace"*/ 20)
+	val fixedAvro_forDecimal: AvroSchema_A = AvroSchema_A.createFixed("FixedSchemaForDecimalLogicalType", null /*"doc_decimal_fixed"*/ , null, /*"decimal_namespace"*/ 20)
 	
 	
 	import scala.util.Random
@@ -123,7 +123,7 @@ object Data  {
 	val randPrecision: Int = 1 + Random.nextInt(MAX_PRECISION.toInt) // + 1 so it is not zero ever.
 	val randScale: Int = 1 + Random.nextInt(randPrecision) // Random.between(1, randPrecision) (only for scala 2.13)
 	
-	val decimalLogicalType: LogicalType_Apache = LogicalTypes_Apache.decimal(randPrecision, randScale)
+	val decimalLogicalType: LogicalType_A = LogicalTypes_A.decimal(randPrecision, randScale)
 	
-	val decimalSchema: SchemaAvro_Apache = decimalLogicalType.addToSchema(fixedAvro_forDecimal)
+	val decimalSchema: AvroSchema_A = decimalLogicalType.addToSchema(fixedAvro_forDecimal)
 }

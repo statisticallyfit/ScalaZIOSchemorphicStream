@@ -28,7 +28,7 @@ import utilMain.UtilMain.implicits._
  */
 
 
-class ParserFromAndyGlowLibrary_Specs extends AnyFeatureSpec with GivenWhenThen with Matchers {
+class IGNORE_ParserFromAndyGlowLibrary_Specs extends AnyFeatureSpec with GivenWhenThen with Matchers {
 	
 	
 	Feature("Convert raw json schema string to Json Circe (basic primitives)") {

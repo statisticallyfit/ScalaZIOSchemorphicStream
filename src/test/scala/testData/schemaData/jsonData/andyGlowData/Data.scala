@@ -1,18 +1,18 @@
 package testData.schemaData.jsonData.andyGlowData
 
 import json.Schema._
-import json.{Schema ⇒ SchemaJson_Glow}
+import json.{Schema ⇒ JsonSchema_G}
 /**
  *
  */
 object Data {
 
 	
-	val intJson_Glow: SchemaJson_Glow[Int] = `integer`
+	val intJson_Glow: JsonSchema_G[Int] = `integer`
 	
-	val strJson_Glow: SchemaJson_Glow[String] = `string`
+	val strJson_Glow: JsonSchema_G[String] = `string`
 	
-	val booleanJson_Glow: SchemaJson_Glow[Boolean] = `boolean`
+	val booleanJson_Glow: JsonSchema_G[Boolean] = `boolean`
 	
 	// TODO continue
 }

@@ -6,7 +6,7 @@ import cats.syntax.all._
 //import cats.implicits._
 
 import higherkindness.droste._
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaSkeuoAvro}
+import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
 
 import org.scalacheck._ // Arbitrary, Gen
 import org.scalacheck.cats.implicits._
@@ -27,52 +27,52 @@ import utilTest.arbitraryInstances.ArbitraryGeneral._
 object instancesAvro {
 	
 	
-	implicit def avroArbitrary[T](implicit T: Arbitrary[T]): Arbitrary[SchemaSkeuoAvro[T]] = {
+	implicit def avroArbitrary[T](implicit T: Arbitrary[T]): Arbitrary[AvroSchema_S[T]] = {
 		
-		val orderGen: Gen[SchemaSkeuoAvro.Order] = Gen.oneOf(SchemaSkeuoAvro.Order.Ascending, SchemaSkeuoAvro.Order.Descending, SchemaSkeuoAvro.Order.Ignore)
+		val orderGen: Gen[AvroSchema_S.Order] = Gen.oneOf(AvroSchema_S.Order.Ascending, AvroSchema_S.Order.Descending, AvroSchema_S.Order.Ignore)
 		
-		val fieldGen: Gen[SchemaSkeuoAvro.Field[T]] = (
+		val fieldGen: Gen[AvroSchema_S.Field[T]] = (
 			nonEmptyString,
 			Gen.listOf(nonEmptyString),
 			Gen.option(nonEmptyString),
 			Gen.option(orderGen),
 			T.arbitrary
-		).mapN(SchemaSkeuoAvro.Field.apply[T])
+		).mapN(AvroSchema_S.Field.apply[T])
 		
 		Arbitrary(
 			Gen.oneOf(
-				SchemaSkeuoAvro.`null`[T]().pure[Gen],
-				SchemaSkeuoAvro.boolean[T]().pure[Gen],
-				SchemaSkeuoAvro.int[T]().pure[Gen],
-				SchemaSkeuoAvro.long[T]().pure[Gen],
-				SchemaSkeuoAvro.float[T]().pure[Gen],
-				SchemaSkeuoAvro.double[T]().pure[Gen],
-				SchemaSkeuoAvro.bytes[T]().pure[Gen],
-				SchemaSkeuoAvro.string[T]().pure[Gen],
-				(nonEmptyString, nonEmptyString).mapN(SchemaSkeuoAvro.namedType[T]),
-				T.arbitrary map SchemaSkeuoAvro.array[T],
-				T.arbitrary map SchemaSkeuoAvro.map[T],
+				AvroSchema_S.`null`[T]().pure[Gen],
+				AvroSchema_S.boolean[T]().pure[Gen],
+				AvroSchema_S.int[T]().pure[Gen],
+				AvroSchema_S.long[T]().pure[Gen],
+				AvroSchema_S.float[T]().pure[Gen],
+				AvroSchema_S.double[T]().pure[Gen],
+				AvroSchema_S.bytes[T]().pure[Gen],
+				AvroSchema_S.string[T]().pure[Gen],
+				(nonEmptyString, nonEmptyString).mapN(AvroSchema_S.namedType[T]),
+				T.arbitrary map AvroSchema_S.array[T],
+				T.arbitrary map AvroSchema_S.map[T],
 				(
 					nonEmptyString,
 					Gen.option(nonEmptyString),
 					Gen.listOf(nonEmptyString),
 					Gen.option(nonEmptyString),
 					Gen.listOf(fieldGen)
-				).mapN(SchemaSkeuoAvro.record[T]),
-				Gen.nonEmptyListOf(T.arbitrary) map { l => SchemaSkeuoAvro.union[T](NonEmptyList.fromListUnsafe(l)) },
+				).mapN(AvroSchema_S.record[T]),
+				Gen.nonEmptyListOf(T.arbitrary) map { l => AvroSchema_S.union[T](NonEmptyList.fromListUnsafe(l)) },
 				(
 					nonEmptyString,
 					Gen.option(nonEmptyString),
 					Gen.listOf(nonEmptyString),
 					Gen.option(nonEmptyString),
 					Gen.listOf(nonEmptyString)
-				).mapN(SchemaSkeuoAvro.enum[T]),
+				).mapN(AvroSchema_S.enum[T]),
 				(
 					nonEmptyString,
 					Gen.option(nonEmptyString),
 					Gen.listOf(nonEmptyString),
 					Gen.posNum[Int]
-				).mapN(SchemaSkeuoAvro.fixed[T])
+				).mapN(AvroSchema_S.fixed[T])
 			)
 		)
 	}

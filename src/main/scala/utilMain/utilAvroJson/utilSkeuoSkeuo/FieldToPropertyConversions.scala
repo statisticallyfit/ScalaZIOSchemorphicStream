@@ -2,16 +2,16 @@ package utilMain.utilAvroJson.utilSkeuoSkeuo
 
 
 
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
-import SchemaAvro_Skeuo._
+import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
+import AvroSchema_S._
 
 
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
-import SchemaJson_Skeuo._
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import JsonSchema_S._
 
 
-import SchemaAvro_Skeuo.{Field ⇒ FieldAvro}
-import SchemaJson_Skeuo.{Property ⇒ PropertyJson}
+import AvroSchema_S.{Field ⇒ FieldAvro}
+import JsonSchema_S.{Property ⇒ PropertyJson}
 
 import scala.reflect.runtime.universe._
 

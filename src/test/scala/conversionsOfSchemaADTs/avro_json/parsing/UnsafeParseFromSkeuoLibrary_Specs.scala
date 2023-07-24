@@ -17,11 +17,11 @@ import io.circe.{Json ⇒ JsonCirce}
 import io.circe.Decoder
 import higherkindness.skeuomorph.openapi.JsonDecoders._
 
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
-import SchemaAvro_Skeuo._
+import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
+import AvroSchema_S._
 
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
-import SchemaJson_Skeuo._
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import JsonSchema_S._
 
 
 import testData.schemaData.avroData.skeuoData.Data._
@@ -74,7 +74,7 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(circeJsonStr)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr)
 			
 			
 			Then("... result should match canonical json skeuo")
@@ -127,7 +127,7 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr).getOrElse(None)
 			
 			
 			Then("... result should match canonical json skeuo")
@@ -177,7 +177,7 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr).getOrElse(None)
 			
 			
 			Then("... result should match canonical json skeuo")
@@ -235,7 +235,7 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr).getOrElse(None)
 			
 			
 			Then("... result should match canonical json skeuo")
@@ -297,7 +297,7 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr).getOrElse(None)
 			
 			
 			Then("... result should match canonical json skeuo")
@@ -383,12 +383,12 @@ class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThe
 			
 			And("When converting json circe to json skeuo... ")
 			
-			val skeuoDecodedFromCirce = Decoder[SchemaJson_Skeuo.Fixed].decodeJson(circeJsonStr).getOrElse(None)
+			val skeuoDecodedFromCirce = Decoder[JsonSchema_S.Fixed].decodeJson(circeJsonStr).getOrElse(None)
 			
 			
 			Then("... result should match canonical json skeuo")
 			
-			val skeuoCheck: ObjectF[SchemaJson_Skeuo[_ <: ArrayF[FloatF[Nothing]]]] = ObjectF(
+			val skeuoCheck: ObjectF[JsonSchema_S[_ <: ArrayF[FloatF[Nothing]]]] = ObjectF(
 				properties = List(
 					Property(name = "name", tpe = StringF()),
 					Property(name = "symbol",tpe = ObjectF(

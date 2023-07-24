@@ -16,11 +16,11 @@ import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.ParseStrToADT.parseType
 import utilMain.UtilMain
 
 
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
-//import SchemaJson_Skeuo._
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+//import JsonSchema_S._
 
-import json.{Schema ⇒ SchemaJson_Glow}
-import SchemaJson_Glow._
+import json.{Schema ⇒ JsonSchema_G}
+import JsonSchema_G._
 
 import scala.util.Try
 
@@ -48,10 +48,10 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			When("parsing")
-			val schemaGlow: SchemaJson_Glow[_] = parseType(jsonSchemaStr).value
+			val schemaGlow: JsonSchema_G[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `string` (schema-adt from andy glow)")
-			schemaGlow shouldBe a[SchemaJson_Glow[_]]
+			schemaGlow shouldBe a[JsonSchema_G[_]]
 			schemaGlow should not be a[String] // has been converted
 			schemaGlow shouldEqual `string`
 			
@@ -62,12 +62,12 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			And("converting the andy glow schema to skeuo schema")
-			val schemaSkeuo: SchemaJson_Skeuo[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
+			val schemaSkeuo: JsonSchema_S[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
 			
 			
 			Then("result should be a skeuo adt json schema")
-			schemaSkeuo shouldBe a [SchemaJson_Skeuo[_]]
-			schemaSkeuo shouldEqual SchemaJson_Skeuo.StringF()
+			schemaSkeuo shouldBe a [JsonSchema_S[_]]
+			schemaSkeuo shouldEqual JsonSchema_S.StringF()
 			
 			info(s"schemaSkeuo = ${schemaSkeuo}")
 			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(schemaSkeuo)}")
@@ -86,10 +86,10 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			When("parsing")
-			val schemaGlow: SchemaJson_Glow[_] = parseType(jsonSchemaStr).value
+			val schemaGlow: JsonSchema_G[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `integer` (schema-adt from andy glow)")
-			schemaGlow shouldBe a[SchemaJson_Glow[_]]
+			schemaGlow shouldBe a[JsonSchema_G[_]]
 			schemaGlow should not be a[String] // has been converted
 			schemaGlow shouldEqual `integer`
 			
@@ -100,12 +100,12 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			And("converting the andy glow schema to skeuo schema")
-			val schemaSkeuo: SchemaJson_Skeuo[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
+			val schemaSkeuo: JsonSchema_S[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
 			
 			
 			Then("result should be a skeuo adt json schema")
-			schemaSkeuo shouldBe a[SchemaJson_Skeuo[_]]
-			schemaSkeuo shouldEqual SchemaJson_Skeuo.IntegerF()
+			schemaSkeuo shouldBe a[JsonSchema_S[_]]
+			schemaSkeuo shouldEqual JsonSchema_S.IntegerF()
 			
 			info(s"schemaSkeuo = ${schemaSkeuo}")
 			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(schemaSkeuo)}")
@@ -124,10 +124,10 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			When("parsing")
-			val schemaGlow: SchemaJson_Glow[_] = parseType(jsonSchemaStr).value
+			val schemaGlow: JsonSchema_G[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `array(`string`)` (schema-adt from andy glow)")
-			schemaGlow shouldBe a[SchemaJson_Glow[_]]
+			schemaGlow shouldBe a[JsonSchema_G[_]]
 			schemaGlow should not be a[String] // has been converted
 			schemaGlow shouldEqual `array`(`string`)
 			
@@ -138,12 +138,12 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			And("converting the andy glow schema to skeuo schema")
-			val schemaSkeuo: SchemaJson_Skeuo[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
+			val schemaSkeuo: JsonSchema_S[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
 			
 			
 			Then("result should be a skeuo adt json schema")
-			schemaSkeuo shouldBe a[SchemaJson_Skeuo[_]]
-			schemaSkeuo shouldEqual SchemaJson_Skeuo.ArrayF(SchemaJson_Skeuo.StringF())
+			schemaSkeuo shouldBe a[JsonSchema_S[_]]
+			schemaSkeuo shouldEqual JsonSchema_S.ArrayF(JsonSchema_S.StringF())
 			
 			info(s"schemaSkeuo = ${schemaSkeuo}")
 			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(schemaSkeuo)}")
@@ -169,10 +169,10 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			When("parsing")
-			val schemaGlow: SchemaJson_Glow[_] = parseType(jsonSchemaStr).value
+			val schemaGlow: JsonSchema_G[_] = parseType(jsonSchemaStr).value
 			
 			Then("result should be `array`(`array`(`array`(`integer`)))) (schema-adt from andy glow)")
-			schemaGlow shouldBe a[SchemaJson_Glow[_]]
+			schemaGlow shouldBe a[JsonSchema_G[_]]
 			schemaGlow should not be a[String] // has been converted
 			schemaGlow shouldEqual `array`(`array`(`array`(`integer`)))
 			
@@ -183,12 +183,12 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			And("converting the andy glow schema to skeuo schema")
-			val schemaSkeuo: SchemaJson_Skeuo[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
+			val schemaSkeuo: JsonSchema_S[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
 			
 			
 			Then("result should be a skeuo adt json schema")
-			schemaSkeuo shouldBe a[SchemaJson_Skeuo[_]]
-			schemaSkeuo shouldEqual SchemaJson_Skeuo.ArrayF(SchemaJson_Skeuo.ArrayF(SchemaJson_Skeuo.ArrayF(SchemaJson_Skeuo.IntegerF())))
+			schemaSkeuo shouldBe a[JsonSchema_S[_]]
+			schemaSkeuo shouldEqual JsonSchema_S.ArrayF(JsonSchema_S.ArrayF(JsonSchema_S.ArrayF(JsonSchema_S.IntegerF())))
 			
 			info(s"schemaSkeuo = ${schemaSkeuo}")
 			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(schemaSkeuo)}")
@@ -227,11 +227,11 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 				  |""".stripMargin
 			
 			When("parsing")
-			val schemaGlowTry: Try[SchemaJson_Glow[_]] = parseType(sampleSchemaJsonRaw)
-			val schemaGlow: SchemaJson_Glow[_] = schemaGlowTry.value
+			val schemaGlowTry: Try[JsonSchema_G[_]] = parseType(sampleSchemaJsonRaw)
+			val schemaGlow: JsonSchema_G[_] = schemaGlowTry.value
 			
 			Then("result should be a schema-adt from Andy Glow")
-			schemaGlow shouldBe a[SchemaJson_Glow[_]]
+			schemaGlow shouldBe a[JsonSchema_G[_]]
 			schemaGlow should not be a[String] // has been converted
 			
 			
@@ -243,11 +243,11 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			And("converting the andy glow schema to skeuo schema")
-			val schemaSkeuo: SchemaJson_Skeuo[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
+			val schemaSkeuo: JsonSchema_S[Any] = andyGlowToSkeuoJsonSchema(schemaGlow) // TODO parameter instead of Any?
 			
 			
 			Then("result should be a skeuo adt json schema")
-			schemaSkeuo shouldBe a[SchemaJson_Skeuo[_]]
+			schemaSkeuo shouldBe a[JsonSchema_S[_]]
 			// TODO update here
 			//schemaSkeuo shouldEqual ArrayF(ArrayF(ArrayF(IntegerF())))
 			

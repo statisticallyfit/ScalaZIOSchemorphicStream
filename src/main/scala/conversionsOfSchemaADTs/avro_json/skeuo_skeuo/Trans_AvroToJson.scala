@@ -10,15 +10,15 @@ import higherkindness.droste._
 import higherkindness.droste.data.Fix
 //import higherkindness.droste.syntax.all._
 
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
-import SchemaAvro_Skeuo._
+import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
+import AvroSchema_S._
 
 
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
-import SchemaJson_Skeuo._
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import JsonSchema_S._
 
-import SchemaAvro_Skeuo.{Field ⇒ FieldAvro}
-import SchemaJson_Skeuo.{Property ⇒ PropertyJson}
+import AvroSchema_S.{Field ⇒ FieldAvro}
+import JsonSchema_S.{Property ⇒ PropertyJson}
 
 import scala.reflect.runtime.universe._
 
@@ -36,7 +36,7 @@ import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
  */
 object Trans_AvroToJson {
 
-	def transJ/*[T: TypeTag]*/: Trans[SchemaAvro_Skeuo, SchemaJson_Skeuo, SchemaJson_Skeuo.Fixed] = Trans {
+	def transJ/*[T: TypeTag]*/: Trans[AvroSchema_S, JsonSchema_S, Fix[JsonSchema_S]] = Trans {
 		
 		case TNull() ⇒ ObjectF(List(), List())
 		case TInt() ⇒ IntegerF()
@@ -47,7 +47,7 @@ object Trans_AvroToJson {
 		
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fixed]]) ⇒ {
 			
-			val ps: List[Property[Fixed]] =  fields.map((f: FieldAvro[Fixed]) ⇒ field2Property(f))
+			val ps: List[Property[Fix[JsonSchema_S]]] =  fields.map((f: FieldAvro[Fix[JsonSchema_S]]) ⇒ field2Property(f))
 			val rs: List[String] = fields.map(f ⇒ f.name)
 			
 			ObjectF(ps, rs)
@@ -56,7 +56,7 @@ object Trans_AvroToJson {
 	}
 	
 	
-	def transform_AvroToJsonSkeuo[T: TypeTag]: Trans[SchemaAvro_Skeuo, SchemaJson_Skeuo, T] = Trans {
+	def transform_AvroToJsonSkeuo[T: TypeTag]: Trans[AvroSchema_S, JsonSchema_S, T] = Trans {
 		
 		// NOTE: in the Avro file here (CityMesh - devs - datasource) the 'symbol' has type 'null' and in json the 'symbol' has type 'object' with  required = [], and properties = {}
 		// path = /development/projects/statisticallyfit/github/learningdataflow/SchaemeowMorphism/src/test/scala/testData/testDataPrivateTati/asset-schemas/sdp-asset-schemas-citymesh/src/main/trafficflow/ctm.tf_devs/ctm.tf_devs.datasource/

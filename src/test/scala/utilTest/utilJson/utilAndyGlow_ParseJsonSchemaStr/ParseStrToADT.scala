@@ -8,7 +8,7 @@ import scala.util.Try
 //import com.github.andyglow.jsonschema.ParseJsonSchema
 
 import com.github.andyglow.scalamigration._
-import json.{Schema ⇒ SchemaJson_Glow}
+import json.{Schema ⇒ JsonSchema_G}
 
 //import utilTest.utilJson.utilAndyGlow_ParseJsonSchema.ParseJsonSchema
 
@@ -16,7 +16,7 @@ import json.{Schema ⇒ SchemaJson_Glow}
  *
  */
 object ParseStrToADT {
-	def parseType(x: String): Try[SchemaJson_Glow[_]] = {
+	def parseType(x: String): Try[JsonSchema_G[_]] = {
 		
 		//val firstPart: Try[Value.obj] = (ParseJson(x) find { case e: Value.obj => e })
 		

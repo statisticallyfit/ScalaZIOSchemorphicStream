@@ -1,9 +1,9 @@
 package utilMain.utilAvro.utilSkeuoApache
 
 import com.fasterxml.jackson.databind.node.JsonNodeType
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
+import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
 import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldSkeuo, Order ⇒ OrderSkeuo}
-import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
+import org.apache.avro.{Schema ⇒ AvroSchema_A}
 import org.apache.avro.Schema.{Field ⇒ FieldApache}
 import org.apache.avro.Schema.Field.{Order ⇒ OrderApache}
 
@@ -23,9 +23,9 @@ object FieldAndOrderConversions {
 	type FieldS[T] = FieldSkeuo[T]
 	
 	
-	def order2Order_AS: OrderA ⇒ OrderS = SchemaAvro_Skeuo.order2Order
+	def order2Order_AS: OrderA ⇒ OrderS = AvroSchema_S.order2Order
 	
-	def field2Field_AS: FieldA ⇒ FieldS[SchemaAvro_Apache] = SchemaAvro_Skeuo.field2Field
+	def field2Field_AS: FieldA ⇒ FieldS[AvroSchema_A] = AvroSchema_S.field2Field
 	
 	def order2Order_SA: OrderS ⇒ OrderA = (orderS: OrderS) ⇒ orderS match {
 		case OrderSkeuo.Ascending ⇒ OrderApache.ASCENDING
@@ -33,12 +33,12 @@ object FieldAndOrderConversions {
 		case OrderSkeuo.Ignore ⇒ OrderApache.IGNORE
 	}
 	
-	def field2Field_SA: FieldS[SchemaAvro_Apache] ⇒ FieldA =
-		(fieldS: FieldS[SchemaAvro_Apache]) ⇒ {
+	def field2Field_SA: FieldS[AvroSchema_A] ⇒ FieldA =
+		(fieldS: FieldS[AvroSchema_A]) ⇒ {
 			//val t: util.List[String] = fieldS.aliases.asJava
 			
 			val fName: String = fieldS.name
-			val fSchema: SchemaAvro_Apache = fieldS.tpe
+			val fSchema: AvroSchema_A = fieldS.tpe
 			//val fieldApache_doc: String = fieldS.doc.getOrElse("") //("NO DOC")
 			val fDoc: Null = null
 			val fDefaultValue: Null = null // NOTE: put assumption that null means it does not appear when printed in the Apache Schema

@@ -7,6 +7,13 @@ scalaVersion := "2.12.17" //"2.13.10" //"2.12.17"
 
 //crossScalaVersions := Seq("2.11.11", "2.12.17")
 
+
+//set global / Test /
+Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.AllLibraryJars
+//Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
+
+
+
 /*assumedEvictionErrorLevel := Level.Error
 //assumedVersionScheme := VersionScheme.EarlySemVer
 libraryDependencySchemes += "org.scala-lang.modules" %% "scala-java8-compat" % VersionScheme.Always*/
@@ -148,21 +155,21 @@ lazy val global = project
 			allDependencies.saul_autoschema,
 			
 			allDependencies.docless,
-			/*allDependencies.opetushallitus_scalaschema,
+			allDependencies.opetushallitus_scalaschema,
 		// Dependency (fge) for opetus hallitus - was not pulled in by itself, why?
 			allDependencies.fge_jsonschemavalidator,
 		// Dependecy (json4s-core, ast, jackson) - versioning error. If for all the json4s libs, if I don't keep
 			// the version the same, and state them explciitly here, then compiler complains with classpath error (jvalue not found)
 			// Solution source = https://stackoverflow.com/a/47669923
-			allDependencies.json4s,
+			//allDependencies.json4s,
 			allDependencies.json4s_jackson,
-			allDependencies.json4s_jackson_core,
-			allDependencies.json4s_core,
+			//allDependencies.json4s_jackson_core,
+			//allDependencies.json4s_core,
 			allDependencies.json4s_ast,
-			allDependencies.json4s_native,
-			allDependencies.json4s_native_core,
+			//allDependencies.json4s_native,
+			//allDependencies.json4s_native_core,
 			allDependencies.json4s_ext,
-			allDependencies.json4s_scalap,*/
+			//allDependencies.json4s_scalap,
 			
 			allDependencies.avroTools_for_avdlToAvsc,
 			
@@ -232,7 +239,7 @@ lazy val allDependencies =
 		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
 		
 		val versionOfSaulAutoschema = "1.0.4"
-		val versionOfOpetushallitus = "2.23.0_2.12"
+		val versionOfOpetushallitus = "2.33.0_2.12_beta" //"2.23.0_2.12"
 		// Try downgrading to 3.6.6 because of "NoClassDefFoundError" for Jvalue
 		// Source = https://stackoverflow.com/questions/69912882/java-lang-classnotfoundexception-org-json4s-jsonastjvalue
 		val versionOfJson4s_simple = "3.2.11" // for scala 2.11
