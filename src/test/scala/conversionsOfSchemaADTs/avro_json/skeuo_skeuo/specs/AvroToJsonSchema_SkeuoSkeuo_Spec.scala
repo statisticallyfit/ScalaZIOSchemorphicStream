@@ -1,27 +1,35 @@
-package conversionsOfSchemaADTs.avro_json.skeuo_S.specs
+package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 
 //import cats.syntax.all._
 
 import higherkindness.droste._
 import higherkindness.droste.data.Fix
 import higherkindness.droste.syntax.all._
+
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
+
 import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
+import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
+
 import io.circe.{Decoder, DecodingFailure, Json ⇒ JsonCirce}
 import io.circe.Decoder.Result
 import higherkindness.skeuomorph.openapi.JsonDecoders._
-import utilTest.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
+
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans._
 import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
+
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
 import AvroSchema_S._
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
 import JsonSchema_S._
+
+import org.json4s.JValue
+
 import testData.schemaData.avroData.skeuoData.Data._
-import testData.schemaData.jsonData.skeuoData.Data._
+import testData.rawstringData.jsonData.Data._
 
 
 
@@ -149,50 +157,7 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			info(s"--- skeuo-json -> json circe = \n${JsonSchema_S.render(nullJson_Circe_S).manicure}")
 			
 			
-			// TODO HERE - using opetushallitus to take json data -> json schema
-			import scala.reflect.runtime.universe._
-			import fi.oph.scalaschema.{SchemaFactory, SchemaToJson, Schema ⇒ SchemaJson_Opetus}
-			//import org.json4s.package.JValue
 			
-			import org.json4s.jackson.JsonMethods
-			import org.json4s.jackson.JsonMethods._ //asJsonNode
-			import org.json4s.JsonAST.{JObject}
-			import org.json4s.{JNull, JInt, JString, JArray}
-			
-			import com.github.fge.jsonschema.core.report.ListReportProvider
-			import com.github.fge.jsonschema.core.report.LogLevel.{ERROR, FATAL}
-			import com.github.fge.jsonschema.main.{JsonSchemaFactory, JsonValidator}
-			
-			object helpers {
-				def schemaOf(c: Class[_]) = SchemaFactory.default.createSchema(c)
-				
-				def jsonSchemaOf[T: TypeTag]: String = jsonSchemaOf(SchemaFactory.default.createSchema[T])
-				
-				def jsonSchemaOf(c: Class[_]): String = jsonSchemaOf(schemaOf(c))
-				
-				def jsonSchemaOf(s: SchemaJson_Opetus): String = {
-					val schemaJson = s.toJson
-					// Just check that the created schema is a valid JSON schema, ignore validation results
-					jsonSchemaFactory.getJsonSchema(asJsonNode(SchemaToJson.toJsonSchema(s))).validate(asJsonNode(JObject()))
-					JsonMethods.compact(schemaJson)
-				}
-				
-				private lazy val jsonSchemaFactory = JsonSchemaFactory.newBuilder.setReportProvider(new ListReportProvider(ERROR, FATAL)).freeze()
-			}
-			import helpers._
-			
-			// HELP left off here issue with json4s import (not for scala 2.12)
-			val nulljc: String = jsonSchemaOf(JNull.getClass)
-			//val nulljc = jsonSchemaOf(classOf[JNull.type])
-			val intjc = jsonSchemaOf[JInt]
-			val strjc = jsonSchemaOf[JString]
-			val arrjc = jsonSchemaOf[JArray]
-			
-			info(s"--- OPETUS HALLITUS: json data -> json schema circe")
-			info(s"nulljc = $nulljc")
-			info(s"intjc = $intjc")
-			info(s"strjc = $strjc")
-			info(s"arrjc = $arrjc")
 			
 			
 			
@@ -219,6 +184,10 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 		Scenario("array of int") {
 			
 			Given("skeuo-avro-schema")
+			
+			
+			
+			
 			
 			// value-check
 			List(
@@ -287,30 +256,8 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			
 			// TODO put in "test()" / or in "should" form:
 			//  And("--- skeuo-avro (fix) --> apache-avro: \nThe avro-apache string should coincide with the json circe string")
+			import conversionsOfSchemaADTs.avro_json.parsing.ParseChecker._
 			
-			def strToCirceToSkeuoJson(rawJsonStr: String): Option[Fix[JsonSchema_S]] = {
-				val parsed: JsonCirce = unsafeParse(rawJsonStr)
-				val decoded: Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(parsed)
-				
-				decoded.getOrElse(None) match {
-					case None ⇒ None
-					case v:Fix[JsonSchema_S] ⇒ Some(v)
-				}
-			}
-			
-			def strToCirceToSkeuoAvro(rawJsonStr: String): Option[Fix[AvroSchema_S]] = {
-				val parsed: JsonCirce = unsafeParse(rawJsonStr)
-				
-				import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
-				
-				
-				val decoded: Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(parsed)
-				
-				decoded.getOrElse(None) match {
-					case None ⇒ None
-					case v: Fix[AvroSchema_S] ⇒ Some(v)
-				}
-			}
 			
 			info(s"-------------------------------" +
 				s"\nCHECK 1" +
@@ -368,6 +315,41 @@ class AvroToJsonSchema_SkeuoSkeuo_Spec  extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			// TODO left off here (avro issues) to convert myToJson result from json-value into json-schema because now it gives Left('not well formed") error
+			
+			
+			/*import scala.reflect.runtime.universe._
+			
+			import fi.oph.scalaschema.{SchemaFactory, SchemaToJson, Schema ⇒ SchemaJson_Opetus}
+			//import org.json4s.package.JValue
+			
+			import org.json4s.jackson.JsonMethods
+			import org.json4s.jackson.JsonMethods._ //asJsonNode
+			import org.json4s.JsonAST.{JObject, JNull, JInt, JString, JArray}
+			import org.json4s.JsonAST.JValue
+			
+			//import org.json4s.{JNull, JInt, JString, JArray}
+			
+			
+			import com.github.fge.jsonschema.core.report.ListReportProvider
+			import com.github.fge.jsonschema.core.report.LogLevel.{ERROR, FATAL}
+			import com.github.fge.jsonschema.main.{JsonSchemaFactory, JsonValidator}
+			
+			import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs.HELP_Opetushallitus_jdata_to_jschema.helpers._
+			
+			val j: JValue = JNull
+			
+			// HELP left off here issue with json4s import (not for scala 2.12)
+			val nulljc: String = jsonSchemaOf(JNull.getClass)
+			//val nulljc = jsonSchemaOf(classOf[JNull.type])
+			val intjc = jsonSchemaOf[JInt]
+			val strjc = jsonSchemaOf[JString]
+			val arrjc = jsonSchemaOf[JArray]
+			
+			println(s"--- OPETUS HALLITUS: json data -> json schema circe")
+			println(s"nulljc = $nulljc")
+			println(s"intjc = $intjc")
+			println(s"strjc = $strjc")
+			println(s"arrjc = $arrjc")*/
 			
 		}
 	}

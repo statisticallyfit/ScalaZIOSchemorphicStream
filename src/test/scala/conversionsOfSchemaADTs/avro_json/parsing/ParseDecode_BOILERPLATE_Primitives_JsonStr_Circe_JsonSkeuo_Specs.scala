@@ -40,7 +40,7 @@ import conversionsOfSchemaADTs.avro_json.parsing.ParseChecker
 /**
  *
  */
-class ParseDecode_BOILERPLATE_Primitives_JsonStr_Circe_JsonSkeuo extends AnyFunSuite with Matchers {
+class ParseDecode_BOILERPLATE_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends AnyFunSuite with Matchers {
 	
 	
 	

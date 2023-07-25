@@ -1,4 +1,4 @@
-package utilTest.utilJson.utilSkeuo_ParseJsonSchemaStr
+package utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr
 
 import io.circe.{Json ⇒ JsonCirce}
 import io.circe.parser.parse

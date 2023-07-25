@@ -9,9 +9,8 @@ scalaVersion := "2.12.17" //"2.13.10" //"2.12.17"
 
 
 //set global / Test /
-Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.AllLibraryJars
+Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary
 //Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
-
 
 
 /*assumedEvictionErrorLevel := Level.Error
@@ -75,7 +74,7 @@ sbt:SchaemeowMorphism> compile
 [error]
 [error] this can be overridden using libraryDependencySchemes or evictionErrorLevel
 
- */
+*/
 
 //addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10")
 
@@ -156,9 +155,9 @@ lazy val global = project
 			
 			allDependencies.docless,
 			allDependencies.opetushallitus_scalaschema,
-		// Dependency (fge) for opetus hallitus - was not pulled in by itself, why?
+			// Dependency (fge) for opetus hallitus - was not pulled in by itself, why?
 			allDependencies.fge_jsonschemavalidator,
-		// Dependecy (json4s-core, ast, jackson) - versioning error. If for all the json4s libs, if I don't keep
+			// Dependecy (json4s-core, ast, jackson) - versioning error. If for all the json4s libs, if I don't keep
 			// the version the same, and state them explciitly here, then compiler complains with classpath error (jvalue not found)
 			// Solution source = https://stackoverflow.com/a/47669923
 			//allDependencies.json4s,
@@ -347,7 +346,6 @@ lazy val allDependencies =
 		val andyGlow_jsonschema_Enumeratum = "com.github.andyglow" %% "scala-jsonschema-enumeratum" % versionOfAndyGlowScalaJsonSchema // <-- optional
 		// zero-dependency json and jsonschema parser
 		val andyGlow_jsonschema_Parser = "com.github.andyglow" %% "scala-jsonschema-parser" % versionOfAndyGlowScalaJsonSchema // <-- optional
-		
 		
 		
 		val saul_autoschema = "com.sauldhernandez" %% "autoschema" % versionOfSaulAutoschema

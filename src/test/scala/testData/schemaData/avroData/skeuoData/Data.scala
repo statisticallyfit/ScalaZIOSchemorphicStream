@@ -39,10 +39,12 @@ object Data {
 	val arrayStrAvro_Fix_S: Fix[AvroSchema_S] = Fix(TArray(Fix(TString())))
 	
 	
-	val arrayIntAvro3_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[AvroSchema_S[Int]]]] = TArray(TArray(TArray(TInt())))
-	val arrayIntAvro3_Circe_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[AvroSchema_S[JsonCirce]]]] = TArray(TArray(TArray(TInt())))
-	val arrayIntAvro3_Fix_S: Fix[AvroSchema_S]  = Fix(TArray(Fix(TArray(Fix(TArray(Fix(TInt())))))))
+	val array3IntAvro_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[AvroSchema_S[Int]]]] = TArray(TArray(TArray(TInt())))
+	val array3IntAvro_Circe_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[AvroSchema_S[JsonCirce]]]] = TArray(TArray(TArray(TInt())))
+	val array3IntAvro_Fix_S: Fix[AvroSchema_S]  = Fix(TArray(Fix(TArray(Fix(TArray(Fix(TInt())))))))
 	
+	
+	//val record // TODO record position, location
 	
 	// NOTE; trying to copy avro schema "RawCityMesh - devs - datasource
 	// TODO what is the inner type parameter?
@@ -57,6 +59,8 @@ object Data {
 				)
 			))
 	))*/
+	
+	// TODO alter these to be more understandable (canonical record datas, not examples)
 	
 	val recordStringAvro_S: AvroSchema_S[AvroSchema_S[Nothing]] = TRecord(
 		name = "StringRecord",

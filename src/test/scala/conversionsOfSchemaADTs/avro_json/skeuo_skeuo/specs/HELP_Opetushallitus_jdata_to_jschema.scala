@@ -13,6 +13,12 @@ import org.json4s.JsonAST.JValue
 
 //import org.json4s.{JNull, JInt, JString, JArray}
 
+
+import com.github.fge.jsonschema.core.report.ListReportProvider
+import com.github.fge.jsonschema.core.report.LogLevel.{ERROR, FATAL}
+import com.github.fge.jsonschema.main.{JsonSchemaFactory, JsonValidator}
+
+
 /**
  *
  */
@@ -22,10 +28,6 @@ object HELP_Opetushallitus_jdata_to_jschema {
 	// TODO HERE - using opetushallitus to take json data -> json schema
 	
 	
-	
-	import com.github.fge.jsonschema.core.report.ListReportProvider
-	import com.github.fge.jsonschema.core.report.LogLevel.{ERROR, FATAL}
-	import com.github.fge.jsonschema.main.{JsonSchemaFactory, JsonValidator}
 	
 	
 	object helpers {

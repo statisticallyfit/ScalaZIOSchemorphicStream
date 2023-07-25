@@ -38,21 +38,139 @@ object Trans_AvroToJson {
 
 	def transJ/*[T: TypeTag]*/: Trans[AvroSchema_S, JsonSchema_S, Fix[JsonSchema_S]] = Trans {
 		
-		case TNull() ⇒ ObjectF(List(), List())
+				// TODO find out if this mapping is correct
+		case TNull() ⇒ ObjectF(List(
+			Property(name = "null", tpe = Fix(StringF()))
+		), List())
+		
 		case TInt() ⇒ IntegerF()
 		
 		case TString() ⇒ StringF()
 		
-		case TArray(inner: Fixed) ⇒ ArrayF(inner)
+		case TBoolean() ⇒ BooleanF()
+		
+		case TLong() ⇒ LongF()
+		
+		case TFloat() ⇒ FloatF()
+		
+		case TDouble() ⇒ DoubleF()
+		
+		case TBytes() ⇒ ByteF()
+		
+		case TArray(inner: Fix[JsonSchema_S]) ⇒ ArrayF(inner)
+		
+		// Source: avro map -> json map = https://hyp.is/ixmlxio5Ee6pv28sNQ9XaA/docs.airbyte.com/understanding-airbyte/json-avro-conversion/
+		// TODO find in file: map example
+		case TMap(inner: Fix[JsonSchema_S]) ⇒ {
+			
+			val ps: List[Property[Fix[JsonSchema_S]]] = List(
+				Property(name = "map", tpe = inner)
+			)
+			
+			val rs: List[String] = List()
+			
+			ObjectF(ps, rs)
+		}
 		
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fixed]]) ⇒ {
 			
 			val ps: List[Property[Fix[JsonSchema_S]]] =  fields.map((f: FieldAvro[Fix[JsonSchema_S]]) ⇒ field2Property(f))
 			val rs: List[String] = fields.map(f ⇒ f.name)
 			
-			ObjectF(ps, rs)
+			//ObjectF(ps, rs)
+			ObjectF(
+				properties = List(
+					Property(name = name, tpe = Fix(ObjectF(ps, rs)))
+				), // TODO compare to below structure
+				required = List("name") // TODO
+			)
 			
 		}
+		
+		// TODO HELP  cannot create property because no tpe: A object is provided ...
+		//case TNamedType(namespace: String, name: String) ⇒ transJ(TRecord)
+		
+		
+		case TEnum(name: String,
+		namespace: Option[String],
+		aliases: List[String],
+		doc: Option[String],
+		symbols: List[String]) ⇒ {
+			
+			// TODO what happens to the rest of the info?
+			//EnumF(cases = symbols)
+			ObjectF(
+				properties = List(
+					Property(name = "enum", tpe = Fix(ObjectF(
+							properties = List(
+								Property(name = name, tpe = Fix(EnumF(cases = symbols)))),
+							required = List()
+							))
+					),
+					Property(name = "namespace", tpe = Fix(ObjectF(
+						properties = List(
+							Property(name = namespace.getOrElse(None), tpe = Fix(StringF()))
+						),
+						required = List()
+					)))
+				),
+				required = List("name", "namespace", "symbols") // TODO
+			)
+		}
+		
+		// Source: unions (avro) --> arrays (json)
+		// Source 2: toJson (data) function = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L274
+		case TUnion(options: cats.data.NonEmptyList[Fix[JsonSchema_S]]) ⇒
+			ArrayF(options.toList)
+		
+			
+			
+		case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) ⇒ {
+			
+			// TODO trying out a new layering strategy:
+			val ps: List[Property[Fix[JsonSchema_S]]] = List(
+				Property(name = "fixed", tpe = Fix(ObjectF(
+					properties = List(Property(name = name, tpe = Fix(StringF()))), // TODO name in here?
+					required = aliases // TODO?
+				))),
+				Property(name = "name", tpe = Fix(StringF())), // TODO or name out here?
+				Property(name = "size", tpe = Fix(IntegerF()))
+			)
+			val rs: List[String] = List() // TODO ??
+			
+			ObjectF(ps, rs)
+		}
+		
+		case TDate() ⇒ ObjectF(
+			properties = List(
+				Property(name = "type", tpe = Fix(IntegerF())),
+				Property(name = "logicalType", tpe = Fix(DateF()))
+			),
+			required = List()
+		)
+		case TTimestampMillis() ⇒ ObjectF(
+			properties = List(
+				Property(name = "type", tpe = Fix(LongF())),
+				Property(name = "logicalType", tpe = Fix(DateTimeF()))
+			),
+			required = List()
+		)
+		case TTimeMillis() ⇒ ObjectF(
+			properties = List(
+				Property(name = "type", tpe = Fix(IntegerF())),
+				Property(name = "logicalType", tpe = Fix(DateTimeF()))
+			),
+			required = List()
+		)
+		case TDecimal(precision: Int, scale:Int ) ⇒ ObjectF(
+			properties = List(
+				Property(name = "type", tpe = Fix(ByteF())), // TODO byte or fixed? (make another objectf to be fixed instead of byte here)
+				Property(name = "logicalType", tpe = Fix(DateTimeF())),
+				Property(name = "precision", tpe = Fix(IntegerF())),
+				Property(name = "scale", tpe = Fix(IntegerF()))
+			),
+			required = List() //List("decimal", "precision", "scale") // TODO ??
+		)
 	}
 	
 	

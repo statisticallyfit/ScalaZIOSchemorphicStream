@@ -40,7 +40,7 @@ import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
  * 2) json circe -> json-skeuo (using circe's decoder)
  *
  */
-class UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThen with Matchers {
+class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThen with Matchers {
 	
 	
 	
