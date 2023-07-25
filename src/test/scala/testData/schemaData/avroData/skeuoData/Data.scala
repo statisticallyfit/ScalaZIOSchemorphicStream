@@ -30,13 +30,13 @@ object Data {
 	val intAvro_Fix_S: Fix[AvroSchema_S] = Fix(TInt())
 	
 	
-	val arrayIntAvro_S: AvroSchema_S[AvroSchema_S[Int]] = TArray(TInt())
-	val arrayIntAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TArray(TInt())
-	val arrayIntAvro_Fix_S: Fix[AvroSchema_S] = Fix(TArray(Fix(TInt())))
+	val array1IntAvro_S: AvroSchema_S[AvroSchema_S[Int]] = TArray(TInt())
+	val array1IntAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TArray(TInt())
+	val array1IntAvro_Fix_S: Fix[AvroSchema_S] = Fix(TArray(Fix(TInt())))
 	
-	val arrayStrAvro_S: AvroSchema_S[AvroSchema_S[String]] = TArray(TString())
-	val arrayStrAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TArray(TString())
-	val arrayStrAvro_Fix_S: Fix[AvroSchema_S] = Fix(TArray(Fix(TString())))
+	val array1StrAvro_S: AvroSchema_S[AvroSchema_S[String]] = TArray(TString())
+	val array1StrAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TArray(TString())
+	val array1StrAvro_Fix_S: Fix[AvroSchema_S] = Fix(TArray(Fix(TString())))
 	
 	
 	val array3IntAvro_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[AvroSchema_S[Int]]]] = TArray(TArray(TArray(TInt())))
@@ -93,4 +93,12 @@ object Data {
 			)
 		)
 	))
+	
+	/**
+	 * TODO
+	 * null, int, string
+	 * boolean, long, float, double, bytes,
+	 * array
+	 * map, record, union, enum, union, fixed, date, timestamp-millis, time-mills, decimeal
+	 */
 }

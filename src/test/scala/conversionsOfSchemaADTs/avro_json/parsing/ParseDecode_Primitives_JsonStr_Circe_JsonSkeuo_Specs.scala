@@ -57,7 +57,7 @@ class ParseDecode_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends AnyFunSuite w
 			circeJsonStr shouldBe a[JsonCirce]
 			
 			
-			val decodedJsonSkeuo: Option[Fix[JsonSchema_S]] = ParseChecker.strToCirceToSkeuoJson(rawJsonStr)
+			val decodedJsonSkeuo: Option[Fix[JsonSchema_S]] = ParseStringToCirceToADT.strToCirceToSkeuoJson(rawJsonStr)
 			
 			// value check
 			decodedJsonSkeuo shouldEqual Some(checkerJsonSkeuo)
@@ -120,13 +120,13 @@ class ParseDecode_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends AnyFunSuite w
 	)
 	
 	testStructure("array of string",
-		givenRawJsonStr = arrayStrJson_R,
-		checkerJsonSkeuo = arrayStrJson_Fix_S
+		givenRawJsonStr = array1StrJson_R,
+		checkerJsonSkeuo = array1StrJson_Fix_S
 	)
 	
 	testStructure("array (triple) of int)",
-		givenRawJsonStr = arrayStrJson_R,
-		checkerJsonSkeuo = arrayStrJson_Fix_S
+		givenRawJsonStr = array1StrJson_R,
+		checkerJsonSkeuo = array1StrJson_Fix_S
 	)
 	
 	testStructure("map",
@@ -144,33 +144,34 @@ class ParseDecode_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends AnyFunSuite w
 		checkerJsonSkeuo = recordExampleJson_Location_Fix_S
 	)
 	
-	testStructure("enum",
-		givenRawJsonStr = strJson_R,
-		checkerJsonSkeuo = strJson_Fix_S
-	)
-	
-	testStructure("fixed",
-		givenRawJsonStr = strJson_R,
-		checkerJsonSkeuo = strJson_Fix_S
-	)
-	
-	testStructure("date",
-		givenRawJsonStr = strJson_R,
-		checkerJsonSkeuo = strJson_Fix_S
-	)
-	
-	testStructure("timestamp-millis",
-		givenRawJsonStr = strJson_R,
-		checkerJsonSkeuo = strJson_Fix_S
-	)
-	
-	testStructure("time-millis",
-		givenRawJsonStr = strJson_R,
-		checkerJsonSkeuo = strJson_Fix_S
-	)
-	
-	testStructure("decimal",
-		givenRawJsonStr = strJson_R,
-		checkerJsonSkeuo = strJson_Fix_S
-	)
+	// TODO FILL IN
+//	testStructure("enum",
+//		givenRawJsonStr = strJson_R,
+//		checkerJsonSkeuo = strJson_Fix_S
+//	)
+//
+//	testStructure("fixed",
+//		givenRawJsonStr = strJson_R,
+//		checkerJsonSkeuo = strJson_Fix_S
+//	)
+//
+//	testStructure("date",
+//		givenRawJsonStr = strJson_R,
+//		checkerJsonSkeuo = strJson_Fix_S
+//	)
+//
+//	testStructure("timestamp-millis",
+//		givenRawJsonStr = strJson_R,
+//		checkerJsonSkeuo = strJson_Fix_S
+//	)
+//
+//	testStructure("time-millis",
+//		givenRawJsonStr = strJson_R,
+//		checkerJsonSkeuo = strJson_Fix_S
+//	)
+//
+//	testStructure("decimal",
+//		givenRawJsonStr = strJson_R,
+//		checkerJsonSkeuo = strJson_Fix_S
+//	)
 }

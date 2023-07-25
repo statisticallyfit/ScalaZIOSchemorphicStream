@@ -16,7 +16,7 @@ import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 /**
  *
  */
-object ParseChecker {
+object ParseStringToCirceToADT {
 	
 	def strToCirceToSkeuoJson(rawJsonStr: String): Option[Fix[JsonSchema_S]] = {
 		val parsed: JsonCirce = unsafeParse(rawJsonStr)

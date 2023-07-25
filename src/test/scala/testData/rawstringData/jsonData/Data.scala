@@ -6,7 +6,14 @@ package testData.rawstringData.jsonData
 object Data {
 	
 	
-	val nullJson_R: String = "" // TODO print out again with render
+	val nullJson_R: String =
+		"""
+		  |{
+		  |  "type": "object",
+		  |  "properties": {},
+		  |  "required": []
+		  |}
+		  |""".stripMargin
 	
 	val intJson_R: String =
 		"""
@@ -24,7 +31,7 @@ object Data {
 		  |""".stripMargin
 		  
 
-	val arrayJson_R: String =
+	val array1StrJson_R: String =
 		"""
 		  |{
 		  |  "type": "array",
@@ -50,6 +57,12 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin
+	
+	
+	
+	// TODO MAP
+	
+	
 	
 	// NOTE (from autoschema generation not from original json file)
 	val recordExampleJson_Position_R: String =
@@ -114,4 +127,13 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin
+	
+	
+	/**
+	 * TODO
+	 * null, int, string
+	 * boolean, long, float, double, bytes,
+	 * array
+	 * map, record, union, enum, union, fixed, date, timestamp-millis, time-mills, decimeal
+	 */
 }

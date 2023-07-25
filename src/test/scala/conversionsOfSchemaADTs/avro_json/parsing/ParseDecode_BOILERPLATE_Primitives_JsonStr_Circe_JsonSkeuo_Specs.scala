@@ -34,7 +34,7 @@ import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 
-import conversionsOfSchemaADTs.avro_json.parsing.ParseChecker
+import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT
 
 
 /**
@@ -63,7 +63,7 @@ class ParseDecode_BOILERPLATE_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends A
 		circeJsonStr shouldBe a [JsonCirce]
 		
 		
-		val jsonSkeuoDecoded: Option[Fix[JsonSchema_S]] = ParseChecker.strToCirceToSkeuoJson(rawJsonStr)
+		val jsonSkeuoDecoded: Option[Fix[JsonSchema_S]] = ParseStringToCirceToADT.strToCirceToSkeuoJson(rawJsonStr)
 		
 		// value check
 		jsonSkeuoDecoded shouldEqual Some(StringF())
@@ -102,7 +102,7 @@ class ParseDecode_BOILERPLATE_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends A
 		circeJsonStr shouldBe a[JsonCirce]
 		
 		
-		val jsonSkeuoDecoded: Option[Fix[JsonSchema_S]] = ParseChecker.strToCirceToSkeuoJson(rawJsonStr)
+		val jsonSkeuoDecoded: Option[Fix[JsonSchema_S]] = ParseStringToCirceToADT.strToCirceToSkeuoJson(rawJsonStr)
 		
 		// value check
 		jsonSkeuoDecoded shouldEqual Some(IntegerF())
@@ -143,7 +143,7 @@ class ParseDecode_BOILERPLATE_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends A
 		circeJsonStr shouldBe a[JsonCirce]
 		
 		
-		val jsonSkeuoDecoded: Option[Fix[JsonSchema_S]] = ParseChecker.strToCirceToSkeuoJson(rawJsonStr)
+		val jsonSkeuoDecoded: Option[Fix[JsonSchema_S]] = ParseStringToCirceToADT.strToCirceToSkeuoJson(rawJsonStr)
 		
 		// value check
 		jsonSkeuoDecoded shouldEqual Some(StringF())

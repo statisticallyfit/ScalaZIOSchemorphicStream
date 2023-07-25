@@ -39,7 +39,8 @@ object Trans_AvroToJson {
 	def transJ/*[T: TypeTag]*/: Trans[AvroSchema_S, JsonSchema_S, Fix[JsonSchema_S]] = Trans {
 		
 				// TODO find out if this mapping is correct
-		case TNull() ⇒ ObjectF(List(
+		case TNull() ⇒
+			ObjectF(List(
 			Property(name = "null", tpe = Fix(StringF()))
 		), List())
 		
@@ -109,7 +110,7 @@ object Trans_AvroToJson {
 					),
 					Property(name = "namespace", tpe = Fix(ObjectF(
 						properties = List(
-							Property(name = namespace.getOrElse(None), tpe = Fix(StringF()))
+							Property(name = namespace.getOrElse(""), tpe = Fix(StringF()))
 						),
 						required = List()
 					)))
@@ -121,10 +122,11 @@ object Trans_AvroToJson {
 		// Source: unions (avro) --> arrays (json)
 		// Source 2: toJson (data) function = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L274
 		case TUnion(options: cats.data.NonEmptyList[Fix[JsonSchema_S]]) ⇒
-			ArrayF(options.toList)
+			ArrayF(options.head )
+		// TODO check how to get just one value to get the type Fix[JsonSchema_S] for array
 		
-			
-			
+		
+		
 		case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) ⇒ {
 			
 			// TODO trying out a new layering strategy:
@@ -174,7 +176,7 @@ object Trans_AvroToJson {
 	}
 	
 	
-	def transform_AvroToJsonSkeuo[T: TypeTag]: Trans[AvroSchema_S, JsonSchema_S, T] = Trans {
+	/*def transform_AvroToJsonSkeuo[T: TypeTag]: Trans[AvroSchema_S, JsonSchema_S, T] = Trans {
 		
 		// NOTE: in the Avro file here (CityMesh - devs - datasource) the 'symbol' has type 'null' and in json the 'symbol' has type 'object' with  required = [], and properties = {}
 		// path = /development/projects/statisticallyfit/github/learningdataflow/SchaemeowMorphism/src/test/scala/testData/testDataPrivateTati/asset-schemas/sdp-asset-schemas-citymesh/src/main/trafficflow/ctm.tf_devs/ctm.tf_devs.datasource/
@@ -209,5 +211,5 @@ object Trans_AvroToJson {
 
 		}
 		
-	}
+	}*/
 }
