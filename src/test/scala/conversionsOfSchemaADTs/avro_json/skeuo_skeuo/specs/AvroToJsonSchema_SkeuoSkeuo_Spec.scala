@@ -29,6 +29,7 @@ import JsonSchema_S._
 import org.json4s.JValue
 
 import testData.schemaData.avroData.skeuoData.Data._
+import testData.schemaData.jsonData.skeuoData.Data._
 import testData.rawstringData.jsonData.Data._
 
 

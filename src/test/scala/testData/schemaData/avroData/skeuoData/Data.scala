@@ -78,7 +78,7 @@ object Data {
 		)
 	)
 	
-	val recordStringAvro_SFix: Fix[AvroSchema_S]  = Fix(TRecord(
+	val recordStringAvro_Fix_S: Fix[AvroSchema_S]  = Fix(TRecord(
 		name = "StringRecord",
 		namespace = Some("StringNamespace"),
 		aliases = List("a1", "a2"),
