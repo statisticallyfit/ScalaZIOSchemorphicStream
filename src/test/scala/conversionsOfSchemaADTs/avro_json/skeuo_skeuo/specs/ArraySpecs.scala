@@ -139,7 +139,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					s"\nskeuo-avro: \n$avroFix" +
 					s"\njson-circe: \n${libToJson(avroFix).manicure}" +
 					s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
-					s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${strToCirceToSkeuoJson(redocly_jsonSchemaFromData)}" +
+					s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${strToCirceToSkeuoAvro(redocly_jsonSchemaFromData)}" +
 					s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(strToCirceToSkeuoJson(redocly_jsonSchemaFromData).get)}" +
 					s"\nskeuo-avro: \n${checker_AvroSkeuo_toJsonCirce_toAvroSkeuo(avroFix)}")
 				
