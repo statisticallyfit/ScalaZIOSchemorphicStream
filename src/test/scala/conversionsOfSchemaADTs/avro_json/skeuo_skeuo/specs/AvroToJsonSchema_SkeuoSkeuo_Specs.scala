@@ -43,156 +43,19 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs  extends AnyFeatureSpec with GivenWhenTh
 
 	Feature("Convert skeuo-avro-adt to skeuo-json-adt (basic primitives)"){
 		
-		Scenario("null"){
-			
-			Given("skeuo-avro-schema")
-			
-			// value-level check
-			nullAvro_S shouldEqual TNull()
-			nullAvro_Fix_S shouldEqual TNull()
-			nullAvro_Circe_S shouldEqual TNull()
-			
-			// type-level check
-			nullAvro_S shouldBe a[AvroSchema_S[_]]
-			UtilMain.getFuncTypeSubs(nullAvro_S) shouldEqual "AvroSchema_S[Null]"
-			
-			// HELP error says: no classtag available for Fix
-			//nullAvro_Fix_S shouldBe a[Fix[AvroSchema_S]]
-			UtilMain.getFuncTypeSubs(nullAvro_Fix_S) should equal("Fix[AvroSchema_S]")
-			
-			nullAvro_Circe_S shouldBe a[AvroSchema_S[_]]
-			UtilMain.getFuncTypeSubs(nullAvro_Circe_S) should equal("AvroSchema_S[JsonCirce]")
-			
-			
-			info(s"CHECK skuo-fix == skeuo-simple = ${nullAvro_S === nullAvro_Fix_S}")
-			
-			/*info(s"skeuo-avro = $nullAvro_S | type = ${UtilMain.getFuncTypeSubs(nullAvro_S)}")
-			info(s"skeuo-avro (fix) = $nullAvro_SFix | type = ${UtilMain.getFuncTypeSubs(nullAvro_SFix)}")
-			info(s"skeuo-avro (circe) = $nullAvro_SC | type = ${UtilMain.getFuncTypeSubs(nullAvro_SC)}")*/
-			
-			
-			When("converting to skeuo-json-schema by applying the function")
-			
-			/*List(
-				avroToJsonFunction[Null],
-				avroToJsonFunction[JsonCirce],
-				avroToJsonFunction[Fix[AvroSchema_S]]
-			).map(
-				func ⇒ func shouldBe a [AvroSchema_S[_] => JsonSchema_S[_]]
-			)
-			
-			
-			UtilMain.getFuncTypeSubs(avroToJsonFunction[Null]) shouldEqual "AvroSchema_S[Null] => JsonSchema_S[Null]"
-			
-			UtilMain.getFuncTypeSubs(avroToJsonFunction[JsonCirce]) shouldEqual "AvroSchema_S[JsonCirce] => JsonSchema_S[JsonCirce]"
-			
-			UtilMain.getFuncTypeSubs(avroToJsonFunction[Fix[AvroSchema_S]]) shouldEqual "AvroSchema_S[Fix[AvroSchema_S]] => JsonSchema_S[Fix[AvroSchema_S]]"*/
-			
-			/*info(s"func type = ${UtilMain.getFuncTypeSubs(avroToJsonFunction[Null])}")
-			info(s"func type (circe) = ${UtilMain.getFuncTypeSubs(avroToJsonFunction[JsonCirce])}")
-			info(s"func type (fix) = ${UtilMain.getFuncTypeSubs(avroToJsonFunction[Fix[AvroSchema_S]])}")*/
-			
-			
-			// TODO next:
-			// 1) str -> json circe -> skeuo-json-fixed (to be able to create tests from desired string output to skeuo and then check if that skeuo is matching my generated skeuo)
-			// 2) str -> apache avro (parser!) -> skeuo-avro (create tests from desired avro string to skeuo-avro)
-			// 3) ... from 2), get skeuo-avro -> json circe (using toJson call) (reason: to get from avro-str -> json circe)
-			// 4) skeuo-json -> json circe (using render() call)
-			
-			
-			
-			Then("skeuo-json-schema should be correctly generated")
-			
-			val jsonSkeuo = avroToJson_byCataTransAlg(nullAvro_Fix_S)
-			
-			/*val jsonSkeuo: JsonSchema_S[Null] = avroToJson(nullAvro_S)
-			val jsonSkeuo_C: JsonSchema_S[JsonCirce] = avroToJson[JsonCirce](nullAvro_Circe_S)
-			val jsonSkeuo_UF: JsonSchema_S[Fix[AvroSchema_S]] = avroToJson(nullAvro_Fix_S.unfix)*/
-			
-			
-			// value-level check
-			/*List(jsonSkeuo, jsonSkeuo_C, jsonSkeuo_UF,
-				nullJson_S,
-				ObjectF(properties = List(), required = List())
-			).distinct.length should equal(1)
-			
-			// type-level check
-			List(
-				jsonSkeuo, jsonSkeuo_C, jsonSkeuo_UF
-			).map(js ⇒ js shouldBe a [JsonSchema_S[_]])
-			
-			UtilMain.getFuncTypeSubs(jsonSkeuo) shouldEqual "JsonSchema_S[Null]"
-			UtilMain.getFuncTypeSubs(jsonSkeuo_C) shouldEqual "JsonSchema_S[JsonCirce]"
-			UtilMain.getFuncTypeSubs(jsonSkeuo_UF) shouldEqual "JsonSchema_S[Fix[AvroSchema_S]]"*/
-			
-			
-			
-			
-			And("--- skeuo-avro (fix) --> apache-avro: \nThe avro-apache string should coincide with the json circe string")
-			
-			/*def roundTripVerify_AvroStrAndJsonCirce(avroStrStart: String, avroSkeuoMidCheck: AvroSchema_S[JsonCirce], jsonCirceEnd: JsonCirce): Boolean = {
-			
-				// step 1 - parse avro str to avro-apache-schema
-				val schemaAvro_Apache: SchemaAvro_Apache = new SchemaAvro_Apache.Parser().parse(avroStrStart)
-			
-				// step 2 - check skeuos are equal (generated vs. given)
-				val schemaAvro_S: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(schemaAvro_Apache)
-				
-				schemaAvro_S shouldEqual avroSkeuoMidCheck
-				
-				// step 3 - generate json circe
-				val schemaJson_Circe: JsonCirce = AvroSchema_S.toJson(avroSkeuoMidCheck)
-				
-				// step 4 - check json circe are equal (generated vs. given)
-				schemaJson_Circe.manicure shouldEqual jsonCirceEnd.manicure
-				
-				schemaAvro_S == avroSkeuoMidCheck && schemaJson_Circe.manicure == jsonCirceEnd.manicure
-			}*/
-			
-			
-			info(s"--- skeuo-avro (fix) --> apache-avro = ${skeuoToApacheAvroSchema(nullAvro_Fix_S).toString(true)}")
-			info(s"--- skeuo-avro --> skeuo-json = $jsonSkeuo")
-			info(s"--- skeuo-avro -> json circe = ${AvroSchema_S.toJson(nullAvro_Circe_S).manicure}")
-			// TODO put in raw-string VERSUS json-circe
-			info(s"--- skeuo-json -> json circe = \n${libRender(nullJson_Fix_S).manicure}")
-			//info(s"--- skeuo-json -> json circe = \n${JsonSchema_S.render(nullJson_Circe_S).manicure}")
-			
-			
-			
-			
-			
-			
-			// TODO HELP FIX
-			skeuoToApacheAvroSchema(nullAvro_Fix_S).toString(true) should equal ("\"null\"")
-			
-			jsonSkeuo shouldEqual nullJson_Fix_S
-			
-			// TODO fix: AvroSchema_S.toJson(nullAvro_Circe_S).manicure should equal ("Null")
-			
-			
-			// TODO fix
-			/*JsonSchema_S.render(nullJson_Circe_S).manicure should equal (
-				"""
-				  |{
-				  |  "type": "object",
-				  |  "properties": {},
-				  |  "required": []
-				  |}
-				  |""".stripMargin)*/
-		}
 		
 		// TODO use funsuite and have a separate file for each type
 		
 		Scenario("array of int") {
 			
-			Given("skeuo-avro-schema")
+			Given("a skeuomorph avro-schema")
 			
 			
 			// value-check
 			List(
 				array1IntAvro_S, array1IntAvro_Circe_S, array1IntAvro_Fix_S
 			).distinct.length should equal(1) // should be the same values
-			val butterfly = 0
+			
 			
 			// type-check
 			List(
@@ -234,7 +97,7 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs  extends AnyFeatureSpec with GivenWhenTh
 			
 			
 			// type-check
-			jsonSkeuo shouldBe a [JsonSchema_S[_]] // Fix is invisible
+			jsonSkeuo shouldBe a[JsonSchema_S[_]] // Fix is invisible
 			UtilMain.getFuncTypeSubs(jsonSkeuo) shouldEqual "Fix[JsonSchema_S]"
 			
 			
@@ -250,7 +113,7 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs  extends AnyFeatureSpec with GivenWhenTh
 				s"\nOUTPUT: \n${skeuoToApacheAvroSchema(array1IntAvro_Fix_S).toString(true)}")
 			
 			
-			val rawArrayInt =
+			val redocly_jsonSchemaFromData =
 				"""
 				  |{
 				  |  "type": "object",
@@ -270,8 +133,9 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs  extends AnyFeatureSpec with GivenWhenTh
 				s"\nskeuo-avro (fix) --> json-circe --> skeuo-json (fix)" +
 				s"\nskeuo-avro: \n$array1IntAvro_Fix_S" +
 				s"\njson-circe: \n${libToJson(array1IntAvro_Fix_S).manicure}" +
-				s"\n-- REPLACE: json data -> json schema (redocly): \n$rawArrayInt" +
-				s"\n-- json-str -> circe -> skeuo-json (from redocly): \n${strToCirceToSkeuoJson(rawArrayInt)}" +
+				s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
+				s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${strToCirceToSkeuoJson(redocly_jsonSchemaFromData)}" +
+				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(strToCirceToSkeuoJson(redocly_jsonSchemaFromData).get)}" +
 				s"\nskeuo-json: \n${checker_AvroSkeuo_toJsonCirce_toJsonSkeuo(array1IntAvro_Fix_S)}")
 			
 			
@@ -287,8 +151,9 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs  extends AnyFeatureSpec with GivenWhenTh
 				s"\nskeuo-avro (fix) --> json-circe --> skeuo-avro (fix)" +
 				s"\nskeuo-avro: \n$array1IntAvro_Fix_S" +
 				s"\njson-circe: \n${libToJson(array1IntAvro_Fix_S).manicure}" +
-				s"\n-- REPLACE: json data -> json schema (redocly): \n$rawArrayInt" +
-				s"\n-- json-str -> circe -> skeuo-avro (from redocly): \n${strToCirceToSkeuoAvro(rawArrayInt)}" +
+				s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
+				s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${strToCirceToSkeuoJson(redocly_jsonSchemaFromData)}" +
+				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(strToCirceToSkeuoJson(redocly_jsonSchemaFromData).get)}" +
 				s"\nskeuo-avro: \n${checker_AvroSkeuo_toJsonCirce_toAvroSkeuo(array1IntAvro_Fix_S)}")
 			
 			info(s"-------------------------------" +
