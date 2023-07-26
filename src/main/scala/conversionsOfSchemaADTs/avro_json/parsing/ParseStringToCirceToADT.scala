@@ -24,7 +24,7 @@ object ParseStringToCirceToADT {
 		}
 	}
 	
-	def strToCirceToSkeuoAvro(rawJsonStr: String): Option[Fix[AvroSchema_S]] = {
+	def strToCirceToSkeuoAvro(rawJsonStr: String): Result[Fix[AvroSchema_S]] = {
 		val parsed: JsonCirce = unsafeParse(rawJsonStr)
 		
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
@@ -32,10 +32,11 @@ object ParseStringToCirceToADT {
 		
 		val decoded: Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(parsed)
 		
-		decoded.getOrElse(None) match {
+		decoded
+		/*decoded.getOrElse(None) match {
 			case None ⇒ None
 			case v: Fix[AvroSchema_S] ⇒ Some(v)
-		}
+		}*/
 	}
 	
 }

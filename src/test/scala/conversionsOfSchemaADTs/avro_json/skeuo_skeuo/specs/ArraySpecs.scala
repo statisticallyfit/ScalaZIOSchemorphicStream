@@ -1,12 +1,15 @@
 package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 
-
+import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans.avroToJson_byCataTransAlg
 import higherkindness.droste.data.Fix
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import io.circe.Decoder.Result
+import io.circe.{Json ⇒ JsonCirce}
+import org.apache.avro.{Schema ⇒ AvroSchema_A}
 import org.scalatest.Inspectors._
 import org.scalatest._
 import org.scalatest.funspec.AnyFunSpec
@@ -115,11 +118,24 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					  |}
 					  |""".stripMargin*/
 				
+				val a3: AvroSchema_A = skeuoToApacheAvroSchema(array3IntAvro_Fix_S)
+				//val u: JsonCirce = unsafeParse(a3.toString)
+				val u: JsonCirce = libToJsonAltered(array3IntAvro_Fix_S)
+				val as: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(u)
+				val js: Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo(u)
+				
+				info(s"HERE: skeuo-avro: $array3IntAvro_Fix_S")
+				info(s"HERE: apache-str: $a3")
+				info(s"skeuo-avro -> json-circe?: $u")
+				info(s"skeuo-avro -> json-circe -> skeuo-json?: $js")
+				info(s"skeuo-avro -> json-circe -> skeuo-avro?: $as")
+				
+				
 				info(s"-------------------------------" +
 					s"\nCHECK 2" +
 					s"\nskeuo-avro (fix) --> json-circe --> skeuo-json (fix)" +
 					s"\nskeuo-avro: \n$avroFix" +
-					s"\njson-circe: \n${libToJson(avroFix).manicure}" +
+					s"\njson-circe: \n${libToJsonAltered(avroFix).manicure}" +
 					s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
 					s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${strToCirceToSkeuoJson(redocly_jsonSchemaFromData)}" +
 					s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(strToCirceToSkeuoJson(redocly_jsonSchemaFromData).get).manicure}" +
@@ -133,21 +149,35 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					s"\njson-circe: \n${libRender(jsonFix).manicure}" +
 					s"\nskeuo-json: \n${checker_JsonSkeuo_toJsonCirce_toJsonSkeuo(jsonFix)}")
 				
+				
+				
+				val a4: AvroSchema_A = skeuoToApacheAvroSchema(avroFix)
+				val ua4: JsonCirce = unsafeParse(a4.toString(true)) // useless
+				//val uc4: JsonCirce = unsafeParse(libRender(jsonFix).toString)
+				//val s4: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(ua4)
 				info(s"-------------------------------" +
 					s"\nCHECK 4" +
 					s"\nskeuo-avro (fix) --> json-circe --> skeuo-avro (fix)" +
 					s"\nskeuo-avro: \n$avroFix" +
-					s"\njson-circe: \n${libToJson(avroFix).manicure}" +
-					s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
-					s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${strToCirceToSkeuoAvro(redocly_jsonSchemaFromData)}" +
-					s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(strToCirceToSkeuoJson(redocly_jsonSchemaFromData).get)}" +
-					s"\nskeuo-avro: \n${checker_AvroSkeuo_toJsonCirce_toAvroSkeuo(avroFix)}")
+					s"\n-> circe: \n${libToJsonAltered(avroFix).manicure}" +
+					s"\n-> apache-avro-str: \n${a4.toString(true)}" +
+					s"\n-- apache-avro-str -> circe: \n${ua4}" +
+					s"\n-- apache-avro-str -> circe -> skeuo-avro: \n${checker_AvroSkeuo_toJsonCirce_toAvroSkeuo(avroFix)}" +
+					s"\n-- redocly: json-str -> circe -> skeuo-avro: \n${strToCirceToSkeuoAvro(redocly_jsonSchemaFromData)}" +
+					s"\n\n-- skeuo-json -> circe: \n${libRender(jsonFix).manicure}")
 				
+				
+				val j: JsonCirce = libRender(avroToJson_byCataTransAlg(avroFix))
+				val a: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(j)
 				info(s"-------------------------------" +
 					s"\nCONVERTER FUNCTION:" +
 					s"\nskeuo-avro (fix) --> skeuo-json (fix)" +
 					s"\nINPUT: \n$avroFix" +
-					s"\nOUTPUT: \n${avroToJson_byCataTransAlg(avroFix)}")
+					s"\nOUTPUT: \n${avroToJson_byCataTransAlg(avroFix)}" +
+					s"\nskeuo-avro -> skeuo-json -> json-circe -> skeuo-avro" +
+					s"\n-> json-circe: ${j}" +
+					s"\n-> skeuo-avro: $a")
+				
 				
 			}
 		}

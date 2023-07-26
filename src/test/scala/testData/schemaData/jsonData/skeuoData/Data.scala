@@ -47,9 +47,9 @@ object Data {
 	val array1StrJson_Fix_S: Fix[JsonSchema_S] = Fix(ArrayF(Fix(StringF())))
 	
 	
-	val array3IntAvro_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[Int]]]] = ArrayF(ArrayF(ArrayF(IntegerF())))
-	val array3IntAvro_Circe_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonCirce]]]] = ArrayF(ArrayF(ArrayF(IntegerF())))
-	val array3IntAvro_Fix_S: Fix[JsonSchema_S] = Fix(ArrayF(Fix(ArrayF(Fix(ArrayF(Fix(IntegerF())))))))
+	val array3IntJson_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[Int]]]] = ArrayF(ArrayF(ArrayF(IntegerF())))
+	val array3IntJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonCirce]]]] = ArrayF(ArrayF(ArrayF(IntegerF())))
+	val array3IntJson_Fix_S: Fix[JsonSchema_S] = Fix(ArrayF(Fix(ArrayF(Fix(ArrayF(Fix(IntegerF())))))))
 	
 	
 	/**
