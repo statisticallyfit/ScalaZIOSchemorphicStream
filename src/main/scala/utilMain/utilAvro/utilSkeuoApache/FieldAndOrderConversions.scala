@@ -1,14 +1,10 @@
 package utilMain.utilAvro.utilSkeuoApache
 
-import com.fasterxml.jackson.databind.node.JsonNodeType
-import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
 import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldSkeuo, Order ⇒ OrderSkeuo}
-import org.apache.avro.{Schema ⇒ AvroSchema_A}
-import org.apache.avro.Schema.{Field ⇒ FieldApache}
+import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
 import org.apache.avro.Schema.Field.{Order ⇒ OrderApache}
-
-import scala.jdk.CollectionConverters._
-import java.util
+import org.apache.avro.Schema.{Field ⇒ FieldApache}
+import org.apache.avro.{Schema ⇒ AvroSchema_A}
 
 
 /**
@@ -48,7 +44,7 @@ object FieldAndOrderConversions {
 			// 	isTextual() from JsonNodeType.java (jackson library)
 			
 			//: JsonNodeType = JsonNodeType.STRING // TODO temporary to make the string test pass.
-				//FieldApache.NULL_DEFAULT_VALUE
+			//FieldApache.NULL_DEFAULT_VALUE
 			//val fieldApache_defaultValue: util.List[String] = fieldS.aliases.asJava // HELP: apache has no 'aliases' while skeuo does and skeuo has no 'default value' while apache does -- are they the same?
 			val fOrder: OrderA = order2Order_SA(fieldS.order.getOrElse(OrderSkeuo.Ignore))
 			

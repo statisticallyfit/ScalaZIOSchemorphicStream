@@ -7,13 +7,8 @@ import cats.syntax.all._
 
 import higherkindness.droste._
 import higherkindness.skeuomorph.mu.MuF
-
-import org.scalacheck._ // Arbitrary, Gen
+import org.scalacheck._
 import org.scalacheck.cats.implicits._
-
-
-import scala.jdk.CollectionConverters._
-
 import utilTest.arbitraryInstances.ArbitraryGeneral._
 
 
@@ -108,5 +103,5 @@ object instancesMu {
 	
 	def muCoproductWithoutTNullGen[T](implicit B: Basis[MuF, T]): Gen[MuF.TCoproduct[T]] =
 		muCoproductArbitrary(withTNull = false).arbitrary
-
+	
 }

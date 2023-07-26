@@ -1,9 +1,8 @@
 package utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr
 
-import io.circe.{Json ⇒ JsonCirce}
+import cats.syntax.all._
 import io.circe.parser.parse
-
-import cats.syntax.all._ // for .valueOr
+import io.circe.{Json ⇒ JsonCirce} // for .valueOr
 
 
 /**

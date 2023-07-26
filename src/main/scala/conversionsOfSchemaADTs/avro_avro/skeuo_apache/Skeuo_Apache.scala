@@ -20,7 +20,7 @@ object Skeuo_Apache {
 	
 	/**
 	 * Coalgebra type is:
-	 * 	Apache => Skeuo[Apache]
+	 * Apache => Skeuo[Apache]
 	 *
 	 * @return
 	 */
@@ -36,8 +36,7 @@ object Skeuo_Apache {
 	}*/
 	
 	
-	
-	def nonalgebra_SkeuoToApache/*[T: TypeTag]*/(schemaSkeuo: SchemaAvro_Skeuo[SchemaAvro_Apache]): SchemaAvro_Apache = {
+	def nonalgebra_SkeuoToApache /*[T: TypeTag]*/ (schemaSkeuo: SchemaAvro_Skeuo[SchemaAvro_Apache]): SchemaAvro_Apache = {
 		
 		schemaSkeuo match {
 			case SchemaAvro_Skeuo.TNull() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.NULL)
@@ -247,7 +246,7 @@ object Skeuo_Apache {
 	
 	/**
 	 * Algebra type is:
-	 * 	Skeuo[Apache] => Apache
+	 * Skeuo[Apache] => Apache
 	 *
 	 * @return
 	 */
@@ -274,9 +273,6 @@ object Skeuo_Apache {
 	
 	
 	def apacheToSkeuoAvroSchema: SchemaAvro_Apache ⇒ Fix[SchemaAvro_Skeuo] = scheme.ana(coalgebra_ApacheToSkeuo).apply(_)
-	
-	
-	
 	
 	
 	def roundTrip_ApacheAvroToApacheAvro: SchemaAvro_Apache ⇒ SchemaAvro_Apache = skeuoToApacheAvroSchema compose apacheToSkeuoAvroSchema

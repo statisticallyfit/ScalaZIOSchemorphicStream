@@ -2,8 +2,8 @@ package Examples_ZioSchemaUsage
 
 
 import zio._
+import zio.schema.Schema._
 import zio.schema.{TypeId, Schema ⇒ SchemaZIO}
-import SchemaZIO._
 
 
 /**

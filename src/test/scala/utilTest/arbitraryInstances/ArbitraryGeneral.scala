@@ -1,14 +1,11 @@
 package utilTest.arbitraryInstances
 
-import java.util.UUID
-
-
-import cats.data.NonEmptyList
 import cats.syntax.all._
+
+import java.util.UUID
 //import cats.implicits._
 
 import org.scalacheck._
-import org.scalacheck.cats.implicits._
 
 
 /**

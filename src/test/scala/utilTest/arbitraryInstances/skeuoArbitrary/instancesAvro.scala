@@ -5,15 +5,9 @@ import cats.data.NonEmptyList
 import cats.syntax.all._
 //import cats.implicits._
 
-import higherkindness.droste._
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-
-import org.scalacheck._ // Arbitrary, Gen
+import org.scalacheck._
 import org.scalacheck.cats.implicits._
-
-
-import scala.jdk.CollectionConverters._
-
 import utilTest.arbitraryInstances.ArbitraryGeneral._
 
 

@@ -1,21 +1,16 @@
 package testData.schemaData.avroData.skeuoData
 
-import higherkindness.droste._
 import higherkindness.droste.data.Fix
-import higherkindness.droste.syntax.all._
-
-
+import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldAvro, _}
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import AvroSchema_S._
-import AvroSchema_S.{Field ⇒ FieldAvro}
-
 import io.circe.{Json ⇒ JsonCirce}
+
 
 /**
  *
  */
 object Data {
-
+	
 	// TODO - to put strin g/ int / null in place of T? or to leave as Nothing?
 	val nullAvro_S: AvroSchema_S[Null] = TNull()
 	val nullAvro_Circe_S: AvroSchema_S[JsonCirce] = TNull()
@@ -41,7 +36,7 @@ object Data {
 	
 	val array3IntAvro_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[AvroSchema_S[Int]]]] = TArray(TArray(TArray(TInt())))
 	val array3IntAvro_Circe_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[AvroSchema_S[JsonCirce]]]] = TArray(TArray(TArray(TInt())))
-	val array3IntAvro_Fix_S: Fix[AvroSchema_S]  = Fix(TArray(Fix(TArray(Fix(TArray(Fix(TInt())))))))
+	val array3IntAvro_Fix_S: Fix[AvroSchema_S] = Fix(TArray(Fix(TArray(Fix(TArray(Fix(TInt())))))))
 	
 	
 	//val record // TODO record position, location
@@ -78,7 +73,7 @@ object Data {
 		)
 	)
 	
-	val recordStringAvro_Fix_S: Fix[AvroSchema_S]  = Fix(TRecord(
+	val recordStringAvro_Fix_S: Fix[AvroSchema_S] = Fix(TRecord(
 		name = "StringRecord",
 		namespace = Some("StringNamespace"),
 		aliases = List("a1", "a2"),

@@ -1,30 +1,23 @@
 package conversionsOfSchemaADTs.json_json.specs
 
 
+import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
 
-
-import conversionsOfSchemaADTs.json_json.Skeuo_AndyGlow._
-
 // HELP replacing with mine (copied) because cannot import since this is in his tests folder
 //import com.github.andyglow.testsupport._
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.testsupportForTryValue._
 import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.ParseStrToADT.parseType
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.testsupportForTryValue._
 //import utilTest.UtilTest
-import utilMain.UtilMain
-
-
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import utilMain.UtilMain
 //import JsonSchema_S._
 
+import json.Schema._
 import json.{Schema ⇒ JsonSchema_G}
-import JsonSchema_G._
 
-import scala.util.Try
-
-import scala.reflect.runtime.universe._
 
 /**
  *
@@ -46,7 +39,6 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 				  |""".stripMargin
 			
 			
-			
 			When("parsing")
 			val schemaGlow: JsonSchema_G[_] = parseType(jsonSchemaStr).value
 			
@@ -66,7 +58,7 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			
 			
 			Then("result should be a skeuo adt json schema")
-			schemaSkeuo shouldBe a [JsonSchema_S[_]]
+			schemaSkeuo shouldBe a[JsonSchema_S[_]]
 			schemaSkeuo shouldEqual JsonSchema_S.StringF()
 			
 			info(s"schemaSkeuo = ${schemaSkeuo}")
@@ -74,8 +66,7 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 		}
 		
 		
-		
-		Scenario("integer"){
+		Scenario("integer") {
 			Given("a json schema (single integer)")
 			val jsonSchemaStr: String =
 				"""
@@ -111,7 +102,7 @@ class JsonSchema_RawStr_Glow_Skeuo_Spec extends AnyFeatureSpec with GivenWhenThe
 			info(s"getFuncType (short + long) = ${UtilMain.getFuncType(schemaSkeuo)}")
 		}
 		
-		Scenario("array"){
+		Scenario("array") {
 			Given("a json schema (single array)")
 			val jsonSchemaStr: String =
 				"""{

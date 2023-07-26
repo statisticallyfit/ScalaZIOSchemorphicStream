@@ -1,18 +1,14 @@
 package utilTest.arbitraryInstances.apacheArbitrary
 
-import cats.data.NonEmptyList
 import cats.syntax.all._
 //import cats.implicits._
 
+import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
 import org.scalacheck._
 import org.scalacheck.cats.implicits._
-
 import utilTest.arbitraryInstances.ArbitraryGeneral._
 
 import scala.jdk.CollectionConverters._
-
-
-import org.apache.avro.{Schema ⇒ SchemaApacheAvro}
 
 
 /**
@@ -64,5 +60,5 @@ object instancesAvro {
 		
 		Gen.oneOf(primitives, arrayOrMap, union, record)
 	}
-
+	
 }

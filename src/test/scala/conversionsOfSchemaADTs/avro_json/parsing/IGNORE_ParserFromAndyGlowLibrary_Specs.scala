@@ -1,26 +1,18 @@
 package conversionsOfSchemaADTs.avro_json.parsing
 
 
-
+import com.github.andyglow.jsonschema.AsCirce._
+import json.schema.Version.Draft04
+import json.{Schema ⇒ SchemaJson_Glow}
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
-
-
-
-import json.{Schema ⇒ SchemaJson_Glow}
-import json.schema.Version.Draft04
-import com.github.andyglow.jsonschema.AsCirce._
 //import io.circe._
 import io.circe.{Json ⇒ JsonCirce}
-import SchemaJson_Glow._
-
-
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.testsupportForTryValue._
-import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.ParseStrToADT.parseType
-
-import utilMain.UtilMain
+import json.Schema._
 import utilMain.UtilMain.implicits._
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.ParseStrToADT.parseType
+import utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr.testsupportForTryValue._
 
 
 /**
@@ -48,7 +40,7 @@ class IGNORE_ParserFromAndyGlowLibrary_Specs extends AnyFeatureSpec with GivenWh
 			When("parsing via Andy Glow library's parser ...")
 			
 			val schemaGlow: SchemaJson_Glow[_] = parseType(rawJsonStr).value
-			schemaGlow shouldBe a [SchemaJson_Glow[_]]
+			schemaGlow shouldBe a[SchemaJson_Glow[_]]
 			schemaGlow should not be a[String] // has been converted
 			schemaGlow shouldEqual `string`
 			
@@ -59,7 +51,7 @@ class IGNORE_ParserFromAndyGlowLibrary_Specs extends AnyFeatureSpec with GivenWh
 			val circeJsonStr: JsonCirce = schemaGlow.asCirce(Draft04())
 			
 			Then("result should be a Json Circe string and should match original string")
-			circeJsonStr shouldBe a [JsonCirce]
+			circeJsonStr shouldBe a[JsonCirce]
 			//circeJsonStr.cutOutSchemaRef.noSpaces shouldEqual rawJsonStr.noSpaces
 			//circeJsonStr.spaces2
 			
@@ -204,7 +196,6 @@ class IGNORE_ParserFromAndyGlowLibrary_Specs extends AnyFeatureSpec with GivenWh
 			info(s"length = ${cut.removeSpaceBeforeColon.length}")
 			
 		}
-		
 		
 		
 		Scenario("record (e.g. Position)") {

@@ -2,20 +2,14 @@ package conversionsOfSchemaADTs.avro_json.parsing
 
 import higherkindness.droste._
 import higherkindness.droste.data.Fix
-import higherkindness.droste.syntax.all._
-
-
-import utilMain.UtilMain
-import utilMain.UtilMain.implicits._
-import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
-import io.circe.{Decoder, DecodingFailure, Json ⇒ JsonCirce}
-import io.circe.Decoder.Result
-import higherkindness.skeuomorph.openapi.JsonDecoders._
-
+import higherkindness.skeuomorph.avro.AvroF._
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import AvroSchema_S._
+import higherkindness.skeuomorph.openapi.JsonDecoders._
+import higherkindness.skeuomorph.openapi.JsonSchemaF._
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-import JsonSchema_S._
+import io.circe.Decoder.Result
+import io.circe.{Decoder, Json ⇒ JsonCirce}
+
 
 /**
  *

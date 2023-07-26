@@ -1,14 +1,8 @@
 package conversionsOfSchemaADTs.avro_json.data_avrojsonPairs
 
 
-
-import com.github.andyglow.json.JsonFormatter
-import com.github.andyglow.jsonschema.AsValue
-import json.{Schema ⇒ SchemaJson_Glow, _}
 import org.coursera.autoschema.AutoSchema
 import play.api.libs.json.JsObject
-
-
 
 
 /**
@@ -24,8 +18,6 @@ object ConverterAutoschema_ClassToJsonSchema extends App {
 	}*/
 	
 	
-	
-	
 	// HELP Problem - cannot use the non-legacy version because Any in the parameter list - causing this error:
 	/*
 	schema for Any is not supported, conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.data_Telraam.devs.datasource.Class_TelraamDevsDatasourceLegacy_fromJson.TelraamActiveSegmentsDataSchema :: List[conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.data_Telraam.devs.datasource.Class_TelraamDevsDatasourceLegacy_fromJson.Features] :: conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.data_Telraam.devs.datasource.Class_TelraamDevsDatasourceLegacy_fromJson.Features :: conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.data_Telraam.devs.datasource.Class_TelraamDevsDatasourceLegacy_fromJson.Properties
@@ -37,9 +29,10 @@ object ConverterAutoschema_ClassToJsonSchema extends App {
 	 */
 	
 	
+	import conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.data_CityMesh.devs.folder_datasource.Class_RawCityMeshContext_fromJson._
 	import conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.data_Telraam.devs.datasource.Class_TelraamDevsDatasource_fromJson._
 	
-	import conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.data_CityMesh.devs.folder_datasource.Class_RawCityMeshContext_fromJson._
+	
 	/*implicit val anySchema = Json.schema[Any]
 	
 	implicit val propertiesSchema: SchemaJson_Glow[Properties] = Json.schema[Properties]

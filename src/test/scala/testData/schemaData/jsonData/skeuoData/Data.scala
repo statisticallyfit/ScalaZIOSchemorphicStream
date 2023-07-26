@@ -1,13 +1,9 @@
 package testData.schemaData.jsonData.skeuoData
 
 
-import higherkindness.droste._
 import higherkindness.droste.data.Fix
-import higherkindness.droste.syntax.all._
-
+import higherkindness.skeuomorph.openapi.JsonSchemaF._
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-import JsonSchema_S._
-
 import io.circe.{Json ⇒ JsonCirce}
 
 
@@ -68,7 +64,7 @@ object Data {
 	// TODO test Nothing vs. Float (because of innermost type at 'tpe'
 	val recordExampleJson_Position_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[Float]]] = ObjectF(
 		properties = List(
-			Property(name = "coordinates",tpe = ArrayF(FloatF()))
+			Property(name = "coordinates", tpe = ArrayF(FloatF()))
 		),
 		required = List()
 	)

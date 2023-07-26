@@ -15,8 +15,6 @@ import scala.collection.JavaConverters._
 object TODOHELP_example extends App {
 	
 	
-	
-	
 	def getFooAvroOutputStream(data: Seq[Foo]): ByteArrayOutputStream = {
 		val stream = new ByteArrayOutputStream()
 		val os = AvroOutputStream.data[Foo].to(stream).build()

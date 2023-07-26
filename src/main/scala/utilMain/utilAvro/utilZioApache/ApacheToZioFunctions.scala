@@ -13,18 +13,12 @@ import zio.schema.CaseSet.Aux
 import zio.schema.codec.{AvroAnnotations, AvroPropMarker, StringType, IntType, RecordType} //StringType, RecordType
 import zio.schema.codec.AvroAnnotations._
 import zio.schema.codec.AvroPropMarker._
-
+import ImplicitSchemaExtensionClasses._
 
 import scala.jdk.CollectionConverters._
-
 import scala.util.{Right, Try}
-
 import scala.annotation.StaticAnnotation
-
 import scala.collection.immutable.ListMap
-
-
-import ImplicitSchemaExtensionClasses._
 
 
 /**
@@ -224,7 +218,7 @@ object ApacheToZioFunctions {
 			.map(t => {
 				val inner =
 					if (t.getType == SchemaAvro_Apache.Type.RECORD && t.getFields.size() == 1 && t
-																					 .getObjectProp(UnionWrapper.propName) == true) {
+																					  .getObjectProp(UnionWrapper.propName) == true) {
 						t.getFields.asScala.head.schema() // unwrap nested union
 					} else t
 				apacheAvroSchemaToSchemaZIO(inner).map(

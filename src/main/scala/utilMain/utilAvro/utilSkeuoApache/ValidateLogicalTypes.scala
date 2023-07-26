@@ -1,9 +1,9 @@
 package utilMain.utilAvro.utilSkeuoApache
 
-import org.apache.avro.{Schema ⇒ AvroSchema_A}
-import org.apache.avro.{LogicalType => LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache}
+import org.apache.avro.{LogicalType ⇒ LogicalTypeApache, Schema ⇒ AvroSchema_A}
 
 import scala.util.control.Exception._
+
 
 /**
  * SOURCE for tutorials on using the scala.util.control.Exceptions
@@ -15,10 +15,12 @@ import scala.util.control.Exception._
 object ValidateLogicalTypes {
 	def isValidated(logicalType: LogicalTypeApache, schemaArg: AvroSchema_A): Boolean = {
 		
-		val wasThrown: Option[Unit] = catching(classOf[IllegalArgumentException]) opt { logicalType.validate(schemaArg) }
+		val wasThrown: Option[Unit] = catching(classOf[IllegalArgumentException]) opt {
+			logicalType.validate(schemaArg)
+		}
 		
 		wasThrown match {
-			case Some(_) ⇒ true  // error was not thrown, so the logical type is validated
+			case Some(_) ⇒ true // error was not thrown, so the logical type is validated
 			case None ⇒ false // error WAS thrown, so logical type is NOT validated
 		}
 		

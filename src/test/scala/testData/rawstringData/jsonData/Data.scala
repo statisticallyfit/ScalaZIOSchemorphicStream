@@ -21,7 +21,7 @@ object Data {
 		  |  "type": "integer"
 		  |}
 		  |""".stripMargin
-		  
+	
 	
 	val strJson_R: String =
 		"""
@@ -29,8 +29,8 @@ object Data {
 		  |  "type": "string"
 		  |}
 		  |""".stripMargin
-		  
-
+	
+	
 	val array1StrJson_R: String =
 		"""
 		  |{
@@ -40,7 +40,7 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin
-		  
+	
 	
 	val array3IntJson_R: String =
 		"""
@@ -63,7 +63,6 @@ object Data {
 	// TODO MAP
 	
 	
-	
 	// NOTE (from autoschema generation not from original json file)
 	val recordExampleJson_Position_R: String =
 		"""
@@ -82,7 +81,7 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin
-		  
+	
 	// NOTE (from autoschema generation not from original json file)
 	val recordExampleJson_Location_R: String =
 		"""{

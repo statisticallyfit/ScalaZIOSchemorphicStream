@@ -2,35 +2,13 @@ package conversionsOfSchemaADTs.avro_json.parsing
 
 
 import higherkindness.droste.data.Fix
-import higherkindness.droste._
-import higherkindness.droste.syntax.all._
-
-import org.scalatest.GivenWhenThen
 //import org.scalatest.featurespec.AnyFeatureSpec
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import io.circe.{Json ⇒ JsonCirce}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should._
-
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo._
-import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
-
-import io.circe.{Json ⇒ JsonCirce}
-import io.circe.Decoder
-import higherkindness.skeuomorph.openapi.JsonDecoders._
-
-import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import AvroSchema_S._
-
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-import JsonSchema_S._
-
-
-import testData.schemaData.avroData.skeuoData.Data._
-import testData.schemaData.jsonData.skeuoData.Data._
 import testData.rawstringData.jsonData.Data._
-
-import scala.reflect.runtime.universe._
-
-import utilMain.UtilMain
+import testData.schemaData.jsonData.skeuoData.Data._
 import utilMain.UtilMain.implicits._
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 
@@ -145,33 +123,33 @@ class ParseDecode_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends AnyFunSuite w
 	)
 	
 	// TODO FILL IN
-//	testStructure("enum",
-//		givenRawJsonStr = strJson_R,
-//		checkerJsonSkeuo = strJson_Fix_S
-//	)
-//
-//	testStructure("fixed",
-//		givenRawJsonStr = strJson_R,
-//		checkerJsonSkeuo = strJson_Fix_S
-//	)
-//
-//	testStructure("date",
-//		givenRawJsonStr = strJson_R,
-//		checkerJsonSkeuo = strJson_Fix_S
-//	)
-//
-//	testStructure("timestamp-millis",
-//		givenRawJsonStr = strJson_R,
-//		checkerJsonSkeuo = strJson_Fix_S
-//	)
-//
-//	testStructure("time-millis",
-//		givenRawJsonStr = strJson_R,
-//		checkerJsonSkeuo = strJson_Fix_S
-//	)
-//
-//	testStructure("decimal",
-//		givenRawJsonStr = strJson_R,
-//		checkerJsonSkeuo = strJson_Fix_S
-//	)
+	//	testStructure("enum",
+	//		givenRawJsonStr = strJson_R,
+	//		checkerJsonSkeuo = strJson_Fix_S
+	//	)
+	//
+	//	testStructure("fixed",
+	//		givenRawJsonStr = strJson_R,
+	//		checkerJsonSkeuo = strJson_Fix_S
+	//	)
+	//
+	//	testStructure("date",
+	//		givenRawJsonStr = strJson_R,
+	//		checkerJsonSkeuo = strJson_Fix_S
+	//	)
+	//
+	//	testStructure("timestamp-millis",
+	//		givenRawJsonStr = strJson_R,
+	//		checkerJsonSkeuo = strJson_Fix_S
+	//	)
+	//
+	//	testStructure("time-millis",
+	//		givenRawJsonStr = strJson_R,
+	//		checkerJsonSkeuo = strJson_Fix_S
+	//	)
+	//
+	//	testStructure("decimal",
+	//		givenRawJsonStr = strJson_R,
+	//		checkerJsonSkeuo = strJson_Fix_S
+	//	)
 }

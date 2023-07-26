@@ -1,17 +1,13 @@
 package conversionsOfSchemaADTs.avro_json.parsing
 
 import higherkindness.droste.data.Fix
-
-import io.circe.{Decoder, DecodingFailure, Json ⇒ JsonCirce}
-import io.circe.Decoder.Result
-import higherkindness.skeuomorph.openapi.JsonDecoders._
-
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import AvroSchema_S._
+import higherkindness.skeuomorph.openapi.JsonDecoders._
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-import JsonSchema_S._
-
+import io.circe.Decoder.Result
+import io.circe.{Decoder, Json ⇒ JsonCirce}
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
+
 
 /**
  *
@@ -41,5 +37,5 @@ object ParseStringToCirceToADT {
 			case v: Fix[AvroSchema_S] ⇒ Some(v)
 		}
 	}
-
+	
 }

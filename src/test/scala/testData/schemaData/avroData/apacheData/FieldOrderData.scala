@@ -1,9 +1,8 @@
 package testData.schemaData.avroData.apacheData
 
 
-import org.apache.avro.{Schema ⇒ SchemaAvro_A}
-import org.apache.avro.Schema.{Field ⇒ FieldAvro_A}
 import org.apache.avro.Schema.Field.{Order ⇒ Order_A}
+import org.apache.avro.Schema.{Field ⇒ FieldAvro_A}
 import testData.schemaData.avroData.apacheData.Data._
 
 

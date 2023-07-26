@@ -1,28 +1,14 @@
 package conversionsOfSchemaADTs.avro_json.skeuo_skeuo
 
 
-
-
-import cats.data.NonEmptyList
-
-import higherkindness.droste.{Embed, Trans}
-import higherkindness.droste._
+import higherkindness.droste.Trans
 import higherkindness.droste.data.Fix
 //import higherkindness.droste.syntax.all._
 
+import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldAvro, _}
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import AvroSchema_S._
-
-
+import higherkindness.skeuomorph.openapi.JsonSchemaF._
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-import JsonSchema_S._
-
-import AvroSchema_S.{Field ⇒ FieldAvro}
-import JsonSchema_S.{Property ⇒ PropertyJson}
-
-import scala.reflect.runtime.universe._
-
-
 import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
 
 
@@ -31,18 +17,18 @@ import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
  * SOURCE inspiration = https://github.com/higherkindness/skeuomorph/blob/cc739d3dcdc07ead250461b6ecc6fa4daf2ba988/src/main/scala/higherkindness/skeuomorph/mu/Transform.scala#L59
  *
  * DEF of Trans in droste:
- * 	gtrans - https://github.com/higherkindness/droste/blob/76b206db3ee073aa2ecbf72d4e85d5595aabf913/modules/core/src/main/scala/higherkindness/droste/trans.scala#L6
+ * gtrans - https://github.com/higherkindness/droste/blob/76b206db3ee073aa2ecbf72d4e85d5595aabf913/modules/core/src/main/scala/higherkindness/droste/trans.scala#L6
  * trans = https://github.com/higherkindness/droste/blob/76b206db3ee073aa2ecbf72d4e85d5595aabf913/modules/core/src/main/scala/higherkindness/droste/package.scala#L76
  */
 object Trans_AvroToJson {
-
-	def transJ/*[T: TypeTag]*/: Trans[AvroSchema_S, JsonSchema_S, Fix[JsonSchema_S]] = Trans {
+	
+	def transJ /*[T: TypeTag]*/ : Trans[AvroSchema_S, JsonSchema_S, Fix[JsonSchema_S]] = Trans {
 		
-				// TODO find out if this mapping is correct
+		// TODO find out if this mapping is correct
 		case TNull() ⇒
 			ObjectF(List(
-			Property(name = "null", tpe = Fix(StringF()))
-		), List())
+				Property(name = "null", tpe = Fix(StringF()))
+			), List())
 		
 		case TInt() ⇒ IntegerF()
 		
@@ -75,7 +61,7 @@ object Trans_AvroToJson {
 		
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fixed]]) ⇒ {
 			
-			val ps: List[Property[Fix[JsonSchema_S]]] =  fields.map((f: FieldAvro[Fix[JsonSchema_S]]) ⇒ field2Property(f))
+			val ps: List[Property[Fix[JsonSchema_S]]] = fields.map((f: FieldAvro[Fix[JsonSchema_S]]) ⇒ field2Property(f))
 			val rs: List[String] = fields.map(f ⇒ f.name)
 			
 			//ObjectF(ps, rs)
@@ -103,10 +89,10 @@ object Trans_AvroToJson {
 			ObjectF(
 				properties = List(
 					Property(name = "enum", tpe = Fix(ObjectF(
-							properties = List(
-								Property(name = name, tpe = Fix(EnumF(cases = symbols)))),
-							required = List()
-							))
+						properties = List(
+							Property(name = name, tpe = Fix(EnumF(cases = symbols)))),
+						required = List()
+					))
 					),
 					Property(name = "namespace", tpe = Fix(ObjectF(
 						properties = List(
@@ -122,7 +108,7 @@ object Trans_AvroToJson {
 		// Source: unions (avro) --> arrays (json)
 		// Source 2: toJson (data) function = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L274
 		case TUnion(options: cats.data.NonEmptyList[Fix[JsonSchema_S]]) ⇒
-			ArrayF(options.head )
+			ArrayF(options.head)
 		// TODO check how to get just one value to get the type Fix[JsonSchema_S] for array
 		
 		
@@ -164,7 +150,7 @@ object Trans_AvroToJson {
 			),
 			required = List()
 		)
-		case TDecimal(precision: Int, scale:Int ) ⇒ ObjectF(
+		case TDecimal(precision: Int, scale: Int) ⇒ ObjectF(
 			properties = List(
 				Property(name = "type", tpe = Fix(ByteF())), // TODO byte or fixed? (make another objectf to be fixed instead of byte here)
 				Property(name = "logicalType", tpe = Fix(DateTimeF())),

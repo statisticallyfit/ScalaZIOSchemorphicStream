@@ -3,18 +3,17 @@ package utilMain
 //import org.scalatest.Informer
 
 import io.circe.{Json ⇒ JsonCirce}
+
+
 /**
  *
  */
-
 
 
 object UtilMain {
 	
 	
 	object implicits {
-		
-		
 		
 		
 		implicit class StringOps(str: String) {
@@ -68,9 +67,9 @@ object UtilMain {
 					.replaceAllLiterally(startDraft04_space, "")
 					.replaceAllLiterally(startDraft04, "")
 					.stripLeading().stripTrailing()
-					
-					//.replaceAllLiterally(",\n", "")
-					//.replaceAllLiterally("\n", "")
+				
+				//.replaceAllLiterally(",\n", "")
+				//.replaceAllLiterally("\n", "")
 			}
 			
 			
@@ -173,7 +172,7 @@ object UtilMain {
 		}
 	}
 	
-
+	
 	/*
 	Example:
 	BEFORE:
@@ -186,7 +185,6 @@ object UtilMain {
 		"type" : "string"
 	}
 	 */
-	
 	
 	
 	// NOTE: treating as block / pkg name the string of letters separated by the 'separators' = the underscore or dot
@@ -215,7 +213,6 @@ object UtilMain {
 		
 		extractContinue(accRuns = accRuns :+ newAcc.mkString, traversalList = traversalList.drop(idx))
 	}
-	
 	
 	
 	private object ReplacePackageNameHelpers {
@@ -274,6 +271,7 @@ object UtilMain {
 			classNames
 		}
 	}
+	
 	import ReplacePackageNameHelpers._
 	
 	
@@ -287,8 +285,8 @@ object UtilMain {
 	 *
 	 *
 	 * TODO test that the following pass: (see utilData)
-	 * 	1) json.Schema ---> JsonSchema_Glow
-	 *   2) 	higherkindness.skeuomorph.openapi.JsonSchemaF[Any] ---> JsonSchema_Skeuo[Any]
+	 * 1) json.Schema ---> JsonSchema_Glow
+	 * 2) 	higherkindness.skeuomorph.openapi.JsonSchemaF[Any] ---> JsonSchema_Skeuo[Any]
 	 */
 	def replacePkgWithClass(
 						   classNameWithPckgNames: String,
@@ -310,8 +308,6 @@ object UtilMain {
 		
 		// NOTE: key: apply substitute again for class names that have been liberated from the pckg '.', and that must be substituted (like JsonSchemaF)
 		val sub2: List[String] = doSubstitute(optMapOfClassesToSubst, optPckgsToKeep, keep1)
-		
-		
 		
 		
 		val pairs: List[(String, String)] = justPkgNames.zip(sub2)
@@ -340,8 +336,8 @@ object UtilMain {
 	// ----------------------------------------
 	
 	
-	import scala.reflect.{ClassTag, classTag}
 	import scala.reflect.runtime.universe._
+	import scala.reflect.{ClassTag, classTag}
 	
 	
 	def getPackageName[T: ClassTag]: String = {
@@ -516,7 +512,7 @@ object UtilMain {
 	}
 	
 	def getFuncType[T: TypeTag](
-							  f: T/*,
+							  f: T /*,
 							  keepPckgs: Option[List[String]] = None,
 							  classesToSubs: Option[Map[String, String]] = None*/
 						  ): Map[String, String] = {

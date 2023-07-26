@@ -12,7 +12,6 @@ import org.scalatest.matchers.should._
 import org.scalatest.wordspec.AnyWordSpec
 
 
-
 object minihelpers {
 	
 	// SOURCE code = https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/openapi/helpers.scala#L27
@@ -80,6 +79,7 @@ object minihelpers {
 }
 import conversionsOfSchemaADTs.json_json.specs.minihelpers._
 
+
 /**
  *
  */
@@ -116,7 +116,7 @@ class JsonCirce_To_SkeuoJson_Convert_TrySpec extends AnyWordSpec with Matchers {
 				  |            "version": "1.0.1"
 				  |          }
 				  |""".stripMargin
-					
+			
 			tryRawToCirceToSkeuo(jsonRaw = petStoreJsonRawValue)
 		}
 		

@@ -3,33 +3,19 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 //import cats.syntax.all._
 
 
+import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
+import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
+import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans._
 import higherkindness.droste.data.Fix
-
+import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
-
-import utilMain.UtilMain
-import utilMain.UtilMain.implicits._
-
-
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans._
-import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
-
-import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import AvroSchema_S._
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-import JsonSchema_S._
-
-import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT
-import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
-
 import testData.schemaData.avroData.skeuoData.Data._
 import testData.schemaData.jsonData.skeuoData.Data._
-import testData.rawstringData.jsonData.Data._
-
-
-
+import utilMain.UtilMain
+import utilMain.UtilMain.implicits._
 
 
 /**
@@ -38,10 +24,10 @@ import testData.rawstringData.jsonData.Data._
  */
 
 
-class AvroToJsonSchema_SkeuoSkeuo_Specs  extends AnyFeatureSpec with GivenWhenThen with Matchers  {
-
-
-	Feature("Convert skeuo-avro-adt to skeuo-json-adt (basic primitives)"){
+class AvroToJsonSchema_SkeuoSkeuo_Specs extends AnyFeatureSpec with GivenWhenThen with Matchers {
+	
+	
+	Feature("Convert skeuo-avro-adt to skeuo-json-adt (basic primitives)") {
 		
 		
 		// TODO use funsuite and have a separate file for each type
@@ -71,15 +57,13 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs  extends AnyFeatureSpec with GivenWhenTh
 			array1IntAvro_S should equal(array1IntAvro_Fix_S)
 			
 			
-			
-			
 			When("converting to skeuo-json-schema by applying the function")
 			
 			
 			val jsonSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(array1IntAvro_Fix_S)
 			
 			
-			avroToJson_byCataTransAlg shouldBe a [AvroSchema_S[_] => JsonSchema_S[_]]
+			avroToJson_byCataTransAlg shouldBe a[AvroSchema_S[_] => JsonSchema_S[_]]
 			UtilMain.getFuncTypeSubs(avroToJson_byCataTransAlg) shouldEqual "Fix[AvroSchema_S] => Fix[JsonSchema_S]"
 			
 			/*UtilMain.getFuncTypeSubs(avroToJsonFunction[Null]) shouldEqual "AvroSchema_S[Null] => JsonSchema_S[Null]"
@@ -161,8 +145,6 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs  extends AnyFeatureSpec with GivenWhenTh
 				s"\nskeuo-avro (fix) --> skeuo-json (fix)" +
 				s"\nINPUT: \n$array1IntAvro_Fix_S" +
 				s"\nOUTPUT: \n${avroToJson_byCataTransAlg(array1IntAvro_Fix_S)}")
-			
-			
 			
 			
 		}

@@ -1,42 +1,20 @@
 package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 
 
-
-import higherkindness.droste.data.Fix
-import higherkindness.droste._
-import higherkindness.droste.syntax.all._
-
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should._
-import org.scalatest._
-import Matchers._
-import Inspectors._
-import org.scalatest.Assertions._
-
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo._
 import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
+import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans.avroToJson_byCataTransAlg
-
+import higherkindness.droste.data.Fix
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import AvroSchema_S._
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-import JsonSchema_S._
-
-
+import org.scalatest.Inspectors._
+import org.scalatest._
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should._
 import testData.schemaData.avroData.skeuoData.Data._
 import testData.schemaData.jsonData.skeuoData.Data._
-import testData.rawstringData.jsonData.Data._
-
-import scala.reflect.runtime.universe._
-
 import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
-
-import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
-import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT
-import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
 
 
 /**
@@ -44,10 +22,12 @@ import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
  */
 class ArraySpecs extends AnyFunSpec with Matchers {
 	
-	def testStructure(scenarioType: String,
-				   avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String, avroFix: Fix[AvroSchema_S],
-				   jsonFix: Fix[JsonSchema_S],
-				   redocly_jsonSchemaFromData: String) = {
+	def testStructure(
+					  scenarioType: String,
+					  avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String, avroFix: Fix[AvroSchema_S],
+					  jsonFix: Fix[JsonSchema_S],
+					  redocly_jsonSchemaFromData: String
+				  ) = {
 		
 		
 		describe(s"A skeuomorph avro schema - $scenarioType") {
@@ -134,7 +114,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					  |  "additionalProperties": false
 					  |}
 					  |""".stripMargin*/
-					  
+				
 				info(s"-------------------------------" +
 					s"\nCHECK 2" +
 					s"\nskeuo-avro (fix) --> json-circe --> skeuo-json (fix)" +
@@ -202,7 +182,6 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 	// ----
 	
 	
-	
 	/*"Given: A skeuomorph avro schema" when {
 		
 		"value-checking - the different kinds of schema definitions ... " should {
@@ -230,7 +209,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 	
 	
 	//When()
-
+	
 }
 
 

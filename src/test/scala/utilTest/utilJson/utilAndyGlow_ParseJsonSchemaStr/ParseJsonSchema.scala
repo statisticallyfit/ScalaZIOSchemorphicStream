@@ -2,13 +2,12 @@ package utilTest.utilJson.utilAndyGlow_ParseJsonSchemaStr
 
 //package com.github.andyglow.jsonschema
 
-import java.io.{ByteArrayInputStream, InputStream}
-
-import scala.collection._
 import com.github.andyglow.json.{ParseJson, Value}
-import json.{Schema ⇒ JsonSchema_G}
 import json.schema.validation.Instance._
+import json.{Schema ⇒ JsonSchema_G}
 
+import java.io.{ByteArrayInputStream, InputStream}
+import scala.collection._
 import scala.util.{Failure, Success, Try}
 
 
@@ -20,8 +19,8 @@ import scala.util.{Failure, Success, Try}
 
 object ParseJsonSchema {
 	
-	import Value._
 	import JsonSchema_G._
+	import Value._
 	
 	
 	implicit class OptionOps[T](private val x: Option[T]) extends AnyVal {
@@ -62,7 +61,7 @@ object ParseJsonSchema {
 		case _ => Failure(new Exception("not a json schema"))
 	}
 	
-	/*private[jsonschema] */def makeType(x: obj): Try[JsonSchema_G[_]] = {
+	/*private[jsonschema] */ def makeType(x: obj): Try[JsonSchema_G[_]] = {
 		val tpe = x.value.str("type")
 		val title = x.value.str("title")
 		

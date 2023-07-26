@@ -65,13 +65,11 @@ object ZioConvertCaseClassToAvro {
  *
  */
 object Runner extends App {
-
+	
 	import ZioConvertCaseClassToAvro._
 	
 	
 	classToAvroSchema(DeriveSchema.gen[RawCityMeshMeasurementsSchema])
-	
-	
 	
 	
 }

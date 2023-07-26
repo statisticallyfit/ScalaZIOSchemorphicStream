@@ -1,10 +1,7 @@
 package conversionsOfSchemaADTs.avro_avro.skeuo_apache.specs
 
 
-import higherkindness.droste._
 import higherkindness.droste.data.Fix
-import higherkindness.droste.syntax.all._
-import higherkindness.droste.implicits._
 import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
 import org.apache.avro.{Schema ⇒ SchemaAvro_Apache}
 
@@ -12,16 +9,8 @@ import scala.io.BufferedSource
 ///import org.apache.avro.{LogicalType => LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache}
 
 
-import scala.jdk.CollectionConverters._
-
-
-import testData.ScalaCaseClassData._
-
-
 //import org.scalacheck._
 //import org.specs2._
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.should._
 //import org.specs2.specification.core.SpecStructure
 
 
@@ -30,10 +19,7 @@ import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._ //{apacheTo
 
 
 //import utilTest.UtilTest
-import utilMain.UtilMain
-
 import testData.schemaData.avroData.apacheData.Data._
-
 
 import java.io.File
 import scala.io.Source
@@ -43,9 +29,6 @@ import scala.io.Source
  *
  */
 object TRY_AvroToSkeuo_tatidatafile extends App {
-	
-	
-	
 	
 	
 	def roundTripAvdlSkeuoApache(filePath: String = filePath, targetFileType: String = fileType, fileName: String): Boolean = {
@@ -109,17 +92,12 @@ object TRY_AvroToSkeuo_tatidatafile extends App {
 		parsedApache == avroBack
 	}
 	
-
-	
-	
-	
 	
 	val skeuoTstampmillis: Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema(timestampMillisSchema)
 	println(s"apache tstamp = ${timestampMillisSchema}")
 	println(s"skeuo tstamp = $skeuoTstampmillis")
 	println(s"apache round trip tstamp = ${roundTrip_ApacheAvroToApacheAvro(timestampMillisSchema)}")
 	println("\nend tstamp")
-	
 	
 	
 	// TODO how to concat files resulting from the avro-tools' conversion of .avdl to .avsc?

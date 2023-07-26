@@ -1,18 +1,15 @@
 package testData.schemaData.avroData.apacheData
 
 
-
-import org.apache.avro.{Schema ⇒ AvroSchema_A}
-import org.apache.avro.Schema.{Field ⇒ FieldAvro_A}
-import org.apache.avro.Schema.Field.{Order ⇒ Order_A}
-import org.apache.avro.{LogicalType => LogicalType_A, LogicalTypes ⇒ LogicalTypes_A}
+import org.apache.avro.{LogicalType ⇒ LogicalType_A, LogicalTypes ⇒ LogicalTypes_A, Schema ⇒ AvroSchema_A}
 
 import scala.jdk.CollectionConverters._
+
 
 /**
  *
  */
-object Data  {
+object Data {
 	
 	// Primitive schemas
 	val strAvro_A: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.STRING)
@@ -32,7 +29,6 @@ object Data  {
 	val bytesAvro_A: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.BYTES)
 	
 	
-	
 	// Array schemas
 	val arrayNullAvro_A: AvroSchema_A = AvroSchema_A.createArray(nullAvro_A)
 	val arrayBooleanAvro_A: AvroSchema_A = AvroSchema_A.createArray(booleanAvro_A)
@@ -45,7 +41,6 @@ object Data  {
 	
 	val array3IntAvro_A: AvroSchema_A = AvroSchema_A.createArray(AvroSchema_A.createArray(AvroSchema_A.createArray(intAvro_A)))
 	val array2IntAvro_A: AvroSchema_A = array3IntAvro_A.getElementType
-	
 	
 	
 	//Map schema
@@ -65,7 +60,9 @@ object Data  {
 	
 	// Record schema
 	// TODO add aliases?
+	
 	import testData.schemaData.avroData.apacheData.FieldOrderData._
+	
 	
 	val recordAvro_A: AvroSchema_A = AvroSchema_A.createRecord("Record", "doc for record", "namespace for record", /*isError =*/ false, List(strFieldAvro_1_oa, strFieldAvro_2_oa, strFieldAvro_3_oa, strFieldAvro_1_od, strFieldAvro_2_od, strFieldAvro_3_od, strFieldAvro_1_oi, strFieldAvro_2_oi, strFieldAvro_3_oi, intFieldAvro_1_oa, intFieldAvro_2_oa, intFieldAvro_3_oa, intFieldAvro_1_od, intFieldAvro_2_od, intFieldAvro_3_od, intFieldAvro_1_oi, intFieldAvro_2_oi, intFieldAvro_3_oi).asJava)
 	
@@ -74,7 +71,7 @@ object Data  {
 	
 	// Enum schema
 	val enumAvro_A: AvroSchema_A = AvroSchema_A.createEnum("Color", "the colors of the rainbow with additional ones added in", "Color namespace string here", List("red", "orange", "yellow", "green", "pink", "magenta", "periwinkle", "tan", "jade", "blue", "indigo", "violet").asJava)
-
+	
 	// Fixed schema
 	val fixedAvro_A: AvroSchema_A = AvroSchema_A.createFixed("Fixed", "doc for fixed", "namespace for fixed", 10) // TODO different sizes ? (does it matter?)
 	
@@ -91,13 +88,11 @@ object Data  {
 	val dateAvro_A: AvroSchema_A = dateLogicalType.addToSchema(intAvro_forDate)
 	
 	
-	
 	// Time millis logical type schema
 	val intAvro_forMillis: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.INT)
 	val millisLogicalType: LogicalType_A = LogicalTypes_A.timeMillis()
 	
 	val millisAvro_A: AvroSchema_A = millisLogicalType.addToSchema(intAvro_forMillis)
-	
 	
 	
 	// Timestamp millis logical type schema
@@ -107,13 +102,12 @@ object Data  {
 	val timestampMillisSchema: AvroSchema_A = timestampMillisLogicalType.addToSchema(longAvro_forTimestamp)
 	
 	
-	
 	// Decimal logical type schema
 	val fixedAvro_forDecimal: AvroSchema_A = AvroSchema_A.createFixed("FixedSchemaForDecimalLogicalType", null /*"doc_decimal_fixed"*/ , null, /*"decimal_namespace"*/ 20)
 	
 	
 	import scala.util.Random
-	import java.lang.Math
+	
 	
 	// Formula for max precision of decimal logical type (source = https://github.com/apache/avro/blob/d02241e2adeb923e5b89b57f48c19c40ad4fbb07/lang/java/avro/src/main/java/org/apache/avro/LogicalTypes.java#L318-L329)
 	final val MAX_PRECISION: Long = Math.floor(Math.log10(2.0) * (8 * fixedAvro_forDecimal.getFixedSize - 1).toDouble).round

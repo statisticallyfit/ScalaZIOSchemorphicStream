@@ -1,22 +1,21 @@
 package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 
 
-import scala.reflect.runtime.universe._
-
 import fi.oph.scalaschema.{SchemaFactory, SchemaToJson, Schema ⇒ SchemaJson_Opetus}
+
+import scala.reflect.runtime.universe._
 //import org.json4s.package.JValue
 
+import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods
-import org.json4s.jackson.JsonMethods._ //asJsonNode
-import org.json4s.JsonAST.{JObject, JNull, JInt, JString, JArray}
-import org.json4s.JsonAST.JValue
+import org.json4s.jackson.JsonMethods._
 
 //import org.json4s.{JNull, JInt, JString, JArray}
 
 
 import com.github.fge.jsonschema.core.report.ListReportProvider
 import com.github.fge.jsonschema.core.report.LogLevel.{ERROR, FATAL}
-import com.github.fge.jsonschema.main.{JsonSchemaFactory, JsonValidator}
+import com.github.fge.jsonschema.main.JsonSchemaFactory
 
 
 /**
@@ -26,8 +25,6 @@ object HELP_Opetushallitus_jdata_to_jschema {
 	
 	
 	// TODO HERE - using opetushallitus to take json data -> json schema
-	
-	
 	
 	
 	object helpers {
@@ -46,6 +43,7 @@ object HELP_Opetushallitus_jdata_to_jschema {
 		
 		private lazy val jsonSchemaFactory = JsonSchemaFactory.newBuilder.setReportProvider(new ListReportProvider(ERROR, FATAL)).freeze()
 	}
+	
 	import helpers._
 	
 	

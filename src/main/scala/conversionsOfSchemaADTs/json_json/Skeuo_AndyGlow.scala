@@ -1,11 +1,8 @@
 package conversionsOfSchemaADTs.json_json
 
 
-
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ SchemaJson_Skeuo}
-
 import json.{Schema ⇒ SchemaJson_Glow}
-import SchemaJson_Glow._
 
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
@@ -32,12 +29,12 @@ object Skeuo_AndyGlow {
 		// NOTE: number takes type parameters that are in Numeric (Long, Float, Double, BigInt, BigDecimal, Byte, Short)
 		// NOTE or use Andy Glow Predef code link = https://github.com/andyglow/scala-jsonschema/blob/d52b2bb7d38785bc4e4545285eee7eca1e8978ce/core/src/main/scala/json/schema/Predef.scala#L37
 		
-		case _:SchemaJson_Glow.`number`[Float] ⇒ SchemaJson_Skeuo.FloatF()
-		case _:SchemaJson_Glow.`number`[Long] ⇒ SchemaJson_Skeuo.LongF()
+		case _: SchemaJson_Glow.`number`[Float] ⇒ SchemaJson_Skeuo.FloatF()
+		case _: SchemaJson_Glow.`number`[Long] ⇒ SchemaJson_Skeuo.LongF()
 		
-		case _:SchemaJson_Glow.`number`[Byte] ⇒ SchemaJson_Skeuo.ByteF()
-		case _:SchemaJson_Glow.`number`[Int] ⇒ SchemaJson_Skeuo.IntegerF()
-		case _:SchemaJson_Glow.`number`[Integer] ⇒ SchemaJson_Skeuo.IntegerF()
+		case _: SchemaJson_Glow.`number`[Byte] ⇒ SchemaJson_Skeuo.ByteF()
+		case _: SchemaJson_Glow.`number`[Int] ⇒ SchemaJson_Skeuo.IntegerF()
+		case _: SchemaJson_Glow.`number`[Integer] ⇒ SchemaJson_Skeuo.IntegerF()
 		
 		/*case _: SchemaJson_Glow.`number`[tpe] ⇒ typeOf[tpe] match {
 			case Byte ⇒ SchemaJson_Skeuo.ByteF()
@@ -52,7 +49,7 @@ object Skeuo_AndyGlow {
 		}*/
 		
 		
-		case SchemaJson_Glow.array(componentSchema: SchemaJson_Glow[T], unique) ⇒  {
+		case SchemaJson_Glow.array(componentSchema: SchemaJson_Glow[T], unique) ⇒ {
 			
 			println(s"INSIDE array converter: glow -> skeuo")
 			println(s"inner type (tag.tpe.toString) = ${tag.tpe.toString}")

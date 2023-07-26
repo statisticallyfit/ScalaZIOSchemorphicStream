@@ -1,35 +1,13 @@
 package conversionsOfSchemaADTs.avro_json.parsing
 
 
-
-import higherkindness.droste.data.Fix
-import higherkindness.droste._
-import higherkindness.droste.syntax.all._
-
+import higherkindness.skeuomorph.openapi.JsonDecoders._
+import higherkindness.skeuomorph.openapi.JsonSchemaF._
+import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import io.circe.{Decoder, Json ⇒ JsonCirce}
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should._
-
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo._
-import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
-
-import io.circe.{Json ⇒ JsonCirce}
-import io.circe.Decoder
-import higherkindness.skeuomorph.openapi.JsonDecoders._
-
-import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import AvroSchema_S._
-
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-import JsonSchema_S._
-
-
-import testData.schemaData.avroData.skeuoData.Data._
-import testData.schemaData.jsonData.skeuoData.Data._
-
-import scala.reflect.runtime.universe._
-
-import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 
@@ -41,7 +19,6 @@ import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
  *
  */
 class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhenThen with Matchers {
-	
 	
 	
 	Feature("Convert raw json schema string to Json Circe (basic primitives)") {
@@ -66,8 +43,8 @@ class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhe
 			
 			Then("result should be a Json Circe string")
 			
-			rawJsonStr shouldBe a [String]
-			circeJsonStr shouldBe a [JsonCirce]
+			rawJsonStr shouldBe a[String]
+			circeJsonStr shouldBe a[JsonCirce]
 			
 			circeJsonStr.noSpaces shouldEqual rawJsonStr.noSpaces
 			
@@ -120,7 +97,7 @@ class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhe
 			
 			Then("result should be a Json Circe string")
 			
-			rawJsonStr shouldBe a [String]
+			rawJsonStr shouldBe a[String]
 			circeJsonStr shouldBe a[JsonCirce]
 			
 			circeJsonStr.noSpaces shouldEqual rawJsonStr.noSpaces
@@ -170,7 +147,7 @@ class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhe
 			
 			Then("result should be a Json Circe string")
 			
-			rawJsonStr shouldBe a [String]
+			rawJsonStr shouldBe a[String]
 			circeJsonStr shouldBe a[JsonCirce]
 			
 			circeJsonStr.noSpaces shouldEqual rawJsonStr.noSpaces
@@ -227,7 +204,7 @@ class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhe
 			
 			Then("result should be a Json Circe string")
 			
-			rawJsonStr shouldBe a [String]
+			rawJsonStr shouldBe a[String]
 			circeJsonStr shouldBe a[JsonCirce]
 			
 			circeJsonStr.noSpaces shouldEqual rawJsonStr.noSpaces
@@ -243,7 +220,6 @@ class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhe
 			val skeuoCheck = ArrayF(ArrayF(ArrayF(IntegerF())))
 			
 			skeuoDecodedFromCirce.getOrElse(None) shouldEqual skeuoCheck
-			
 			
 			
 			info(s"raw json str = \n$rawJsonStr")
@@ -280,7 +256,6 @@ class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhe
 				  |  }
 				  |}
 				  |""".stripMargin.trim
-				  
 			
 			
 			When("parsing via Skeuomorph library's parser into Json Circe...")
@@ -290,7 +265,7 @@ class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhe
 			
 			Then("result should be a Json Circe string")
 			
-			rawJsonStr shouldBe a [String]
+			rawJsonStr shouldBe a[String]
 			circeJsonStr shouldBe a[JsonCirce]
 			
 			circeJsonStr.noSpaces shouldEqual rawJsonStr.noSpaces
@@ -302,7 +277,7 @@ class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhe
 			
 			Then("... result should match canonical json skeuo")
 			
-			val skeuoCheck: ObjectF[ArrayF[FloatF[Nothing]]] = ObjectF(properties =List(Property(name = "coordinates", tpe = ArrayF(FloatF()))),required = List())
+			val skeuoCheck: ObjectF[ArrayF[FloatF[Nothing]]] = ObjectF(properties = List(Property(name = "coordinates", tpe = ArrayF(FloatF()))), required = List())
 			
 			skeuoDecodedFromCirce.getOrElse(None) shouldEqual skeuoCheck
 			
@@ -391,15 +366,15 @@ class OLD_UnsafeParseFromSkeuoLibrary_Specs extends AnyFeatureSpec with GivenWhe
 			val skeuoCheck: ObjectF[JsonSchema_S[_ <: ArrayF[FloatF[Nothing]]]] = ObjectF(
 				properties = List(
 					Property(name = "name", tpe = StringF()),
-					Property(name = "symbol",tpe = ObjectF(
+					Property(name = "symbol", tpe = ObjectF(
 						properties = List(),
 						required = List()
 					)),
-					Property(name = "id",tpe = StringF()),
-					Property(name = "sensorName",tpe = StringF()),
-					Property(name = "position",tpe = ObjectF(
+					Property(name = "id", tpe = StringF()),
+					Property(name = "sensorName", tpe = StringF()),
+					Property(name = "position", tpe = ObjectF(
 						properties = List(
-							Property(name = "coordinates",tpe = ArrayF(FloatF()))
+							Property(name = "coordinates", tpe = ArrayF(FloatF()))
 						),
 						required = List()
 					))

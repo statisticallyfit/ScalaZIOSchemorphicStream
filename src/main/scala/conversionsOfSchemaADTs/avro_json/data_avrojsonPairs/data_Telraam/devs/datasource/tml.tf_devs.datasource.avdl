@@ -8,7 +8,7 @@ protocol TmlDevsInput {
 		string bike;
 		string pedestrian;
 		long segment_id;
-		union{null,string} last_data_package;
+		union{null, string} last_data_package;
 		string timezone;
 		string `date`;
 		string period;
