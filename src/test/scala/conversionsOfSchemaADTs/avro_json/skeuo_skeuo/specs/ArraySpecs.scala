@@ -95,28 +95,74 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
 				
 				
-				info(s"-------------------------------" +
-					s"\nCHECK 1" +
-					s"\nskeuo-avro (fix) --> apache-avro-str: " +
-					s"\nINPUT: \n$avroS" +
-					s"\nOUTPUT: \n${skeuoToApacheAvroSchema(avroFix).toString(true)}")
+				val apacheAvro: AvroSchema_A = skeuoToApacheAvroSchema(avroFix)
+				val apacheAvroStr: String = apacheAvro.toString(true).removeSpaceBeforeColon
+				val skeuoAvro: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(apacheAvro)
+				val skeuoJson: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(skeuoAvro)
+				val circeJson_fromJsonSkeuo: JsonCirce = libRender(skeuoJson)
+				
+				info(s"TATI's way: apache-avro-str ---> skeuo-avro --> skeuo-json --> json-circe")
+				info(s"-- apache-avro-str\n: $apacheAvroStr")
+				info(s"-- skeuoAvro: $skeuoAvro")
+				info(s"-- skeuoJson: $skeuoJson")
+				info(s"-- skeuoJson -> json-circe\n: ${circeJson_fromJsonSkeuo.manicure}")
+				
+				info(s"\n\nMY DECODING WAY: ")
+				info(s"STEP 1): apache-avro-str --> skeuo-avro | Reason: state how string-avro looks (assumption / expectation)")
+				
+				info(s"STEP 2): skeuo-avro --> skeuo-json | Reason: Trans converter")
+				
+				info(s"STEP 3): skeuo-avro --> json-circe | Reason: get common denominator (circe), from avro side")
+				
+				info(s"STEP 4): skeuo-json --> json-circe | Reason: get common denominator (circe), from json side")
+				
+				info(s"\n-----------------------------------------------------------" +
+					s"\nCHECKER 2a: " +
+					s"\nraw-json-str (expectation input) -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output) " +
+					s"\n|\t Reason: find out how json-str translates to json-adt to check correctness of my Trans converter " +
+					s"\n|\t (from json side) " +
+					s"\n|\t (starting from: json-str)")
+				
+				info(s"\n-----------------------------------------------------------" +
+					s"\nCHECKER 2b: " +
+					s"\nraw-json-str (expectation input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans input) " +
+					s"\n|\t Reason: find out how json-str translates to avro-adt  " +
+					s"\n|\t (from avro side) " +
+					s"\n|\t (starting from: json-str)")
+				
+				info(s"\n-----------------------------------------------------------" +
+					s"\nCHECKER 2c: " +
+					s"\nraw-avro-str (expectation input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans input) " +
+					s"\n|\t Reason: find out how avro-str translates to avro-adt  " +
+					s"\n|\t (from avro side) " +
+					s"\n|\t (starting from: avro-str)")
+				
+				//--------------------
+				
+				info(s"\n-----------------------------------------------------------" +
+					s"\nCHECKER 1a: " +
+					s"\napache-avro-str (expectation input) -> (skeuo-avro) -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
+					s"\n|\t Reason: compare skeuo-json (trans output) vs. skeuo-json (decoder output) to check correctness of my Trans converter " +
+					s"\n|\t (from json-side) " +
+					s"\n|\t (starting from: avro-str)")
+				
+				info(s"\n-----------------------------------------------------------" +
+					s"\nCHECKER 1b: " +
+					s"\nskeuo-avro -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
+					s"\n|\t Reason: compare skeuo-json (trans output) vs. skeuo-json (decoder output) to check correctness of my Trans converter " +
+					s"\n|\t (from json-side) " +
+					s"\n|\t (starting from: skeuo-avro-adt (easier than string-start))")
 				
 				
-				/*val redocly_jsonSchemaFromData =
-					"""
-					  |{
-					  |  "type": "object",
-					  |  "properties": {
-					  |    "type": {
-					  |      "type": "string"
-					  |    },
-					  |    "items": {
-					  |      "type": "string"
-					  |    }
-					  |  },
-					  |  "additionalProperties": false
-					  |}
-					  |""".stripMargin*/
+				
+				info(s"\n-----------------------------------------------------------" +
+					s"\nCHECKER 3: " +
+					s"\nskeuo-json (trans output) -> json-circe -> skeuo-avro (decoder output) vs. skeuo avro (trans input) " +
+					s"\n|\t Reason: compare how skeuo-json (trans output) renders to skeuo-avro to check correctness of my Trans converter " +
+					s"\n|\t (from avro-side) " +
+					s"\n|\t (starting from: skeuo-json output)")
+				
+				
 				
 				val a3: AvroSchema_A = skeuoToApacheAvroSchema(array3IntAvro_Fix_S)
 				//val u: JsonCirce = unsafeParse(a3.toString)

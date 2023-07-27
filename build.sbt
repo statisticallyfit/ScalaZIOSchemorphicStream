@@ -154,7 +154,7 @@ lazy val global = project
 			allDependencies.saul_autoschema,
 			
 			allDependencies.docless,
-			allDependencies.opetushallitus_scalaschema,
+			/*allDependencies.opetushallitus_scalaschema,
 			// Dependency (fge) for opetus hallitus - was not pulled in by itself, why?
 			allDependencies.fge_jsonschemavalidator,
 			// Dependecy (json4s-core, ast, jackson) - versioning error. If for all the json4s libs, if I don't keep
@@ -168,7 +168,7 @@ lazy val global = project
 			//allDependencies.json4s_native,
 			//allDependencies.json4s_native_core,
 			allDependencies.json4s_ext,
-			//allDependencies.json4s_scalap,
+			//allDependencies.json4s_scalap,*/
 			
 			allDependencies.avroTools_for_avdlToAvsc,
 			
