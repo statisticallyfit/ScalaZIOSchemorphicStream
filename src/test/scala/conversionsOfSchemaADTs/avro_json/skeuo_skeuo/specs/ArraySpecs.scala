@@ -110,11 +110,15 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				info(s"\n\nMY DECODING WAY: ")
 				info(s"STEP 1): apache-avro-str --> skeuo-avro | Reason: state how string-avro looks (assumption / expectation)")
 				
-				info(s"STEP 2): skeuo-avro --> skeuo-json | Reason: Trans converter")
+				info(s"STEP 2a): skeuo-avro --> skeuo-json | Reason: Trans converter, the algebra way")
 				
-				info(s"STEP 3): skeuo-avro --> json-circe | Reason: get common denominator (circe), from avro side")
+				info(s"STEP 2b): skeuo-json -> skeuo-avro | Reason: Trans converter, the coalgebra way")
 				
-				info(s"STEP 4): skeuo-json --> json-circe | Reason: get common denominator (circe), from json side")
+				info(s"STEP 3a): skeuo-avro --> json-circe | Reason: get common denominator (circe), from avro side")
+				
+				info(s"STEP 3b): skeuo-json --> json-circe | Reason: get common denominator (circe), from json side")
+				
+				info(s"STEP 4): skeuo-json --> skeuo-avro --> avro-str (trans output) vs. avro-str (input) | Reason: get common denominator (avro-str), from avro-side")
 				
 				info(s"\n-----------------------------------------------------------" +
 					s"\nCHECKER 2a: " +
@@ -126,28 +130,28 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				info(s"\n-----------------------------------------------------------" +
 					s"\nCHECKER 2b: " +
 					s"\nraw-json-str (expectation input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans input) " +
-					s"\n|\t Reason: find out how json-str translates to avro-adt  " +
+					s"\n|\t Reason: find out how json-str translates to avro-adt  + get common denominator (skeuo-avro), from avro-side" +
 					s"\n|\t (from avro side) " +
 					s"\n|\t (starting from: json-str)")
 				
 				info(s"\n-----------------------------------------------------------" +
 					s"\nCHECKER 2c: " +
 					s"\nraw-avro-str (expectation input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans input) " +
-					s"\n|\t Reason: find out how avro-str translates to avro-adt  " +
+					s"\n|\t Reason: find out how avro-str translates to avro-adt  + get common denominator (skeuo-avro), from avor-side." +
 					s"\n|\t (from avro side) " +
 					s"\n|\t (starting from: avro-str)")
 				
 				//--------------------
 				
 				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 1a: " +
-					s"\napache-avro-str (expectation input) -> (skeuo-avro) -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
+					s"\nCHECKER 2d: " +
+					s"\nraw-avro-str (expectation input) -> (skeuo-avro) -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
 					s"\n|\t Reason: compare skeuo-json (trans output) vs. skeuo-json (decoder output) to check correctness of my Trans converter " +
 					s"\n|\t (from json-side) " +
 					s"\n|\t (starting from: avro-str)")
 				
 				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 1b: " +
+					s"\nCHECKER 3: " +
 					s"\nskeuo-avro -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
 					s"\n|\t Reason: compare skeuo-json (trans output) vs. skeuo-json (decoder output) to check correctness of my Trans converter " +
 					s"\n|\t (from json-side) " +
