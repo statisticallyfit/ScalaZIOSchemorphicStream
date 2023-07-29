@@ -31,6 +31,16 @@ object Data {
 		  |""".stripMargin
 	
 	
+	val array1IntJson_R: String =
+		"""
+		  |{
+		  |  "type": "array",
+		  |  "items": {
+		  |    "type": "integer"
+		  |  }
+		  |}
+		  |""".stripMargin
+	
 	val array1StrJson_R: String =
 		"""
 		  |{

@@ -4,8 +4,8 @@ import cats.data.NonEmptyList
 import higherkindness.droste._
 import higherkindness.droste.data.Fix
 //import higherkindness.droste.syntax.all._
-import higherkindness.skeuomorph.avro.{AvroF ⇒ SchemaAvro_Skeuo}
-import org.apache.avro.{LogicalType ⇒ LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache, Schema ⇒ SchemaAvro_Apache}
+import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
+import org.apache.avro.{LogicalType ⇒ LogicalTypeApache, LogicalTypes ⇒ LogicalTypesApache, Schema ⇒ AvroSchema_A}
 import utilMain.utilAvro.utilSkeuoApache.FieldAndOrderConversions.{FieldS, field2Field_SA}
 import utilMain.utilAvro.utilSkeuoApache.ValidateLogicalTypes.isValidated
 
@@ -24,36 +24,36 @@ object Skeuo_Apache {
 	 *
 	 * @return
 	 */
-	def coalgebra_ApacheToSkeuo: Coalgebra[SchemaAvro_Skeuo, SchemaAvro_Apache] = SchemaAvro_Skeuo.fromAvro
+	def coalgebra_ApacheToSkeuo: Coalgebra[AvroSchema_S, AvroSchema_A] = AvroSchema_S.fromAvro
 	
 	
 	/*import scala.reflect.runtime.universe._
 	
 	
-	def galgebra_SkeuoToApache[T: TypeTag]: GAlgebra[SchemaAvro_Skeuo, T, SchemaAvro_Apache] = GAlgebra {
+	def galgebra_SkeuoToApache[T: TypeTag]: GAlgebra[AvroSchema_S, T, AvroSchema_A] = GAlgebra {
 		
-		case SchemaAvro_Skeuo.TNull() ⇒ SchemaAvro_Apache.create(SchemaAvro_Apache.Type.NULL)
+		case AvroSchema_S.TNull() ⇒ AvroSchema_A.create(AvroSchema_A.Type.NULL)
 	}*/
 	
 	
-	def nonalgebra_SkeuoToApache /*[T: TypeTag]*/ (schemaSkeuo: SchemaAvro_Skeuo[SchemaAvro_Apache]): SchemaAvro_Apache = {
+	def nonalgebra_SkeuoToApache /*[T: TypeTag]*/ (schemaSkeuo: AvroSchema_S[AvroSchema_A]): AvroSchema_A = {
 		
 		schemaSkeuo match {
-			case SchemaAvro_Skeuo.TNull() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.NULL)
+			case AvroSchema_S.TNull() => AvroSchema_A.create(AvroSchema_A.Type.NULL)
 			
-			case SchemaAvro_Skeuo.TBoolean() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.BOOLEAN)
+			case AvroSchema_S.TBoolean() => AvroSchema_A.create(AvroSchema_A.Type.BOOLEAN)
 			
-			case SchemaAvro_Skeuo.TString() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.STRING)
+			case AvroSchema_S.TString() => AvroSchema_A.create(AvroSchema_A.Type.STRING)
 			
-			case SchemaAvro_Skeuo.TInt() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.INT)
+			case AvroSchema_S.TInt() => AvroSchema_A.create(AvroSchema_A.Type.INT)
 			
-			case SchemaAvro_Skeuo.TLong() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.LONG)
+			case AvroSchema_S.TLong() => AvroSchema_A.create(AvroSchema_A.Type.LONG)
 			
-			case SchemaAvro_Skeuo.TFloat() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.FLOAT)
+			case AvroSchema_S.TFloat() => AvroSchema_A.create(AvroSchema_A.Type.FLOAT)
 			
-			case SchemaAvro_Skeuo.TDouble() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.DOUBLE)
+			case AvroSchema_S.TDouble() => AvroSchema_A.create(AvroSchema_A.Type.DOUBLE)
 			
-			case SchemaAvro_Skeuo.TBytes() => SchemaAvro_Apache.create(SchemaAvro_Apache.Type.BYTES)
+			case AvroSchema_S.TBytes() => AvroSchema_A.create(AvroSchema_A.Type.BYTES)
 			
 			
 			/**
@@ -63,38 +63,38 @@ object Skeuo_Apache {
 			 *
 			 * HELP: see here `toJson` seems like inner part is INT = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L249
 			 */
-			case SchemaAvro_Skeuo.TArray(innerItemSchema: SchemaAvro_Apache) ⇒ {
+			case AvroSchema_S.TArray(innerItemSchema: AvroSchema_A) ⇒ {
 				
 				println("Inside avroFToApache ARRAY converter: ")
 				println(s"apacheSchema = $innerItemSchema")
 				println(s"apacheSchema.getType = ${innerItemSchema.getType}")
 				
-				SchemaAvro_Apache.createArray(innerItemSchema)
+				AvroSchema_A.createArray(innerItemSchema)
 			}
 			/*apacheSchema.getType match {
-			case n @ SchemaAvro_Apache.Type.NULL ⇒ SchemaAvro_Apache.createArray(SchemaAvro_Apache.create(n))
-			case b @ SchemaAvro_Apache.Type.BOOLEAN ⇒ SchemaAvro_Apache.createArray(SchemaAvro_Apache.create(b))
-			case i @ SchemaAvro_Apache.Type.INT ⇒ {
+			case n @ AvroSchema_A.Type.NULL ⇒ AvroSchema_A.createArray(AvroSchema_A.create(n))
+			case b @ AvroSchema_A.Type.BOOLEAN ⇒ AvroSchema_A.createArray(AvroSchema_A.create(b))
+			case i @ AvroSchema_A.Type.INT ⇒ {
 				println(s"apacheSchema = $apacheSchema")
-				SchemaAvro_Apache.createArray(SchemaAvro_Apache.create(i))
+				AvroSchema_A.createArray(AvroSchema_A.create(i))
 			}
-			case l @ SchemaAvro_Apache.Type.LONG ⇒ SchemaAvro_Apache.createArray(SchemaAvro_Apache.create(l))
-			case f @ SchemaAvro_Apache.Type.FLOAT ⇒ SchemaAvro_Apache.createArray(SchemaAvro_Apache.create(f))
-			case d @ SchemaAvro_Apache.Type.DOUBLE ⇒ SchemaAvro_Apache.createArray(SchemaAvro_Apache.create(d))
-			case by @ SchemaAvro_Apache.Type.BYTES ⇒ SchemaAvro_Apache.createArray(SchemaAvro_Apache.create(by))
-			case s @ SchemaAvro_Apache.Type.STRING ⇒ SchemaAvro_Apache.createArray(SchemaAvro_Apache.create(s))
-			case SchemaAvro_Apache.Type.MAP ⇒ SchemaAvro_Apache.createArray(SchemaAvro_Apache.createMap(apacheSchema.getValueType))
-			case SchemaAvro_Apache.Type.ARRAY ⇒ SchemaAvro_Apache.createArray(SchemaAvro_Apache.createArray(apacheSchema.getElementType))
-			case SchemaAvro_Apache.Type.RECORD ⇒ {
-				val a: SchemaAvro_Apache = apacheSchema
-				/*val res: SchemaAvro_Apache = SchemaAvro_Apache.createArray(SchemaAvro_Apache.createRecord(a.getName, a.getDoc, a.getNamespace, a.isError, a.getFields))*/
-				val res2 = SchemaAvro_Apache.createArray(a)
+			case l @ AvroSchema_A.Type.LONG ⇒ AvroSchema_A.createArray(AvroSchema_A.create(l))
+			case f @ AvroSchema_A.Type.FLOAT ⇒ AvroSchema_A.createArray(AvroSchema_A.create(f))
+			case d @ AvroSchema_A.Type.DOUBLE ⇒ AvroSchema_A.createArray(AvroSchema_A.create(d))
+			case by @ AvroSchema_A.Type.BYTES ⇒ AvroSchema_A.createArray(AvroSchema_A.create(by))
+			case s @ AvroSchema_A.Type.STRING ⇒ AvroSchema_A.createArray(AvroSchema_A.create(s))
+			case AvroSchema_A.Type.MAP ⇒ AvroSchema_A.createArray(AvroSchema_A.createMap(apacheSchema.getValueType))
+			case AvroSchema_A.Type.ARRAY ⇒ AvroSchema_A.createArray(AvroSchema_A.createArray(apacheSchema.getElementType))
+			case AvroSchema_A.Type.RECORD ⇒ {
+				val a: AvroSchema_A = apacheSchema
+				/*val res: AvroSchema_A = AvroSchema_A.createArray(AvroSchema_A.createRecord(a.getName, a.getDoc, a.getNamespace, a.isError, a.getFields))*/
+				val res2 = AvroSchema_A.createArray(a)
 				res2
 			} //createRecord(String name, String doc, String namespace, boolean isError, List<Field> fields)
-			case SchemaAvro_Apache.Type.ENUM ⇒ {
+			case AvroSchema_A.Type.ENUM ⇒ {
 				val a = apacheSchema
-				//val ea: SchemaAvro_Apache = apacheSchema.asInstanceOf[SchemaAvro_Apache.Type.ENUM]
-				SchemaAvro_Apache.createArray(SchemaAvro_Apache.createEnum(a.getName, a.getDoc, a.getNamespace, a.getEnumSymbols))
+				//val ea: AvroSchema_A = apacheSchema.asInstanceOf[AvroSchema_A.Type.ENUM]
+				AvroSchema_A.createArray(AvroSchema_A.createEnum(a.getName, a.getDoc, a.getNamespace, a.getEnumSymbols))
 			}
 				//createEnum(String name, String doc, String namespace, List<String> values)
 			}*/
@@ -102,26 +102,26 @@ object Skeuo_Apache {
 			/**
 			 * Apache Map Type = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L243
 			 */
-			case SchemaAvro_Skeuo.TMap(innerItemSchema: SchemaAvro_Apache) => SchemaAvro_Apache.createMap(innerItemSchema)
+			case AvroSchema_S.TMap(innerItemSchema: AvroSchema_A) => AvroSchema_A.createMap(innerItemSchema)
 			
 			
 			/**
 			 * Apache's Named Record == skeuomorph's TNamedType
 			 * SOURCE = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L211
 			 */
-			case SchemaAvro_Skeuo.TNamedType(namespace: String, name: String) ⇒ {
-				SchemaAvro_Apache.createRecord(name, null /*"NO DOC"*/ , namespace, /*isError =*/ false)
+			case AvroSchema_S.TNamedType(namespace: String, name: String) ⇒ {
+				AvroSchema_A.createRecord(name, null /*"NO DOC"*/ , namespace, /*isError =*/ false)
 			}
 			
 			/**
 			 * Apache's Named Record with Fields == skeuomorph's TRecord
 			 * SOURCE = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L222-L225
 			 */
-			case SchemaAvro_Skeuo.TRecord(skeuoName: String,
+			case AvroSchema_S.TRecord(skeuoName: String,
 			skeuoNamespace: Option[String],
 			aliases: List[String],
 			skeuoDoc: Option[String],
-			skeuoFields: List[FieldS[SchemaAvro_Apache]]) ⇒ {
+			skeuoFields: List[FieldS[AvroSchema_A]]) ⇒ {
 				
 				// Skeuo Order = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L61-L64
 				// Apache Order = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L530
@@ -138,7 +138,7 @@ object Skeuo_Apache {
 				// HELP: apache has `isError` while skeuo does not and skeuo has `aliases` while apache does not.... how to fix?
 				//  TODO say by default that this record is NOT an error type? = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L364
 				
-				val recordSchema: SchemaAvro_Apache = SchemaAvro_Apache.createRecord(skeuoName, skeuoDoc.getOrElse(null /*"NO DOC"*/), skeuoNamespace.getOrElse(null /*"NO NAMESPACE"*/), /*isError =*/ false, skeuoFields.map(f ⇒ field2Field_SA(f)).asJava)
+				val recordSchema: AvroSchema_A = AvroSchema_A.createRecord(skeuoName, skeuoDoc.getOrElse(null /*"NO DOC"*/), skeuoNamespace.getOrElse(null /*"NO NAMESPACE"*/), /*isError =*/ false, skeuoFields.map(f ⇒ field2Field_SA(f)).asJava)
 				
 				aliases.foreach(a ⇒ recordSchema.addAlias(a))
 				
@@ -149,8 +149,8 @@ object Skeuo_Apache {
 			/**
 			 * Apache Union Type = https://github.com/apache/avro/blob/master/lang/java/avro/src/main/java/org/apache/avro/Schema.java#L248-L254
 			 */
-			case SchemaAvro_Skeuo.TUnion(schemaList: NonEmptyList[SchemaAvro_Apache]) ⇒ {
-				SchemaAvro_Apache.createUnion(schemaList.toList.asJava)
+			case AvroSchema_S.TUnion(schemaList: NonEmptyList[AvroSchema_A]) ⇒ {
+				AvroSchema_A.createUnion(schemaList.toList.asJava)
 			}
 			
 			/**
@@ -158,8 +158,8 @@ object Skeuo_Apache {
 			 *
 			 * HELP: Skeuo has 'aliases' while apache does not -- meaning? - check meaning of aliases vs. symbols - which contains the enum subcases?
 			 */
-			case SchemaAvro_Skeuo.TEnum(name, namespaceOpt, aliases, docOpt, symbols) => {
-				val enumSchema = SchemaAvro_Apache.createEnum(name,
+			case AvroSchema_S.TEnum(name, namespaceOpt, aliases, docOpt, symbols) => {
+				val enumSchema = AvroSchema_A.createEnum(name,
 					docOpt.orNull,
 					namespaceOpt.getOrElse(null /*"NO NAMESPACE"*/),
 					symbols.asJava
@@ -176,8 +176,8 @@ object Skeuo_Apache {
 			 * TODO CHECK IF MY IMPLEMENTATION IS CORREC: skeuo has `aliases` while apache does not --- construct Fixed first then addAliases = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L233
 			 * NOTE: skeup has `namespaceOption` while apache has `space`` -- they are the same (namespace wrapped in option)
 			 */
-			case SchemaAvro_Skeuo.TFixed(name, namespaceOpt, aliases, size) => {
-				val fixedSchema: SchemaAvro_Apache = SchemaAvro_Apache.createFixed(name, null /*"NO DOC"*/ , namespaceOpt.orNull, size)
+			case AvroSchema_S.TFixed(name, namespaceOpt, aliases, size) => {
+				val fixedSchema: AvroSchema_A = AvroSchema_A.createFixed(name, null /*"NO DOC"*/ , namespaceOpt.orNull, size)
 				
 				aliases.foreach(a => fixedSchema.addAlias(a))
 				
@@ -188,52 +188,52 @@ object Skeuo_Apache {
 			
 			// Logical Types: Date, Time, Decimal etc
 			
-			case SchemaAvro_Skeuo.TDate() => {
-				val intSchema: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.INT)
+			case AvroSchema_S.TDate() => {
+				val intSchema: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.INT)
 				val dateLogicalType: LogicalTypeApache = LogicalTypesApache.date()
 				
 				assert(/*dateLogicalType.validate(intSchema)*/ isValidated(dateLogicalType, intSchema),
 					s"${dateLogicalType.getName} Logical Type uses ${intSchema.getType} schema only") // check if compatible
 				
-				val dateSchema: SchemaAvro_Apache = dateLogicalType.addToSchema(intSchema)
+				val dateSchema: AvroSchema_A = dateLogicalType.addToSchema(intSchema)
 				
 				assert(dateSchema == intSchema) // the int schema was altered (warning: state change!)
 				
 				dateSchema
 			}
-			case SchemaAvro_Skeuo.TTimeMillis() ⇒ {
+			case AvroSchema_S.TTimeMillis() ⇒ {
 				
-				val intSchema: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.INT)
+				val intSchema: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.INT)
 				val millisLogicalType: LogicalTypeApache = LogicalTypesApache.timeMillis()
 				
 				assert(isValidated(millisLogicalType, intSchema), s"${millisLogicalType.getName} Logical Type uses ${intSchema.getType} schema only") // check if compatible
 				
-				val millisSchema: SchemaAvro_Apache = millisLogicalType.addToSchema(intSchema)
+				val millisSchema: AvroSchema_A = millisLogicalType.addToSchema(intSchema)
 				
 				millisSchema
 			}
 			
-			case SchemaAvro_Skeuo.TTimestampMillis() => {
+			case AvroSchema_S.TTimestampMillis() => {
 				
-				val longSchema: SchemaAvro_Apache = SchemaAvro_Apache.create(SchemaAvro_Apache.Type.LONG)
+				val longSchema: AvroSchema_A = AvroSchema_A.create(AvroSchema_A.Type.LONG)
 				val timestampMillisLogicalType: LogicalTypeApache = LogicalTypesApache.timestampMillis()
 				
 				assert(isValidated(timestampMillisLogicalType, longSchema), s"${timestampMillisLogicalType.getName} Logical Type uses ${longSchema.getType} schema only") // check if compatible
 				
-				val timestampMillisSchema: SchemaAvro_Apache = timestampMillisLogicalType.addToSchema(longSchema)
+				val timestampMillisSchema: AvroSchema_A = timestampMillisLogicalType.addToSchema(longSchema)
 				
 				timestampMillisSchema
 			}
 			
-			case SchemaAvro_Skeuo.TDecimal(precision: Int, scale: Int) ⇒ {
+			case AvroSchema_S.TDecimal(precision: Int, scale: Int) ⇒ {
 				
-				val fixedSchema: SchemaAvro_Apache = SchemaAvro_Apache.createFixed("Fixed (schema) for Decimal (logical type)", null /*"doc_decimal_fixed"*/ , null, /*"decimal_namespace"*/ 0)
+				val fixedSchema: AvroSchema_A = AvroSchema_A.createFixed("Fixed (schema) for Decimal (logical type)", null /*"doc_decimal_fixed"*/ , null, /*"decimal_namespace"*/ 0)
 				// TODO is this OK?
 				
 				val decimalLogicalType: LogicalTypeApache = LogicalTypesApache.decimal(precision, scale)
 				assert(isValidated(decimalLogicalType, fixedSchema), s"${decimalLogicalType.getName} Logical Type uses ${fixedSchema.getType} schema only") // check if compatible
 				
-				val decimalSchema: SchemaAvro_Apache = decimalLogicalType.addToSchema(fixedSchema)
+				val decimalSchema: AvroSchema_A = decimalLogicalType.addToSchema(fixedSchema)
 				
 				decimalSchema
 			}
@@ -250,18 +250,18 @@ object Skeuo_Apache {
 	 *
 	 * @return
 	 */
-	def algebra_SkeuoToApache: Algebra[SchemaAvro_Skeuo, SchemaAvro_Apache] =
+	def algebra_SkeuoToApache: Algebra[AvroSchema_S, AvroSchema_A] =
 		Algebra { // Algebra[Skeuo, Apache] ----- MEANING ---->  Skeuo[Apache] => Apache
-			fa: SchemaAvro_Skeuo[SchemaAvro_Apache] ⇒ nonalgebra_SkeuoToApache(fa)
+			fa: AvroSchema_S[AvroSchema_A] ⇒ nonalgebra_SkeuoToApache(fa)
 			
 			
 		}
 	
 	
 	
-	// TODO change names: SchemaAvro_Apache etc
+	// TODO change names: AvroSchema_A etc
 	
-	def skeuoToApacheAvroSchema: Fix[SchemaAvro_Skeuo] ⇒ SchemaAvro_Apache = scheme.cata(algebra_SkeuoToApache).apply(_)
+	def skeuoToApacheAvroSchema: Fix[AvroSchema_S] ⇒ AvroSchema_A = scheme.cata(algebra_SkeuoToApache).apply(_)
 	
 	
 	// TODO meaning of putting [Fix] as scheme parameter?
@@ -269,14 +269,14 @@ object Skeuo_Apache {
 	/*import higherkindness.droste.data._
 	
 	
-	val r: Fix[SchemaAvro_Skeuo] ⇒ SchemaAvro_Apache = scheme[Fix].cata(algebra_SkeuoToApache).apply(_)*/
+	val r: Fix[AvroSchema_S] ⇒ AvroSchema_A = scheme[Fix].cata(algebra_SkeuoToApache).apply(_)*/
 	
 	
-	def apacheToSkeuoAvroSchema: SchemaAvro_Apache ⇒ Fix[SchemaAvro_Skeuo] = scheme.ana(coalgebra_ApacheToSkeuo).apply(_)
+	def apacheToSkeuoAvroSchema: AvroSchema_A ⇒ Fix[AvroSchema_S] = scheme.ana(coalgebra_ApacheToSkeuo).apply(_)
 	
 	
-	def roundTrip_ApacheAvroToApacheAvro: SchemaAvro_Apache ⇒ SchemaAvro_Apache = skeuoToApacheAvroSchema compose apacheToSkeuoAvroSchema
+	def roundTrip_ApacheAvroToApacheAvro: AvroSchema_A ⇒ AvroSchema_A = skeuoToApacheAvroSchema compose apacheToSkeuoAvroSchema
 	
-	def roundTrip_SkeuoAvroToSkeuoAvro: Fix[SchemaAvro_Skeuo] ⇒ Fix[SchemaAvro_Skeuo] = apacheToSkeuoAvroSchema compose skeuoToApacheAvroSchema
+	def roundTrip_SkeuoAvroToSkeuoAvro: Fix[AvroSchema_S] ⇒ Fix[AvroSchema_S] = apacheToSkeuoAvroSchema compose skeuoToApacheAvroSchema
 	
 }

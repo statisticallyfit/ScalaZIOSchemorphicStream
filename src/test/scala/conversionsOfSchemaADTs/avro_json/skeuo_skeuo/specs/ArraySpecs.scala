@@ -1,21 +1,25 @@
 package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 
-import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
+
+
 import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
-import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans.avroToJson_byCataTransAlg
+import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans.{avroToJson_byCataTransAlg, jsonToAvro_byAnaTransCoalg}
 import higherkindness.droste.data.Fix
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import org.apache.avro.{Schema ⇒ AvroSchema_A}
 import io.circe.Decoder.Result
 import io.circe.{Json ⇒ JsonCirce}
-import org.apache.avro.{Schema ⇒ AvroSchema_A}
+import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
+import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
+import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
 import org.scalatest.Inspectors._
-import org.scalatest._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should._
 import testData.schemaData.avroData.skeuoData.Data._
 import testData.schemaData.jsonData.skeuoData.Data._
+import testData.rawstringData.avroData.Data._
+import testData.rawstringData.jsonData.Data._
 import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
 
@@ -25,11 +29,12 @@ import utilMain.UtilMain.implicits._
  */
 class ArraySpecs extends AnyFunSpec with Matchers {
 	
-	def testStructure(
-					  scenarioType: String,
-					  avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String, avroFix: Fix[AvroSchema_S],
-					  jsonFix: Fix[JsonSchema_S],
-					  redocly_jsonSchemaFromData: String
+	def testStructure(scenarioType: String,
+				   rawAvroStr: String, rawJsonStr: String,
+				   avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String,
+				   avroFixS: Fix[AvroSchema_S],
+				   jsonFixS: Fix[JsonSchema_S]/*,
+				   redocly_jsonSchemaFromData: String*/
 				  ) = {
 		
 		
@@ -41,7 +46,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					
 					assume(List(
 						//array1IntAvro_S, array1IntAvro_Circe_S, array1IntAvro_Fix_S
-						avroS, avroC, avroFix
+						avroS, avroC, avroFixS
 					).distinct.length == 1)
 					
 				}
@@ -51,7 +56,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				
 				they("should all have the same Avro Schema type") {
 					
-					forEvery(List(avroS, avroC, avroFix)) {
+					forEvery(List(avroS, avroC, avroFixS)) {
 						skeuoSchema ⇒ skeuoSchema shouldBe a[AvroSchema_S[_]]
 					}
 					//.map(skeuoSchema ⇒ skeuoSchema shouldBe a[AvroSchema_S[_]]) )
@@ -60,7 +65,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					/*info(s"func type avros = ${UtilMain.getFuncTypeSubs(avroS)}")
 					UtilMain.getFuncTypeSubs(avroS) shouldEqual tpeS
 					UtilMain.getFuncTypeSubs(avroC) shouldEqual tpeC*/
-					UtilMain.getFuncTypeSubs(avroFix) shouldEqual "Fix[AvroSchema_S]"
+					UtilMain.getFuncTypeSubs(avroFixS) shouldEqual "Fix[AvroSchema_S]"
 				}
 			}
 		}
@@ -95,138 +100,165 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
 				
 				
-				val apacheAvro: AvroSchema_A = skeuoToApacheAvroSchema(avroFix)
-				val apacheAvroStr: String = apacheAvro.toString(true).removeSpaceBeforeColon
+				//val apacheAvro: AvroSchema_A = skeuoToApacheAvroSchema(avroFixS)
+				//val apacheAvroStr: String = apacheAvro.toString(true).removeSpaceBeforeColon
+				val apacheAvro: AvroSchema_A = new AvroSchema_A.Parser().parse(rawAvroStr)
 				val skeuoAvro: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(apacheAvro)
-				val skeuoJson: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(skeuoAvro)
-				val circeJson_fromJsonSkeuo: JsonCirce = libRender(skeuoJson)
+				val skeuoJson_trans_fromApacheStr: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(skeuoAvro)
+				//val circeJson_fromJsonSkeuo: JsonCirce = libRender(skeuoJson_trans_fromApache)
 				
 				info(s"TATI's way: apache-avro-str ---> skeuo-avro --> skeuo-json --> json-circe")
-				info(s"-- apache-avro-str\n: $apacheAvroStr")
-				info(s"-- skeuoAvro: $skeuoAvro")
-				info(s"-- skeuoJson: $skeuoJson")
-				info(s"-- skeuoJson -> json-circe\n: ${circeJson_fromJsonSkeuo.manicure}")
+				info(s"--- apache-avro-str (given): \n${rawAvroStr}")
+				info(s"--> skeuoAvro: $skeuoAvro")
+				info(s"--> skeuoJson: $skeuoJson_trans_fromApacheStr")
+				info(s"--> json-circe: \n${libRender(skeuoJson_trans_fromApacheStr).manicure}")
 				
 				info(s"\n\nMY DECODING WAY: ")
-				info(s"STEP 1): apache-avro-str --> skeuo-avro | Reason: state how string-avro looks (assumption / expectation)")
+				info(s"CHECKER 1: " +
+					s"\napache-avro-str --> skeuo-avro | Reason: state how string-avro looks (assumption / expectation)" +
+					s"\n--- apache-avro-str (given): \n$rawAvroStr" +
+					s"\n--> skeuo-avro: $skeuoAvro")
 				
-				info(s"STEP 2a): skeuo-avro --> skeuo-json | Reason: Trans converter, the algebra way")
 				
-				info(s"STEP 2b): skeuo-json -> skeuo-avro | Reason: Trans converter, the coalgebra way")
+				info(s"\nCHECKER 2a: " +
+					s"\nskeuo-avro --> skeuo-json | Reason: Trans converter, the algebra way" +
+					s"\n--- skeuo-avro (given): $avroFixS" +
+					s"\n--> skeuo-json: ${avroToJson_byCataTransAlg(avroFixS)}")
 				
-				info(s"STEP 3a): skeuo-avro --> json-circe | Reason: get common denominator (circe), from avro side")
 				
-				info(s"STEP 3b): skeuo-json --> json-circe | Reason: get common denominator (circe), from json side")
+				info(s"\nCHECKER 2b: " +
+					s"\nskeuo-json -> skeuo-avro | Reason: Trans converter, the coalgebra way")
+				val skeuoAvro_trans: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
+				info(s"\n--- skeuo-json (given): $jsonFixS")
+				info(s"\n--> skeuo-avro: $skeuoAvro_trans")
 				
-				info(s"STEP 4): skeuo-json --> skeuo-avro --> avro-str (trans output) vs. avro-str (input) | Reason: get common denominator (avro-str), from avro-side")
+				
+				info(s"\nCHECKER 3: " +
+					s"\nskeuo-json --> skeuo-avro --> avro-str (trans output) vs. avro-str (input) | Reason: get common denominator (avro-str), from avro-side")
+				val apacheAvro_trans: AvroSchema_A = skeuoToApacheAvroSchema(skeuoAvro_trans)
+				val apacheAvroStr_trans: String = apacheAvro_trans.toString(true).removeSpaceBeforeColon
+				info(s"\n--- skeuo-json (given): ${jsonFixS}")
+				info(s"\n--> skeuo-avro (trans): ${skeuoAvro_trans}")
+				info(s"\n--> apache-avro-str (trans): \n$apacheAvroStr_trans")
+				
+				
+				info(s"\nCHECKER 4a: " +
+					s"\nskeuo-avro --> json-circe | Reason: get common denominator (circe), from avro side" +
+					s"\n--- skeuo-avro (given): $avroFixS" +
+					s"\n--> json-circe: \n${libToJsonAltered(avroFixS).manicure}")
+				
+				info(s"\nCHECKER 4b: " +
+					s"\nskeuo-json --> json-circe | Reason: get common denominator (circe), from json side" +
+					s"\n--- skeuo-json (trans output): ${skeuoJson_trans_fromApacheStr}" +
+					s"\n--> json-circe (decoder output): \n${libRender(skeuoJson_trans_fromApacheStr).manicure}")
+				
+				
 				
 				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 2a: " +
+					s"\nCHECKER 5a: " +
 					s"\nraw-json-str (expectation input) -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output) " +
 					s"\n|\t Reason: find out how json-str translates to json-adt to check correctness of my Trans converter " +
 					s"\n|\t (from json side) " +
-					s"\n|\t (starting from: json-str)")
+					s"\n|\t (starting from: json-str)" +
+					s"\n--- raw-json-str (given): ${rawJsonStr}" +
+					s"\n--> json-circe: \n${unsafeParse(rawJsonStr).manicure}" +
+					s"\n--> skeuo-json (decoder output): ${strToCirceToSkeuoJson(rawJsonStr)}" +
+					s"\n\t VERSUS. skeuo-json (trans output): ${avroToJson_byCataTransAlg(avroFixS)}")
 				
 				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 2b: " +
+					s"\nCHECKER 5b: " +
 					s"\nraw-json-str (expectation input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans input) " +
 					s"\n|\t Reason: find out how json-str translates to avro-adt  + get common denominator (skeuo-avro), from avro-side" +
 					s"\n|\t (from avro side) " +
-					s"\n|\t (starting from: json-str)")
+					s"\n|\t (starting from: json-str)" +
+					s"\n--- raw-json-str (given): ${rawJsonStr}" +
+					s"\n--> json-circe: \n${unsafeParse(rawJsonStr).manicure}" +
+					s"\n--> skeuo-avro (decoder output): ${strToCirceToSkeuoAvro(rawJsonStr)}" +
+					s"\n\t VERSUS. skeuo-avro (trans output): ${jsonToAvro_byAnaTransCoalg(jsonFixS)}")
 				
 				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 2c: " +
-					s"\nraw-avro-str (expectation input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans input) " +
-					s"\n|\t Reason: find out how avro-str translates to avro-adt  + get common denominator (skeuo-avro), from avor-side." +
+					s"\nCHECKER 5c: " +
+					s"\nraw-avro-str (expectation input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans output) " +
+					s"\n|\t Reason: find out how avro-str translates to avro-adt  + get common denominator (skeuo-avro), from avro-side." +
 					s"\n|\t (from avro side) " +
 					s"\n|\t (starting from: avro-str)")
+				val jsonCirce_2: JsonCirce = libToJsonAltered(skeuoAvro)
+				info(s"\n--- raw-avro-str (given): $rawAvroStr" +
+					s"\n--> (apache-avro -> skeuo-avro (via apacheToSkeuo func)) -> json-circe (via libToJsonAltered): ${jsonCirce_2.manicure}" +
+					s"\n--> skeuo-avro (decoder output): ${funcCirceToAvroSkeuo(jsonCirce_2)}" +
+					s"\n\t VERSUS. skeuo-avro (trans output): ${jsonToAvro_byAnaTransCoalg(jsonFixS)}")
 				
-				//--------------------
+				
 				
 				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 2d: " +
+					s"\nCHECKER 5d: " +
 					s"\nraw-avro-str (expectation input) -> (skeuo-avro) -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
 					s"\n|\t Reason: compare skeuo-json (trans output) vs. skeuo-json (decoder output) to check correctness of my Trans converter " +
 					s"\n|\t (from json-side) " +
-					s"\n|\t (starting from: avro-str)")
+					s"\n|\t (starting from: avro-str)" +
+					s"\n--- raw-avro-str (given): \n$rawAvroStr" +
+					s"\n--> (apache-avro -> skeuo-avro (via apacheToSkeuo func)) -> json-circe (via libToJsonAltered): \n${jsonCirce_2.manicure}" +
+					s"\n--> skeuo-json (decoder output): ${funcCirceToJsonSkeuo(jsonCirce_2)}" +
+					s"\n\t VERSUS. skeuo-json (trans output): ${avroToJson_byCataTransAlg(avroFixS)}")
 				
 				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 3: " +
+					s"\nCHECKER 6a: " +
 					s"\nskeuo-avro -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
 					s"\n|\t Reason: compare skeuo-json (trans output) vs. skeuo-json (decoder output) to check correctness of my Trans converter " +
 					s"\n|\t (from json-side) " +
-					s"\n|\t (starting from: skeuo-avro-adt (easier than string-start))")
+					s"\n|\t (starting from: skeuo-avro-adt (easier than string-start))" +
+					s"\n--- skeuo-avro (given): $avroFixS" +
+					s"\n--> json-circe: \n${libToJsonAltered(avroFixS).manicure}" +
+					s"\n--> skeuo-json (decoder output): ${checker_AvroSkeuo_toJsonCirce_toJsonSkeuo(avroFixS)}" +
+					s"\n\t VERSUS. skeuo-json (trans output): ${avroToJson_byCataTransAlg(avroFixS)}")
 				
 				
-				
+				val skeuoJson_trans_fromAvroADT: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
 				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 3: " +
-					s"\nskeuo-json (trans output) -> json-circe -> skeuo-avro (decoder output) vs. skeuo avro (trans input) " +
+					s"\nCHECKER 6b: " +
+					s"\nskeuo-json (trans output) -> json-circe -> skeuo-avro (decoder output) vs. skeuo avro (trans input) vs. skeuo-avro (trans output)" +
 					s"\n|\t Reason: compare how skeuo-json (trans output) renders to skeuo-avro to check correctness of my Trans converter " +
 					s"\n|\t (from avro-side) " +
-					s"\n|\t (starting from: skeuo-json output)")
+					s"\n|\t (starting from: skeuo-json output)" +
+					s"\n--- skeuo-json (trans output): $skeuoJson_trans_fromAvroADT" +
+					s"\n--> json-circe: \n${libRender(skeuoJson_trans_fromAvroADT).manicure}" +
+					s"\n--> skeuo-avro (decoder output): ${checker_JsonSkeuo_toJsonCirce_toAvroSkeuo(skeuoJson_trans_fromAvroADT)}" +
+					s"\n\t VERSUS. skeuo-avro (trans input): ${avroFixS}" +
+					s"\n\t VERSUS. skeuo-avro (trans output): ${jsonToAvro_byAnaTransCoalg(jsonFixS)}"
+					)
 				
 				
 				
-				val a3: AvroSchema_A = skeuoToApacheAvroSchema(array3IntAvro_Fix_S)
-				//val u: JsonCirce = unsafeParse(a3.toString)
-				val u: JsonCirce = libToJsonAltered(array3IntAvro_Fix_S)
-				val as: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(u)
-				val js: Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo(u)
-				
-				info(s"HERE: skeuo-avro: $array3IntAvro_Fix_S")
-				info(s"HERE: apache-str: $a3")
-				info(s"skeuo-avro -> json-circe?: $u")
-				info(s"skeuo-avro -> json-circe -> skeuo-json?: $js")
-				info(s"skeuo-avro -> json-circe -> skeuo-avro?: $as")
 				
 				
-				info(s"-------------------------------" +
-					s"\nCHECK 2" +
+				info(s"\n---------------------------------------------------------")
+				info("\nDECODING SANITY CHECK:")
+				info(s"\nCHECK 1" +
 					s"\nskeuo-avro (fix) --> json-circe --> skeuo-json (fix)" +
-					s"\nskeuo-avro: \n$avroFix" +
-					s"\njson-circe: \n${libToJsonAltered(avroFix).manicure}" +
-					s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
-					s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${strToCirceToSkeuoJson(redocly_jsonSchemaFromData)}" +
-					s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(strToCirceToSkeuoJson(redocly_jsonSchemaFromData).get).manicure}" +
-					s"\nskeuo-json: \n${checker_AvroSkeuo_toJsonCirce_toJsonSkeuo(avroFix)}")
+					s"\nskeuo-avro: $avroFixS" +
+					s"\njson-circe: \n${libToJsonAltered(avroFixS).manicure}" +
+					s"\nskeuo-json: ${checker_AvroSkeuo_toJsonCirce_toJsonSkeuo(avroFixS)}")
 				
 				
-				info(s"-------------------------------" +
-					s"\nCHECK 3" +
-					s"\nskeuo-json (fix) --> json-circe --> skeuo-json (fix)" +
-					s"\nskeuo-json: \n$jsonFix" +
-					s"\njson-circe: \n${libRender(jsonFix).manicure}" +
-					s"\nskeuo-json: \n${checker_JsonSkeuo_toJsonCirce_toJsonSkeuo(jsonFix)}")
-				
-				
-				
-				val a4: AvroSchema_A = skeuoToApacheAvroSchema(avroFix)
-				val ua4: JsonCirce = unsafeParse(a4.toString(true)) // useless
-				//val uc4: JsonCirce = unsafeParse(libRender(jsonFix).toString)
-				//val s4: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(ua4)
-				info(s"-------------------------------" +
-					s"\nCHECK 4" +
+				info(s"\nCHECK 2" +
 					s"\nskeuo-avro (fix) --> json-circe --> skeuo-avro (fix)" +
-					s"\nskeuo-avro: \n$avroFix" +
-					s"\n-> circe: \n${libToJsonAltered(avroFix).manicure}" +
-					s"\n-> apache-avro-str: \n${a4.toString(true)}" +
-					s"\n-- apache-avro-str -> circe: \n${ua4}" +
-					s"\n-- apache-avro-str -> circe -> skeuo-avro: \n${checker_AvroSkeuo_toJsonCirce_toAvroSkeuo(avroFix)}" +
-					s"\n-- redocly: json-str -> circe -> skeuo-avro: \n${strToCirceToSkeuoAvro(redocly_jsonSchemaFromData)}" +
-					s"\n\n-- skeuo-json -> circe: \n${libRender(jsonFix).manicure}")
+					s"\nskeuo-avro: $avroFixS" +
+					s"\njson-circe: \n${libToJsonAltered(avroFixS).manicure}" +
+					s"\nskeuo-avro: ${checker_AvroSkeuo_toJsonCirce_toAvroSkeuo(avroFixS)}")
+				
+				info(s"\nCHECK 3" +
+					s"\nskeuo-json (fix) --> json-circe --> skeuo-avro (fix)" +
+					s"\nskeuo-json: $jsonFixS" +
+					s"\njson-circe: \n${libRender(jsonFixS).manicure}" +
+					s"\nskeuo-avro: ${checker_JsonSkeuo_toJsonCirce_toAvroSkeuo(jsonFixS)}")
+				
+				info(s"\nCHECK 4" +
+					s"\nskeuo-json (fix) --> json-circe --> skeuo-json (fix)" +
+					s"\nskeuo-json: $jsonFixS" +
+					s"\njson-circe: \n${libRender(jsonFixS).manicure}" +
+					s"\nskeuo-json: ${checker_JsonSkeuo_toJsonCirce_toJsonSkeuo(jsonFixS)}")
 				
 				
-				val j: JsonCirce = libRender(avroToJson_byCataTransAlg(avroFix))
-				val a: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(j)
-				info(s"-------------------------------" +
-					s"\nCONVERTER FUNCTION:" +
-					s"\nskeuo-avro (fix) --> skeuo-json (fix)" +
-					s"\nINPUT: \n$avroFix" +
-					s"\nOUTPUT: \n${avroToJson_byCataTransAlg(avroFix)}" +
-					s"\nskeuo-avro -> skeuo-json -> json-circe -> skeuo-avro" +
-					s"\n-> json-circe: ${j}" +
-					s"\n-> skeuo-avro: $a")
 				
 				
 			}
@@ -238,26 +270,39 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 		array1IntAvro_Fix_S → "AvroSchema_S[AvroSchema_S[JsonCirce]]")*/
 	
 	
+	/*,
+			redocly_jsonSchemaFromData =
+				"""
+				|{
+				|  "type": "object",
+				|  "properties": {
+				|    "type": {
+				|      "type": "string"
+				|    },
+				|    "items": {
+				|      "type": "string"
+				|    }
+				|  },
+				|  "additionalProperties": false
+				|}
+				|""".stripMargin*/
+	
+	
+	
+	info(s"PRINT OUT array string from skeuo schema avro to see avro str")
+	info(s"${skeuoToApacheAvroSchema(nullAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
+	info(s"${skeuoToApacheAvroSchema(intAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
+	info(s"${skeuoToApacheAvroSchema(strAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
+	info(s"${skeuoToApacheAvroSchema(booleanAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
+	info(s"${skeuoToApacheAvroSchema(array1IntAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
+	
 	testStructure(scenarioType = "array of int",
+		rawAvroStr = array1IntAvro_R,
+		rawJsonStr = array1IntJson_R,
 		avroS = array1IntAvro_S, tpeS = "AvroSchema_S[AvroSchema_S[Int]]",
 		avroC = array1IntAvro_Circe_S, tpeC = "AvroSchema_S[AvroSchema_S[JsonCirce]]",
-		avroFix = array1IntAvro_Fix_S,
-		jsonFix = array1IntJson_Fix_S,
-		redocly_jsonSchemaFromData =
-			"""
-			  |{
-			  |  "type": "object",
-			  |  "properties": {
-			  |    "type": {
-			  |      "type": "string"
-			  |    },
-			  |    "items": {
-			  |      "type": "string"
-			  |    }
-			  |  },
-			  |  "additionalProperties": false
-			  |}
-			  |""".stripMargin
+		avroFixS = array1IntAvro_Fix_S,
+		jsonFixS = array1IntJson_Fix_S
 	)
 	// ----
 	

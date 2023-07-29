@@ -28,7 +28,7 @@ object ParseADTToCirceToADT {
 	val libToJson: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(AvroSchema_S.toJson).apply(_)
 	
 	
-	def libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(myToJson).apply(_)
+	val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(myToJson).apply(_)
 	
 	// Copied from skeuomorph (is private) = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L88
 	def jsonType(value: String, attr: (String, JsonCirce)*): JsonCirce =
@@ -181,6 +181,8 @@ object ParseADTToCirceToADT {
 	def checker_JsonSkeuo_toJsonCirce_toJsonSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libRender
 	
 	def checker_AvroSkeuo_toJsonCirce_toAvroSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libToJsonAltered
+	
+	def checker_JsonSkeuo_toJsonCirce_toAvroSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libRender
 	
 	//////// ------------------------------------------------------------
 	/*val avroS_to_JsonCirce: JsonCirce = libToJson(array1IntAvro_Fix_S)

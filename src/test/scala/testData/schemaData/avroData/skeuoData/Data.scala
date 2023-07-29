@@ -24,6 +24,7 @@ object Data {
 	val intAvro_Circe_S: AvroSchema_S[JsonCirce] = TInt()
 	val intAvro_Fix_S: Fix[AvroSchema_S] = Fix(TInt())
 	
+	val booleanAvro_Fix_S: Fix[AvroSchema_S] = Fix(TBoolean())
 	
 	val array1IntAvro_S: AvroSchema_S[AvroSchema_S[Int]] = TArray(TInt())
 	val array1IntAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TArray(TInt())
