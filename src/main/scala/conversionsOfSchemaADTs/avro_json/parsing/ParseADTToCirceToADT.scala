@@ -30,12 +30,16 @@ object ParseADTToCirceToADT {
 	
 	val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(myToJson).apply(_)
 	
+	
 	// Copied from skeuomorph (is private) = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L88
 	def jsonType(value: String, attr: (String, JsonCirce)*): JsonCirce =
 		JsonCirce.obj((("type" -> JsonCirce.fromString(value)) :: attr.toList): _*)
 	
+	
 	def format(value: String): (String, JsonCirce) =
 		"format" -> JsonCirce.fromString(value)
+	
+	
 	def myToJson: Algebra[AvroSchema_S, JsonCirce] = Algebra {
 		// TODO check if correct
 		case TNull() ⇒ jsonType("null", attr = List():_*)

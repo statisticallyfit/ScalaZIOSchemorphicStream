@@ -135,7 +135,7 @@ object Skeuo_Skeuo {
 		val avroToJson_byCataTransAlg: Fix[AvroSchema_S] ⇒ Fix[JsonSchema_S] = scheme.cata(transJ.algebra).apply(_)
 		
 		import TransSchemaImplicits.{skeuoEmbed_JA, skeuoProject_AJ} // skeuoProject_AJ
-		
+		//import TransSchemaImplicits.skeuoProject_AJ
 		
 		val jsonToAvro_byAnaTransCoalg: Fix[JsonSchema_S] ⇒ Fix[AvroSchema_S] = scheme.ana(transJ.coalgebra).apply(_)
 		

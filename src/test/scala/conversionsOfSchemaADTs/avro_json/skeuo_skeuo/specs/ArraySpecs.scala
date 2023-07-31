@@ -13,6 +13,7 @@ import io.circe.{Json ⇒ JsonCirce}
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
+import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.DecoderCheck_CanonicalWay_TransAvroStrToJsonStr
 import org.scalatest.Inspectors._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should._
@@ -31,6 +32,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 	
 	def testStructure(scenarioType: String,
 				   rawAvroStr: String, rawJsonStr: String,
+				   jsonCirceCheck: JsonCirce,
 				   avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String,
 				   avroFixS: Fix[AvroSchema_S],
 				   jsonFixS: Fix[JsonSchema_S]/*,
@@ -38,7 +40,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				  ) = {
 		
 		
-		describe(s"A skeuomorph avro schema - $scenarioType") {
+		describe(s"A Skeuomorph avro schema - $scenarioType") {
 			
 			describe("value-checking - the different kinds of schema definitions ... ") {
 				
@@ -71,15 +73,22 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 		}
 		
 		
-		describe("the conversion function of skeuomorph avro schema to json schema") {
+		describe("the conversion function") {
 			
-			describe("the converter function should convert avro-schema to json-schema") {
+			describe("should convert between Skeuomorph schemas") {
 				
 				it("should have avro-schema to json-schema type") {
 					
 					avroToJson_byCataTransAlg shouldBe a[AvroSchema_S[_] => JsonSchema_S[_]]
 					
 					UtilMain.getFuncTypeSubs(avroToJson_byCataTransAlg) shouldEqual "Fix[AvroSchema_S] => Fix[JsonSchema_S]"
+				}
+				
+				it("should have json-schema to avro-schema type"){
+					
+					jsonToAvro_byAnaTransCoalg shouldBe a [JsonSchema_S[_] => AvroSchema_S[_] ]
+					
+					UtilMain.getFuncTypeSubs(jsonToAvro_byAnaTransCoalg) shouldEqual "Fix[JsonSchema_S] => Fix[AvroSchema_S]"
 				}
 			}
 		}
@@ -89,73 +98,126 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 			
 			
 			describe("type checking") {
-				it("the result should have type skeuomorph-json-schema") {
+				it("the result should have type Skeuomorph-json-schema") {
 					
 					jsonSkeuo shouldBe a[JsonSchema_S[_]] // Fix is invisible
 					UtilMain.getFuncTypeSubs(jsonSkeuo) shouldEqual "Fix[JsonSchema_S]"
 				}
 			}
 			
-			describe("CHECKING") {
-				import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
+			describe("Canonical check: apache-avro-str (input) vs. json-circe-str (output)") {
+				
+				import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.ImplicitArgs
+				
+				implicit val i = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
+				
+				// TODO find out how to call just the class name without args?
+				
+				DecoderCheck_CanonicalWay_TransAvroStrToJsonStr(i).printOutsForUnderstanding
+				DecoderCheck_CanonicalWay_TransAvroStrToJsonStr(i).checking
+				
+				/*val o1 = DecoderCheck_CanonicalWay_TransAvroStrToJsonStr(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
+				
+				o1.printOutsForUnderstanding
+				o1.checking*/
 				
 				
-				//val apacheAvro: AvroSchema_A = skeuoToApacheAvroSchema(avroFixS)
-				//val apacheAvroStr: String = apacheAvro.toString(true).removeSpaceBeforeColon
-				val apacheAvro: AvroSchema_A = new AvroSchema_A.Parser().parse(rawAvroStr)
-				val skeuoAvro: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(apacheAvro)
-				val skeuoJson_trans_fromApacheStr: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(skeuoAvro)
-				//val circeJson_fromJsonSkeuo: JsonCirce = libRender(skeuoJson_trans_fromApache)
 				
-				info(s"TATI's way: apache-avro-str ---> skeuo-avro --> skeuo-json --> json-circe")
-				info(s"--- apache-avro-str (given): \n${rawAvroStr}")
-				info(s"--> skeuoAvro: $skeuoAvro")
-				info(s"--> skeuoJson: $skeuoJson_trans_fromApacheStr")
-				info(s"--> json-circe: \n${libRender(skeuoJson_trans_fromApacheStr).manicure}")
-				
+				info(s"\n-----------------------------------------------------------")
 				info(s"\n\nMY DECODING WAY: ")
-				info(s"CHECKER 1: " +
-					s"\napache-avro-str --> skeuo-avro | Reason: state how string-avro looks (assumption / expectation)" +
-					s"\n--- apache-avro-str (given): \n$rawAvroStr" +
-					s"\n--> skeuo-avro: $skeuoAvro")
 				
 				
-				info(s"\nCHECKER 2a: " +
+				
+				val skeuoJson_fromStr: Fix[JsonSchema_S] = funcCirceToJsonSkeuo(jsonCirceCheck).right.get
+				val skeuoJson_trans_fromADT: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
+				
+				info(s"\nCHECKER 1a: " +
 					s"\nskeuo-avro --> skeuo-json | Reason: Trans converter, the algebra way" +
 					s"\n--- skeuo-avro (given): $avroFixS" +
-					s"\n--> skeuo-json: ${avroToJson_byCataTransAlg(avroFixS)}")
+					s"\n--> skeuo-json (from adt): ${skeuoJson_trans_fromADT}" +
+					s"\n\t VERSUS. skeuo-json (from str): ${skeuoJson_fromStr}" +
+					s"\n\t VERSUS. skeuo-json (given): $jsonFixS ")
+				
+				//skeuoJson_trans_fromADT shouldEqual skeuoJson_trans_fromStr
+				//skeuoJson_trans_fromADT shouldEqual jsonFixS
+				// NOTE: already tested above so no use including it again
+				/*forEvery(List(
+					skeuoJson_trans_fromStr,
+					skeuoJson_trans_fromADT
+				)) {
+					js ⇒ js should equal(jsonFixS)
+				}*/
 				
 				
-				info(s"\nCHECKER 2b: " +
-					s"\nskeuo-json -> skeuo-avro | Reason: Trans converter, the coalgebra way")
-				val skeuoAvro_trans: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
-				info(s"\n--- skeuo-json (given): $jsonFixS")
-				info(s"\n--> skeuo-avro: $skeuoAvro_trans")
+				
+				info(s"\n-----------------------------------------------------------")
+				
+				// convert: json-circe -> json-skeuo -> avro-skeuo
+				val skeuoAvro_trans_fromStr: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(
+					funcCirceToJsonSkeuo(jsonCirceCheck).right.get
+				)
+				val skeuoAvro_trans_fromADT: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
+				info(s"\nCHECKER 1b: " +
+					s"\nskeuo-json -> skeuo-avro | Reason: Trans converter, the coalgebra way" +
+					s"\n--- skeuo-json (given): $jsonFixS" +
+					s"\n--> skeuo-avro (from adt): $skeuoAvro_trans_fromADT" +
+					s"\n\t VERSUS. skeuo-avro (from str): $skeuoAvro_fromStr" +
+					s"\n\t VERSUS. skeuo-avro (given): $avroFixS")
+				
+				//skeuoAvro_trans_fromADT shouldEqual skeuoAvro_trans_fromStr
+				forEvery(List(
+					skeuoAvro_trans_fromADT,
+					skeuoAvro_trans_fromStr
+				)) {
+					as ⇒ as should equal(avroFixS)
+				}
 				
 				
-				info(s"\nCHECKER 3: " +
-					s"\nskeuo-json --> skeuo-avro --> avro-str (trans output) vs. avro-str (input) | Reason: get common denominator (avro-str), from avro-side")
-				val apacheAvro_trans: AvroSchema_A = skeuoToApacheAvroSchema(skeuoAvro_trans)
+				
+				info(s"\n-----------------------------------------------------------")
+				
+				val apacheAvro_trans: AvroSchema_A = skeuoToApacheAvroSchema(skeuoAvro_trans_fromADT)
 				val apacheAvroStr_trans: String = apacheAvro_trans.toString(true).removeSpaceBeforeColon
+				
+				info(s"\nCHECKER 2: " +
+					s"\nskeuo-json --> skeuo-avro --> avro-str (trans output) vs. avro-str (input) | Reason: get common denominator (avro-str), from avro-side")
 				info(s"\n--- skeuo-json (given): ${jsonFixS}")
-				info(s"\n--> skeuo-avro (trans): ${skeuoAvro_trans}")
-				info(s"\n--> apache-avro-str (trans): \n$apacheAvroStr_trans")
+				info(s"\n--> skeuo-avro (trans output): ${skeuoAvro_trans_fromADT}")
+				info(s"\n--> apache-avro-str (trans output): \n$apacheAvroStr_trans")
+				info(s"\n\t VERSUS: apache-avro-str (given): \n$rawAvroStr")
+				
+				skeuoAvro_trans_fromADT shouldEqual skeuoAvro_trans_fromStr
+				apacheAvroStr_trans shouldEqual rawAvroStr
 				
 				
-				info(s"\nCHECKER 4a: " +
-					s"\nskeuo-avro --> json-circe | Reason: get common denominator (circe), from avro side" +
+				info(s"\n-----------------------------------------------------------")
+				
+				val skeuoJson_trans_fromAvroADT: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
+				val skeuoJson_trans_fromStr: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(skeuoAvro_fromStr)
+				val circeJson_fromAvro: JsonCirce = libToJsonAltered(avroFixS)
+				val circeJson_fromJson: JsonCirce = libRender(skeuoJson_trans_fromStr)
+				
+				info(s"\nCHECKER 3a: " +
+					s"\nskeuo-avro --> json-circe | Reason: get common denominator (circe), from json side" +
 					s"\n--- skeuo-avro (given): $avroFixS" +
-					s"\n--> json-circe: \n${libToJsonAltered(avroFixS).manicure}")
+					s"\n--> json-circe: \n${circeJson_fromAvro.manicure}")
 				
-				info(s"\nCHECKER 4b: " +
+				info(s"\nCHECKER 3b: " +
 					s"\nskeuo-json --> json-circe | Reason: get common denominator (circe), from json side" +
-					s"\n--- skeuo-json (trans output): ${skeuoJson_trans_fromApacheStr}" +
-					s"\n--> json-circe (decoder output): \n${libRender(skeuoJson_trans_fromApacheStr).manicure}")
+					s"\n--- skeuo-json (trans output): ${skeuoJson_trans_fromStr}" +
+					s"\n--> json-circe (decoder output): \n${circeJson_fromJson.manicure}")
+				
+				circeJson_fromAvro shouldEqual circeJson_fromJson
+				
+				// TODO check all equal
+				skeuoJson_trans_fromADT
+				skeuoJson_trans_fromStr
+				skeuoJson_fromStr
+				skeuoJson_trans_fromAvroADT
 				
 				
-				
-				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 5a: " +
+				info(s"\n-----------------------------------------------------------")
+				info(s"\nCHECKER 5a: " +
 					s"\nraw-json-str (expectation input) -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output) " +
 					s"\n|\t Reason: find out how json-str translates to json-adt to check correctness of my Trans converter " +
 					s"\n|\t (from json side) " +
@@ -163,11 +225,12 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					s"\n--- raw-json-str (given): ${rawJsonStr}" +
 					s"\n--> json-circe: \n${unsafeParse(rawJsonStr).manicure}" +
 					s"\n--> skeuo-json (decoder output): ${strToCirceToSkeuoJson(rawJsonStr)}" +
-					s"\n\t VERSUS. skeuo-json (trans output): ${avroToJson_byCataTransAlg(avroFixS)}")
+					s"\n\t VERSUS. skeuo-json (trans output): ${skeuoJson_trans_fromStr}")
 				
-				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 5b: " +
-					s"\nraw-json-str (expectation input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans input) " +
+				
+				info(s"\n-----------------------------------------------------------")
+				info(s"\nCHECKER 5b: " +
+					s"\nraw-json-str (expectation input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans input) vs. skeuo-avro (output)" +
 					s"\n|\t Reason: find out how json-str translates to avro-adt  + get common denominator (skeuo-avro), from avro-side" +
 					s"\n|\t (from avro side) " +
 					s"\n|\t (starting from: json-str)" +
@@ -176,22 +239,22 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					s"\n--> skeuo-avro (decoder output): ${strToCirceToSkeuoAvro(rawJsonStr)}" +
 					s"\n\t VERSUS. skeuo-avro (trans output): ${jsonToAvro_byAnaTransCoalg(jsonFixS)}")
 				
-				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 5c: " +
+				info(s"\n-----------------------------------------------------------")
+				
+				info(s"\nCHECKER 5c: " +
 					s"\nraw-avro-str (expectation input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans output) " +
 					s"\n|\t Reason: find out how avro-str translates to avro-adt  + get common denominator (skeuo-avro), from avro-side." +
 					s"\n|\t (from avro side) " +
 					s"\n|\t (starting from: avro-str)")
-				val jsonCirce_2: JsonCirce = libToJsonAltered(skeuoAvro)
+				val jsonCirce_2: JsonCirce = libToJsonAltered(skeuoAvro_fromStr)
 				info(s"\n--- raw-avro-str (given): $rawAvroStr" +
 					s"\n--> (apache-avro -> skeuo-avro (via apacheToSkeuo func)) -> json-circe (via libToJsonAltered): ${jsonCirce_2.manicure}" +
 					s"\n--> skeuo-avro (decoder output): ${funcCirceToAvroSkeuo(jsonCirce_2)}" +
 					s"\n\t VERSUS. skeuo-avro (trans output): ${jsonToAvro_byAnaTransCoalg(jsonFixS)}")
 				
 				
-				
-				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 5d: " +
+				info(s"\n-----------------------------------------------------------")
+				info(s"\nCHECKER 5d: " +
 					s"\nraw-avro-str (expectation input) -> (skeuo-avro) -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
 					s"\n|\t Reason: compare skeuo-json (trans output) vs. skeuo-json (decoder output) to check correctness of my Trans converter " +
 					s"\n|\t (from json-side) " +
@@ -201,8 +264,8 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					s"\n--> skeuo-json (decoder output): ${funcCirceToJsonSkeuo(jsonCirce_2)}" +
 					s"\n\t VERSUS. skeuo-json (trans output): ${avroToJson_byCataTransAlg(avroFixS)}")
 				
-				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 6a: " +
+				info(s"\n-----------------------------------------------------------")
+				info(s"\nCHECKER 6a: " +
 					s"\nskeuo-avro -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
 					s"\n|\t Reason: compare skeuo-json (trans output) vs. skeuo-json (decoder output) to check correctness of my Trans converter " +
 					s"\n|\t (from json-side) " +
@@ -213,9 +276,10 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					s"\n\t VERSUS. skeuo-json (trans output): ${avroToJson_byCataTransAlg(avroFixS)}")
 				
 				
+				info(s"\n-----------------------------------------------------------")
+				
 				val skeuoJson_trans_fromAvroADT: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
-				info(s"\n-----------------------------------------------------------" +
-					s"\nCHECKER 6b: " +
+				info(s"\nCHECKER 6b: " +
 					s"\nskeuo-json (trans output) -> json-circe -> skeuo-avro (decoder output) vs. skeuo avro (trans input) vs. skeuo-avro (trans output)" +
 					s"\n|\t Reason: compare how skeuo-json (trans output) renders to skeuo-avro to check correctness of my Trans converter " +
 					s"\n|\t (from avro-side) " +
@@ -231,7 +295,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				
 				
 				
-				info(s"\n---------------------------------------------------------")
+				info(s"\n-----------------------------------------------------------")
 				info("\nDECODING SANITY CHECK:")
 				info(s"\nCHECK 1" +
 					s"\nskeuo-avro (fix) --> json-circe --> skeuo-json (fix)" +
@@ -307,7 +371,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 	// ----
 	
 	
-	/*"Given: A skeuomorph avro schema" when {
+	/*"Given: A Skeuomorph avro schema" when {
 		
 		"value-checking - the different kinds of schema definitions ... " should {
 			
