@@ -4,7 +4,7 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo
  *
  */
 trait DecoderChecks {
-	def printOutsForUnderstanding: Unit
+	def printOuts(): Unit
 	
-	def checking: Unit
+	def checking(): Unit
 }
