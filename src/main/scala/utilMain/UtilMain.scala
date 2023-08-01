@@ -25,7 +25,7 @@ object UtilMain {
 			def noSpaces: String = implicitWorkhorse.noSpaces(str)
 			
 			def removeSpaceBetweenBrackets: String = implicitWorkhorse.removeSpaceBetweenBrackets(str)
-			
+			def manicure: String = implicitWorkhorse.manicure(str)
 		}
 		
 		

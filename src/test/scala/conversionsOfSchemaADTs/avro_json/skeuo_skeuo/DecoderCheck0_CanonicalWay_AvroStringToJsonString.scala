@@ -3,20 +3,15 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo
 import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans.avroToJson_byCataTransAlg
-
 import higherkindness.droste.data.Fix
-
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-
 import io.circe.{Json ⇒ JsonCirce}
-
 import org.apache.avro.{Schema ⇒ AvroSchema_A}
-
+import org.scalatest.Assertion
 import org.scalatest.Inspectors._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should._
-
 import utilMain.UtilMain.implicits._
 
 
@@ -39,13 +34,13 @@ case class DecoderCheck0_CanonicalWay_AvroStringToJsonString(implicit imp: Impli
 	//val apacheAvroStr: String = apacheAvro.toString(true).removeSpaceBeforeColon
 	val apacheAvro_fromStr: AvroSchema_A = new AvroSchema_A.Parser().parse(rawAvroStr) // TODO Option for parsing failure?
 	
-	val skeuoAvro_fromStr: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(apacheAvro_fromStr)
+	val skeuoAvro_fromApacheStr: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(apacheAvro_fromStr)
 	
-	val skeuoJson_fromTrans_byStr: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(skeuoAvro_fromStr)
+	val skeuoJson_fromTransOfAvroStr: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(skeuoAvro_fromApacheStr)
 	
-	val skeuoJson_fromTrans_byADT: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
+	val skeuoJson_fromTransOfAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
 	
-	val circeJson_fromTrans_byStr: JsonCirce = libRender(skeuoJson_fromTrans_byStr)
+	val circeJson_fromTransOfJsonSkeuoOfAvroStr: JsonCirce = libRender(skeuoJson_fromTransOfAvroStr)
 	//val circeJson_fromJsonSkeuo: JsonCirce = libRender(skeuoJson_trans_fromApache)
 	
 	
@@ -54,26 +49,39 @@ case class DecoderCheck0_CanonicalWay_AvroStringToJsonString(implicit imp: Impli
 		
 		info(s"CANONICAL way: apache-avro-str ---> skeuo-avro --> skeuo-json --> json-circe-str")
 		info(s"--- apache-avro-str (given): \n${rawAvroStr}")
-		info(s"--> skeuoAvro: $skeuoAvro_fromStr")
-		info(s"--> skeuoJson (from str-trans): $skeuoJson_fromTrans_byStr")
-		info(s"VERSUS: skeuoJson (from adt-trans): $skeuoJson_fromTrans_byADT")
-		info(s"--> json-circe (from trans): \n${circeJson_fromTrans_byStr.manicure}")
+		info(s"--> skeuoAvro: $skeuoAvro_fromApacheStr")
+		info(s"--> skeuoJson (from str-trans): $skeuoJson_fromTransOfAvroStr")
+		info(s"VERSUS: skeuoJson (from adt-trans): $skeuoJson_fromTransOfAvroSkeuo")
+		info(s"--> json-circe (from trans): \n${circeJson_fromTransOfJsonSkeuoOfAvroStr.manicure}")
 	}
 	
 	def checking(): Unit = {
 		
-		skeuoAvro_fromStr shouldEqual avroFixS
-		//skeuoJson_trans_fromStr should equal(jsonFixS)
-		//skeuoJson_trans_fromStr should equal(skeuoJson_trans_fromADT)
+		import Checks._
 		
-		forEvery(List(
-			skeuoJson_fromTrans_byStr,
-			skeuoJson_fromTrans_byADT
-		)) {
-			js ⇒ js should equal(jsonFixS)
+		checkInputAvroSkeuoEqualsAvroSkeuoFromApacheString
+		checkInputJsonSkeuoEqualsOutputJsonSkeuosFromApacheStringAndFromTrans
+		checkInputJsonCirceEqualsOutputJsonCirceFromTrans
+		
+	}
+	
+	object Checks {
+		def checkInputAvroSkeuoEqualsAvroSkeuoFromApacheString: Assertion = {
+			skeuoAvro_fromApacheStr shouldEqual avroFixS
 		}
 		
-		circeJson_fromTrans_byStr should equal(jsonCirceCheck)
+		def checkInputJsonSkeuoEqualsOutputJsonSkeuosFromApacheStringAndFromTrans: Assertion = {
+			forEvery(List(
+				skeuoJson_fromTransOfAvroStr,
+				skeuoJson_fromTransOfAvroSkeuo
+			)) {
+				js ⇒ js should equal(jsonFixS)
+			}
+		}
+		
+		def checkInputJsonCirceEqualsOutputJsonCirceFromTrans: Assertion = {
+			circeJson_fromTransOfJsonSkeuoOfAvroStr should equal(jsonCirceCheck)
+		}
 	}
 }
 

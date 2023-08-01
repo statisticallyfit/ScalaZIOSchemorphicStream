@@ -15,6 +15,7 @@ import io.circe.{Json ⇒ JsonCirce}
 
 import org.apache.avro.{Schema ⇒ AvroSchema_A}
 
+import org.scalatest.Assertion
 import org.scalatest.Inspectors._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should._
@@ -38,10 +39,10 @@ case class DecoderCheck1b_JsonSkeuoToAvroSkeuo(implicit imp: ImplicitArgs )
 	val skeuoAvro_fromStr: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(apacheAvro_fromStr)
 	
 	// convert: json-circe -> json-skeuo -> avro-skeuo
-	val skeuoAvro_fromTrans_byStr: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(
+	val skeuoAvro_fromTransOfDecoder: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(
 		funcCirceToJsonSkeuo(jsonCirceCheck).right.get
 	)
-	val skeuoAvro_fromTrans_byADT: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
+	val skeuoAvro_fromTransOfADT: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
 	
 	def printOuts(): Unit = {
 		info(s"\n-----------------------------------------------------------")
@@ -49,8 +50,8 @@ case class DecoderCheck1b_JsonSkeuoToAvroSkeuo(implicit imp: ImplicitArgs )
 		info(s"\nCHECKER 1b: " +
 			s"\nskeuo-json -> skeuo-avro | Reason: Trans converter, the coalgebra way" +
 			s"\n--- skeuo-json (given): $jsonFixS" +
-			s"\n--> skeuo-avro (adt-trans): $skeuoAvro_fromTrans_byADT" +
-			s"\n\t VERSUS. skeuo-avro (decoder output): $skeuoAvro_fromTrans_byStr" +
+			s"\n--> skeuo-avro (adt-trans): $skeuoAvro_fromTransOfADT" +
+			s"\n\t VERSUS. skeuo-avro (decoder output): $skeuoAvro_fromTransOfDecoder" +
 			s"\n\t VERSUS. skeuo-avro (str-given): $skeuoAvro_fromStr" +
 			s"\n\t VERSUS. skeuo-avro (given): $avroFixS")
 	}
@@ -58,11 +59,19 @@ case class DecoderCheck1b_JsonSkeuoToAvroSkeuo(implicit imp: ImplicitArgs )
 	//skeuoAvro_trans_fromADT shouldEqual skeuoAvro_trans_fromStr
 	
 	def checking(): Unit = {
-		forEvery(List(
-			skeuoAvro_fromTrans_byADT,
-			skeuoAvro_fromTrans_byStr
-		)) {
-			as ⇒ as should equal(avroFixS)
+		import Checks._
+		
+		checkInputAvroSkeuoEqualsAvroSkeuoFromDecoderAndFromTrans
+	}
+	
+	object Checks {
+		def checkInputAvroSkeuoEqualsAvroSkeuoFromDecoderAndFromTrans: Assertion = {
+			forEvery(List(
+				skeuoAvro_fromTransOfADT,
+				skeuoAvro_fromTransOfDecoder
+			)) {
+				as ⇒ as should equal(avroFixS)
+			}
 		}
 	}
 }
