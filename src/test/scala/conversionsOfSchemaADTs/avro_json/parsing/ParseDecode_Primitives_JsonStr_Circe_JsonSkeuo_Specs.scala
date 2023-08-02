@@ -35,7 +35,7 @@ class ParseDecode_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends AnyFunSuite w
 			circeJsonStr shouldBe a[JsonCirce]
 			
 			
-			val decodedJsonSkeuo: Option[Fix[JsonSchema_S]] = ParseStringToCirceToADT.strToCirceToSkeuoJson(rawJsonStr)
+			val decodedJsonSkeuo: Option[Fix[JsonSchema_S]] = ParseStringToCirceToADT.decodeJsonStringToCirceToJsonSkeuo(rawJsonStr)
 			
 			// value check
 			decodedJsonSkeuo shouldEqual Some(checkerJsonSkeuo)

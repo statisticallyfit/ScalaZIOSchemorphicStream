@@ -38,10 +38,10 @@ case class DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans(implicit imp: I
 	val apacheAvro_fromGivenStr: AvroSchema_A = new AvroSchema_A.Parser().parse(rawAvroStr) // TODO Option for parsing failure?
 	val apacheAvroStr_fromGivenStr: String = apacheAvro_fromGivenStr.toString(true).manicure
 	val skeuoAvro_fromStr: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(apacheAvro_fromGivenStr)
-	val skeuoAvro_fromDecoder: Result[Fix[AvroSchema_S]] = strToCirceToSkeuoAvro(rawJsonStr)
+	val skeuoAvro_fromDecoder: Result[Fix[AvroSchema_S]] = decodeJsonStringToCirceToAvroSkeuo(rawJsonStr)
 	
-	val jsonCirce_fromStr: JsonCirce = unsafeParse(rawJsonStr)
-	val jsonCirce_fromDecoder: JsonCirce = libToJsonAltered(skeuoAvro_fromStr)
+	val jsonCirce_fromJsonStr: JsonCirce = unsafeParse(rawJsonStr)
+	val jsonCirce_fromDecoderAvroStr: JsonCirce = libToJsonAltered(skeuoAvro_fromStr)
 	
 	
 	val skeuoAvro_fromTransOfGivenJsonSkeuo: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
@@ -57,7 +57,7 @@ case class DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans(implicit imp: I
 			s"\n|\t (starting from: avro-str)")
 		
 		info(s"\n--- raw-avro-str (given): $rawAvroStr" +
-			s"\n--> (apache-avro -> skeuo-avro (via apacheToSkeuo func)) -> json-circe (via libToJsonAltered): ${jsonCirce_fromDecoder.manicure}" +
+			s"\n--> (apache-avro -> skeuo-avro (via apacheToSkeuo func)) -> json-circe (via libToJsonAltered): ${jsonCirce_fromDecoderAvroStr.manicure}" +
 			s"\n--> skeuo-avro (decoder output): ${skeuoAvro_fromDecoder}" +
 			s"\n\t VERSUS. skeuo-avro (trans output): ${skeuoAvro_fromTransOfGivenJsonSkeuo}")
 	}
@@ -73,8 +73,8 @@ case class DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans(implicit imp: I
 		def checkInputJsonCirceMatchesJsonCirceFromDecoder: Assertion = {
 			
 			forEvery(List(
-				jsonCirce_fromStr,
-				jsonCirce_fromDecoder
+				jsonCirce_fromJsonStr,
+				jsonCirce_fromDecoderAvroStr
 			)) {
 				jc ⇒ jc should equal (jsonCirceCheck)
 			}

@@ -29,7 +29,7 @@ case class DecoderCheck4b_JsonStringBegin_AvroDecoderVsAvroTrans(implicit imp: I
 	
 	
 	val jsonCirceFromStr: JsonCirce = unsafeParse(rawJsonStr)
-	val skeuoAvro_fromDecoder: Result[Fix[AvroSchema_S]] = strToCirceToSkeuoAvro(rawJsonStr)
+	val skeuoAvro_fromDecoder: Result[Fix[AvroSchema_S]] = decodeJsonStringToCirceToAvroSkeuo(rawJsonStr)
 	val skeuoAvro_fromTransOfJsonSkeuo: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
 	
 	

@@ -118,9 +118,9 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs extends AnyFeatureSpec with GivenWhenThe
 				s"\nskeuo-avro: \n$array1IntAvro_Fix_S" +
 				s"\njson-circe: \n${libToJson(array1IntAvro_Fix_S).manicure}" +
 				s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
-				s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${strToCirceToSkeuoJson(redocly_jsonSchemaFromData)}" +
-				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(strToCirceToSkeuoJson(redocly_jsonSchemaFromData).get)}" +
-				s"\nskeuo-json: \n${checker_AvroSkeuo_toJsonCirce_toJsonSkeuo(array1IntAvro_Fix_S)}")
+				s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData)}" +
+				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData).get)}" +
+				s"\nskeuo-json: \n${decodeAvroSkeuoCirceToJsonSkeuo(array1IntAvro_Fix_S)}")
 			
 			
 			info(s"-------------------------------" +
@@ -128,7 +128,7 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs extends AnyFeatureSpec with GivenWhenThe
 				s"\nskeuo-json (fix) --> json-circe --> skeuo-json (fix)" +
 				s"\nskeuo-json: \n$array1IntJson_Fix_S" +
 				s"\njson-circe: \n${libRender(array1IntJson_Fix_S).manicure}" +
-				s"\nskeuo-json: \n${checker_JsonSkeuo_toJsonCirce_toJsonSkeuo(array1IntJson_Fix_S)}")
+				s"\nskeuo-json: \n${decodeJsonSkeuoToCirceToJsonSkeuo(array1IntJson_Fix_S)}")
 			
 			info(s"-------------------------------" +
 				s"\nCHECK 4" +
@@ -136,9 +136,9 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs extends AnyFeatureSpec with GivenWhenThe
 				s"\nskeuo-avro: \n$array1IntAvro_Fix_S" +
 				s"\njson-circe: \n${libToJson(array1IntAvro_Fix_S).manicure}" +
 				s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
-				s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${strToCirceToSkeuoJson(redocly_jsonSchemaFromData)}" +
-				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(strToCirceToSkeuoJson(redocly_jsonSchemaFromData).get)}" +
-				s"\nskeuo-avro: \n${checker_AvroSkeuo_toJsonCirce_toAvroSkeuo(array1IntAvro_Fix_S)}")
+				s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData)}" +
+				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData).get)}" +
+				s"\nskeuo-avro: \n${decodeAvroSkeuoToCirceToAvroSkeuo(array1IntAvro_Fix_S)}")
 			
 			info(s"-------------------------------" +
 				s"\nCONVERTER FUNCTION:" +

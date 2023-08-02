@@ -33,7 +33,7 @@ case class DecoderCheck4a_JsonStringBegin_JsonDecoderVersusJsonTrans(implicit im
 	/*val skeuoJson_fromStr: Fix[JsonSchema_S] = funcCirceToJsonSkeuo(jsonCirceCheck).right.get*/
 	
 	val jsonCirceFromStr: JsonCirce = unsafeParse(rawJsonStr)
-	val skeuoJson_fromDecoder: Option[Fix[JsonSchema_S]] = strToCirceToSkeuoJson(rawJsonStr)
+	val skeuoJson_fromDecoder: Option[Fix[JsonSchema_S]] = decodeJsonStringToCirceToJsonSkeuo(rawJsonStr)
 	val skeuoJson_fromTransOfGivenAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
 	
 	
