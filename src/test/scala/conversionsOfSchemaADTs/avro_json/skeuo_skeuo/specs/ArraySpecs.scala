@@ -222,7 +222,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					s"\nskeuo-avro (fix) --> json-circe --> skeuo-json (fix)" +
 					s"\nskeuo-avro: $avroFixS" +
 					s"\njson-circe: \n${libToJsonAltered(avroFixS).manicure}" +
-					s"\nskeuo-json: ${decodeAvroSkeuoCirceToJsonSkeuo(avroFixS)}")
+					s"\nskeuo-json: ${decodeAvroSkeuoToCirceToJsonSkeuo(avroFixS)}")
 				
 				
 				info(s"\nCHECK 2" +

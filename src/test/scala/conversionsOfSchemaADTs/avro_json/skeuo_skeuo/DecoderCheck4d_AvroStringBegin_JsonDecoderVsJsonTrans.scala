@@ -39,7 +39,7 @@ case class DecoderCheck4d_AvroStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 	
 	//val skeuoJson_fromDecoderOfAvro: Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo(jsonCirce_fromDecoderOfAvro)
 	val skeuoJson_fromDecoderOfCirce: Fix[JsonSchema_S] = funcCirceToJsonSkeuo(jsonCirceCheck).right.get
-	val skeuoJson_fromDecoderOfAvro: Result[Fix[JsonSchema_S]] = decodeAvroSkeuoCirceToJsonSkeuo(avroFixS)
+	val skeuoJson_fromDecoderOfAvro: Result[Fix[JsonSchema_S]] = decodeAvroSkeuoToCirceToJsonSkeuo(avroFixS)
 	
 	def printOuts(): Unit = {
 		info(s"\n-----------------------------------------------------------")

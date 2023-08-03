@@ -120,7 +120,7 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs extends AnyFeatureSpec with GivenWhenThe
 				s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
 				s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData)}" +
 				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData).get)}" +
-				s"\nskeuo-json: \n${decodeAvroSkeuoCirceToJsonSkeuo(array1IntAvro_Fix_S)}")
+				s"\nskeuo-json: \n${decodeAvroSkeuoToCirceToJsonSkeuo(array1IntAvro_Fix_S)}")
 			
 			
 			info(s"-------------------------------" +
