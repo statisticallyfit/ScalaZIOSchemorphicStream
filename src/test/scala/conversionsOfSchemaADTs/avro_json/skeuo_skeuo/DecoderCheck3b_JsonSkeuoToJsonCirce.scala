@@ -20,7 +20,7 @@ import utilMain.UtilMain.implicits._
 /**
  *
  */
-case class DecoderCheck3b_JsonSkeuoToJsonCirce(implicit imp: ImplicitArgs)
+class DecoderCheck3b_JsonSkeuoToJsonCirce(implicit imp: ImplicitArgs)
 	extends AnyFunSpec with DecoderChecks with Matchers {
 	
 	import imp._
@@ -68,7 +68,7 @@ case class DecoderCheck3b_JsonSkeuoToJsonCirce(implicit imp: ImplicitArgs)
 		def checkInputJsonSkeuoShouldMatchJsonSkeuoFromAvroSkeuoTransAndStrAndDecoder: Assertion = {
 			forEvery(List(
 				skeuoJson_fromTransOfGivenAvroSkeuo,
-				skeuoJson_fromTransOfAvroSkeuoFromStr,
+				skeuoJson_fromTransOfAvroSkeuoOfStr,
 				skeuoJson_fromDecoder
 			)) {
 				sj ⇒ sj shouldEqual jsonFixS
@@ -82,6 +82,8 @@ case class DecoderCheck3b_JsonSkeuoToJsonCirce(implicit imp: ImplicitArgs)
 }
 
 
+/*
 object DecoderCheck3b_JsonSkeuoToJsonCirce {
 	def apply(implicit imp: ImplicitArgs) = new DecoderCheck3b_JsonSkeuoToJsonCirce
 }
+*/

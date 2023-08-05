@@ -2,6 +2,7 @@ package conversionsOfSchemaADTs.avro_json.parsing
 
 
 import higherkindness.droste.data.Fix
+import io.circe.Decoder.Result
 //import org.scalatest.featurespec.AnyFeatureSpec
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
 import io.circe.{Json ⇒ JsonCirce}
@@ -35,12 +36,12 @@ class ParseDecode_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends AnyFunSuite w
 			circeJsonStr shouldBe a[JsonCirce]
 			
 			
-			val decodedJsonSkeuo: Option[Fix[JsonSchema_S]] = ParseStringToCirceToADT.decodeJsonStringToCirceToJsonSkeuo(rawJsonStr)
+			val decodedJsonSkeuo: Result[Fix[JsonSchema_S]] = ParseStringToCirceToADT.decodeJsonStringToCirceToJsonSkeuo(rawJsonStr)
 			
 			// value check
-			decodedJsonSkeuo shouldEqual Some(checkerJsonSkeuo)
+			decodedJsonSkeuo.right.get shouldEqual checkerJsonSkeuo
 			// type check
-			decodedJsonSkeuo.get shouldBe a[JsonSchema_S[_]]
+			decodedJsonSkeuo.right.get shouldBe a[JsonSchema_S[_]]
 			
 			
 			info(s"raw json str = \n$rawJsonStr")

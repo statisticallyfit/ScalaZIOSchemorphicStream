@@ -110,11 +110,11 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				
 				import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.ImplicitArgs
 				
-				implicit val impArgs = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
+				implicit val impArgs: ImplicitArgs = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
 				
 				// TODO find out how to call just the class name without args?
 				
-				val d0 = DecoderCheck0_CanonicalWay_AvroStringToJsonString(impArgs)
+				val d0 = new DecoderCheck0_CanonicalWay_AvroStringToJsonString()
 				d0.printOuts()
 				
 				d0.Checks.checkInputAvroSkeuoEqualsAvroSkeuoFromApacheString
@@ -123,35 +123,21 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				//d0.checking()
 				
 				
-				
-				val d1a = DecoderCheck1a_AvroSkeuoToJsonSkeuo(impArgs)
-				d1a.printOuts()
-				d1a.Checks.checkInputJsonSkeuoEqualsOutputJsonSkeuosFromDecoderAndFromTrans
-				//d1a.checking()
-				
-				
-				val d1b = DecoderCheck1b_JsonSkeuoToAvroSkeuo(impArgs)
-				d1b.printOuts()
-				d1b.Checks.checkInputAvroSkeuoEqualsAvroSkeuoFromDecoderAndFromTrans
-				//d1b.checking()
-				
-				
-				
-				val d2 = DecoderCheck2_JsonSkeuoToAvroString(impArgs)
+				val d2 = new DecoderCheck2_JsonSkeuoToAvroString()
 				d2.printOuts()
 				d2.Checks.checkInputAvroStringEqualsApacheAvroStringFromAvroSkeuoTransOutput
 				d2.Checks.checkInputAvroSkeuoEqualsAvroSkeuoFromJsonSkeuoTransOutput
 				//d2.checking()
 				
 				
-				val d3a = DecoderCheck3a_AvroSkeuoToJsonCirce(impArgs)
+				val d3a = new DecoderCheck3a_AvroSkeuoToJsonCirce()
 				d3a.printOuts()
 				d3a.Checks.checkInputAvroSkeuoShouldMatchAvroSkeuoStr
 				d3a.Checks.checkInputJsonSkeuoShouldMatchJsonSkeuoFromAvroSkeuoTransAndStrAndDecoder
 				d3a.Checks.checkJsonCirceFromAvroSkeuoEqualsJsonCirceFromJsonSkeuo
 				//d3a.checking()
 				
-				val d3b = DecoderCheck3b_JsonSkeuoToJsonCirce(impArgs)
+				val d3b = new DecoderCheck3b_JsonSkeuoToJsonCirce()
 				d3b.printOuts()
 				d3b.Checks.checkInputAvroSkeuoShouldMatchAvroSkeuoStr
 				d3b.Checks.checkInputJsonSkeuoShouldMatchJsonSkeuoFromAvroSkeuoTransAndStrAndDecoder
@@ -159,58 +145,30 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				
 				
 				
-				val d4a = DecoderCheck4a_JsonStringBegin_JsonDecoderVersusJsonTrans(impArgs)
+				val d4a = new DecoderCheck4a_JsonStringBegin_JsonDecoderVsJsonTrans()
 				d4a.printOuts()
 				d4a.Checks.checkInputJsonStringEqualsJsonCirceStrings
 				d4a.Checks.checkJsonFromDecoderMatchesJsonFromTransOfAvroSkeuo
 				
 				
-				val d4b = DecoderCheck4b_JsonStringBegin_AvroDecoderVsAvroTrans(impArgs)
+				val d4b = new DecoderCheck4b_JsonStringBegin_AvroDecoderVsAvroTrans()
 				d4b.printOuts()
 				//d4b.checking()
 				d4b.Checks.checkInputJsonStringEqualsJsonCirceStrings()
-				d4b.Checks.checkAvroFromDecoderMatchesAvroFromTransOfJsonSkeuo()
+				d4b.Checks.checkEqualityOfAllAvroSources()
 				
 				
-				val d4c = DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans(impArgs)
-				d4c.Checks.checkInputJsonCirceMatchesJsonCirceFromDecoder
-				d4c.Checks.checkInputAvroSkeuoMatchesAvroSkeuoFromStrAndDecoderAndTransOfJsonSkeuo
 				
 				
-				val d4d = DecoderCheck4d_AvroStringBegin_JsonDecoderVsJsonTrans(impArgs)
+				val d4c = new DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans()
+				d4c.Checks.checkMatchingJsonCirce
+				d4c.Checks.checkEqualityOfAllAvroSources
+				
+				
+				val d4d = new DecoderCheck4d_AvroStringBegin_JsonDecoderVsJsonTrans()
 				d4d.Checks.checkEqualityOfAllAvroSources()
 				d4d.Checks.checkEqualityOfAllJsonCirceSources()
 				d4d.Checks.checkEqualityOfJsonSkeuoFromAllAvroSources()
-				
-				
-				info(s"\n-----------------------------------------------------------")
-				
-				val apacheAvro_fromGivenStr: AvroSchema_A = new AvroSchema_A.Parser().parse(rawAvroStr) // TODO Option for parsing failure?
-				val apacheAvroStr_fromGivenStr: String = apacheAvro_fromGivenStr.toString(true).manicure
-				val skeuoAvro_fromStr: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(apacheAvro_fromGivenStr)
-				
-				val jsonCirce_fromRawJsonStr: JsonCirce = unsafeParse(rawJsonStr)
-				val jsonCirce_fromDecoderOfAvro: JsonCirce = libToJsonAltered(avroFixS)
-				
-				val skeuoJson_fromTransOfGivenAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
-				
-				
-				val skeuoAvro_fromDecoder: Result[Fix[AvroSchema_S]] = decodeJsonStringToCirceToAvroSkeuo(rawJsonStr)
-				
-				val skeuoAvro_fromTransOfJsonSkeuo: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
-				
-				
-				info(s"\nCHECKER 6b: " +
-					s"\nskeuo-json (trans output) -> json-circe -> skeuo-avro (decoder output) vs. skeuo avro (trans input) vs. skeuo-avro (trans output)" +
-					s"\n|\t Reason: compare how skeuo-json (trans output) renders to skeuo-avro to check correctness of my Trans converter " +
-					s"\n|\t (from avro-side) " +
-					s"\n|\t (starting from: skeuo-json output)" +
-					s"\n--- skeuo-json (trans output): $skeuoJson_trans_fromAvroADT" +
-					s"\n--> json-circe: \n${libRender(skeuoJson_trans_fromAvroADT).manicure}" +
-					s"\n--> skeuo-avro (decoder output): ${decodeJsonSkeuoToCirceToAvroSkeuo(skeuoJson_trans_fromAvroADT)}" +
-					s"\n\t VERSUS. skeuo-avro (trans input): ${avroFixS}" +
-					s"\n\t VERSUS. skeuo-avro (trans output): ${jsonToAvro_byAnaTransCoalg(jsonFixS)}"
-					)
 				
 				
 				
@@ -281,9 +239,12 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 	info(s"${skeuoToApacheAvroSchema(booleanAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
 	info(s"${skeuoToApacheAvroSchema(array1IntAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
 	
+	import testData.schemaData.jsonData.circeData.Data._
+	
 	testStructure(scenarioType = "array of int",
 		rawAvroStr = array1IntAvro_R,
 		rawJsonStr = array1IntJson_R,
+		jsonCirceCheck = array1IntJson_C,
 		avroS = array1IntAvro_S, tpeS = "AvroSchema_S[AvroSchema_S[Int]]",
 		avroC = array1IntAvro_Circe_S, tpeC = "AvroSchema_S[AvroSchema_S[JsonCirce]]",
 		avroFixS = array1IntAvro_Fix_S,

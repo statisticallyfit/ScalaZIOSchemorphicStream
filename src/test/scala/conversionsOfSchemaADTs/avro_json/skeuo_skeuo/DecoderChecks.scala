@@ -8,5 +8,5 @@ trait DecoderChecks {
 	
 	def checking(): Unit
 	
-	object Checks
+	//object Checks
 }

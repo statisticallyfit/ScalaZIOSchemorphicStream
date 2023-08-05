@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ScalaCompilerConfiguration">
-    <profile name="sbt 1" modules="scalazioschemorphicstream_573" />
+    <profile name="sbt 1" modules="root,scala-records_2722,scala-records_9848,scalazioschemorphicstream_573" />
     <profile name="sbt 2" modules="10_misc.SchaemeowMorphism,ScalaZIOSchemorphicStream,SchaemeowMorphism">
       <option name="postfixOps" value="true" />
       <option name="implicitConversions" value="true" />
@@ -9,6 +9,25 @@
       <option name="existentials" value="true" />
       <option name="deprecationWarnings" value="true" />
       <option name="uncheckedWarnings" value="true" />
+      <option name="featureWarnings" value="true" />
+    </profile>
+    <profile name="sbt 3" modules="core">
+      <option name="deprecationWarnings" value="true" />
+      <option name="featureWarnings" value="true" />
+      <plugins>
+        <plugin path="$PROJECT_DIR$/../libs/scala-records/synthPlugin/target/scala-2.12/synthplugin_2.12.8-0.5-SNAPSHOT.jar" />
+      </plugins>
+    </profile>
+    <profile name="sbt 4" modules="coreJS">
+      <option name="deprecationWarnings" value="true" />
+      <option name="featureWarnings" value="true" />
+      <plugins>
+        <plugin path="$PROJECT_DIR$/../libs/scala-records/project/.ivy/cache/org.scala-js/scalajs-compiler_2.12.8/jars/scalajs-compiler_2.12.8-0.6.28.jar" />
+        <plugin path="$PROJECT_DIR$/../libs/scala-records/synthPlugin/target/scala-2.12/synthplugin_2.12.8-0.5-SNAPSHOT.jar" />
+      </plugins>
+    </profile>
+    <profile name="sbt 5" modules="synthPlugin,tests">
+      <option name="deprecationWarnings" value="true" />
       <option name="featureWarnings" value="true" />
     </profile>
   </component>

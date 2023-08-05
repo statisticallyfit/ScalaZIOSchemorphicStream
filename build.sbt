@@ -175,6 +175,8 @@ lazy val global = project
 			
 			allDependencies.avro4s_core,
 			allDependencies.avro4s_json,
+			
+			//allDependencies.scala_records
 		)
 	)
 	.aggregate(
@@ -249,6 +251,8 @@ lazy val allDependencies =
 		val versionOfAvroTools = "1.11.1"
 		
 		val versionOfAvro4S = "4.1.1"
+		
+		val versionOfScalaRecords = "0.4"
 		
 		//------------------
 		
@@ -367,6 +371,8 @@ lazy val allDependencies =
 		
 		val avro4s_core = "com.sksamuel.avro4s" %% "avro4s-core" % versionOfAvro4S
 		val avro4s_json = "com.sksamuel.avro4s" %% "avro4s-json" % versionOfAvro4S
+		
+		val scala_records =  "ch.epfl.lamp" %% "scala-records" % versionOfScalaRecords
 	}
 
 
@@ -425,3 +431,13 @@ Resolver.sonatypeRepo("snapshots") //Resolver.sonatypeRepo("snapshots"),
 //Resolver.bintrayRepo("cibotech", "public")
 )*/
 )
+
+/*
+
+lazy val externalScalaRecordsProject: RootProject =
+	RootProject(uri("git://github.com/scala-records/scala-records.git"))
+// TODO - find out how to specify file path - need to specify file path to make this work ?
+lazy val root: Project = Project("root", file(".")) dependsOn (externalScalaRecordsProject)
+*/
+
+

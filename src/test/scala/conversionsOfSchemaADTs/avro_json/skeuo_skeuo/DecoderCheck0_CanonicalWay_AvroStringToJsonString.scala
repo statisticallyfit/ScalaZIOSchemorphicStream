@@ -19,7 +19,7 @@ import utilMain.UtilMain.implicits._
  *
  */
 // Using implicitargs class to remove the need for passing all the arguments explicitly
-case class DecoderCheck0_CanonicalWay_AvroStringToJsonString(implicit imp: ImplicitArgs )
+class DecoderCheck0_CanonicalWay_AvroStringToJsonString(implicit imp: ImplicitArgs )
 	extends AnyFunSpec with DecoderChecks with Matchers {
 	
 	/*rawAvroStr: String,
@@ -85,7 +85,7 @@ case class DecoderCheck0_CanonicalWay_AvroStringToJsonString(implicit imp: Impli
 	}
 }
 
-
-object DecoderCheck0_CanonicalWay_AvroStringToJsonString {
-	def apply(implicit imp: ImplicitArgs) = new DecoderCheck0_CanonicalWay_AvroStringToJsonString
-}
+/*
+implicit object DecoderCheck0_CanonicalWay_AvroStringToJsonString {
+	implicit def apply(implicit imp: ImplicitArgs) = new DecoderCheck0_CanonicalWay_AvroStringToJsonString
+}*/

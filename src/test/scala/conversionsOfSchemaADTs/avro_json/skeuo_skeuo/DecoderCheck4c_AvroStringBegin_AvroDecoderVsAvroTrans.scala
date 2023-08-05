@@ -29,20 +29,29 @@ import utilMain.UtilMain.implicits._
 /**
  *
  */
-case class DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans(implicit imp: ImplicitArgs)
+class DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans(implicit imp: ImplicitArgs)
 	extends AnyFunSpec with DecoderChecks with Matchers {
 	
 	import imp._
 	
 	
-	val apacheAvro_fromGivenStr: AvroSchema_A = new AvroSchema_A.Parser().parse(rawAvroStr) // TODO Option for parsing failure?
-	val apacheAvroStr_fromGivenStr: String = apacheAvro_fromGivenStr.toString(true).manicure
-	val skeuoAvro_fromStr: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(apacheAvro_fromGivenStr)
-	val skeuoAvro_fromDecoder: Result[Fix[AvroSchema_S]] = decodeJsonStringToCirceToAvroSkeuo(rawJsonStr)
+	/*val result: (
+		AvroSchema_A,
+			String,
+			Fix[AvroSchema_S],
+			Result[Fix[AvroSchema_S]],
+			JsonCirce, JsonCirce,
+			Result[Fix[AvroSchema_S]],
+			Result[Fix[AvroSchema_S]]
+		) = StepByStep.stepAvroStringToAvroSkeuo(rawAvroStr, rawJsonStr)
 	
-	val jsonCirce_fromJsonStr: JsonCirce = unsafeParse(rawJsonStr)
-	val jsonCirce_fromDecoderAvroStr: JsonCirce = libToJsonAltered(skeuoAvro_fromStr)
+	val (parsedApacheAvro, parsedApacheAvroStr,
+		skeuoAvro_fromDecodingAvroStr, skeuoAvro_fromDecodingJsonStr,
+		jsonCirce_fromAvroSkeuo, jsonCirce_fromJsonStr,
+		skeuoAvro_fromDecodingAvroSkeuo, skeuoAvro_fromDecodingCirce) = result*/
 	
+	
+	val obj: Stepping.AvroOutputInfo = Stepping(rawAvroStr, rawJsonStr).stepAnyStringToAvroSkeuo()
 	
 	val skeuoAvro_fromTransOfGivenJsonSkeuo: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
 	
@@ -57,33 +66,42 @@ case class DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans(implicit imp: I
 			s"\n|\t (starting from: avro-str)")
 		
 		info(s"\n--- raw-avro-str (given): $rawAvroStr" +
-			s"\n--> (apache-avro -> skeuo-avro (via apacheToSkeuo func)) -> json-circe (via libToJsonAltered): ${jsonCirce_fromDecoderAvroStr.manicure}" +
-			s"\n--> skeuo-avro (decoder output): ${skeuoAvro_fromDecoder}" +
-			s"\n\t VERSUS. skeuo-avro (trans output): ${skeuoAvro_fromTransOfGivenJsonSkeuo}")
+			s"\n--> apache-avro: \n${obj.parsedApacheAvroStr}" +
+			s"\n--> skeuo-avro (apache -> skeuo output): ${obj.skeuoAvro_fromDecodingAvroStr}" +
+			s"\n    skeuo-avro (from json str): ${obj.skeuoAvro_fromDecodingJsonStr}" +
+			s"\n--> json-circe (from skeuo-avro): ${obj.jsonCirce_fromInputAvroSkeuo.manicure}" +
+			s"\n    json-circe (from json-str): ${obj.jsonCirce_fromInputJsonStr.manicure}" +
+			s"\n--> skeuo-avro (avro-decoder output): ${obj.skeuoAvro_fromDecodingAvroSkeuo}" +
+			s"\n    skeuo-avro (circe-decoder output): ${obj.skeuoAvro_fromDecodingCirce}" +
+			s"\n    skeuo-avro (trans output): ${skeuoAvro_fromTransOfGivenJsonSkeuo}")
 	}
 	
 	def checking(): Unit = {
 		import Checks._
 		
-		checkInputJsonCirceMatchesJsonCirceFromDecoder
-		checkInputAvroSkeuoMatchesAvroSkeuoFromStrAndDecoderAndTransOfJsonSkeuo
+		checkMatchingJsonCirce()
+		checkEqualityOfAllAvroSources()
 	}
 	
 	object Checks {
-		def checkInputJsonCirceMatchesJsonCirceFromDecoder: Assertion = {
+		def checkMatchingJsonCirce(): Assertion = {
 			
 			forEvery(List(
-				jsonCirce_fromJsonStr,
-				jsonCirce_fromDecoderAvroStr
+				obj.jsonCirce_fromInputJsonStr.manicure,
+				obj.jsonCirce_fromInputAvroSkeuo.manicure,
+				rawJsonStr
 			)) {
-				jc ⇒ jc should equal (jsonCirceCheck)
+				jc ⇒ jc should equal (jsonCirceCheck.manicure)
 			}
 		}
 		
-		def checkInputAvroSkeuoMatchesAvroSkeuoFromStrAndDecoderAndTransOfJsonSkeuo: Assertion = {
+		def checkEqualityOfAllAvroSources(): Assertion = {
 			forEvery(List(
-				skeuoAvro_fromStr,
-				skeuoAvro_fromDecoder,
+				obj.skeuoAvro_fromDecodingAvroStr,
+				obj.skeuoAvro_fromDecodingJsonStr,
+				obj.skeuoAvro_fromDecodingAvroSkeuo,
+				obj.skeuoAvro_fromDecodingCirce,
+				
 				skeuoAvro_fromTransOfGivenJsonSkeuo
 			)) {
 				sa ⇒ sa should equal(avroFixS)
@@ -93,6 +111,7 @@ case class DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans(implicit imp: I
 }
 
 
+/*
 object DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans {
 	def apply(implicit imp: ImplicitArgs) = new DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans
-}
+}*/

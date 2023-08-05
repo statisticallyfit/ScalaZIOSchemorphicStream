@@ -119,7 +119,7 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs extends AnyFeatureSpec with GivenWhenThe
 				s"\njson-circe: \n${libToJson(array1IntAvro_Fix_S).manicure}" +
 				s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
 				s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData)}" +
-				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData).get)}" +
+				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData).right.get).manicure}" +
 				s"\nskeuo-json: \n${decodeAvroSkeuoToCirceToJsonSkeuo(array1IntAvro_Fix_S)}")
 			
 			
@@ -137,7 +137,7 @@ class AvroToJsonSchema_SkeuoSkeuo_Specs extends AnyFeatureSpec with GivenWhenThe
 				s"\njson-circe: \n${libToJson(array1IntAvro_Fix_S).manicure}" +
 				s"\n-- REPLACE (redocly): json data str-> json schema str: \n$redocly_jsonSchemaFromData" +
 				s"\n-- redocly:json-str -> circe -> skeuo-json (redocly): \n${decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData)}" +
-				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData).get)}" +
+				s"\n-- redocly:json-str -> circe -> skeuo-json -> circe (via render)\n${libRender(decodeJsonStringToCirceToJsonSkeuo(redocly_jsonSchemaFromData).right.get).manicure}" +
 				s"\nskeuo-avro: \n${decodeAvroSkeuoToCirceToAvroSkeuo(array1IntAvro_Fix_S)}")
 			
 			info(s"-------------------------------" +

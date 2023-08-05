@@ -11,6 +11,7 @@ import io.circe.{Json ⇒ JsonCirce}
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
+import io.circe.Decoder.Result
 import org.apache.avro.{Schema ⇒ AvroSchema_A}
 import org.scalatest.Assertion
 import org.scalatest.Inspectors._
@@ -21,7 +22,7 @@ import utilMain.UtilMain.implicits._
 /**
  *
  */
-case class DecoderCheck4a_JsonStringBegin_JsonDecoderVersusJsonTrans(implicit imp: ImplicitArgs)
+class DecoderCheck4a_JsonStringBegin_JsonDecoderVsJsonTrans(implicit imp: ImplicitArgs)
 	extends AnyFunSpec with DecoderChecks with Matchers {
 	
 	import imp._
@@ -32,8 +33,8 @@ case class DecoderCheck4a_JsonStringBegin_JsonDecoderVersusJsonTrans(implicit im
 	val skeuoJson_trans_fromStr: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(skeuoAvro_fromStr)*/
 	/*val skeuoJson_fromStr: Fix[JsonSchema_S] = funcCirceToJsonSkeuo(jsonCirceCheck).right.get*/
 	
-	val jsonCirceFromStr: JsonCirce = unsafeParse(rawJsonStr)
-	val skeuoJson_fromDecoder: Option[Fix[JsonSchema_S]] = decodeJsonStringToCirceToJsonSkeuo(rawJsonStr)
+	val obj: Stepping.JsonOutputInfo = Stepping(rawAvroStr, rawJsonStr).stepAnyStringToJsonSkeuo()
+	
 	val skeuoJson_fromTransOfGivenAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
 	
 	
@@ -76,7 +77,7 @@ case class DecoderCheck4a_JsonStringBegin_JsonDecoderVersusJsonTrans(implicit im
 		def checkJsonFromDecoderMatchesJsonFromTransOfAvroSkeuo: Assertion = {
 			
 			forEvery(List(
-				skeuoJson_fromDecoder.get,
+				skeuoJson_fromDecoder.right.get,
 				skeuoJson_fromTransOfGivenAvroSkeuo
 			)) {
 				sj ⇒ sj shouldEqual jsonFixS
@@ -87,6 +88,7 @@ case class DecoderCheck4a_JsonStringBegin_JsonDecoderVersusJsonTrans(implicit im
 
 
 
-object DecoderCheck4a_JsonStringBegin_JsonDecoderVersusJsonTrans {
-	def apply(implicit imp: ImplicitArgs) = new DecoderCheck4a_JsonStringBegin_JsonDecoderVersusJsonTrans
-}
+/*
+object DecoderCheck4a_JsonStringBegin_JsonDecoderVsJsonTrans {
+	def apply(implicit imp: ImplicitArgs) = new DecoderCheck4a_JsonStringBegin_JsonDecoderVsJsonTrans
+}*/

@@ -20,7 +20,7 @@ import utilMain.UtilMain.implicits._
 /**
  *
  */
-case class DecoderCheck2_JsonSkeuoToAvroString(implicit imp: ImplicitArgs )
+class DecoderCheck2_JsonSkeuoToAvroString(implicit imp: ImplicitArgs )
 	extends AnyFunSpec with DecoderChecks with Matchers {
 	
 	import imp._
@@ -70,7 +70,9 @@ case class DecoderCheck2_JsonSkeuoToAvroString(implicit imp: ImplicitArgs )
 	}
 }
 
+/*
 
 object DecoderCheck2_JsonSkeuoToAvroString {
 	def apply(implicit imp: ImplicitArgs) = new DecoderCheck2_JsonSkeuoToAvroString
 }
+*/
