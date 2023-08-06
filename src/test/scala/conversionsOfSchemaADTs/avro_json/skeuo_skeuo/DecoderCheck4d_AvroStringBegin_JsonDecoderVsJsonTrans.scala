@@ -11,7 +11,7 @@ import io.circe.Decoder.Result
 import io.circe.{Json ⇒ JsonCirce}
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
-import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT.{Stepping, _}
+import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
 import org.scalatest.Assertion
 import org.scalatest.Inspectors._
 import org.scalatest.funspec.AnyFunSpec
@@ -41,62 +41,73 @@ class DecoderCheck4d_AvroStringBegin_JsonDecoderVsJsonTrans(implicit imp: Implic
 	val skeuoJson_fromDecoderOfAvro: Result[Fix[JsonSchema_S]] = decodeAvroSkeuoToCirceToJsonSkeuo(avroFixS)*/
 	
 	val step: Stepping = Stepping(rawAvroStr, rawJsonStr)
-	step.avroStep
+	val sa: AvroStringDecodeInfo = step.avroStep
+	val sj = step.jsonStep
+	val sai: SkeuoDecodeInfo = step.avroStep.skInfo
+	val sji: SkeuoDecodeInfo = step.jsonStep.skInfo
 	
 	
 	val skeuoJson_fromTransOfGivenAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
 	
 	def printOuts(): Unit = {
+		
+		// RULE: if starting from avro string in the test, then use avrostep, else use jsonstep.
+		
 		info(s"\n-----------------------------------------------------------")
 		info(s"\nCHECKER 4d: " +
-			s"\nraw-avro-str (expectation input) -> (skeuo-avro) -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
-			s"\n|\t Reason: find out how avro-str translates to json-adt  + get common denominator (skeuo-json), from json-side." +
-			s"\n|\t (from json-side) " +
-			s"\n|\t (starting from: avro-str)" +
-			s"\n--- raw-avro-str (given): \n$rawAvroStr" +
-			s"\n--> apache-avro: \n${step.avroStep.parsedApacheAvroStr}" +
-			s"\n--> skeuo-avro (apache -> skeuo output): ${step.avroStep.skeuoAvro_fromDecodingAvroStr}" +
-			s"\n    skeuo-avro (from json str): ${step.skeuoAvro_fromDecodingJsonStr}" +
-			s"\n--> json-circe (from skeuo-avro): ${step.jsonCirce_fromInputAvroSkeuo.manicure}" +
-			s"\n    json-circe (from json-str): ${step.jsonCirce_fromInputJsonStr.manicure}" +
-			s"\n--> skeuo-json (avro-decoder output): ${step.skeuoJson_fromDecodingAvroSkeuo}" +
-			s"\n    skeuo-json (circe-decoder output): ${step.skeuoJson_fromDecodingCirce}" +
-			s"\n    skeuo-json (trans output): ${skeuoJson_fromTransOfGivenAvroSkeuo}")
+		     s"\nraw-avro-str (expectation input) -> (skeuo-avro) -> json-circe -> skeuo-json (decoder output) vs. skeuo-json (trans output)" +
+		     s"\n|\t Reason: find out how avro-str translates to json-adt  + get common denominator (skeuo-json), from json-side." +
+		     s"\n|\t (from json-side) " +
+		     s"\n|\t (starting from: avro-str)" +
+		     s"\n--- raw-avro-str (given): \n$rawAvroStr" +
+		     s"\n--> (interim-apache-avro): \n${sa.parsedApacheAvroStr}" +
+		     s"\n--> (interim-skeuo-avro): ${sa.skeuoAvro_fromApache}" +
+		     s"\n--> json-circe (from skeuo-avro): ${sai.jsonCirce_fromRawAvro.manicure}" +
+		     s"\n    json-circe (from json-str): ${sai.jsonCirce_fromRawJson.manicure}" +
+		     s"\n--> skeuo-json (avro-decoder output): ${sai.skeuoJson_fromDecodingAvro}" +
+		     s"\n    skeuo-json (circe-decoder output): ${sai.skeuoJson_fromRaw}" +
+		     s"\n    skeuo-json (trans output): ${skeuoJson_fromTransOfGivenAvroSkeuo}")
 	}
 	
 	
 	def checking(): Unit = {
-		import Checks._
+		import Checking._
 		
-		checkEqualityOfAllAvroSources()
-		checkEqualityOfAllJsonCirceSources()
-		checkEqualityOfJsonSkeuoFromAllAvroSources()
+		equalityOfAllAvroSources()
+		equalityOfAllCirces()
+		equalityOfJsonSkeuoFromAllAvroSources()
 	}
 	
-	object Checks {
+	object Checking {
 		
-		def checkEqualityOfAllAvroSources(): Assertion = {
-			step.parsedApacheAvroStr shouldEqual rawAvroStr
+		def equalityOfAllAvroSources(): Assertion = {
+			sa.parsedApacheAvroStr shouldEqual rawAvroStr
 			
 			forEvery(List(
-				step.skeuoAvro_fromDecodingJsonStr.right.get,
-				step.skeuoAvro_fromDecodingAvroStr
+				sai.skeuoAvro_fromRaw,
+				sji.skeuoAvro_fromRaw,
+				sai.skeuoAvro_fromDecodingAvro,
+				sji.skeuoAvro_fromDecodingAvro,
+				sai.skeuoAvro_fromDecodingJson,
+				sji.skeuoAvro_fromDecodingJson
 			)) {
-				sa ⇒ sa shouldEqual avroFixS
+				sa ⇒ sa.right.get shouldEqual avroFixS
 			}
 		}
 		
-		def checkEqualityOfAllJsonCirceSources(): Assertion = {
+		def equalityOfAllCirces(): Assertion = {
 			forEvery(List(
-				jsonCirceCheck.manicure,
-				step.jsonCirce_fromInputJsonStr.manicure,
-				step.jsonCirce_fromInputAvroSkeuo.manicure
+				jsonCirceCheck,
+				sai.jsonCirce_fromRawAvro,
+				sai.jsonCirce_fromRawJson,
+				sji.jsonCirce_fromRawAvro,
+				sji.jsonCirce_fromRawJson
 			)) {
-				js ⇒ js shouldEqual rawJsonStr
+				c ⇒ c.manicure shouldEqual rawJsonStr
 			}
 		}
 		
-		def checkEqualityOfJsonSkeuoFromAllAvroSources(): Assertion = {
+		def equalityOfJsonSkeuoFromAllAvroSources(): Assertion = {
 			forEvery(List(
 				skeuoJson_fromTransOfGivenAvroSkeuo,
 				step.skeuoJson_fromDecodingAvroSkeuo.right.get,

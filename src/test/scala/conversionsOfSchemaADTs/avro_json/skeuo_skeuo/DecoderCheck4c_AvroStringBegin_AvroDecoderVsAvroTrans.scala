@@ -51,7 +51,7 @@ class DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans(implicit imp: Implic
 		skeuoAvro_fromDecodingAvroSkeuo, skeuoAvro_fromDecodingCirce) = result*/
 	
 	
-	val obj: Stepping.AvroOutputInfo = Stepping(rawAvroStr, rawJsonStr).stepAnyStringToAvroSkeuo()
+	val obj: Info.AvroOutputInfo = Info(rawAvroStr, rawJsonStr).stepAnyStringToAvroSkeuo()
 	
 	val skeuoAvro_fromTransOfGivenJsonSkeuo: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
 	

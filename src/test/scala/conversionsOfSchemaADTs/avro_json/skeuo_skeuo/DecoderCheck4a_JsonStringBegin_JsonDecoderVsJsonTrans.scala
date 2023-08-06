@@ -33,7 +33,7 @@ class DecoderCheck4a_JsonStringBegin_JsonDecoderVsJsonTrans(implicit imp: Implic
 	val skeuoJson_trans_fromStr: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(skeuoAvro_fromStr)*/
 	/*val skeuoJson_fromStr: Fix[JsonSchema_S] = funcCirceToJsonSkeuo(jsonCirceCheck).right.get*/
 	
-	val obj: Stepping.JsonOutputInfo = Stepping(rawAvroStr, rawJsonStr).stepAnyStringToJsonSkeuo()
+	val obj: Info.JsonOutputInfo = Info(rawAvroStr, rawJsonStr).stepAnyStringToJsonSkeuo()
 	
 	val skeuoJson_fromTransOfGivenAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
 	
