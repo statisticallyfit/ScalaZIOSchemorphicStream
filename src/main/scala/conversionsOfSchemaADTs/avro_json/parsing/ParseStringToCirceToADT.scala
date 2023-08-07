@@ -47,10 +47,9 @@ object ParseStringToCirceToADT {
 		parsedApacheAvroStr: String,
 		skeuoAvro_fromApache: Fix[AvroSchema_S],
 		interimCirce_fromAvro: JsonCirce,
-		interimCirce_fromJson: JsonCirce,
 		skInfo: SkeuoDecodeInfo
 	)
-		extends StringDecodeInfo (rawAvro, rawJson, interimCirce_fromJson, skInfo)
+		extends StringDecodeInfo (rawAvro, rawJson, interimCirce_fromAvro, skInfo)
 		
 	
 	case class JsonStringDecodeInfo(
@@ -99,7 +98,6 @@ object ParseStringToCirceToADT {
 				parsedApacheAvroStr,
 				skeuoAvro_fromApache,
 				interimCirce_fromAvro,
-				interimCirce_fromJson,
 				skInfo = infoSkeuoToCirceToSkeuo(interimCirce_fromAvro))
 			
 			val jsonInfo: JsonStringDecodeInfo = JsonStringDecodeInfo(rawAvro, rawJson,
