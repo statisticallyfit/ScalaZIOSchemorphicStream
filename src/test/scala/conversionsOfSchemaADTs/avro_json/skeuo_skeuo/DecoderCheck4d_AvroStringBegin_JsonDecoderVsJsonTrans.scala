@@ -48,6 +48,7 @@ case class DecoderCheck4d_AvroStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 	
 	
 	val skeuoJson_fromTransOfGivenAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
+	val skeuoAvro_fromTransOfGivenJsonSkeuo: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
 	
 	def printOuts(): Unit = {
 		
@@ -63,9 +64,9 @@ case class DecoderCheck4d_AvroStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 		     s"\n--> (apache-avro): \n${sa.parsedApacheAvroStr}" +
 		     s"\n--> (skeuo-avro): ${sa.skeuoAvro_fromApache}" +
 		     s"\n--> json-circe (from avro-str): ${sa.interimCirce_fromAvro.manicure}" +
-		     /*s"\n    json-circe (from json-str): ${sj.interimCirce_fromJson.manicure}" +*/
+		     s"\n    json-circe (from json-str): ${sj.interimCirce_fromJson.manicure}" +
 		     s"\n--> skeuo-json (avro-decoder output): ${sai.skeuoJson_fromRaw}" +
-		     /*s"\n    skeuo-json (json-decoder output): ${sji.skeuoJson_fromRaw}" +*/
+		     s"\n    skeuo-json (json-decoder output): ${sji.skeuoJson_fromRaw}" +
 		     s"\n    skeuo-json (trans output): ${skeuoJson_fromTransOfGivenAvroSkeuo}")
 	}
 	
@@ -73,79 +74,121 @@ case class DecoderCheck4d_AvroStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 	def checking(): Unit = {
 		import Checking._
 		
-		equalityOfStartingAvroSkeuosFromInputAvroString()
-		equalityOfStartingAvroSkeuosFromInputJsonString()
-		equalityOfCirceBySkeouAvroAndCirceBySkeouJsonFromStartingAvroString()
-		equalityOfEndingJsonSkeuosFromInputAvroString()
-		equalityOfEndingJsonSkeuosFromInputJsonString()
+		// Spirit of the test
+		equalityOfJsonSkeuoFromDecoderAndTrans()
+		
+		
+		// Big test
+		equalityOfBeginningAvroSkeuosFromAvroOrJsonInputString()
+		equalityOfBeginningJsonSkeuosFromAvroOrJsonInputString()
+		equalityOfCirceBySkeuoAvroAndCirceBySkeuoJsonFromAvroOrJsonInputString()
+		equalityOfEndingAvroSkeuosFromAvroOrJsonInputString()
+		equalityOfEndingJsonSkeuosFromAvroOrJsonInputString()
 	}
 	
 	object Checking {
 		
-		def equalityOfStartingAvroSkeuosFromInputAvroString(): Assertion = {
+		// Spirit of the test
+		
+		def equalityOfJsonSkeuoFromDecoderAndTrans(): Assertion = {
 			
+			forEvery(List(
+				
+				Decoding.decodeAvroStringToCirceToJsonSkeuo(rawAvroStr, rawJsonStr),
+				
+				sai.skeuoJson_fromDecodingAvro,
+				sai.skeuoJson_fromRaw,
+				
+				Decoding.decodeJsonStringToCirceToJsonSkeuo(rawAvroStr, rawJsonStr),
+				
+				sji.skeuoJson_fromDecodingAvro,
+				sji.skeuoJson_fromRaw,
+				
+				Right(skeuoJson_fromTransOfGivenAvroSkeuo)
+			)) {
+				skj ⇒ skj.right.get should equal (jsonFixS)
+			}
+		}
+		
+		
+		
+		// Big test
+		
+		def skeuoToSkeuoByCirceDecoding(): Assertion = {
+			// Checking the conversions of skeuo through circe
+			
+			decodeAvroSkeuoToCirceToAvroSkeuo(avroFixS) should equal(Right(skeuoAvro_fromTransOfGivenJsonSkeuo))
+			
+			decodeAvroSkeuoToCirceToJsonSkeuo(avroFixS) should equal(Right(skeuoJson_fromTransOfGivenAvroSkeuo))
+			
+			decodeJsonSkeuoToCirceToAvroSkeuo(jsonFixS) should equal(Right(skeuoAvro_fromTransOfGivenJsonSkeuo))
+			
+			decodeJsonSkeuoToCirceToJsonSkeuo(jsonFixS) should equal(Right(skeuoJson_fromTransOfGivenAvroSkeuo))
+		}
+		
+		def equalityOfBeginningAvroSkeuosFromAvroOrJsonInputString(): Assertion = {
 			sa.parsedApacheAvroStr shouldEqual rawAvroStr
 			
 			forEvery(List(
 				sai.skeuoAvro_fromRaw,
-				sai.skeuoAvro_fromDecodingAvro,
-				sai.skeuoAvro_fromDecodingJson,
-			)) {
-				sa ⇒ sa.right.get shouldEqual avroFixS
+				sji.skeuoAvro_fromRaw
+			)){
+				ska ⇒ ska.right.get shouldEqual avroFixS
 			}
 		}
 		
-		def equalityOfStartingAvroSkeuosFromInputJsonString(): Assertion = {
-			
-			sa.parsedApacheAvroStr shouldEqual rawAvroStr
-			
+		def equalityOfBeginningJsonSkeuosFromAvroOrJsonInputString(): Assertion = {
 			forEvery(List(
-				sji.skeuoAvro_fromRaw,
-				sji.skeuoAvro_fromDecodingAvro,
-				sji.skeuoAvro_fromDecodingJson
-			)
-			) {
-				sa ⇒ sa.right.get shouldEqual avroFixS
+				sai.skeuoJson_fromRaw,
+				sji.skeuoJson_fromRaw
+			)){
+				skj ⇒ skj.right.get shouldEqual jsonFixS
 			}
 		}
 		
-		def equalityOfCirceBySkeouAvroAndCirceBySkeouJsonFromStartingAvroString(): Assertion = {
+		def equalityOfCirceBySkeuoAvroAndCirceBySkeuoJsonFromAvroOrJsonInputString(): Assertion = {
 			forEvery(List(
 				jsonCirceCheck,
 				sai.jsonCirce_fromRawAvro,
 				sai.jsonCirce_fromRawJson,
 				sji.jsonCirce_fromRawAvro,
 				sji.jsonCirce_fromRawJson
-			)) {
+			)
+			) {
 				jc ⇒ jc.manicure shouldEqual rawJsonStr
 			}
 		}
 		
-		def equalityOfEndingJsonSkeuosFromInputAvroString(): Assertion = {
+		
+		def equalityOfEndingAvroSkeuosFromAvroOrJsonInputString(): Assertion = {
 			forEvery(List(
-				Right(skeuoJson_fromTransOfGivenAvroSkeuo),
-				sai.skeuoJson_fromRaw,
-				sai.skeuoJson_fromDecodingAvro,
-				sai.skeuoJson_fromDecodingJson,
-				sji.skeuoJson_fromRaw,
-				sji.skeuoJson_fromDecodingAvro,
-				sji.skeuoJson_fromDecodingJson,
-			)) {
-				sj ⇒ sj.right.get should equal(jsonFixS)
+				//Right(skeuoJson_fromTransOfGivenAvroSkeuo),
+				sai.skeuoAvro_fromDecodingAvro,
+				sai.skeuoAvro_fromDecodingJson,
+				sji.skeuoAvro_fromDecodingAvro,
+				sji.skeuoAvro_fromDecodingJson,
+			)
+			) {
+				ska ⇒ ska.right.get should equal(avroFixS)
 			}
 		}
 		
-		def equalityOfEndingJsonSkeuosFromInputJsonString(): Assertion = {
+		def equalityOfEndingJsonSkeuosFromAvroOrJsonInputString(): Assertion = {
 			forEvery(List(
 				Right(skeuoJson_fromTransOfGivenAvroSkeuo),
-				sji.skeuoJson_fromRaw,
+				//sji.skeuoJson_fromRaw,
+				sai.skeuoJson_fromDecodingAvro,
+				sai.skeuoJson_fromDecodingJson,
 				sji.skeuoJson_fromDecodingAvro,
 				sji.skeuoJson_fromDecodingJson,
 			)
 			) {
-				sj ⇒ sj.right.get should equal(jsonFixS)
+				skj ⇒ skj.right.get should equal(jsonFixS)
 			}
 		}
+		
+		
+		
 	}
 	
 	
