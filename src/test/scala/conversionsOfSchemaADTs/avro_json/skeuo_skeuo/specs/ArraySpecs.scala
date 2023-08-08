@@ -168,7 +168,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				val d4d = DecoderCheck4d_AvroStringBegin_JsonDecoderVsJsonTrans()
 				d4d.Checking.equalityOfBeginningAvroSkeuosFromInputAvroString()
 				d4d.Checking.equalityOfCirceBySkeuoAvroAndCirceBySkeuoJsonFromAvroOrJsonInputString()
-				d4d.Checking.equalityOfEndingAvroSkeuosFromAvroOrJsonInputString()
+				d4d.Checking.equalityOfLastAvroSkeuosFromAvroOrJsonInputString()
 				
 				
 				

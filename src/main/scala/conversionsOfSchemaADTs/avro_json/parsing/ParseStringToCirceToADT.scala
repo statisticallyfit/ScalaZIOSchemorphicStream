@@ -30,12 +30,8 @@ object ParseStringToCirceToADT {
 	abstract class Info
 	
 	abstract class StringDecodeInfo(
-		/*parsedApacheAvro: AvroSchema_A,
-		parsedApacheAvroStr: String,
-		skeuoAvro_fromApache: Fix[AvroSchema_S],
-		interimCirce_fromAvro: JsonCirce,*/
 		rawAvro: String, rawJson: String,
-		interimCirce_fromJson: JsonCirce,
+		interimCirce_fromJsonRaw: JsonCirce,
 		skInfo: SkeuoDecodeInfo
 						  )
 		extends Info
@@ -46,28 +42,28 @@ object ParseStringToCirceToADT {
 		parsedApacheAvro: AvroSchema_A,
 		parsedApacheAvroStr: String,
 		skeuoAvro_fromApache: Fix[AvroSchema_S],
-		interimCirce_fromAvro: JsonCirce,
+		interimCirce_fromAvroSkeuo: JsonCirce,
 		skInfo: SkeuoDecodeInfo
 	)
-		extends StringDecodeInfo (rawAvro, rawJson, interimCirce_fromAvro, skInfo)
+		extends StringDecodeInfo (rawAvro, rawJson, interimCirce_fromAvroSkeuo, skInfo)
 		
 	
 	case class JsonStringDecodeInfo(
 		rawAvro: String,
 		rawJson: String,
-		interimCirce_fromJson: JsonCirce,
+		interimCirce_fromJsonRaw: JsonCirce,
 		skInfo: SkeuoDecodeInfo
-	) extends StringDecodeInfo(rawAvro, rawJson, interimCirce_fromJson, skInfo)
+	) extends StringDecodeInfo(rawAvro, rawJson, interimCirce_fromJsonRaw, skInfo)
 	
 	
 	case class SkeuoDecodeInfo(skeuoAvro_fromRaw: Result[Fix[AvroSchema_S]],
-						  jsonCirce_fromRawAvro: JsonCirce,
-						  skeuoAvro_fromDecodingAvro: Result[Fix[AvroSchema_S]],
-						  skeuoJson_fromDecodingAvro: Result[Fix[JsonSchema_S]],
-						  skeuoJson_fromRaw: Result[Fix[JsonSchema_S]],
-						  jsonCirce_fromRawJson: JsonCirce,
-						  skeuoAvro_fromDecodingJson: Result[Fix[AvroSchema_S]],
-						  skeuoJson_fromDecodingJson: Result[Fix[JsonSchema_S]]
+	                           jsonCirce_fromAvroSkeuo: JsonCirce,
+	                           skeuoAvro_fromDecodeAvroSkeuo: Result[Fix[AvroSchema_S]],
+	                           skeuoJson_fromDecodeAvroSkeuo: Result[Fix[JsonSchema_S]],
+	                           skeuoJson_fromRaw: Result[Fix[JsonSchema_S]],
+	                           jsonCirce_fromJsonSkeuo: JsonCirce,
+	                           skeuoAvro_fromDecodeJsonSkeuo: Result[Fix[AvroSchema_S]],
+	                           skeuoJson_fromDecodeJsonSkeuo: Result[Fix[JsonSchema_S]]
 						 )
 		extends Info
 	
@@ -123,20 +119,20 @@ object ParseStringToCirceToADT {
 			
 			
 			// Generate circes from the starting skeuos
-			val jsonCirce_fromRawAvro: JsonCirce = libToJsonAltered(skeuoAvro_fromRaw.right.get)
-			val jsonCirce_fromRawJson: JsonCirce = libRender(skeuoJson_fromRaw.right.get)
+			val jsonCirce_fromAvroSkeuo: JsonCirce = libToJsonAltered(skeuoAvro_fromRaw.right.get)
+			val jsonCirce_fromJsonSkeuo: JsonCirce = libRender(skeuoJson_fromRaw.right.get)
 			
 			// Generate skeuos from the starting skeuos (for showing decoding capability)
-			val skeuoAvro_fromDecodingAvro: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(jsonCirce_fromRawAvro)
-			val skeuoJson_fromDecodingAvro: Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo(jsonCirce_fromRawAvro)
+			val skeuoAvro_fromDecodeAvroSkeuo: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(jsonCirce_fromAvroSkeuo)
+			val skeuoJson_fromDecodeAvroSkeuo: Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo(jsonCirce_fromAvroSkeuo)
 			
-			val skeuoAvro_fromDecodingJson: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(jsonCirce_fromRawJson)
-			val skeuoJson_fromDecodingJson: Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo(jsonCirce_fromRawJson)
+			val skeuoAvro_fromDecodeJsonSkeuo: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(jsonCirce_fromJsonSkeuo)
+			val skeuoJson_fromDecodeJsonSkeuo: Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo(jsonCirce_fromJsonSkeuo)
 			
 			
 			SkeuoDecodeInfo(
-				skeuoAvro_fromRaw, jsonCirce_fromRawAvro, skeuoAvro_fromDecodingAvro, skeuoJson_fromDecodingAvro,
-				skeuoJson_fromRaw, jsonCirce_fromRawJson, skeuoAvro_fromDecodingJson, skeuoJson_fromDecodingJson
+				skeuoAvro_fromRaw, jsonCirce_fromAvroSkeuo, skeuoAvro_fromDecodeAvroSkeuo, skeuoJson_fromDecodeAvroSkeuo,
+				skeuoJson_fromRaw, jsonCirce_fromJsonSkeuo, skeuoAvro_fromDecodeJsonSkeuo, skeuoJson_fromDecodeJsonSkeuo
 			)
 		}
 	}
@@ -165,14 +161,14 @@ object ParseStringToCirceToADT {
 			
 			Stepping(rawAvro, rawJson).avroStep
 				.skInfo
-				.skeuoJson_fromDecodingAvro
+				.skeuoJson_fromDecodeAvroSkeuo
 		}
 		
 		def decodeAvroStringToCirceToAvroSkeuo(rawAvro: String, rawJson: String): Result[Fix[AvroSchema_S]] = {
 			
 			Stepping(rawAvro, rawJson).avroStep
 				.skInfo
-				.skeuoAvro_fromDecodingAvro
+				.skeuoAvro_fromDecodeAvroSkeuo
 				
 		}
 		
@@ -180,7 +176,7 @@ object ParseStringToCirceToADT {
 			
 			Stepping(rawAvro, rawJson).avroStep
 				.skInfo
-				.skeuoJson_fromDecodingJson
+				.skeuoJson_fromDecodeJsonSkeuo
 				
 		}
 		
@@ -189,7 +185,7 @@ object ParseStringToCirceToADT {
 			Stepping(rawAvro, rawJson)
 				.jsonStep
 				.skInfo
-				.skeuoAvro_fromDecodingJson
+				.skeuoAvro_fromDecodeJsonSkeuo
 		}
 	}
 	
