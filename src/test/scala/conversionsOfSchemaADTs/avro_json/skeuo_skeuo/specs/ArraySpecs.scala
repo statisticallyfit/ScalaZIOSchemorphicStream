@@ -94,118 +94,155 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 			}
 		}
 		
-		describe("converting avro-schema to json-schema") {
-			val jsonSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(array1IntAvro_Fix_S)
-			
+		describe("converting avro-schema to json-schema, and vice versa - using Trans function") {
+			val jsonSkeuoResult: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
+			val avroSkeuoResult: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
 			
 			describe("type checking") {
-				it("the result should have type Skeuomorph-json-schema") {
+				
+				it("the json-skeuo result should have type JsonSchema (from skeuomorph)") {
 					
-					jsonSkeuo shouldBe a[JsonSchema_S[_]] // Fix is invisible
-					UtilMain.getFuncTypeSubs(jsonSkeuo) shouldEqual "Fix[JsonSchema_S]"
+					jsonSkeuoResult shouldBe a[JsonSchema_S[_]] // Fix is invisible
+					UtilMain.getFuncTypeSubs(jsonSkeuoResult) shouldEqual "Fix[JsonSchema_S]"
+				}
+				
+				it("the avro-skeuo result should have type AvroSchema (from skeuomorph)"){
+					
+					avroSkeuoResult shouldBe a [AvroSchema_S[_]]
+					UtilMain.getFuncTypeSubs(avroSkeuoResult) shouldEqual "Fix[AvroSchema_S]"
 				}
 			}
 			
-			describe("avro to json conversion, using circe decoder as backwards-check") {
+			describe("value checking"){
+				it("the json-skeuo result should equal the json-skeuo input"){
+					
+					jsonSkeuoResult should equal (jsonFixS)
+				}
 				
-				import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.ImplicitArgs
+				it("the avro-skeuo result should equal the avro-skeuo input"){
+					avroSkeuoResult should equal (avroFixS)
+				}
+			}
+		}
+		
+		describe("converting avro-schema to json-schema - using circe decoder (as check against Trans function)") {
+			
+			import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.ImplicitArgs
+			
+			implicit val impArgs: ImplicitArgs = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
+			
+			
+			describe("common decoder specs"){
 				
-				implicit val impArgs: ImplicitArgs = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
+				val dcommon = CommonDecoderCheckSpecs()
 				
-				// TODO find out how to call just the class name without args?
-				
-				val d0 = new DecoderCheck0_CanonicalWay_AvroStringToJsonString()
-				d0.printOuts()
-				
-				d0.Checks.checkInputAvroSkeuoEqualsAvroSkeuoFromApacheString
-				d0.Checks.checkInputJsonSkeuoEqualsOutputJsonSkeuosFromApacheStringAndFromTrans
-				d0.Checks.checkInputJsonCirceEqualsOutputJsonCirceFromTrans
-				//d0.checking()
+				dcommon.printOuts()
 				
 				
-				val d2 = new DecoderCheck2_JsonSkeuoToAvroString()
+				it("avro-string and json-string should yield same avro-skeuo") {
+					dcommon.equalityOfInitialAvroSkeuosFromAvroOrJsonInputString()
+				}
+				
+				it("avro-string and json-string should yield same json-skeuo"){
+					dcommon.equalityOfInitialJsonSkeuosFromAvroOrJsonInputString()
+				}
+				
+				it("json-circe should be the same when starting from either avro-string or json-string"){
+					dcommon.equalityOfCirceFromAvroOrJsonInputString()
+				}
+				it("json-circe should be the same when starting from either avro-skeuo or json-skeuo"){
+					dcommon.equalityOfCirceBySkeuoAvroAndCirceBySkeuoJsonFromAvroOrJsonInputString()
+				}
+				
+				it("Converting:  " +
+				   "\navro-string --> circe --> (initial) avro-skeuo --> circe --> avro-skeuo" +
+				   "\navro-string --> circe --> (initial) json-skeuo --> circe --> avro-skeuo" +
+				   "\njson-string --> circe --> (initial) avro-skeuo --> circe --> avro-skeuo" +
+				   "\njson-string --> circe --> (initial) json-skeuo --> circe --> avro-skeuo" +
+				   "\nThese last avro-skeuos should be the same even though they start from either avro/json-strings and go through either avro/json-skeuos"
+				) {
+					
+					dcommon.equalityOfLastAvroSkeuosFromAvroOrJsonInputString()
+				}
+				
+				it("Converting:  " +
+				   "\navro-string --> circe --> (initial) avro-skeuo --> circe --> json-skeuo" +
+				   "\navro-string --> circe --> (initial) json-skeuo --> circe --> json-skeuo" +
+				   "\njson-string --> circe --> (initial) avro-skeuo --> circe --> json-skeuo" +
+				   "\njson-string --> circe --> (initial) json-skeuo --> circe --> json-skeuo" +
+				   "\nThese last json-skeuos should be the same even though they start from either avro/json-strings and go through either avro/json-skeuos"
+				) {
+					
+					dcommon.equalityOfLastJsonSkeuosFromAvroOrJsonInputString()
+				}
+				
+				it("the skeuo-adt from decoding via circe should equal the skeuo-adt from the Trans function"){
+					
+					dcommon.equalityOfSkeuosFromInputAndCirceDecodingAndTrans()
+				}
+				
+			}
+			
+			
+			
+			
+			describe("spec 1 - canonical conversion of avro-string to json-string"){
+				
+				val d1 = DecoderCheck1_Canonical_AvroStringToJsonString()
+				d1.printOuts()
+				
+				
+				it("avro-skeuo (from apache) should equal avro-skeuo (from input)"){
+					d1.Checking.parsingAvroStrToApacheToSkeuoYieldsCorrectAvroSkeuo()
+				}
+				
+				it("Trans function applied to either apache-avro or skeuo-avro should yield same json-skeuo"){
+					d1.Checking.transOfApacheAvroOrSkeuoAvroShouldYieldSameJsonSkeuo()
+				}
+				
+				it("json-circe (from circe decoder of the json-skeuo generated by Trans function) should match the correct json-circe"){
+					d1.Checking.transLeadsToCorrectCirce()
+				}
+			}
+			
+			
+			describe("spec 2 - going backwards from json-skeuo to avro-skeuo and comparing the resulting avro-str with given avro-str"){
+				
+				
+				val d2 = DecoderCheck2_JsonSkeuoToAvroString()
 				d2.printOuts()
-				d2.Checks.checkInputAvroStringEqualsApacheAvroStringFromAvroSkeuoTransOutput
-				d2.Checks.checkInputAvroSkeuoEqualsAvroSkeuoFromJsonSkeuoTransOutput
-				//d2.checking()
-				
-				
-				val d3a = new DecoderCheck3a_AvroSkeuoToJsonCirce()
-				d3a.printOuts()
-				d3a.Checks.checkInputAvroSkeuoShouldMatchAvroSkeuoStr
-				d3a.Checks.checkInputJsonSkeuoShouldMatchJsonSkeuoFromAvroSkeuoTransAndStrAndDecoder
-				d3a.Checks.checkJsonCirceFromAvroSkeuoEqualsJsonCirceFromJsonSkeuo
-				//d3a.checking()
-				
-				val d3b = new DecoderCheck3b_JsonSkeuoToJsonCirce()
-				d3b.printOuts()
-				d3b.Checks.checkInputAvroSkeuoShouldMatchAvroSkeuoStr
-				d3b.Checks.checkInputJsonSkeuoShouldMatchJsonSkeuoFromAvroSkeuoTransAndStrAndDecoder
-				d3b.Checks.checkJsonCirceFromAvroSkeuoEqualsJsonCirceFromJsonSkeuo
 				
 				
 				
-				val d4a = new DecoderCheck4a_JsonStringBegin_JsonDecoderVsJsonTrans()
-				d4a.printOuts()
-				d4a.Checks.checkInputJsonStringEqualsJsonCirceStrings
-				d4a.Checks.checkJsonFromDecoderMatchesJsonFromTransOfAvroSkeuo
-				
-				
-				val d4b = new DecoderCheck4b_JsonStringBegin_AvroDecoderVsAvroTrans()
-				d4b.printOuts()
-				//d4b.checking()
-				d4b.Checks.checkInputJsonStringEqualsJsonCirceStrings()
-				d4b.Checks.checkEqualityOfAllAvroSources()
-				
-				
-				
-				
-				val d4c = new DecoderCheck4c_AvroStringBegin_AvroDecoderVsAvroTrans()
-				d4c.Checks.checkMatchingJsonCirce
-				d4c.Checks.checkEqualityOfAllAvroSources
-				
-				
-				val d4d = DecoderCheck4d_AvroStringBegin_JsonDecoderVsJsonTrans()
-				d4d.Checking.equalityOfBeginningAvroSkeuosFromInputAvroString()
-				d4d.Checking.equalityOfCirceBySkeuoAvroAndCirceBySkeuoJsonFromAvroOrJsonInputString()
-				d4d.Checking.equalityOfLastAvroSkeuosFromAvroOrJsonInputString()
-				
-				
-				
-				
-				
-				info(s"\n-----------------------------------------------------------")
-				info("\nDECODING SANITY CHECK:")
-				info(s"\nCHECK 1" +
-					s"\nskeuo-avro (fix) --> json-circe --> skeuo-json (fix)" +
-					s"\nskeuo-avro: $avroFixS" +
-					s"\njson-circe: \n${libToJsonAltered(avroFixS).manicure}" +
-					s"\nskeuo-json: ${decodeAvroSkeuoToCirceToJsonSkeuo(avroFixS)}")
-				
-				
-				info(s"\nCHECK 2" +
-					s"\nskeuo-avro (fix) --> json-circe --> skeuo-avro (fix)" +
-					s"\nskeuo-avro: $avroFixS" +
-					s"\njson-circe: \n${libToJsonAltered(avroFixS).manicure}" +
-					s"\nskeuo-avro: ${decodeAvroSkeuoToCirceToAvroSkeuo(avroFixS)}")
-				
-				info(s"\nCHECK 3" +
-					s"\nskeuo-json (fix) --> json-circe --> skeuo-avro (fix)" +
-					s"\nskeuo-json: $jsonFixS" +
-					s"\njson-circe: \n${libRender(jsonFixS).manicure}" +
-					s"\nskeuo-avro: ${decodeJsonSkeuoToCirceToAvroSkeuo(jsonFixS)}")
-				
-				info(s"\nCHECK 4" +
-					s"\nskeuo-json (fix) --> json-circe --> skeuo-json (fix)" +
-					s"\nskeuo-json: $jsonFixS" +
-					s"\njson-circe: \n${libRender(jsonFixS).manicure}" +
-					s"\nskeuo-json: ${decodeJsonSkeuoToCirceToJsonSkeuo(jsonFixS)}")
-				
-				
+				d2.Checking.equalityOfInputAvroSkeuoAndOutputAvroString()
+				d2.Checking.equalityOfCircesFromAvroOrJsonInputSkeuo()
+				d2.Checking.equalityOfAvroSkeuoFromDecoderAndTrans()
 				
 				
 			}
+			
+			
+			
+			
+			val d3a = DecoderCheck3a_JsonStringBegin_JsonDecoderVsJsonTrans()
+			d3a.printOuts()
+			d3a.Checking.equalityOfJsonSkeuoFromDecoderAndTrans()
+			
+			val d3b = DecoderCheck3b_JsonStringBegin_AvroDecoderVsAvroTrans()
+			d3b.printOuts()
+			d3b.Checking.equalityOfAvroSkeuoFromDecoderAndTrans()
+			
+			val d3c = DecoderCheck3c_AvroStringBegin_AvroDecoderVsAvroTrans()
+			d3c.printOuts()
+			d3c.Checking.equalityOfAvroSkeuoFromDecoderAndTrans()
+			
+			
+			val d3d = DecoderCheck3d_AvroStringBegin_JsonDecoderVsJsonTrans()
+			d3d.printOuts()
+			d3d.Checking.equalityOfJsonSkeuoFromDecoderAndTrans()
+			
 		}
+		
 	}
 	
 	/*Map(array1IntAvro_S → "AvroSchema_S[AvroSchema_S[Int]]",

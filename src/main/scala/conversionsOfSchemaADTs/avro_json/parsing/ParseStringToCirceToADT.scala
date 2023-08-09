@@ -31,7 +31,7 @@ object ParseStringToCirceToADT {
 	
 	abstract class StringDecodeInfo(
 		rawAvro: String, rawJson: String,
-		interimCirce_fromJsonRaw: JsonCirce,
+		interimCirce: JsonCirce,
 		skInfo: SkeuoDecodeInfo
 						  )
 		extends Info
@@ -42,18 +42,18 @@ object ParseStringToCirceToADT {
 		parsedApacheAvro: AvroSchema_A,
 		parsedApacheAvroStr: String,
 		skeuoAvro_fromApache: Fix[AvroSchema_S],
-		interimCirce_fromAvroSkeuo: JsonCirce,
+		interimCirce: JsonCirce,
 		skInfo: SkeuoDecodeInfo
 	)
-		extends StringDecodeInfo (rawAvro, rawJson, interimCirce_fromAvroSkeuo, skInfo)
+		extends StringDecodeInfo (rawAvro, rawJson, interimCirce, skInfo)
 		
 	
 	case class JsonStringDecodeInfo(
 		rawAvro: String,
 		rawJson: String,
-		interimCirce_fromJsonRaw: JsonCirce,
+		interimCirce: JsonCirce,
 		skInfo: SkeuoDecodeInfo
-	) extends StringDecodeInfo(rawAvro, rawJson, interimCirce_fromJsonRaw, skInfo)
+	) extends StringDecodeInfo(rawAvro, rawJson, interimCirce, skInfo)
 	
 	
 	case class SkeuoDecodeInfo(skeuoAvro_fromRaw: Result[Fix[AvroSchema_S]],
@@ -81,11 +81,11 @@ object ParseStringToCirceToADT {
 			
 			val skeuoAvro_fromApache: Fix[AvroSchema_S] = apacheToSkeuoAvroSchema(parsedApacheAvro)
 			
-			val interimCirce_fromAvro: JsonCirce = libToJsonAltered(skeuoAvro_fromApache)
+			val interimCirce_fromAvroRaw: JsonCirce = libToJsonAltered(skeuoAvro_fromApache)
 			
 			// From Json part
 			// Circe + Starting Skeuo
-			val interimCirce_fromJson: JsonCirce = unsafeParse(rawJson)
+			val interimCirce_fromJsonRaw: JsonCirce = unsafeParse(rawJson)
 			
 			
 			// Encapsulate the skeuo -> circe -> skeuo parts (SkeuoDecodeInfo) with the beginning str part (StringDecodeInfo).
@@ -93,12 +93,12 @@ object ParseStringToCirceToADT {
 				parsedApacheAvro,
 				parsedApacheAvroStr,
 				skeuoAvro_fromApache,
-				interimCirce_fromAvro,
-				skInfo = infoSkeuoToCirceToSkeuo(interimCirce_fromAvro))
+				interimCirce_fromAvroRaw,
+				skInfo = infoSkeuoToCirceToSkeuo(interimCirce_fromAvroRaw))
 			
 			val jsonInfo: JsonStringDecodeInfo = JsonStringDecodeInfo(rawAvro, rawJson,
-				interimCirce_fromJson,
-				skInfo = infoSkeuoToCirceToSkeuo(interimCirce_fromJson))
+				interimCirce_fromJsonRaw,
+				skInfo = infoSkeuoToCirceToSkeuo(interimCirce_fromJsonRaw))
 			
 			Map(
 				SchemaKind.RawAvro → avroInfo,

@@ -19,14 +19,8 @@ import utilMain.UtilMain.implicits._
  *
  */
 // Using implicitargs class to remove the need for passing all the arguments explicitly
-class DecoderCheck0_CanonicalWay_AvroStringToJsonString(implicit imp: ImplicitArgs )
+case class DecoderCheck1_Canonical_AvroStringToJsonString(implicit imp: ImplicitArgs )
 	extends AnyFunSpec with DecoderChecks with Matchers {
-	
-	/*rawAvroStr: String,
-											rawJsonStr: String,
-											jsonCirceCheck: JsonCirce, avroS: AvroSchema_S[_], tpeS: String,
-											avroC: AvroSchema_S[_], tpeC: String,
-											avroFixS: Fix[AvroSchema_S], jsonFixS: Fix[JsonSchema_S]*/
 	
 	import imp._
 	
@@ -57,20 +51,20 @@ class DecoderCheck0_CanonicalWay_AvroStringToJsonString(implicit imp: ImplicitAr
 	
 	def checking(): Unit = {
 		
-		import Checks._
+		import Checking._
 		
-		checkInputAvroSkeuoEqualsAvroSkeuoFromApacheString
-		checkInputJsonSkeuoEqualsOutputJsonSkeuosFromApacheStringAndFromTrans
-		checkInputJsonCirceEqualsOutputJsonCirceFromTrans
-		
+		parsingAvroStrToApacheToSkeuoYieldsCorrectAvroSkeuo()
+		transOfApacheAvroOrSkeuoAvroShouldYieldSameJsonSkeuo()
+		transLeadsToCorrectCirce()
 	}
 	
-	object Checks {
-		def checkInputAvroSkeuoEqualsAvroSkeuoFromApacheString: Assertion = {
+	object Checking {
+		def parsingAvroStrToApacheToSkeuoYieldsCorrectAvroSkeuo(): Assertion = {
 			skeuoAvro_fromApacheStr shouldEqual avroFixS
 		}
 		
-		def checkInputJsonSkeuoEqualsOutputJsonSkeuosFromApacheStringAndFromTrans: Assertion = {
+		
+		def transOfApacheAvroOrSkeuoAvroShouldYieldSameJsonSkeuo(): Assertion = {
 			forEvery(List(
 				skeuoJson_fromTransOfAvroStr,
 				skeuoJson_fromTransOfAvroSkeuo
@@ -79,13 +73,8 @@ class DecoderCheck0_CanonicalWay_AvroStringToJsonString(implicit imp: ImplicitAr
 			}
 		}
 		
-		def checkInputJsonCirceEqualsOutputJsonCirceFromTrans: Assertion = {
+		def transLeadsToCorrectCirce(): Assertion = {
 			circeJson_fromTransOfJsonSkeuoOfAvroStr should equal(jsonCirceCheck)
 		}
 	}
 }
-
-/*
-implicit object DecoderCheck0_CanonicalWay_AvroStringToJsonString {
-	implicit def apply(implicit imp: ImplicitArgs) = new DecoderCheck0_CanonicalWay_AvroStringToJsonString
-}*/
