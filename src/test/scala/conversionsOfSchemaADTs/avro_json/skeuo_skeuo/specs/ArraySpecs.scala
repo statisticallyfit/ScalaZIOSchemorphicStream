@@ -206,40 +206,76 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 			}
 			
 			
-			describe("spec 2 - going backwards from json-skeuo to avro-skeuo and comparing the resulting avro-str with given avro-str"){
+			describe("spec 2: going backwards from json-skeuo to avro-skeuo and comparing the resulting avro-str with given avro-str"){
 				
 				
 				val d2 = DecoderCheck2_JsonSkeuoToAvroString()
 				d2.printOuts()
 				
+				it("given avro-string should match the apache-avro-string generated it"){
+					
+					d2.Checking.equalityOfInputAvroSkeuoAndOutputAvroString()
+				}
 				
+				it("avro-skeuo generated from Trans function should match avro-skeuo from decoding json-skeuo -> circe -> avro-skeuo"){
+					d2.Checking.equalityOfAvroSkeuoFromDecoderAndTrans()
+				}
 				
-				d2.Checking.equalityOfInputAvroSkeuoAndOutputAvroString()
-				d2.Checking.equalityOfCircesFromAvroOrJsonInputSkeuo()
-				d2.Checking.equalityOfAvroSkeuoFromDecoderAndTrans()
-				
+				it("json-circe from the chain (avro-str -> apache-avro -> avro-skeuo) should match the json-circe from the given json-skeuo") {
+					d2.Checking.equalityOfCircesFromAvroOrJsonInputSkeuo()
+				}
 				
 			}
 			
+			describe("spec 3a: json-string --> json-skeuo, and comparing the decoder json-skeuo with Trans json-skeuo"){
+				
+				
+				val d3a = DecoderCheck3a_JsonStringBegin_JsonDecoderVsJsonTrans()
+				d3a.printOuts()
+				
+				it("json-skeuo from circe-decoder should match json-skeuo from Trans function"){
+					
+					d3a.Checking.equalityOfJsonSkeuoFromDecoderAndTrans()
+				}
+			}
+			
+			describe("spec 3b: json-string --> avro-skeuo, and comparing the decoder avro-skeuo with Trans avro-skeuo") {
+				
+				
+				val d3b = DecoderCheck3b_JsonStringBegin_AvroDecoderVsAvroTrans()
+				d3b.printOuts()
+				
+				it("avro-skeuo from circe-decoder should match avro-skeuo from Trans function") {
+					
+					d3b.Checking.equalityOfAvroSkeuoFromDecoderAndTrans()
+				}
+			}
+			
+			describe("spec 3c: avro-string --> avro-skeuo, and comparing the decoder avro-skeuo with Trans avro-skeuo") {
+				
+				
+				val d3c = DecoderCheck3c_AvroStringBegin_AvroDecoderVsAvroTrans()
+				d3c.printOuts()
+				
+				it("avro-skeuo from circe-decoder should match avro-skeuo from Trans function") {
+					
+					d3c.Checking.equalityOfAvroSkeuoFromDecoderAndTrans()
+				}
+			}
 			
 			
+			describe("spec 3d: avro-string --> json-skeuo, and comparing the decoder json-skeuo with Trans json-skeuo") {
+				
+				
+				val d3d = DecoderCheck3d_AvroStringBegin_JsonDecoderVsJsonTrans()
+				d3d.printOuts()
+				
+				it("json-skeuo from circe-decoder should match json-skeuo from Trans function") {
+					
+					d3d.Checking.equalityOfJsonSkeuoFromDecoderAndTrans()
+				}
+			}
 			
-			val d3a = DecoderCheck3a_JsonStringBegin_JsonDecoderVsJsonTrans()
-			d3a.printOuts()
-			d3a.Checking.equalityOfJsonSkeuoFromDecoderAndTrans()
-			
-			val d3b = DecoderCheck3b_JsonStringBegin_AvroDecoderVsAvroTrans()
-			d3b.printOuts()
-			d3b.Checking.equalityOfAvroSkeuoFromDecoderAndTrans()
-			
-			val d3c = DecoderCheck3c_AvroStringBegin_AvroDecoderVsAvroTrans()
-			d3c.printOuts()
-			d3c.Checking.equalityOfAvroSkeuoFromDecoderAndTrans()
-			
-			
-			val d3d = DecoderCheck3d_AvroStringBegin_JsonDecoderVsJsonTrans()
-			d3d.printOuts()
-			d3d.Checking.equalityOfJsonSkeuoFromDecoderAndTrans()
 			
 		}
 		
