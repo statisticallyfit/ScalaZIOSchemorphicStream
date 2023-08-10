@@ -2,16 +2,26 @@ package conversionsOfSchemaADTs.avro_json.parsing
 
 
 import higherkindness.droste.data.Fix
-import io.circe.Decoder.Result
+
 //import org.scalatest.featurespec.AnyFeatureSpec
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+
+import io.circe.Decoder.Result
 import io.circe.{Json ⇒ JsonCirce}
+
+
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should._
+
 import testData.rawstringData.jsonData.Data._
 import testData.schemaData.jsonData.skeuoData.Data._
-import utilMain.UtilMain.implicits._
+
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
+import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
+import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
+
+import utilMain.UtilMain.implicits._
+
 
 //import conversionsOfSchemaADTs.avro_json.parsing.ParseChecker
 
@@ -36,7 +46,7 @@ class ParseDecode_Primitives_JsonStr_Circe_JsonSkeuo_Specs extends AnyFunSuite w
 			circeJsonStr shouldBe a[JsonCirce]
 			
 			
-			val decodedJsonSkeuo: Result[Fix[JsonSchema_S]] = ParseStringToCirceToADT.decodeJsonStringToCirceToJsonSkeuo(rawJsonStr)
+			val decodedJsonSkeuo: Result[Fix[JsonSchema_S]] = Decoding.decodeJsonStringToCirceToJsonSkeuo(rawJsonStr)
 			
 			// value check
 			decodedJsonSkeuo.right.get shouldEqual checkerJsonSkeuo

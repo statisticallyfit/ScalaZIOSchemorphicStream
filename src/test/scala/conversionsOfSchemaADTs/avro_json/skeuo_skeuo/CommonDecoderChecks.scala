@@ -66,11 +66,11 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 	import imp._
 	
 	
-	val step: Stepping = Stepping(rawAvroStr, rawJsonStr)
-	val sa: AvroStringDecodeInfo = step.avroStep
-	val sj: JsonStringDecodeInfo = step.jsonStep
-	val sai: SkeuoDecodeInfo = step.avroStep.skInfo
-	val sji: SkeuoDecodeInfo = step.jsonStep.skInfo
+	val step: Stepping = new Stepping(Some(rawAvroStr), Some(rawJsonStr))
+	val sa: AvroStringDecodeInfo = step.avroStep.avroInfo
+	val sj: JsonStringDecodeInfo = step.jsonStep.jsonInfo
+	val sai: SkeuoDecodeInfo = sa.skInfo
+	val sji: SkeuoDecodeInfo = sj.skInfo
 	
 	
 	val skeuoJson_fromTransOfGivenAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
@@ -84,7 +84,7 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 		info(s"\nraw avro str: \n$rawAvroStr" +
 		     s"\n--> apacheAvro (from parse): \n${sa.parsedApacheAvroStr}" +
 		     s"\n--> skeuoAvro (from apache): ${sa.skeuoAvro_fromApache}" +
-		     s"\n--> json circe (interim-avro): \n${sa.interimCirce.manicure}" +
+		     s"\n--> json circe (interim-avro): \n${sa.interimCirce_fromAvroSKeuo.manicure}" +
 		     
 		     s"\n------> skeuoAvro (from AVRO STR): ${sai.skeuoAvro_fromRaw}" +
 		     s"\n--> json circe (from avro-skeuo): \n${sai.jsonCirce_fromAvroSkeuo.manicure}" +
@@ -135,8 +135,8 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 	def equalityOfCirceFromAvroOrJsonInputString(): Assertion = {
 		
 		forEvery(List(
-			sa.interimCirce,
-			sj.interimCirce,
+			sa.interimCirce_fromAvroSKeuo,
+			sj.interimCirce_fromJsonStr,
 		
 		)
 		) {

@@ -28,11 +28,11 @@ case class DecoderCheck3a_JsonStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 	import imp._
 	
 	
-	val step: Stepping = Stepping(rawAvroStr, rawJsonStr)
-	val sa: AvroStringDecodeInfo = step.avroStep
-	val sj: JsonStringDecodeInfo = step.jsonStep
-	val sai: SkeuoDecodeInfo = step.avroStep.skInfo
-	val sji: SkeuoDecodeInfo = step.jsonStep.skInfo
+	val step: Stepping = new Stepping(Some(rawAvroStr), Some(rawJsonStr))
+	val sa: AvroStringDecodeInfo = step.avroStep.avroInfo
+	val sj: JsonStringDecodeInfo = step.jsonStep.jsonInfo
+	val sai: SkeuoDecodeInfo = sa.skInfo
+	val sji: SkeuoDecodeInfo = sj.skInfo
 	
 	
 	val skeuoJson_fromTransOfGivenAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
@@ -49,8 +49,8 @@ case class DecoderCheck3a_JsonStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 		     s"\n|\t (from json-side) " +
 		     s"\n|\t (starting from: json-str)" +
 		     s"\n--- raw-json-str (given): \n$rawJsonStr" +
-		     s"\n--> json-circe (from avro-str): \n${sa.interimCirce.manicure}" +
-		     s"\n    json-circe (from json-str): \n${sj.interimCirce.manicure}" +
+		     s"\n--> json-circe (from avro-str): \n${sa.interimCirce_fromAvroSKeuo.manicure}" +
+		     s"\n    json-circe (from json-str): \n${sj.interimCirce_fromJsonStr.manicure}" +
 		     s"\n--> skeuo-json (avro-decoder output): ${sai.skeuoJson_fromRaw}" +
 		     s"\n    skeuo-json (json-decoder output): ${sji.skeuoJson_fromRaw}" +
 		     s"\n    skeuo-json (trans output): ${skeuoJson_fromTransOfGivenAvroSkeuo}"
@@ -73,12 +73,12 @@ case class DecoderCheck3a_JsonStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 			
 			forEvery(List(
 				
-				Decoding.decodeAvroStringToCirceToJsonSkeuo(rawAvroStr, rawJsonStr),
+				Decoding.decodeAvroStringToCirceToJsonSkeuo(rawAvroStr, Some(rawJsonStr)),
 				
 				sai.skeuoJson_fromDecodeAvroSkeuo,
 				sai.skeuoJson_fromRaw,
 				
-				Decoding.decodeJsonStringToCirceToJsonSkeuo(rawAvroStr, rawJsonStr),
+				Decoding.decodeJsonStringToCirceToJsonSkeuo(rawJsonStr, Some(rawAvroStr)),
 				
 				sji.skeuoJson_fromDecodeAvroSkeuo,
 				sji.skeuoJson_fromRaw,

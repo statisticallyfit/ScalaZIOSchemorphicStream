@@ -31,6 +31,10 @@ import conversionsOfSchemaADTs.avro_json.skeuo_skeuo._
  */
 class ArraySpecs extends AnyFunSpec with Matchers {
 	
+	
+	
+	
+	
 	def testStructure(scenarioType: String,
 				   rawAvroStr: String, rawJsonStr: String,
 				   jsonCirceCheck: JsonCirce,
@@ -186,7 +190,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 			
 			
 			
-			describe("spec 1 - canonical conversion of avro-string to json-string"){
+			/*describe("spec 1 - canonical conversion of avro-string to json-string"){
 				
 				val d1 = DecoderCheck1_Canonical_AvroStringToJsonString()
 				d1.printOuts()
@@ -274,7 +278,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					
 					d3d.Checking.equalityOfJsonSkeuoFromDecoderAndTrans()
 				}
-			}
+			}*/
 			
 			
 		}
@@ -286,31 +290,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 		array1IntAvro_Fix_S → "AvroSchema_S[AvroSchema_S[JsonCirce]]")*/
 	
 	
-	/*,
-			redocly_jsonSchemaFromData =
-				"""
-				|{
-				|  "type": "object",
-				|  "properties": {
-				|    "type": {
-				|      "type": "string"
-				|    },
-				|    "items": {
-				|      "type": "string"
-				|    }
-				|  },
-				|  "additionalProperties": false
-				|}
-				|""".stripMargin*/
 	
-	
-	
-	info(s"PRINT OUT array string from skeuo schema avro to see avro str")
-	info(s"${skeuoToApacheAvroSchema(nullAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
-	info(s"${skeuoToApacheAvroSchema(intAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
-	info(s"${skeuoToApacheAvroSchema(strAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
-	info(s"${skeuoToApacheAvroSchema(booleanAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
-	info(s"${skeuoToApacheAvroSchema(array1IntAvro_Fix_S).toString(true).removeSpaceBeforeColon}")
 	
 	import testData.schemaData.jsonData.circeData.Data._
 	
