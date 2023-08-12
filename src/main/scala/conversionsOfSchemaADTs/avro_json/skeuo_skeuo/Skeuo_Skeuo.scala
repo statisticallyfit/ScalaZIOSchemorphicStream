@@ -57,6 +57,11 @@ object Skeuo_Skeuo {
 				
 				case StringF() ⇒ Fix(TString())
 				
+				case BooleanF() ⇒ Fix(TBoolean())
+				case FloatF() ⇒ Fix(TFloat())
+				case DoubleF() ⇒ Fix(TDouble())
+				case ByteF() ⇒ Fix(TBytes())
+				
 				case ArrayF(inner: Fix[AvroSchema_S]) ⇒ Fix(TArray(inner)) // TODO just inner or wrap with TArray?
 				
 				case ObjectF(props: List[Property[Fix[AvroSchema_S]]],

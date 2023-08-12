@@ -38,6 +38,11 @@ object Data {
 	val intJson_Fix_S: Fix[JsonSchema_S] = Fix(IntegerF())
 	
 	
+	val booleanJson_S: JsonSchema_S[Boolean] = BooleanF()
+	val booleanJson_Circe_S: JsonSchema_S[JsonCirce] = BooleanF()
+	val booleanJson_Fix_S: Fix[JsonSchema_S] = Fix(BooleanF())
+	
+	
 	val array1IntJson_S: JsonSchema_S[JsonSchema_S[Int]] = ArrayF(IntegerF())
 	val array1IntJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonCirce]] = ArrayF(IntegerF())
 	val array1IntJson_Fix_S: Fix[JsonSchema_S] = Fix(ArrayF(Fix(IntegerF())))
@@ -74,7 +79,7 @@ object Data {
 		),
 		required = List()
 	)
-	val recordExampleJson_Position_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
+	val recordEXPositionJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
 		properties = List(
 			Property(name = "coordinates", tpe = Fix(ArrayF(Fix(FloatF()))))
 		),
@@ -119,7 +124,7 @@ object Data {
 		required = List("position", "sensorName", "name", "id")
 	)
 	
-	val recordExampleJson_Location_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
+	val recordEXLocationJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
 		properties = List(
 			Property(name = "name", tpe = Fix(StringF())),
 			Property(name = "symbol", tpe = Fix(ObjectF(

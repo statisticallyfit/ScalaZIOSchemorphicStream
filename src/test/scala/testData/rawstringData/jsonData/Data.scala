@@ -1,5 +1,8 @@
 package testData.rawstringData.jsonData
 
+
+import utilMain.UtilMain.implicits._
+
 /**
  *
  */
@@ -13,14 +16,14 @@ object Data {
 		  |  "properties": {},
 		  |  "required": []
 		  |}
-		  |""".stripMargin
+		  |""".stripMargin.trim
 	
 	val intJson_R: String =
 		"""
 		  |{
 		  |  "type": "integer"
 		  |}
-		  |""".stripMargin
+		  |""".stripMargin.trim
 	
 	
 	val strJson_R: String =
@@ -28,18 +31,34 @@ object Data {
 		  |{
 		  |  "type": "string"
 		  |}
-		  |""".stripMargin
+		  |""".stripMargin.trim
+	
+	val booleanJson_R: String =
+		"""
+		  |{
+		  |  "type": "boolean"
+		  |}
+		  |""".stripMargin.trim
 	
 	
 	val array1IntJson_R: String =
 		"""
+		  |{
+		  |  "type" : "array",
+		  |  "items" : {
+		  |    "type" : "integer",
+		  |    "format" : "int32"
+		  |  }
+		  |}
+		  |""".stripMargin.manicure
+		/*"""
 		  |{
 		  |  "type": "array",
 		  |  "items": {
 		  |    "type": "integer"
 		  |  }
 		  |}
-		  |""".stripMargin
+		  |""".stripMargin*/
 	
 	val array1StrJson_R: String =
 		"""
@@ -49,7 +68,7 @@ object Data {
 		  |    "type": "string"
 		  |  }
 		  |}
-		  |""".stripMargin
+		  |""".stripMargin.trim
 	
 	
 	val array3IntJson_R: String =
@@ -66,7 +85,7 @@ object Data {
 		  |    }
 		  |  }
 		  |}
-		  |""".stripMargin
+		  |""".stripMargin.trim
 	
 	
 	
@@ -74,7 +93,7 @@ object Data {
 	
 	
 	// NOTE (from autoschema generation not from original json file)
-	val recordExampleJson_Position_R: String =
+	val recordEXPositionJson_R: String =
 		"""
 		  |{
 		  |  "title": "Position",
@@ -90,10 +109,10 @@ object Data {
 		  |    }
 		  |  }
 		  |}
-		  |""".stripMargin
+		  |""".stripMargin.trim
 	
 	// NOTE (from autoschema generation not from original json file)
-	val recordExampleJson_Location_R: String =
+	val recordEXLocationJson_R: String =
 		"""{
 		  |  "title": "Locations",
 		  |  "type": "object",
@@ -135,7 +154,7 @@ object Data {
 		  |    }
 		  |  }
 		  |}
-		  |""".stripMargin
+		  |""".stripMargin.trim
 	
 	
 	/**

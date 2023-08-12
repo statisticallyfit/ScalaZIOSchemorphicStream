@@ -45,7 +45,7 @@ object ParseStringToCirceToADT {
 		interimCirce_fromAvroSKeuo: JsonCirce,
 		skInfo: SkeuoDecodeInfo
 	)
-		extends StringDecodeInfo (rawAvro, rawJsonOpt.getOrElse(""), interimCirce_fromAvroSKeuo, skInfo)
+		extends StringDecodeInfo (rawAvro, if(rawJsonOpt.isDefined) rawJsonOpt.get.trim else "", interimCirce_fromAvroSKeuo, skInfo)
 		
 	
 	case class JsonStringDecodeInfo(
@@ -53,7 +53,7 @@ object ParseStringToCirceToADT {
 		rawJson: String,
 		interimCirce_fromJsonStr: JsonCirce,
 		skInfo: SkeuoDecodeInfo
-	) extends StringDecodeInfo(rawAvroOpt.getOrElse(""), rawJson, interimCirce_fromJsonStr, skInfo)
+	) extends StringDecodeInfo(if(rawAvroOpt.isDefined) rawAvroOpt.get.trim else "", rawJson, interimCirce_fromJsonStr, skInfo)
 	
 	
 	case class SkeuoDecodeInfo(skeuoAvro_fromRaw: Result[Fix[AvroSchema_S]],
@@ -81,7 +81,9 @@ object ParseStringToCirceToADT {
 				case false ⇒ None
 				case true ⇒ {
 					
-					val parsedApacheAvro: AvroSchema_A = new AvroSchema_A.Parser().parse(rawAvroOpt.get) // TODO option for parsing failure?
+					val rawAvro: String = rawAvroOpt.get.trim
+					
+					val parsedApacheAvro: AvroSchema_A = new AvroSchema_A.Parser().parse(rawAvro) // TODO option for parsing failure?
 					
 					val parsedApacheAvroStr: String = parsedApacheAvro.toString(true).manicure
 					
@@ -89,7 +91,7 @@ object ParseStringToCirceToADT {
 					
 					val interimCirce_fromAvroRaw: JsonCirce = libToJsonAltered(skeuoAvro_fromApache)
 					
-					Some(AvroStringDecodeInfo(rawAvroOpt.get, rawJsonOpt,
+					Some(AvroStringDecodeInfo(rawAvro, rawJsonOpt,
 						parsedApacheAvro,
 						parsedApacheAvroStr,
 						skeuoAvro_fromApache,
@@ -161,8 +163,13 @@ object ParseStringToCirceToADT {
 		
 		// RULE: if starting from avro string in the test, then use avrostep, else if starting with json string in the test,  use jsonstep.
 		
-		val avroStep: AvroStepping = AvroStepping(rawAvroOpt.get, rawJsonOpt)
-		val jsonStep: JsonStepping = JsonStepping(rawJsonOpt.get, rawAvroOpt)
+		val avroInfoOpt: Option[AvroStringDecodeInfo] = info(SchemaKind.RawAvro).asInstanceOf[Option[AvroStringDecodeInfo]]
+		
+		val jsonInfoOpt: Option[JsonStringDecodeInfo] = info(SchemaKind.RawJson).asInstanceOf[Option[JsonStringDecodeInfo]]
+		
+		// bad - recursive loop - stackoverflow error since these classes inherit from Stepping
+		/*val avroStep: AvroStepping = AvroStepping(rawAvroOpt.get, rawJsonOpt)
+		val jsonStep: JsonStepping = JsonStepping(rawJsonOpt.get, rawAvroOpt)*/
 	}
 	
 	case class AvroStepping(
@@ -170,7 +177,7 @@ object ParseStringToCirceToADT {
 		rawJsonOpt: Option[String] = None
 	) extends Stepping(Some(rawAvro), rawJsonOpt) {
 		
-		val avroInfo: AvroStringDecodeInfo = info(SchemaKind.RawAvro).asInstanceOf[AvroStringDecodeInfo]
+		/*val avroInfo: AvroStringDecodeInfo = info(SchemaKind.RawAvro).asInstanceOf[AvroStringDecodeInfo]*/
 	}
 	
 	case class JsonStepping(
@@ -178,11 +185,11 @@ object ParseStringToCirceToADT {
 		rawAvroOpt: Option[String] = None
 	) extends Stepping(rawAvroOpt, Some(rawJson)) {
 		
-		val jsonInfo: JsonStringDecodeInfo = info(SchemaKind.RawJson).asInstanceOf[JsonStringDecodeInfo]
+		/*val jsonInfo: JsonStringDecodeInfo = info(SchemaKind.RawJson).asInstanceOf[JsonStringDecodeInfo]*/
 	}
 	
 	
-	object Decoding {
+	object DecodingStr {
 		
 		//private lazy val step: Stepping = Stepping(rawAvro, rawJson)
 		
@@ -190,15 +197,16 @@ object ParseStringToCirceToADT {
 		
 		def decodeAvroStringToCirceToJsonSkeuo(rawAvro: String, rawJsonOpt: Option[String] = None): Result[Fix[JsonSchema_S]] = {
 			
+			// NOTE: the beauty of having a separate AvroStepping class, not just Stepping, is that here can be sure that the option (avroInfoOpt) is defined (because the class is Avro-type so the arg-str that is passed is a plain avro-str and not an option (like for json))
 			
-			AvroStepping(rawAvro, rawJsonOpt).avroInfo
+			AvroStepping(rawAvro, rawJsonOpt).avroInfoOpt.get
 				.skInfo
 				.skeuoJson_fromDecodeAvroSkeuo
 		}
 		
 		def decodeAvroStringToCirceToAvroSkeuo(rawAvro: String, rawJsonOpt: Option[String] = None): Result[Fix[AvroSchema_S]] = {
 			
-			AvroStepping(rawAvro, rawJsonOpt).avroInfo
+			AvroStepping(rawAvro, rawJsonOpt).avroInfoOpt.get
 				.skInfo
 				.skeuoAvro_fromDecodeAvroSkeuo
 				
@@ -206,7 +214,7 @@ object ParseStringToCirceToADT {
 		
 		def decodeJsonStringToCirceToJsonSkeuo(rawJson: String, rawAvroOpt: Option[String] = None): Result[Fix[JsonSchema_S]] = {
 			
-			JsonStepping(rawJson, rawAvroOpt).jsonInfo
+			JsonStepping(rawJson, rawAvroOpt).jsonInfoOpt.get
 				.skInfo
 				.skeuoJson_fromDecodeJsonSkeuo
 				
@@ -214,7 +222,7 @@ object ParseStringToCirceToADT {
 		
 		def decodeJsonStringToCirceToAvroSkeuo(rawJson: String, rawAvroOpt: Option[String] = None): Result[Fix[AvroSchema_S]] = {
 			
-			JsonStepping(rawJson, rawAvroOpt).jsonInfo
+			JsonStepping(rawJson, rawAvroOpt).jsonInfoOpt.get
 				.skInfo
 				.skeuoAvro_fromDecodeJsonSkeuo
 		}

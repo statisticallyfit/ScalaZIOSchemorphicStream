@@ -27,13 +27,10 @@ case class DecoderCheck3b_JsonStringBegin_AvroDecoderVsAvroTrans(implicit imp: I
 	
 	import imp._
 	
-	/*val jsonCirceFromStr: JsonCirce = unsafeParse(rawJsonStr)
-	val skeuoAvro_fromDecoder: Result[Fix[AvroSchema_S]] = decodeJsonStringToCirceToAvroSkeuo(rawJsonStr)
-	*/
 	
 	val step: Stepping = new Stepping(Some(rawAvroStr), Some(rawJsonStr))
-	val sa: AvroStringDecodeInfo = step.avroStep.avroInfo
-	val sj: JsonStringDecodeInfo = step.jsonStep.jsonInfo
+	val sa: AvroStringDecodeInfo = step.avroInfoOpt.get
+	val sj: JsonStringDecodeInfo = step.jsonInfoOpt.get
 	val sai: SkeuoDecodeInfo = sa.skInfo
 	val sji: SkeuoDecodeInfo = sj.skInfo
 	
@@ -76,12 +73,12 @@ case class DecoderCheck3b_JsonStringBegin_AvroDecoderVsAvroTrans(implicit imp: I
 			
 			forEvery(List(
 				
-				Decoding.decodeAvroStringToCirceToAvroSkeuo(rawAvroStr, Some(rawJsonStr)),
+				DecodingStr.decodeAvroStringToCirceToAvroSkeuo(rawAvroStr, Some(rawJsonStr)),
 				
 				sai.skeuoAvro_fromDecodeAvroSkeuo,
 				sai.skeuoAvro_fromRaw,
 				
-				Decoding.decodeJsonStringToCirceToAvroSkeuo(rawJsonStr, Some(rawAvroStr)),
+				DecodingStr.decodeJsonStringToCirceToAvroSkeuo(rawJsonStr, Some(rawAvroStr)),
 				
 				sji.skeuoAvro_fromDecodeAvroSkeuo,
 				sji.skeuoAvro_fromRaw,

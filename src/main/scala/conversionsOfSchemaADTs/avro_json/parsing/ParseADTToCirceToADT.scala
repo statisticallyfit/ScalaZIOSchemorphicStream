@@ -180,21 +180,15 @@ object ParseADTToCirceToADT {
 	val funcCirceToAvroSkeuo: JsonCirce ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
 	
 	
-	def decodeAvroSkeuoToCirceToJsonSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libToJsonAltered
-	
-	def decodeJsonSkeuoToCirceToJsonSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libRender
-	
-	def decodeAvroSkeuoToCirceToAvroSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libToJsonAltered
-	
-	def decodeJsonSkeuoToCirceToAvroSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libRender
-	
-	//////// ------------------------------------------------------------
-	/*val avroS_to_JsonCirce: JsonCirce = libToJson(array1IntAvro_Fix_S)
-	val jsonS_to_JsonCirce: JsonCirce = libRender(array1IntJson_Fix_S)
-	
-	val avroS_to_JsonCirce_to_JsonS: Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(avroS_to_JsonCirce)
-	
-	
-	val jsonS_to_JsonCirce_to_JsonS: Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(jsonS_to_JsonCirce)
-	val avroS_to_JsonCirce_To_AvroS: Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(avroS_to_JsonCirce)*/
+	object DecodingSkeuo {
+		
+		def decodeAvroSkeuoToCirceToJsonSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libToJsonAltered
+		
+		def decodeJsonSkeuoToCirceToJsonSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libRender
+		
+		def decodeAvroSkeuoToCirceToAvroSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libToJsonAltered
+		
+		def decodeJsonSkeuoToCirceToAvroSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libRender
+		
+	}
 }

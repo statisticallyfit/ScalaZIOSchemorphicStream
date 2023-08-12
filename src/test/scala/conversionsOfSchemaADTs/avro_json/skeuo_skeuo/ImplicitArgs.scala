@@ -48,5 +48,5 @@ object ImplicitArgs {
 						 jsonCirceCheck: JsonCirce, avroS: AvroSchema_S[_], tpeS: String,
 						 avroC: AvroSchema_S[_], tpeC: String,
 						 avroFixS: Fix[AvroSchema_S], jsonFixS: Fix[JsonSchema_S]
-					 ) = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
+					 ) = new ImplicitArgs(rawAvroStr.manicure, rawJsonStr.manicure, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
 }

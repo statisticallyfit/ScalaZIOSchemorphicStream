@@ -67,8 +67,11 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 	
 	
 	val step: Stepping = new Stepping(Some(rawAvroStr), Some(rawJsonStr))
-	val sa: AvroStringDecodeInfo = step.avroStep.avroInfo
-	val sj: JsonStringDecodeInfo = step.jsonStep.jsonInfo
+	val sa: AvroStringDecodeInfo = step.avroInfoOpt.get
+	val sj: JsonStringDecodeInfo = step.jsonInfoOpt.get
+	// Can also do it this way but less efficient since have to compute the 'info' value twice, each time missing either the avro-str or json-str.
+	/*val avroStep = AvroStepping(rawAvroStr)
+	val jsonStep = JsonStepping(rawJsonStr)*/
 	val sai: SkeuoDecodeInfo = sa.skInfo
 	val sji: SkeuoDecodeInfo = sj.skInfo
 	
@@ -199,7 +202,7 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 		
 		def avroToAvroSkeuoByCirceDecoderShouldMatchAvroSkeuoByTrans(): Assertion = {
 			forEvery(List(
-				decodeAvroSkeuoToCirceToAvroSkeuo(avroFixS),
+				DecodingSkeuo.decodeAvroSkeuoToCirceToAvroSkeuo(avroFixS),
 				Right(skeuoAvro_fromTransOfGivenJsonSkeuo)
 			)
 			) {
@@ -209,7 +212,7 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 		
 		def avroToJsonSkeuoByCirceDecoderShouldMatchJsonSkeuoByTrans(): Assertion = {
 			forEvery(List(
-				decodeAvroSkeuoToCirceToJsonSkeuo(avroFixS),
+				DecodingSkeuo.decodeAvroSkeuoToCirceToJsonSkeuo(avroFixS),
 				Right(skeuoJson_fromTransOfGivenAvroSkeuo)
 			)
 			) {
@@ -219,7 +222,7 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 		
 		def jsonToAvroSkeuoByCirceDecoderShouldMatchAvroSkeuoByTrans(): Assertion = {
 			forEvery(List(
-				decodeJsonSkeuoToCirceToAvroSkeuo(jsonFixS),
+				DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(jsonFixS),
 				Right(skeuoAvro_fromTransOfGivenJsonSkeuo)
 			)
 			) {
@@ -230,7 +233,7 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 		def jsonToJsonSkeuoByCirceDecodingShouldMatchJsonSkeuoByTrans(): Assertion = {
 			
 			forEvery(List(
-				decodeJsonSkeuoToCirceToJsonSkeuo(jsonFixS),
+				DecodingSkeuo.decodeJsonSkeuoToCirceToJsonSkeuo(jsonFixS),
 				Right(skeuoJson_fromTransOfGivenAvroSkeuo)
 			)
 			) {

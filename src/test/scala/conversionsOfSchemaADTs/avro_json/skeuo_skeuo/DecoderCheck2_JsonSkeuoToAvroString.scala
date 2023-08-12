@@ -40,7 +40,7 @@ case class DecoderCheck2_JsonSkeuoToAvroString(implicit imp: ImplicitArgs )
 	val jsonCirce_fromJsonSkeuo: JsonCirce = libRender(jsonFixS)
 	val jsonCirce_fromAvroSkeuo: JsonCirce = libToJsonAltered(skeuoAvro_fromTransOfGivenJsonSkeuo)
 	
-	val skeuoAvro_fromDecoder: Result[Fix[AvroSchema_S]] = decodeJsonSkeuoToCirceToAvroSkeuo(jsonFixS)
+	val skeuoAvro_fromDecoder: Result[Fix[AvroSchema_S]] = DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(jsonFixS)
 	
 	def printOuts(): Unit = {
 		info(s"\nCHECKER 2: " +

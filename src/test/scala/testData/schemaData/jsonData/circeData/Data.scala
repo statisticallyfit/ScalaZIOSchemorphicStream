@@ -18,6 +18,7 @@ object Data {
 	
 	val strJson_C: JsonCirce = unsafeParse(strJson_R)
 	
+	val booleanJson_C: JsonCirce = unsafeParse(booleanJson_R)
 	
 	val array1IntJson_C: JsonCirce = unsafeParse(array1IntJson_R)
 	val array1StrJson_C: JsonCirce = unsafeParse(array1StrJson_R)

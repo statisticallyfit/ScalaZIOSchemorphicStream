@@ -105,7 +105,7 @@ object UtilMain {
 			}
 			
 			
-			def manicure(str: String): String = removeSpaceBetweenBrackets(removeSpaceBeforeColon(cutOutSchemaRef(str)))
+			def manicure(str: String): String = removeSpaceBetweenBrackets(removeSpaceBeforeColon(cutOutSchemaRef(str))).trim
 			
 			
 			/**

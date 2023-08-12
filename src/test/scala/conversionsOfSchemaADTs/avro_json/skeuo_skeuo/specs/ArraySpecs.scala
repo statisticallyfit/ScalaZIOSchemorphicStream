@@ -17,10 +17,13 @@ import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
 import org.scalatest.Inspectors._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should._
+
 import testData.schemaData.avroData.skeuoData.Data._
 import testData.schemaData.jsonData.skeuoData.Data._
+import testData.schemaData.jsonData.circeData.Data._
 import testData.rawstringData.avroData.Data._
 import testData.rawstringData.jsonData.Data._
+
 import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
 
@@ -45,9 +48,9 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				  ) = {
 		
 		
-		describe(s"A Skeuomorph avro schema - $scenarioType") {
+		describe(s"\n\nA skeuo avro schema - $scenarioType") {
 			
-			describe("value-checking - the different kinds of schema definitions ... ") {
+			describe("\nValue-checking - the different kinds of schema definitions ... ") {
 				
 				they("should have the same value") {
 					
@@ -59,7 +62,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				}
 			}
 			
-			describe("type-checking - the different kinds of schema definitions") {
+			describe("\nType-checking - the different kinds of schema definitions") {
 				
 				they("should all have the same Avro Schema type") {
 					
@@ -78,9 +81,9 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 		}
 		
 		
-		describe("the conversion function") {
+		describe("\n\nThe conversion function") {
 			
-			describe("should convert between Skeuomorph schemas") {
+			describe("\nShould convert between Skeuomorph schemas") {
 				
 				it("should have avro-schema to json-schema type") {
 					
@@ -98,11 +101,11 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 			}
 		}
 		
-		describe("converting avro-schema to json-schema, and vice versa - using Trans function") {
+		describe("\n\nConverting avro-schema to json-schema, and vice versa - using Trans function") {
 			val jsonSkeuoResult: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
 			val avroSkeuoResult: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
 			
-			describe("type checking") {
+			describe("\nType checking") {
 				
 				it("the json-skeuo result should have type JsonSchema (from skeuomorph)") {
 					
@@ -117,7 +120,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				}
 			}
 			
-			describe("value checking"){
+			describe("\nValue checking"){
 				it("the json-skeuo result should equal the json-skeuo input"){
 					
 					jsonSkeuoResult should equal (jsonFixS)
@@ -129,14 +132,14 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 			}
 		}
 		
-		describe("converting avro-schema to json-schema - using circe decoder (as check against Trans function)") {
+		describe("\n\nConverting avro-schema to json-schema - using circe decoder (as check against Trans function)") {
 			
 			import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.ImplicitArgs
 			
 			implicit val impArgs: ImplicitArgs = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
 			
 			
-			describe("common decoder specs"){
+			describe("\nCommon decoder specs"){
 				
 				val dcommon = CommonDecoderCheckSpecs()
 				
@@ -158,7 +161,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					dcommon.equalityOfCirceBySkeuoAvroAndCirceBySkeuoJsonFromAvroOrJsonInputString()
 				}
 				
-				it("Converting:  " +
+				it("the ending avro-skeuo should be the same regardless of the kind of source-string:  " +
 				   "\navro-string --> circe --> (initial) avro-skeuo --> circe --> avro-skeuo" +
 				   "\navro-string --> circe --> (initial) json-skeuo --> circe --> avro-skeuo" +
 				   "\njson-string --> circe --> (initial) avro-skeuo --> circe --> avro-skeuo" +
@@ -169,7 +172,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					dcommon.equalityOfLastAvroSkeuosFromAvroOrJsonInputString()
 				}
 				
-				it("Converting:  " +
+				it("the ending json-skeuo should be the same regardless of the kind of source-string:  " +
 				   "\navro-string --> circe --> (initial) avro-skeuo --> circe --> json-skeuo" +
 				   "\navro-string --> circe --> (initial) json-skeuo --> circe --> json-skeuo" +
 				   "\njson-string --> circe --> (initial) avro-skeuo --> circe --> json-skeuo" +
@@ -190,7 +193,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 			
 			
 			
-			/*describe("spec 1 - canonical conversion of avro-string to json-string"){
+			describe("\nSpec 1 - canonical conversion of avro-string to json-string"){
 				
 				val d1 = DecoderCheck1_Canonical_AvroStringToJsonString()
 				d1.printOuts()
@@ -210,7 +213,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 			}
 			
 			
-			describe("spec 2: going backwards from json-skeuo to avro-skeuo and comparing the resulting avro-str with given avro-str"){
+			describe("\nSpec 2: going backwards from json-skeuo to avro-skeuo and comparing the resulting avro-str with given avro-str"){
 				
 				
 				val d2 = DecoderCheck2_JsonSkeuoToAvroString()
@@ -231,7 +234,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				
 			}
 			
-			describe("spec 3a: json-string --> json-skeuo, and comparing the decoder json-skeuo with Trans json-skeuo"){
+			describe("\nSpec 3a: json-string --> json-skeuo, and comparing the decoder json-skeuo with Trans json-skeuo"){
 				
 				
 				val d3a = DecoderCheck3a_JsonStringBegin_JsonDecoderVsJsonTrans()
@@ -243,7 +246,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				}
 			}
 			
-			describe("spec 3b: json-string --> avro-skeuo, and comparing the decoder avro-skeuo with Trans avro-skeuo") {
+			describe("\nSpec 3b: json-string --> avro-skeuo, and comparing the decoder avro-skeuo with Trans avro-skeuo") {
 				
 				
 				val d3b = DecoderCheck3b_JsonStringBegin_AvroDecoderVsAvroTrans()
@@ -255,7 +258,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 				}
 			}
 			
-			describe("spec 3c: avro-string --> avro-skeuo, and comparing the decoder avro-skeuo with Trans avro-skeuo") {
+			describe("\nSpec 3c: avro-string --> avro-skeuo, and comparing the decoder avro-skeuo with Trans avro-skeuo") {
 				
 				
 				val d3c = DecoderCheck3c_AvroStringBegin_AvroDecoderVsAvroTrans()
@@ -268,7 +271,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 			}
 			
 			
-			describe("spec 3d: avro-string --> json-skeuo, and comparing the decoder json-skeuo with Trans json-skeuo") {
+			describe("\nSpec 3d: avro-string --> json-skeuo, and comparing the decoder json-skeuo with Trans json-skeuo") {
 				
 				
 				val d3d = DecoderCheck3d_AvroStringBegin_JsonDecoderVsJsonTrans()
@@ -278,7 +281,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 					
 					d3d.Checking.equalityOfJsonSkeuoFromDecoderAndTrans()
 				}
-			}*/
+			}
 			
 			
 		}
@@ -290,9 +293,76 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 		array1IntAvro_Fix_S → "AvroSchema_S[AvroSchema_S[JsonCirce]]")*/
 	
 	
+	info(s"VARIABLE PRINT OUTS")
+	
+	val args_avroSkeuo: List[Fix[AvroSchema_S]] = List(nullAvro_Fix_S, strAvro_Fix_S, intAvro_Fix_S, booleanAvro_Fix_S, longAvro_Fix_S, floatAvro_Fix_S, doubleAvro_Fix_S, bytesAvro_Fix_S,
+		array1IntAvro_Fix_S, array1StrAvro_Fix_S, array3IntAvro_Fix_S,
+		recordStrAvro_Fix_S,
+		//recordEXPositionAvro_Fix_S, recordEXLocationAvro_Fix_S
+	)
+	def printAvroSkeuoToAvroString(): Unit = {
+		
+		def printer(arg: Fix[AvroSchema_S]) = info(s"${skeuoToApacheAvroSchema(arg).toString(true).manicure}")
+		
+		args_avroSkeuo.map(arg ⇒ printer(arg))
+	}
+	
+	info(s"${skeuoToApacheAvroSchema(intAvro_Fix_S).toString(true).manicure}")
+	info(s"${skeuoToApacheAvroSchema(strAvro_Fix_S).toString(true).manicure}")
+	info(s"${skeuoToApacheAvroSchema(booleanAvro_Fix_S).toString(true).manicure}")
+	info(s"${skeuoToApacheAvroSchema(array1IntAvro_Fix_S).toString(true).manicure}")
+	info(s"${skeuoToApacheAvroSchema(array1StrAvro_Fix_S).toString(true).manicure}")
+	info(s"${skeuoToApacheAvroSchema(array3IntAvro_Fix_S).toString(true).manicure}")
+	info(s"${skeuoToApacheAvroSchema(recordStrAvro_Fix_S).toString(true).manicure}")
+	/*info(s"record position (json circe): \n${libRender(recordEXPositionJson_Fix_S).manicure}")
+	info(s"record location (json circe): \n${libRender(recordEXLocationJson_Fix_S).manicure}")
+	info(s"record position (avro-skeuo): \n${DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(recordEXPositionJson_Fix_S)}")
+	info(s"record location (avro-skeuo): \n${DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(recordEXLocationJson_Fix_S)}")
+	info(s"record position (avro-str): \n${skeuoToApacheAvroSchema(DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(recordEXPositionJson_Fix_S).right.get).toString(true).manicure}")
+	info(s"record location (avro-str): \n${skeuoToApacheAvroSchema(DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(recordEXLocationJson_Fix_S).right.get).toString(true).manicure}")*/
+	
+	/*testStructure(scenarioType = "null type",
+		rawAvroStr = nullAvro_R,
+		rawJsonStr = nullJson_R,
+		jsonCirceCheck = nullJson_C,
+		avroS = nullAvro_S, tpeS = "AvroSchema_S[Null]",
+		avroC = nullAvro_Circe_S, tpeC = "AvroSchema_S[JsonCirce]",
+		avroFixS = nullAvro_Fix_S,
+		jsonFixS = nullJson_Fix_S
+	)*/
 	
 	
-	import testData.schemaData.jsonData.circeData.Data._
+	/*testStructure(scenarioType = "integer type",
+		rawAvroStr = intAvro_R,
+		rawJsonStr = intJson_R,
+		jsonCirceCheck = intJson_C,
+		avroS = intAvro_S, tpeS = "AvroSchema_S[Int]",
+		avroC = intAvro_Circe_S, tpeC = "AvroSchema_S[JsonCirce]",
+		avroFixS = intAvro_Fix_S,
+		jsonFixS = intJson_Fix_S
+	)
+	
+	testStructure(scenarioType = "string type",
+		rawAvroStr = strAvro_R,
+		rawJsonStr = strJson_R,
+		jsonCirceCheck = strJson_C,
+		avroS = strAvro_S, tpeS = "AvroSchema_S[String]",
+		avroC = strAvro_Circe_S, tpeC = "AvroSchema_S[JsonCirce]",
+		avroFixS = strAvro_Fix_S,
+		jsonFixS = strJson_Fix_S
+	)
+	
+	
+	testStructure(scenarioType = "boolean type",
+		rawAvroStr = booleanAvro_R,
+		rawJsonStr = booleanJson_R,
+		jsonCirceCheck = booleanJson_C,
+		avroS = booleanAvro_S, tpeS = "AvroSchema_S[Boolean]",
+		avroC = booleanAvro_Circe_S, tpeC = "AvroSchema_S[JsonCirce]",
+		avroFixS = booleanAvro_Fix_S,
+		jsonFixS = booleanJson_Fix_S
+	)*/
+	
 	
 	testStructure(scenarioType = "array of int",
 		rawAvroStr = array1IntAvro_R,
@@ -303,54 +373,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 		avroFixS = array1IntAvro_Fix_S,
 		jsonFixS = array1IntJson_Fix_S
 	)
-	// ----
 	
-	
-	/*"Given: A Skeuomorph avro schema" when {
-		
-		"value-checking - the different kinds of schema definitions ... " should {
-			
-			"have the same value" in {
-				List(
-					array1IntAvro_S, array1IntAvro_Circe_S, array1IntAvro_Fix_S
-				).distinct.length should equal(1) // should be the same values
-			}
-		}
-		
-		"type-checking - the different kinds of schema definitions" should {
-			
-			"all have the same Avro Schema type" in {
-				List(
-					array1IntAvro_S, array1IntAvro_Circe_S, array1IntAvro_Fix_S
-				).map(skeuoSchema ⇒ skeuoSchema shouldBe a[AvroSchema_S[_]])
-				
-				UtilMain.getFuncTypeSubs(array1IntAvro_S) shouldEqual "AvroSchema_S[AvroSchema_S[Int]]"
-				UtilMain.getFuncTypeSubs(array1IntAvro_Circe_S) shouldEqual "AvroSchema_S[AvroSchema_S[JsonCirce]]"
-				UtilMain.getFuncTypeSubs(array1IntAvro_Fix_S) shouldEqual "Fix[AvroSchema_S]"
-			}
-		}
-	}*/
-	
-	
-	//When()
 	
 }
 
-
-/*test("value check - the different kinds of schema definitions should have the same value"){
-	
-	List(
-		array1IntAvro_S, array1IntAvro_Circe_S, array1IntAvro_Fix_S
-	).distinct.length should equal(1) // should be the same values
-}
-
-test("type-check - the different kinds of schema definitions should all be of Avro Schema type"){
-	
-	List(
-		array1IntAvro_S, array1IntAvro_Circe_S, array1IntAvro_Fix_S
-	).map(skeuoSchema ⇒ skeuoSchema shouldBe a[AvroSchema_S[_]])
-	
-	UtilMain.getFuncTypeSubs(array1IntAvro_S) shouldEqual "AvroSchema_S[AvroSchema_S[Int]]"
-	UtilMain.getFuncTypeSubs(array1IntAvro_Circe_S) shouldEqual "AvroSchema_S[AvroSchema_S[JsonCirce]]"
-	UtilMain.getFuncTypeSubs(array1IntAvro_Fix_S) shouldEqual "Fix[AvroSchema_S]"
-}*/
