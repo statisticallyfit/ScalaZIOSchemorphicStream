@@ -42,7 +42,7 @@ case class DecoderCheck2_JsonSkeuoToAvroString(implicit imp: ImplicitArgs )
 	
 	val skeuoAvro_fromDecoder: Result[Fix[AvroSchema_S]] = DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(jsonFixS)
 	
-	def printOuts(): Unit = {
+	def showResults(): String = {
 		info(s"\nCHECKER 2: " +
 			s"\nskeuo-json --> skeuo-avro --> avro-str (trans output) vs. avro-str (input) | Reason: get common denominator (avro-str), from avro-side")
 		info(s"\n--- skeuo-json (given): ${jsonFixS}" +
@@ -53,6 +53,8 @@ case class DecoderCheck2_JsonSkeuoToAvroString(implicit imp: ImplicitArgs )
 		     s"\n--> json-circe (from avro-skeuo): \n${jsonCirce_fromAvroSkeuo}" +
 		     s"\n--> json-circe (from json-skeuo): \n${jsonCirce_fromJsonSkeuo}")
 		
+		
+		""
 	}
 	
 	def checking(): Unit = {

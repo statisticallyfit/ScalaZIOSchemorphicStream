@@ -38,7 +38,7 @@ case class DecoderCheck1_Canonical_AvroStringToJsonString(implicit imp: Implicit
 	//val circeJson_fromJsonSkeuo: JsonCirce = libRender(skeuoJson_trans_fromApache)
 	
 	
-	def printOuts(): Unit = {
+	def showResults(): String = {
 		info(s"\n-----------------------------------------------------------")
 		
 		info(s"CANONICAL way: apache-avro-str ---> skeuo-avro --> skeuo-json --> json-circe-str")
@@ -47,6 +47,8 @@ case class DecoderCheck1_Canonical_AvroStringToJsonString(implicit imp: Implicit
 		info(s"--> skeuoJson (from str-trans): $skeuoJson_fromTransOfAvroStr")
 		info(s"VERSUS: skeuoJson (from adt-trans): $skeuoJson_fromTransOfAvroSkeuo")
 		info(s"--> json-circe (from trans): \n${circeJson_fromTransOfJsonSkeuoOfAvroStr.manicure}")
+		
+		""
 	}
 	
 	def checking(): Unit = {

@@ -38,7 +38,7 @@ case class DecoderCheck3a_JsonStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 	val skeuoJson_fromTransOfGivenAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
 	val skeuoAvro_fromTransOfGivenJsonSkeuo: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
 	
-	def printOuts(): Unit = {
+	def showResults(): String = {
 		
 		// RULE: if starting from avro string in the test, then use avrostep, else use jsonstep.
 		
@@ -55,6 +55,8 @@ case class DecoderCheck3a_JsonStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 		     s"\n    skeuo-json (json-decoder output): ${sji.skeuoJson_fromRaw}" +
 		     s"\n    skeuo-json (trans output): ${skeuoJson_fromTransOfGivenAvroSkeuo}"
 		)
+		
+		""
 	}
 	
 	
