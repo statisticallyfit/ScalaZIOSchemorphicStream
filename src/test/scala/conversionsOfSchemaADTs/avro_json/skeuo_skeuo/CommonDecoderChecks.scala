@@ -91,23 +91,23 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 		           s"\n--> skeuoAvro (from apache): ${sa.skeuoAvro_fromApache}" +
 		           s"\n--> json circe (interim-avro): \n${sa.interimCirce_fromAvroSKeuo.manicure}" +
 		
-		s"\n------> skeuoAvro (from AVRO STR): ${sai.skeuoAvro_fromRaw}" +
+		s"\n\n------> skeuoAvro (from AVRO STR): ${sai.skeuoAvro_fromRaw}" +
 		s"\n--> json circe (from avro-skeuo): \n${sai.jsonCirce_fromAvroSkeuo.manicure}" +
 		s"\n--> skeuoAvro (from decode-avro-skeuo): ${sai.skeuoAvro_fromDecodeAvroSkeuo}" +
 		s"\n    skeuoJson (from decode-avro-skeuo): ${sai.skeuoJson_fromDecodeAvroSkeuo}" +
 		
-		s"\n------> skeuoJson (from AVRO STR): ${sai.skeuoJson_fromRaw}" +
+		s"\n\n------> skeuoJson (from AVRO STR): ${sai.skeuoJson_fromRaw}" +
 		s"\n--> json circe (from json-skeuo): \n${sai.jsonCirce_fromJsonSkeuo.manicure}" +
 		s"\n--> skeuoAvro (from decode-json-skeuo): ${sai.skeuoAvro_fromDecodeJsonSkeuo}" +
 		s"\n    skeuoJson (from decode-json-skeuo): ${sai.skeuoJson_fromDecodeJsonSkeuo}" +
 		
 		
-		s"\n------> skeuoAvro (from JSON STR): ${sji.skeuoAvro_fromRaw}" +
+		s"\n\n------> skeuoAvro (from JSON STR): ${sji.skeuoAvro_fromRaw}" +
 		s"\n--> json circe (from avro-skeuo): \n${sji.jsonCirce_fromAvroSkeuo.manicure}" +
 		s"\n--> skeuoAvro (from decode-avro-skeuo): ${sji.skeuoAvro_fromDecodeAvroSkeuo}" +
 		s"\n    skeuoJson (from decode-avro-skeuo): ${sji.skeuoJson_fromDecodeAvroSkeuo}" +
 		
-		s"\n------> skeuoJson (from JSON STR): ${sji.skeuoJson_fromRaw}" +
+		s"\n\n------> skeuoJson (from JSON STR): ${sji.skeuoJson_fromRaw}" +
 		s"\n--> json circe (from json-skeuo): \n${sji.jsonCirce_fromJsonSkeuo.manicure}" +
 		s"\n--> skeuoAvro (from decode-json-skeuo): ${sji.skeuoAvro_fromDecodeJsonSkeuo}" +
 		s"\n    skeuoJson (from decode-json-skeuo): ${sji.skeuoJson_fromDecodeJsonSkeuo}")

@@ -33,18 +33,10 @@ import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.ImplicitArgs
 
 
 
-
-
-
-object Framework extends AnyFunSpec with Matchers {
-	
+case class VariableWrapper(implicit args: ImplicitArgs) {
 	
 	object Vars {
 		
-		
-		implicit val impArgs: ImplicitArgs = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
-		
-		import impArgs._
 		
 		val dcommon = CommonDecoderCheckSpecs()
 		val d1 = DecoderCheck1_Canonical_AvroStringToJsonString()
@@ -54,25 +46,59 @@ object Framework extends AnyFunSpec with Matchers {
 		val d3c = DecoderCheck3c_AvroStringBegin_AvroDecoderVsAvroTrans()
 		val d3d = DecoderCheck3d_AvroStringBegin_JsonDecoderVsJsonTrans()
 	}
+}
+
+
+
+//trait TraitInheritFunSpecAndMatchers extends AnyFunSpec with Matchers
+
+/**
+ * // NOTE: must pass in the args explicitly for this class because the data  is different depending on the scenarioType
+ * @param scenarioType
+ * @param rawAvroStr
+ * @param rawJsonStr
+ * @param jsonCirceCheck
+ * @param avroS
+ * @param tpeS
+ * @param avroC
+ * @param tpeC
+ * @param avroFixS
+ * @param jsonFixS
+ */
+
+
+object TestFramework/*(
+	scenarioType: String,
+	rawAvroStr: String, rawJsonStr: String,
+	jsonCirceCheck: JsonCirce,
+	avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String,
+	avroFixS: Fix[AvroSchema_S],
+	jsonFixS: Fix[JsonSchema_S]
+	
+)*/ extends AnyFunSpec with Matchers  {
 	
 	
-	// NOTE: must pass in the args explicitly for this function because the data  is different
-	def testStructure(
-		scenarioType: String,
-		rawAvroStr: String, rawJsonStr: String,
-		jsonCirceCheck: JsonCirce,
-		avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String,
-		avroFixS: Fix[AvroSchema_S],
-		jsonFixS: Fix[JsonSchema_S]
-	) = {
+	def structure(scenarioType: String)(/*implicit imp: ImplicitArgs*/
+	                                    rawAvroStr: String, rawJsonStr: String,
+								 jsonCirceCheck: JsonCirce,
+								 avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String,
+								 avroFixS: Fix[AvroSchema_S],
+								 jsonFixS: Fix[JsonSchema_S]
+	
+	): Unit = {
+		
+		// passing implicit args to the rest of this function body
+		implicit val impArgs: ImplicitArgs = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
 		
 		
 		
-		Vars()
+		val vw = VariableWrapper()
+		import vw.Vars._
+	
 		
-		describe(s"\n\nA skeuo avro schema - $scenarioType") {
+		describe(s"\n\nGiven an avro-skeuo schema - ${scenarioType.toUpperCase()}") {
 			
-			describe("\nValue-checking - the different kinds of schema definitions ... ") {
+			describe("\nValue-checking - the different kinds of avro-skeuo definitions ... ") {
 				
 				they("should have the same value") {
 					
@@ -104,7 +130,7 @@ object Framework extends AnyFunSpec with Matchers {
 		}
 		
 		
-		describe("\n\nThe conversion function") {
+		describe("\n\nThe Trans conversion function") {
 			
 			describe("\nShould convert between Skeuomorph schemas") {
 				
@@ -162,8 +188,6 @@ object Framework extends AnyFunSpec with Matchers {
 				
 				
 				it("avro-string and json-string should yield same avro-skeuo") {
-					info("\n\nSOMETHING HERE TOO")
-					
 					dcommon.equalityOfInitialAvroSkeuosFromAvroOrJsonInputString()
 				}
 				
@@ -278,9 +302,18 @@ object Framework extends AnyFunSpec with Matchers {
 					d3d.Checking.equalityOfJsonSkeuoFromDecoderAndTrans()
 				}
 			}
-			
-			
 		}
-		
 	}
+	
+	/*def printOuts(): Unit = {
+		
+		
+		info(dcommon.showResults())
+		info(d1.showResults())
+		info(d2.showResults())
+		info(d3a.showResults())
+		info(d3b.showResults())
+		info(d3c.showResults())
+		info(d3d.showResults())
+	}*/
 }

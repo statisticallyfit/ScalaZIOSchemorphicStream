@@ -31,12 +31,12 @@ import conversionsOfSchemaADTs.avro_json.skeuo_skeuo._
 
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.ImplicitArgs
 
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs.Framework
+import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs._
 
 /**
  * Source funspec structures = https://www.scalatest.org/at_a_glance/FunSpec
  */
-class ArraySpecs extends AnyFunSpec with Matchers {
+class ArraySpecs extends  AnyFunSpec with Matchers   {
 	
 	
 	/*Map(array1IntAvro_S → "AvroSchema_S[AvroSchema_S[Int]]",
@@ -114,9 +114,7 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 		jsonFixS = booleanJson_Fix_S
 	)*/
 	
-	
-	Framework().testStructure(scenarioType = "array of int",
-		rawAvroStr = array1IntAvro_R,
+	/*implicit val implicitArgsArray1Int: ImplicitArgs = new ImplicitArgs(rawAvroStr = array1IntAvro_R,
 		rawJsonStr = array1IntJson_R,
 		jsonCirceCheck = array1IntJson_C,
 		avroS = array1IntAvro_S, tpeS = "AvroSchema_S[AvroSchema_S[Int]]",
@@ -125,6 +123,39 @@ class ArraySpecs extends AnyFunSpec with Matchers {
 		jsonFixS = array1IntJson_Fix_S
 	)
 	
+	val vw = VariableWrapper()*/
+	
+	TestFramework.structure(scenarioType = "array of int")(
+		rawAvroStr = array1IntAvro_R,
+		rawJsonStr = array1IntJson_R,
+		jsonCirceCheck = array1IntJson_C,
+		avroS = array1IntAvro_S, tpeS = "AvroSchema_S[AvroSchema_S[Int]]",
+		avroC = array1IntAvro_Circe_S, tpeC = "AvroSchema_S[AvroSchema_S[JsonCirce]]",
+		avroFixS = array1IntAvro_Fix_S,
+		jsonFixS = array1IntJson_Fix_S
+	)
+	/*info(vw.Vars.dcommon.showResults())
+	info(vw.Vars.d1.showResults())
+	info(vw.Vars.d2.showResults())
+	info(vw.Vars.d3a.showResults())
+	info(vw.Vars.d3b.showResults())
+	info(vw.Vars.d3c.showResults())
+	info(vw.Vars.d3d.showResults())*/
+	
+	
+	/*val testArray1Int: TestStructure = TestStructure(scenarioType = "array of int",
+		rawAvroStr = array1IntAvro_R,
+		rawJsonStr = array1IntJson_R,
+		jsonCirceCheck = array1IntJson_C,
+		avroS = array1IntAvro_S, tpeS = "AvroSchema_S[AvroSchema_S[Int]]",
+		avroC = array1IntAvro_Circe_S, tpeC = "AvroSchema_S[AvroSchema_S[JsonCirce]]",
+		avroFixS = array1IntAvro_Fix_S,
+		jsonFixS = array1IntJson_Fix_S
+	)
+	testArray1Int.testStructure()
+	testArray1Int.printOuts()
+	
+	info(testArray1Int.Vars.dcommon.showResults())*/
 	
 }
 

@@ -65,9 +65,9 @@ object Skeuo_Apache {
 			 */
 			case AvroSchema_S.TArray(innerItemSchema: AvroSchema_A) ⇒ {
 				
-				println("Inside avroFToApache ARRAY converter: ")
+				/*println("Inside avroFToApache ARRAY converter: ")
 				println(s"apacheSchema = $innerItemSchema")
-				println(s"apacheSchema.getType = ${innerItemSchema.getType}")
+				println(s"apacheSchema.getType = ${innerItemSchema.getType}")*/
 				
 				AvroSchema_A.createArray(innerItemSchema)
 			}
