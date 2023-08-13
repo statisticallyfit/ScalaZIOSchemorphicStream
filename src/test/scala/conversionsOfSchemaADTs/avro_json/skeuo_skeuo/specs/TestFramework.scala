@@ -33,10 +33,13 @@ import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.ImplicitArgs
 
 
 
-case class VariableWrapper(implicit args: ImplicitArgs) {
+case class VariableWrapper(explicitArgs: ExplicitArgs) {
 	
 	object Vars {
 		
+		import explicitArgs._
+		
+		implicit val implicitArgs: ImplicitArgs = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
 		
 		val dcommon = CommonDecoderCheckSpecs()
 		val d1 = DecoderCheck1_Canonical_AvroStringToJsonString()
@@ -50,51 +53,19 @@ case class VariableWrapper(implicit args: ImplicitArgs) {
 
 
 
-//trait TraitInheritFunSpecAndMatchers extends AnyFunSpec with Matchers
-
-/**
- * // NOTE: must pass in the args explicitly for this class because the data  is different depending on the scenarioType
- * @param scenarioType
- * @param rawAvroStr
- * @param rawJsonStr
- * @param jsonCirceCheck
- * @param avroS
- * @param tpeS
- * @param avroC
- * @param tpeC
- * @param avroFixS
- * @param jsonFixS
- */
-
-
-object TestFramework/*(
-	scenarioType: String,
-	rawAvroStr: String, rawJsonStr: String,
-	jsonCirceCheck: JsonCirce,
-	avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String,
-	avroFixS: Fix[AvroSchema_S],
-	jsonFixS: Fix[JsonSchema_S]
-	
-)*/ extends AnyFunSpec with Matchers  {
+trait TraitInheritFunSpecAndMatchers /*extends AnyFunSpec with Matchers*/ { this: AnyFunSpec with Matchers ⇒
 	
 	
-	def structure(scenarioType: String)(/*implicit imp: ImplicitArgs*/
-	                                    rawAvroStr: String, rawJsonStr: String,
-								 jsonCirceCheck: JsonCirce,
-								 avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String,
-								 avroFixS: Fix[AvroSchema_S],
-								 jsonFixS: Fix[JsonSchema_S]
-	
-	): Unit = {
+	def testStructure(scenarioType: String)(explicitArgs: ExplicitArgs): Unit = {
+		import explicitArgs._
 		
 		// passing implicit args to the rest of this function body
-		implicit val impArgs: ImplicitArgs = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
+		//implicit val implicitArgs: ImplicitArgs = new ImplicitArgs(rawAvroStr, rawJsonStr, jsonCirceCheck, avroS, tpeS, avroC, tpeC, avroFixS, jsonFixS)
 		
 		
-		
-		val vw = VariableWrapper()
+		val vw = VariableWrapper(explicitArgs)
 		import vw.Vars._
-	
+		
 		
 		describe(s"\n\nGiven an avro-skeuo schema - ${scenarioType.toUpperCase()}") {
 			
@@ -304,6 +275,48 @@ object TestFramework/*(
 			}
 		}
 	}
+	
+	def printOuts(scenarioType: String)(explicitArgs: ExplicitArgs): Unit = {
+		
+		val v = VariableWrapper(explicitArgs)
+		
+		info(v.Vars.dcommon.showResults())
+		info(v.Vars.d1.showResults())
+		info(v.Vars.d2.showResults())
+		info(v.Vars.d3a.showResults())
+		info(v.Vars.d3b.showResults())
+		info(v.Vars.d3c.showResults())
+		info(v.Vars.d3d.showResults())
+	}
+}
+
+/**
+ * // NOTE: must pass in the args explicitly for this class because the data  is different depending on the scenarioType
+ * @param scenarioType
+ * @param rawAvroStr
+ * @param rawJsonStr
+ * @param jsonCirceCheck
+ * @param avroS
+ * @param tpeS
+ * @param avroC
+ * @param tpeC
+ * @param avroFixS
+ * @param jsonFixS
+ */
+
+
+object TestFramework/*(
+	scenarioType: String,
+	rawAvroStr: String, rawJsonStr: String,
+	jsonCirceCheck: JsonCirce,
+	avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String,
+	avroFixS: Fix[AvroSchema_S],
+	jsonFixS: Fix[JsonSchema_S]
+	
+)*/ extends AnyFunSpec with Matchers  with TraitInheritFunSpecAndMatchers{
+	
+	
+	
 	
 	/*def printOuts(): Unit = {
 		

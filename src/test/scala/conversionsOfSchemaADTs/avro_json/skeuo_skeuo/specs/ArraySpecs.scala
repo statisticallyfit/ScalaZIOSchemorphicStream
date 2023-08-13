@@ -36,12 +36,8 @@ import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs._
 /**
  * Source funspec structures = https://www.scalatest.org/at_a_glance/FunSpec
  */
-class ArraySpecs extends  AnyFunSpec with Matchers   {
+class ArraySpecs extends  AnyFunSpec with Matchers with TraitInheritFunSpecAndMatchers  {
 	
-	
-	/*Map(array1IntAvro_S → "AvroSchema_S[AvroSchema_S[Int]]",
-		array1IntAvro_Circe_S → "AvroSchema_S[AvroSchema_S[JsonCirce]]",
-		array1IntAvro_Fix_S → "AvroSchema_S[AvroSchema_S[JsonCirce]]")*/
 	
 	
 	info(s"VARIABLE PRINT OUTS")
@@ -114,7 +110,7 @@ class ArraySpecs extends  AnyFunSpec with Matchers   {
 		jsonFixS = booleanJson_Fix_S
 	)*/
 	
-	/*implicit val implicitArgsArray1Int: ImplicitArgs = new ImplicitArgs(rawAvroStr = array1IntAvro_R,
+	val argsArray1Int: ExplicitArgs = new ExplicitArgs(rawAvroStr = array1IntAvro_R,
 		rawJsonStr = array1IntJson_R,
 		jsonCirceCheck = array1IntJson_C,
 		avroS = array1IntAvro_S, tpeS = "AvroSchema_S[AvroSchema_S[Int]]",
@@ -123,24 +119,19 @@ class ArraySpecs extends  AnyFunSpec with Matchers   {
 		jsonFixS = array1IntJson_Fix_S
 	)
 	
-	val vw = VariableWrapper()*/
 	
-	TestFramework.structure(scenarioType = "array of int")(
-		rawAvroStr = array1IntAvro_R,
-		rawJsonStr = array1IntJson_R,
-		jsonCirceCheck = array1IntJson_C,
-		avroS = array1IntAvro_S, tpeS = "AvroSchema_S[AvroSchema_S[Int]]",
-		avroC = array1IntAvro_Circe_S, tpeC = "AvroSchema_S[AvroSchema_S[JsonCirce]]",
-		avroFixS = array1IntAvro_Fix_S,
-		jsonFixS = array1IntJson_Fix_S
-	)
-	/*info(vw.Vars.dcommon.showResults())
-	info(vw.Vars.d1.showResults())
-	info(vw.Vars.d2.showResults())
-	info(vw.Vars.d3a.showResults())
-	info(vw.Vars.d3b.showResults())
-	info(vw.Vars.d3c.showResults())
-	info(vw.Vars.d3d.showResults())*/
+	testStructure(scenarioType = "array of int")(argsArray1Int)
+	printOuts(scenarioType = "array of int")(argsArray1Int)
+	
+	/*var v = VariableWrapper(argsArray1Int)
+	
+	info(v.Vars.dcommon.showResults())
+	info(v.Vars.d1.showResults())
+	info(v.Vars.d2.showResults())
+	info(v.Vars.d3a.showResults())
+	info(v.Vars.d3b.showResults())
+	info(v.Vars.d3c.showResults())
+	info(v.Vars.d3d.showResults())*/
 	
 	
 	/*val testArray1Int: TestStructure = TestStructure(scenarioType = "array of int",

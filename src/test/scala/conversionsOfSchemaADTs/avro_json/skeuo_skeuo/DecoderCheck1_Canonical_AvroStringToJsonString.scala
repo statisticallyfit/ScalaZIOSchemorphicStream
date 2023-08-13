@@ -39,16 +39,17 @@ case class DecoderCheck1_Canonical_AvroStringToJsonString(implicit imp: Implicit
 	
 	
 	def showResults(): String = {
-		info(s"\n-----------------------------------------------------------")
 		
-		info(s"CANONICAL way: apache-avro-str ---> skeuo-avro --> skeuo-json --> json-circe-str")
-		info(s"--- apache-avro-str (given): \n${rawAvroStr}")
-		info(s"--> skeuoAvro: $skeuoAvro_fromApacheStr")
-		info(s"--> skeuoJson (from str-trans): $skeuoJson_fromTransOfAvroStr")
-		info(s"VERSUS: skeuoJson (from adt-trans): $skeuoJson_fromTransOfAvroSkeuo")
-		info(s"--> json-circe (from trans): \n${circeJson_fromTransOfJsonSkeuoOfAvroStr.manicure}")
+		var infoVar: String = s"\n-----------------------------------------------------------"
 		
-		""
+		infoVar += s"\n\nCANONICAL way: apache-avro-str ---> skeuo-avro --> skeuo-json --> json-circe-str"
+		infoVar += s"\n\n--- apache-avro-str (given): \n${rawAvroStr}"
+		infoVar += s"\n--> skeuoAvro: $skeuoAvro_fromApacheStr"
+		infoVar += s"\n--> skeuoJson (from str-trans): $skeuoJson_fromTransOfAvroStr"
+		infoVar += s"\n    skeuoJson (from adt-trans): $skeuoJson_fromTransOfAvroSkeuo"
+		infoVar += s"\n--> json-circe (from trans): \n${circeJson_fromTransOfJsonSkeuoOfAvroStr.manicure}"
+		
+		infoVar
 	}
 	
 	def checking(): Unit = {

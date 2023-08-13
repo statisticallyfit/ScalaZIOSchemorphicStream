@@ -84,9 +84,9 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 	def showResults(): String = {
 		
 		var infoVar: String = s"\n-----------------------------------------------------------"
-		infoVar += s"COMMON DECODER CHECKS:"
+		infoVar += s"\nCOMMON DECODER CHECKS:"
 		
-		infoVar += (s"\nraw avro str: \n$rawAvroStr" +
+		infoVar += (s"\n\n--- raw avro str: \n$rawAvroStr" +
 		           s"\n--> apacheAvro (from parse): \n${sa.parsedApacheAvroStr}" +
 		           s"\n--> skeuoAvro (from apache): ${sa.skeuoAvro_fromApache}" +
 		           s"\n--> json circe (interim-avro): \n${sa.interimCirce_fromAvroSKeuo.manicure}" +

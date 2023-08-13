@@ -42,20 +42,23 @@ case class DecoderCheck3b_JsonStringBegin_AvroDecoderVsAvroTrans(implicit imp: I
 		
 		// RULE: if starting from avro string in the test, then use avrostep, else use jsonstep.
 		
-		info(s"\n-----------------------------------------------------------")
-		info(s"\nCHECKER 3b: " +
-		     s"\nraw-json-str (input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans output)" +
-		     s"\n|\t Reason: find out how json-str translates to avro-adt  + get common denominator (skeuo-avro), from avro-side." +
+		var infoVar: String = s"\n-----------------------------------------------------------"
+		
+		infoVar += (s"\nCHECKER 3b: " +
+		     s"\n\nraw-json-str (input) -> json-circe -> skeuo-avro (decoder output) vs. skeuo-avro (trans output)" +
+		     
+		            s"\n|\t Reason: find out how json-str translates to avro-adt  + get common denominator (skeuo-avro), from avro-side." +
 		     s"\n|\t (from avro-side) " +
 		     s"\n|\t (starting from: json-str)" +
-		     s"\n--- raw-json-str (given): \n$rawJsonStr" +
+		            
+		            s"\n\n raw-json-str (given): \n$rawJsonStr" +
 		     s"\n--> json-circe (from json-str): \n${sj.interimCirce_fromJsonStr.manicure}" +
 		     s"\n    json-circe (from json-str): \n${sa.interimCirce_fromAvroSKeuo.manicure}" +
 		     s"\n--> skeuo-avro (avro-decoder output): ${sai.skeuoAvro_fromRaw}" +
 		     s"\n    skeuo-avro (json-decoder output): ${sji.skeuoAvro_fromRaw}" +
-		     s"\n    skeuo-avro (trans output): ${skeuoAvro_fromTransOfGivenJsonSkeuo}"
-		)
-		""
+		     s"\n    skeuo-avro (trans output): ${skeuoAvro_fromTransOfGivenJsonSkeuo}")
+		
+		infoVar
 	}
 	
 	
