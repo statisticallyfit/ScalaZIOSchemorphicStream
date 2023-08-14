@@ -24,9 +24,11 @@ object Data {
 	val nullJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonCirce]] = ObjectF(List(
 		Property(name = "null", tpe = StringF())
 	), List())
-	val nullJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(List(
+	val nullJson_Fix_S_complicated: Fix[JsonSchema_S] = Fix(ObjectF(List(
 		Property(name = "null", tpe = Fix(StringF()))
 	), List()))
+	
+	val nullJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(properties = List(), required = List()))
 	
 	
 	val strJson_S: JsonSchema_S[String] = StringF()

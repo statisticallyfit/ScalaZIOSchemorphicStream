@@ -50,20 +50,28 @@ object Skeuo_Skeuo {
 			
 			// JsonSchema_S [ Fix[AvroSchema_S]] => Fix[AvroSchema_S]
 			def algebra: Algebra[JsonSchema_S, Fix[AvroSchema_S]] = Algebra {
-				
+				// Null
 				case ObjectF(List(), List()) ⇒ Fix(TNull())
-				
+				// Integer
 				case IntegerF() ⇒ Fix(TInt())
-				
+				// String
 				case StringF() ⇒ Fix(TString())
-				
+				// Boolean
 				case BooleanF() ⇒ Fix(TBoolean())
+				// Long
+				case LongF() ⇒ Fix(TLong())
+				// Float
 				case FloatF() ⇒ Fix(TFloat())
+				// Double
 				case DoubleF() ⇒ Fix(TDouble())
+				// Byte
 				case ByteF() ⇒ Fix(TBytes())
-				
+				// Array
 				case ArrayF(inner: Fix[AvroSchema_S]) ⇒ Fix(TArray(inner)) // TODO just inner or wrap with TArray?
 				
+				// Map
+				
+				// Record
 				case ObjectF(props: List[Property[Fix[AvroSchema_S]]],
 				reqs: List[String]) ⇒ {
 					
@@ -100,14 +108,28 @@ object Skeuo_Skeuo {
 		implicit def skeuoProject_AJ: Project[AvroSchema_S, Fix[JsonSchema_S]] = new Project[AvroSchema_S, Fix[JsonSchema_S]] {
 			
 			def coalgebra: Coalgebra[AvroSchema_S, Fix[JsonSchema_S]] = Coalgebra {
+				// Null
 				case Fix(ObjectF(List(), List())) ⇒ TNull()
-				
+				// Integer
 				case Fix(IntegerF()) ⇒ TInt()
-				
+				// String
 				case Fix(StringF()) ⇒ TString()
-				
+				// Boolean
+				case Fix(BooleanF()) ⇒ TBoolean()
+				// Long
+				case Fix(LongF()) ⇒ TLong()
+				// Double
+				case Fix(DoubleF()) ⇒ TDouble()
+				// Float
+				case Fix(FloatF()) ⇒ TFloat()
+				// Bytes
+				case Fix(ByteF()) ⇒ TBytes()
+				// Array
 				case Fix(ArrayF(inner: Fix[JsonSchema_S])) ⇒ TArray(inner)
 				
+				// Map
+				
+				// Record
 				case Fix(ObjectF(props: List[Property[Fix[JsonSchema_S]]],
 				reqs: List[String])) ⇒ {
 					

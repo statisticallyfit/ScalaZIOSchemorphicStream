@@ -8,7 +8,10 @@ import utilMain.UtilMain.implicits._
  */
 object Data {
 	
+	// TODO which definition to use for null?
 	
+	// (1) From json-skeuo:
+	// ObjectF(properties = List(), required = List())
 	val nullJson_R: String =
 		"""
 		  |{
@@ -17,11 +20,28 @@ object Data {
 		  |  "required": []
 		  |}
 		  |""".stripMargin.trim
+		  
+	 // (2) From json-skeuo:
+	// ObjectF(List(Property(name = "null", tpe = StringF())), List())
+	val nullJson_complicated_R: String = """
+	  |{
+	  |  "type": "object",
+	  |  "properties": {
+	  |    "null": {
+	  |      "type": "string"
+	  |    }
+	  |  },
+	  |  "required": []
+	  |}
+	  |""".stripMargin
+	
+	
 	
 	val intJson_R: String =
 		"""
 		  |{
-		  |  "type": "integer"
+		  |  "type": "integer",
+		  |  "format": "int32"
 		  |}
 		  |""".stripMargin.trim
 	
@@ -40,6 +60,40 @@ object Data {
 		  |}
 		  |""".stripMargin.trim
 	
+	
+	val longJson_R: String =
+		"""
+		  |{
+		  |  "type": "integer",
+		  |  "format": "int64"
+		  |}
+		  |""".stripMargin.trim
+	
+	val floatJson_R: String =
+		"""
+		  |{
+		  |  "type": "number",
+		  |  "format": "float"
+		  |}
+		  |""".stripMargin.trim
+	
+	val doubleJson_R: String =
+		"""
+		  |{
+		  |  "type": "number",
+		  |  "format": "double"
+		  |}
+		  |""".stripMargin.trim
+	
+	
+	val bytesJson_R: String =
+		"""
+		  |{
+		  |  "type": "string",
+		  |  "format": "byte"
+		  |}
+		  |""".stripMargin.trim()
+		  
 	
 	val array1IntJson_R: String =
 		"""
@@ -91,6 +145,8 @@ object Data {
 	
 	// TODO MAP
 	
+	
+	// TODO: find a way to write the json-skeuo equivalents so that when converted to json-circe the results contain the title too.
 	
 	// NOTE (from autoschema generation not from original json file)
 	val recordEXPositionJson_R: String =

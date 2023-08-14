@@ -44,7 +44,11 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		recordExPositionJson_Fix_S, recordExLocationJson_Fix_S
 	)
 	
-	printAvroSkeuoToAvroString(args_avroSkeuo)
+	
+	// TODO issue with record so printing json-skeuo -> circe first
+	//printJsonSkeuoToAvroString(args_jsonSkeuo)
+	info(s"${args_jsonSkeuo.map(skj ⇒ libRender(skj).manicure)}")
+	
 	
 	def printAvroSkeuoToAvroString(listAvroSkeuo: List[Fix[AvroSchema_S]]): Unit = {
 		
@@ -60,6 +64,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	}
 	
 	def printAvroSkeuoToJsonSkeuo(listAvroSkeuo: List[Fix[AvroSchema_S]]): Unit = {
+		
 		// avro-skeuo --> circe (decoder) --> json-skeuo
 		def printer(arg: Fix[AvroSchema_S]) = info(s"${DecodingSkeuo.decodeAvroSkeuoToCirceToJsonSkeuo(arg)}")
 		
@@ -69,6 +74,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	/// ------------------------
 	
 	def printJsonSkeuoToAvroString(listJsonSkeuo: List[Fix[JsonSchema_S]]): Unit = {
+		
 		// json skeuo -> circe -> avro-skeuo -> apache -> avro-str
 		def printer(arg: Fix[JsonSchema_S]) = {
 			val avroSkeuo: Result[Fix[AvroSchema_S]] = DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(arg)
