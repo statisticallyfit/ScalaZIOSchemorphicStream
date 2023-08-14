@@ -53,9 +53,9 @@ case class DecoderCheck3a_JsonStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 		     s"\n--- raw-json-str (given): \n$rawJsonStr" +
 		     s"\n--> json-circe (from avro-str): \n${sa.interimCirce_fromAvroSKeuo.manicure}" +
 		     s"\n    json-circe (from json-str): \n${sj.interimCirce_fromJsonStr.manicure}" +
-		     s"\n--> skeuo-json (avro-decoder output): ${sai.skeuoJson_fromRaw}" +
-		     s"\n    skeuo-json (json-decoder output): ${sji.skeuoJson_fromRaw}" +
-		     s"\n    skeuo-json (trans output): ${skeuoJson_fromTransOfGivenAvroSkeuo}"
+		     s"\n--> skeuo-json (avro-decoder output): \t${sai.skeuoJson_fromRaw}" +
+		     s"\n    skeuo-json (json-decoder output): \t${sji.skeuoJson_fromRaw}" +
+		     s"\n    skeuo-json (trans output):        \t${skeuoJson_fromTransOfGivenAvroSkeuo}"
 		)
 		
 		infoVar

@@ -43,10 +43,11 @@ case class DecoderCheck1_Canonical_AvroStringToJsonString(implicit imp: Implicit
 		var infoVar: String = s"\n-----------------------------------------------------------"
 		
 		infoVar += s"\n\nCANONICAL way: apache-avro-str ---> skeuo-avro --> skeuo-json --> json-circe-str"
-		infoVar += s"\n\n--- apache-avro-str (given): \n${rawAvroStr}"
-		infoVar += s"\n--> skeuoAvro: $skeuoAvro_fromApacheStr"
-		infoVar += s"\n--> skeuoJson (from str-trans): $skeuoJson_fromTransOfAvroStr"
-		infoVar += s"\n    skeuoJson (from adt-trans): $skeuoJson_fromTransOfAvroSkeuo"
+		infoVar += s"\n"
+		infoVar += s"\n--- apache-avro-str (given): \n${rawAvroStr}"
+		infoVar += s"\n--> skeuoAvro:                  \t$skeuoAvro_fromApacheStr"
+		infoVar += s"\n--> skeuoJson (from str-trans): \t$skeuoJson_fromTransOfAvroStr"
+		infoVar += s"\n    skeuoJson (from adt-trans): \t$skeuoJson_fromTransOfAvroSkeuo"
 		infoVar += s"\n--> json-circe (from trans): \n${circeJson_fromTransOfJsonSkeuoOfAvroStr.manicure}"
 		
 		infoVar

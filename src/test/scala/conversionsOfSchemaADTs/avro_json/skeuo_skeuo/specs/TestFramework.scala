@@ -305,28 +305,7 @@ trait TraitInheritFunSpecAndMatchers /*extends AnyFunSpec with Matchers*/ { this
  */
 
 
-object TestFramework/*(
-	scenarioType: String,
-	rawAvroStr: String, rawJsonStr: String,
-	jsonCirceCheck: JsonCirce,
-	avroS: AvroSchema_S[_], tpeS: String, avroC: AvroSchema_S[_], tpeC: String,
-	avroFixS: Fix[AvroSchema_S],
-	jsonFixS: Fix[JsonSchema_S]
-	
-)*/ extends AnyFunSpec with Matchers  with TraitInheritFunSpecAndMatchers{
-	
-	
-	
-	
-	/*def printOuts(): Unit = {
-		
-		
-		info(dcommon.showResults())
-		info(d1.showResults())
-		info(d2.showResults())
-		info(d3a.showResults())
-		info(d3b.showResults())
-		info(d3c.showResults())
-		info(d3d.showResults())
-	}*/
+object TestFramework extends AnyFunSpec with Matchers  with TraitInheritFunSpecAndMatchers{
+
+
 }

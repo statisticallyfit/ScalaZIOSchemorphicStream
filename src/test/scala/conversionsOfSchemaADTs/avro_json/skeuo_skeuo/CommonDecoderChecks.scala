@@ -86,31 +86,32 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 		var infoVar: String = s"\n-----------------------------------------------------------"
 		infoVar += s"\nCOMMON DECODER CHECKS:"
 		
-		infoVar += (s"\n\n--- raw avro str: \n$rawAvroStr" +
+		infoVar += (s"\n" +
+				 s"\n--- raw avro str: \n$rawAvroStr" +
 		           s"\n--> apacheAvro (from parse): \n${sa.parsedApacheAvroStr}" +
-		           s"\n--> skeuoAvro (from apache): ${sa.skeuoAvro_fromApache}" +
+		           s"\n--> skeuoAvro (from apache): \t${sa.skeuoAvro_fromApache}" +
 		           s"\n--> json circe (interim-avro): \n${sa.interimCirce_fromAvroSKeuo.manicure}" +
-		
-		s"\n\n------> skeuoAvro (from AVRO STR): ${sai.skeuoAvro_fromRaw}" +
+		s"\n" +
+		s"\n------> skeuoAvro (from AVRO STR):      \t${sai.skeuoAvro_fromRaw}" +
 		s"\n--> json circe (from avro-skeuo): \n${sai.jsonCirce_fromAvroSkeuo.manicure}" +
-		s"\n--> skeuoAvro (from decode-avro-skeuo): ${sai.skeuoAvro_fromDecodeAvroSkeuo}" +
-		s"\n    skeuoJson (from decode-avro-skeuo): ${sai.skeuoJson_fromDecodeAvroSkeuo}" +
-		
-		s"\n\n------> skeuoJson (from AVRO STR): ${sai.skeuoJson_fromRaw}" +
+		s"\n--> skeuoAvro (from decode-avro-skeuo): \t${sai.skeuoAvro_fromDecodeAvroSkeuo}" +
+		s"\n    skeuoJson (from decode-avro-skeuo): \t${sai.skeuoJson_fromDecodeAvroSkeuo}" +
+		s"\n" +
+		s"\n------> skeuoJson (from AVRO STR):      \t${sai.skeuoJson_fromRaw}" +
 		s"\n--> json circe (from json-skeuo): \n${sai.jsonCirce_fromJsonSkeuo.manicure}" +
-		s"\n--> skeuoAvro (from decode-json-skeuo): ${sai.skeuoAvro_fromDecodeJsonSkeuo}" +
-		s"\n    skeuoJson (from decode-json-skeuo): ${sai.skeuoJson_fromDecodeJsonSkeuo}" +
+		s"\n--> skeuoAvro (from decode-json-skeuo): \t${sai.skeuoAvro_fromDecodeJsonSkeuo}" +
+		s"\n    skeuoJson (from decode-json-skeuo): \t${sai.skeuoJson_fromDecodeJsonSkeuo}" +
 		
-		
-		s"\n\n------> skeuoAvro (from JSON STR): ${sji.skeuoAvro_fromRaw}" +
+		s"\n" +
+		s"\n------> skeuoAvro (from JSON STR):      \t${sji.skeuoAvro_fromRaw}" +
 		s"\n--> json circe (from avro-skeuo): \n${sji.jsonCirce_fromAvroSkeuo.manicure}" +
-		s"\n--> skeuoAvro (from decode-avro-skeuo): ${sji.skeuoAvro_fromDecodeAvroSkeuo}" +
-		s"\n    skeuoJson (from decode-avro-skeuo): ${sji.skeuoJson_fromDecodeAvroSkeuo}" +
-		
-		s"\n\n------> skeuoJson (from JSON STR): ${sji.skeuoJson_fromRaw}" +
+		s"\n--> skeuoAvro (from decode-avro-skeuo): \t${sji.skeuoAvro_fromDecodeAvroSkeuo}" +
+		s"\n    skeuoJson (from decode-avro-skeuo): \t${sji.skeuoJson_fromDecodeAvroSkeuo}" +
+		s"\n" +
+		s"\n------> skeuoJson (from JSON STR):      \t${sji.skeuoJson_fromRaw}" +
 		s"\n--> json circe (from json-skeuo): \n${sji.jsonCirce_fromJsonSkeuo.manicure}" +
-		s"\n--> skeuoAvro (from decode-json-skeuo): ${sji.skeuoAvro_fromDecodeJsonSkeuo}" +
-		s"\n    skeuoJson (from decode-json-skeuo): ${sji.skeuoJson_fromDecodeJsonSkeuo}")
+		s"\n--> skeuoAvro (from decode-json-skeuo): \t${sji.skeuoAvro_fromDecodeJsonSkeuo}" +
+		s"\n    skeuoJson (from decode-json-skeuo): \t${sji.skeuoJson_fromDecodeJsonSkeuo}")
 		
 		infoVar
 	}

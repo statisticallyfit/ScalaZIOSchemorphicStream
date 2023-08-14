@@ -49,10 +49,10 @@ case class DecoderCheck2_JsonSkeuoToAvroString(implicit imp: ImplicitArgs )
 		(s"\nCHECKER 2: " +
 		 s"\nskeuo-json --> skeuo-avro --> avro-str (trans output) vs. avro-str (input) " +
 		 s"|\n\t Reason: get common denominator (avro-str), from avro-side" +
-			
-		 s"\n\n--- skeuo-json (given): ${jsonFixS}" +
-		 s"\n--> skeuo-avro (trans output): ${skeuoAvro_fromTransOfGivenJsonSkeuo}" +
-		 s"\n    skeuo-avro (decoder output): ${skeuoAvro_fromDecoder}" +
+		 s"\n" +
+		 s"\n--- skeuo-json (given):          \t${jsonFixS}" +
+		 s"\n--> skeuo-avro (trans output):   \t${skeuoAvro_fromTransOfGivenJsonSkeuo}" +
+		 s"\n    skeuo-avro (decoder output): \t${skeuoAvro_fromDecoder}" +
 		 s"\n--> apache-avro-str (trans output): \n${apacheAvroStr}" +
 		 s"\n    raw-avro-str (input): \n$rawAvroStr" +
 		 s"\n--> json-circe (from avro-skeuo): \n${jsonCirce_fromAvroSkeuo}" +

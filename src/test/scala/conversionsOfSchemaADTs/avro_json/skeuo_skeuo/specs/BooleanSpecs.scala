@@ -1,7 +1,6 @@
 package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 
 
-
 import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
 
 import higherkindness.droste.data.Fix
@@ -22,28 +21,20 @@ import utilMain.UtilMain.implicits._
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo._
 
 
-
 /**
- * Source funspec structures = https://www.scalatest.org/at_a_glance/FunSpec
+ *
  */
-class ArraySpecs extends  AnyFunSpec with Matchers with TraitInheritFunSpecAndMatchers  {
+class BooleanSpecs  extends  AnyFunSpec with Matchers with TraitInheritFunSpecAndMatchers {
 	
-	
-	
-	
-	val argsArray1Int: ExplicitArgs = new ExplicitArgs(rawAvroStr = array1IntAvro_R,
-		rawJsonStr = array1IntJson_R,
-		jsonCirceCheck = array1IntJson_C,
-		avroS = array1IntAvro_S, tpeS = "AvroSchema_S[AvroSchema_S[Int]]",
-		avroC = array1IntAvro_Circe_S, tpeC = "AvroSchema_S[AvroSchema_S[JsonCirce]]",
-		avroFixS = array1IntAvro_Fix_S,
-		jsonFixS = array1IntJson_Fix_S
+	val argsBoolean: ExplicitArgs = new ExplicitArgs(
+		rawAvroStr = booleanAvro_R,
+		rawJsonStr = booleanJson_R,
+		jsonCirceCheck = booleanJson_C,
+		avroS = booleanAvro_S, tpeS = "AvroSchema_S[Boolean]",
+		avroC = booleanAvro_Circe_S, tpeC = "AvroSchema_S[JsonCirce]",
+		avroFixS = booleanAvro_Fix_S,
+		jsonFixS = booleanJson_Fix_S
 	)
-	
-	
-	TestFramework.testStructure(scenarioType = "array of int")(argsArray1Int)
-	TestFramework.printOuts(scenarioType = "array of int")(argsArray1Int)
-	
-	
+	TestFramework.testStructure(scenarioType = "boolean type")(argsBoolean)
+	TestFramework.printOuts(scenarioType = "boolean type")(argsBoolean)
 }
-

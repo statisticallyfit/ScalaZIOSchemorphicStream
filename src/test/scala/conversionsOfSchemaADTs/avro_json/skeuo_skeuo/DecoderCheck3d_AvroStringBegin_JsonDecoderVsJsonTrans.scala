@@ -50,15 +50,16 @@ case class DecoderCheck3d_AvroStringBegin_JsonDecoderVsJsonTrans(implicit imp: I
 		     s"\n|\t Reason: find out how avro-str translates to json-adt  + get common denominator (skeuo-json), from json-side." +
 		     s"\n|\t (from json-side) " +
 		     s"\n|\t (starting from: avro-str)" +
-			
-		     s"\n\n--- raw-avro-str (given): \n$rawAvroStr" +
+		     
+		     s"\n" +
+		     s"\n--- raw-avro-str (given): \n$rawAvroStr" +
 		     s"\n--> (apache-avro): \n${sa.parsedApacheAvroStr}" +
-		     s"\n--> (skeuo-avro): ${sa.skeuoAvro_fromApache}" +
+		     s"\n--> (skeuo-avro):                     \t${sa.skeuoAvro_fromApache}" +
 		     s"\n--> json-circe (from avro-str): \n${sa.interimCirce_fromAvroSKeuo.manicure}" +
 		     s"\n    json-circe (from json-str): \n${sj.interimCirce_fromJsonStr.manicure}" +
-		     s"\n--> skeuo-json (avro-decoder output): ${sai.skeuoJson_fromRaw}" +
-		     s"\n    skeuo-json (json-decoder output): ${sji.skeuoJson_fromRaw}" +
-		     s"\n    skeuo-json (trans output): ${skeuoJson_fromTransOfGivenAvroSkeuo}")
+		     s"\n--> skeuo-json (avro-decoder output): \t${sai.skeuoJson_fromRaw}" +
+		     s"\n    skeuo-json (json-decoder output): \t${sji.skeuoJson_fromRaw}" +
+		     s"\n    skeuo-json (trans output):        \t${skeuoJson_fromTransOfGivenAvroSkeuo}")
 		
 		infoVar
 	}
