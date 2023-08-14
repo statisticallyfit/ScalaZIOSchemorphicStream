@@ -43,6 +43,23 @@ object Data {
 	val booleanJson_Fix_S: Fix[JsonSchema_S] = Fix(BooleanF())
 	
 	
+	val longJson_S: JsonSchema_S[Long] = LongF()
+	val longJson_Circe_S: JsonSchema_S[JsonCirce] = LongF()
+	val longJson_Fix_S: Fix[JsonSchema_S] = Fix(LongF())
+	
+	val floatJson_S: JsonSchema_S[Float] = FloatF()
+	val floatJson_Circe_S: JsonSchema_S[JsonCirce] = FloatF()
+	val floatJson_Fix_S: Fix[JsonSchema_S] = Fix(FloatF())
+	
+	
+	val doubleJson_S: JsonSchema_S[Double] = DoubleF()
+	val doubleJson_Circe_S: JsonSchema_S[JsonCirce] = DoubleF()
+	val doubleJson_Fix_S: Fix[JsonSchema_S] = Fix(DoubleF())
+	
+	val bytesJson_S: JsonSchema_S[Byte] = ByteF()
+	val bytesJson_Circe_S: JsonSchema_S[JsonCirce] = ByteF()
+	val bytesJson_Fix_S: Fix[JsonSchema_S] = Fix(ByteF())
+	
 	val array1IntJson_S: JsonSchema_S[JsonSchema_S[Int]] = ArrayF(IntegerF())
 	val array1IntJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonCirce]] = ArrayF(IntegerF())
 	val array1IntJson_Fix_S: Fix[JsonSchema_S] = Fix(ArrayF(Fix(IntegerF())))
@@ -57,6 +74,22 @@ object Data {
 	val array3IntJson_Fix_S: Fix[JsonSchema_S] = Fix(ArrayF(Fix(ArrayF(Fix(ArrayF(Fix(IntegerF())))))))
 	
 	
+	
+	// TODO - map is an ObjectF must think about this
+	/*val map1IntJson_S: JsonSchema_S[JsonSchema_S[Int]] = MapF(IntegerF())
+	val map1IntJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonCirce]] = MapF(IntegerF())*/
+	//val map1IntJson_Fix_S: Fix[JsonSchema_S] = ??? // Fix(MapF(Fix(IntegerF())))
+	
+	/*val map1StrJson_S: JsonSchema_S[JsonSchema_S[String]] = MapF(StringF())
+	val map1StrJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonCirce]] = MapF(StringF())*/
+	//val map1StrJson_Fix_S: Fix[JsonSchema_S] = ??? //Fix(MapF(Fix(StringF())))
+	
+	
+	/*val map3IntJson_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[Int]]]] = MapF(MapF(MapF(IntegerF())))
+	val map3IntJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonCirce]]]] = MapF(MapF(MapF(IntegerF())))*/
+	//val map3IntJson_Fix_S: Fix[JsonSchema_S] = ??? // Fix(MapF(Fix(MapF(Fix(MapF(Fix(IntegerF())))))))
+	
+	
 	/**
 	 * TODO
 	 * null, int, string
@@ -65,21 +98,22 @@ object Data {
 	 * map, record, union, enum, union, fixed, date, timestamp-millis, time-mills, decimeal
 	 */
 	
+	//val recordStrJson_Fix_S: Fix[JsonSchema_S] = ???
 	
 	// TODO test Nothing vs. Float (because of innermost type at 'tpe'
-	val recordExampleJson_Position_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[Float]]] = ObjectF(
+	val recordExPositionJson_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[Float]]] = ObjectF(
 		properties = List(
 			Property(name = "coordinates", tpe = ArrayF(FloatF()))
 		),
 		required = List()
 	)
-	val recordExampleJson_Position_Circe_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonCirce]]] = ObjectF(
+	val recordExPositionJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonCirce]]] = ObjectF(
 		properties = List(
 			Property(name = "coordinates", tpe = ArrayF(FloatF()))
 		),
 		required = List()
 	)
-	val recordEXPositionJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
+	val recordExPositionJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
 		properties = List(
 			Property(name = "coordinates", tpe = Fix(ArrayF(Fix(FloatF()))))
 		),
@@ -88,7 +122,7 @@ object Data {
 	
 	
 	// TODO test diff between Float and Nothing in innermost type.
-	val recordExampleJson_Location_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[Float]]]] = ObjectF(
+	val recordExLocationJson_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[Float]]]] = ObjectF(
 		properties = List(
 			Property(name = "name", tpe = StringF()),
 			Property(name = "symbol", tpe = ObjectF(
@@ -106,7 +140,7 @@ object Data {
 		required = List("position", "sensorName", "name", "id")
 	)
 	
-	val recordExampleJson_Location_Circe_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonCirce]]]] = ObjectF(
+	val recordExLocationJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonCirce]]]] = ObjectF(
 		properties = List(
 			Property(name = "name", tpe = StringF()),
 			Property(name = "symbol", tpe = ObjectF(
@@ -124,7 +158,7 @@ object Data {
 		required = List("position", "sensorName", "name", "id")
 	)
 	
-	val recordEXLocationJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
+	val recordExLocationJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
 		properties = List(
 			Property(name = "name", tpe = Fix(StringF())),
 			Property(name = "symbol", tpe = Fix(ObjectF(

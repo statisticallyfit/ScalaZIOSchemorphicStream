@@ -125,8 +125,8 @@ object Data {
 		)
 	))
 	//TODO
-	//val recordEXPositionAvro_Fix_S: Fix[AvroSchema_S] = ???
-	//val recordEXLocationAvro_Fix_S: Fix[AvroSchema_S] = ???
+	//val recordExPositionAvro_Fix_S: Fix[AvroSchema_S] = ???
+	//val recordExLocationAvro_Fix_S: Fix[AvroSchema_S] = ???
 	/**
 	 * TODO
 	 * null, int, string

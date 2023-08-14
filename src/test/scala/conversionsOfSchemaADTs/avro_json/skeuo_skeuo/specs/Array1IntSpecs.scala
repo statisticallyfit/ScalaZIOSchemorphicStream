@@ -26,7 +26,7 @@ import conversionsOfSchemaADTs.avro_json.skeuo_skeuo._
 /**
  * Source funspec structures = https://www.scalatest.org/at_a_glance/FunSpec
  */
-class ArraySpecs extends  AnyFunSpec with Matchers with TraitInheritFunSpecAndMatchers  {
+class Array1IntSpecs extends  AnyFunSpec with Matchers with TraitInheritFunSpecAndMatchers  {
 	
 	
 	
