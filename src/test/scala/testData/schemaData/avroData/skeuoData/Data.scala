@@ -75,6 +75,9 @@ object Data {
 	
 	
 	
+	
+	
+	
 	//val record // TODO record position, location
 	
 	// NOTE; trying to copy avro schema "RawCityMesh - devs - datasource
@@ -111,19 +114,19 @@ object Data {
 	
 	val recordStrAvro_Fix_S: Fix[AvroSchema_S] = Fix(TRecord(
 		name = "StringRecord",
-		namespace = Some("StringNamespace"),
-		aliases = List("a1", "a2"),
-		doc = None,
+		namespace = None, aliases = List(), doc = None,
 		fields = List(
 			FieldAvro(
 				name = "stringField1",
-				aliases = List(),
-				doc = None,
-				order = None,
-				tpe = Fix(TString())
+				tpe = Fix(TString()),
+				aliases = List(), doc = None, order = None
 			)
 		)
 	))
+	
+	
+	
+	
 	//TODO
 	//val recordExPositionAvro_Fix_S: Fix[AvroSchema_S] = ???
 	//val recordExLocationAvro_Fix_S: Fix[AvroSchema_S] = ???

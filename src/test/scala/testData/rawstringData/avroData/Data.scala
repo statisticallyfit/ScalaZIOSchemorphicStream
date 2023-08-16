@@ -6,21 +6,23 @@ package testData.rawstringData.avroData
 object Data {
 
 	
-	val nullAvro_R: String = "null"
+	// NOTE: either use the single quote with escaping OR the triple quote with no escaping
 	
-	val intAvro_R: String = "integer"
+	val nullAvro_R: String = "\"null\""
 	
-	val strAvro_R: String = "string"
+	val intAvro_R: String = "\"int\""
 	
-	val booleanAvro_R: String = "boolean"
+	val strAvro_R: String = "\"string\""
 	
-	val longAvro_R: String = "long"
+	val booleanAvro_R: String = """boolean"""
 	
-	val floatAvro_R: String = "float"
+	val longAvro_R: String = """long"""
 	
-	val doubleAvro_R: String = "double"
+	val floatAvro_R: String = """float"""
 	
-	val bytesAvro_R: String = "bytes"
+	val doubleAvro_R: String = """double"""
+	
+	val bytesAvro_R: String = """bytes"""
 	
 	// -------------------------
 	
@@ -127,7 +129,28 @@ object Data {
 		  |""".stripMargin.trim*/
 		  
 	
-	val recordExPositionAvro_R: String = """"""
+	val recordExPositionAvro_R: String =
+		"""
+		  |{
+		  |  "type": "record",
+		  |  "name": "Position",
+		  |  "fields": [
+		  |    {
+		  |      "name": "coordinates",
+		  |      "type": {
+		  |        "type": "array",
+		  |        "items": "float"
+		  |      }
+		  |    },
+		  |    {
+		  |      "name": "type",
+		  |      "type": "string"
+		  |    }
+		  |  ]
+		  |}
+		  |""".stripMargin.trim()
+		  
+	
 	val recordExLocationAvro_R: String = """"""
 	
 	

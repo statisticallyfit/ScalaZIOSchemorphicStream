@@ -149,7 +149,7 @@ object Data {
 	// TODO: find a way to write the json-skeuo equivalents so that when converted to json-circe the results contain the title too.
 	
 	// NOTE (from autoschema generation not from original json file)
-	val recordEXPositionJson_R: String =
+	val recordExPositionJson_AR: String =
 		"""
 		  |{
 		  |  "title": "Position",
@@ -165,10 +165,45 @@ object Data {
 		  |    }
 		  |  }
 		  |}
-		  |""".stripMargin.trim
+		  |""".stripMargin.trim()
+		  
+	// NOTE: from tati original data file
+	val recordExPositionJson_R: String =
+		"""
+		  |{
+		  |  "type": "object",
+		  |  "required": [],
+		  |  "properties": {
+		  |    "coordinates": {
+		  |      "type": "array",
+		  |      "items": {
+		  |        "type": "number",
+		  |        "format": "number"
+		  |      }
+		  |    }
+		  |  }
+		  |}
+		  |""".stripMargin.trim()
+		  /*
+		  //TODO how to include the topo name - 'properties'?
+		{
+			"title": "Position",
+			"type": "object",
+			"required": [],
+			"properties": {
+				"coordinates": {
+					"type": "array",
+					"items": {
+						"type": "number",
+						"format": "number"
+					}
+				}
+			}
+		}
+		   */
 	
 	// NOTE (from autoschema generation not from original json file)
-	val recordEXLocationJson_R: String =
+	val recordExLocationJson_R: String =
 		"""{
 		  |  "title": "Locations",
 		  |  "type": "object",

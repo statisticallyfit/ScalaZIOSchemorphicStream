@@ -109,6 +109,8 @@ object Data {
 		),
 		required = List()
 	)
+	//ObjectF(List(Property(coordinates,ArrayF(FloatF()))),List())
+	
 	val recordExPositionJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonCirce]]] = ObjectF(
 		properties = List(
 			Property(name = "coordinates", tpe = ArrayF(FloatF()))
@@ -121,6 +123,7 @@ object Data {
 		),
 		required = List()
 	))
+	
 	
 	
 	// TODO test diff between Float and Nothing in innermost type.

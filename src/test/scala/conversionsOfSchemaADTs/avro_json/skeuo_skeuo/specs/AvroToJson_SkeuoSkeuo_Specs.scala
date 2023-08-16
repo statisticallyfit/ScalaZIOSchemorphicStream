@@ -4,6 +4,7 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
+import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import higherkindness.droste.data.Fix
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
@@ -18,6 +19,7 @@ import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo._
 import io.circe.Decoder.Result
+import org.apache.avro.Schema
 import org.specs2.reporter.Reporter
 
 
@@ -37,6 +39,15 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		//recordExPositionAvro_Fix_S, recordExLocationAvro_Fix_S
 	)
 	
+	val args_avroStr: List[String] = List(nullAvro_R, strAvro_R, intAvro_R, //booleanAvro_R, longAvro_R, floatAvro_R, doubleAvro_R, //bytesAvro_R,
+		/*array1IntAvro_R, array1StrAvro_R, array3IntAvro_R,
+		map1IntAvro_R, map1StrAvro_R, map3IntAvro_R,
+		recordStrAvro_R,
+		recordExPositionAvro_R, recordExLocationAvro_R*/
+	)
+	
+	
+	
 	val args_jsonSkeuo: List[Fix[JsonSchema_S]] = List(nullJson_Fix_S, strJson_Fix_S, intJson_Fix_S, booleanJson_Fix_S, longJson_Fix_S, floatJson_Fix_S, doubleJson_Fix_S, bytesJson_Fix_S,
 		array1IntJson_Fix_S, array1StrJson_Fix_S, array3IntJson_Fix_S,
 		//map1IntJson_Fix_S, map1StrJson_Fix_S, map3IntJson_Fix_S,
@@ -47,8 +58,45 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	
 	// TODO issue with record so printing json-skeuo -> circe first
 	//printJsonSkeuoToAvroString(args_jsonSkeuo)
-	info(s"${args_jsonSkeuo.map(skj ⇒ libRender(skj).manicure)}")
+	//info(s"${args_jsonSkeuo.map(skj ⇒ libRender(skj).manicure)}")
 	
+	//info(libRender(recordExPositionJson_trytitle_Fix_S).manicure)
+	
+	// title not there so printing jstring (given) -> circe -> json-skeuo
+	info(s"\n\njson-str (position record) --> json-skeuo")
+	info(s"${funcCirceToJsonSkeuo(unsafeParse(recordExPositionJson_R))}")
+	
+	
+	
+	
+	
+	
+	val circeNull = libToJsonAltered(nullAvro_Fix_S)
+	info(s"\nnull avro-skeuo ---> null json-circe: ${circeNull}")
+	val avroskeuoNull = funcCirceToAvroSkeuo(circeNull)
+	info(s"\nnull circe --> null avro-skeuo: ${avroskeuoNull}")
+	//printAvroStringToCirceToAvroSkeuo(args_avroStr)
+	
+	import io.circe.{Decoder, Json ⇒ JsonCirce}
+	import higherkindness.skeuomorph.openapi.JsonDecoders._
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
+	info(s"\ndecoder.decodejson(Null value): ${Decoder[Fix[AvroSchema_S]].decodeJson(JsonCirce.fromString("Null"))}")
+	
+	
+	// json-skeuo --> circe
+	info(s"\njson-skeuo -> circe: ${libRender(nullJson_Fix_S)}")
+	// json-skeuo --> avro-skeuo
+	info(s"\njson-skeuo -> circe -> avro-skeuo: ${DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(nullJson_Fix_S)}")
+	info(s"\njson-skeuo -> circe -> avro-skeuo: ${DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(nullJson_Fix_S_complicated)}")
+	
+	def printAvroStringToCirceToAvroSkeuo(listAvroStrings: List[String]): Unit = {
+		
+		def printer(arg: String) = info(s"${DecodingStr.decodeAvroStringToCirceToAvroSkeuo(arg)}")
+		
+		listAvroStrings.map(printer(_))
+	}
+	
+	////////------------------------------
 	
 	def printAvroSkeuoToAvroString(listAvroSkeuo: List[Fix[AvroSchema_S]]): Unit = {
 		

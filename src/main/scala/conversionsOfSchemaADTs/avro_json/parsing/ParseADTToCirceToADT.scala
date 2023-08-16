@@ -21,6 +21,12 @@ import io.circe.{Decoder, Json ⇒ JsonCirce}
 object ParseADTToCirceToADT {
 	
 	/**
+	 * Definition from skeuomorph library - just applying anamorphism to make parameters passable to it
+	 * Source = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94
+	 */
+	val libRender: Fix[JsonSchema_S] ⇒ JsonCirce = scheme.cata(JsonSchema_S.render).apply(_)
+	
+	/**
 	 * Definition from skeuomorph library - just make it possible to pass the parameter to it by apply catamorphism over it
 	 * Source = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L238
 	 */
@@ -32,6 +38,7 @@ object ParseADTToCirceToADT {
 	
 	
 	// Copied from skeuomorph (is private) = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L88
+	// TODO add title here like in autoschema (so can include 'name' from avro-kind) = https://github.com/sauldhernandez/autoschema/blob/8e6f394acb3f4b55dbfe8916ffe33abf17aaef2e/src/main/scala/org/coursera/autoschema/AutoSchema.scala#L104
 	def jsonType(value: String, attr: (String, JsonCirce)*): JsonCirce =
 		JsonCirce.obj((("type" -> JsonCirce.fromString(value)) :: attr.toList): _*)
 	
@@ -40,9 +47,16 @@ object ParseADTToCirceToADT {
 		"format" -> JsonCirce.fromString(value)
 	
 	
+	// TODO how to alter libToJsonAltered so that null works? (funcCirceToAvroSkeuo not worknig)
+	
 	def myToJson: Algebra[AvroSchema_S, JsonCirce] = Algebra {
 		// TODO check if correct
-		case TNull() ⇒ jsonType("null", attr = List():_*)
+		case TNull() ⇒ JsonCirce.obj(
+			"type" -> JsonCirce.fromString("record"),
+			"name" -> JsonCirce.fromString("null"),
+			"fields" -> JsonCirce.arr(List():_*)
+			)
+		//jsonType("null", attr = List():_*)
 		case TInt() => jsonType("integer", format("int32"))
 		case TString() => jsonType("string")
 		case TBoolean() => jsonType("boolean")
@@ -165,11 +179,7 @@ object ParseADTToCirceToADT {
 		
 	}
 	
-	/**
-	 * Definition from skeuomorph library - just applying anamorphism to make parameters passable to it
-	 * Source = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94
-	 */
-	val libRender: Fix[JsonSchema_S] ⇒ JsonCirce = scheme.cata(JsonSchema_S.render).apply(_)
+
 	
 	
 	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
