@@ -75,17 +75,22 @@ object Skeuo_Skeuo {
 				case ObjectF(props: List[Property[Fix[AvroSchema_S]]],
 				reqs: List[String]) ⇒ {
 					
-					// TODO required - where does it go?
-					// TODO - what is name of trecord?
+					println(s"INSIDE EMBED'S ALGEBRA: " +
+					        s"\nproperties = $props" +
+					        s"\nrequired = $reqs"
+					)
 					
-					val result: Fix[AvroSchema_S] = props.isEmpty && reqs.isEmpty match {
-						
-						case true ⇒ Fix(TNull())
-						
-						case false ⇒ Fix(
-							TRecord(name = "record", namespace = None, aliases = List(), doc = None,
+					
+					val result: Fix[AvroSchema_S] = if(props.isEmpty && reqs.isEmpty) {
+						Fix(TNull())
+					} else if(props.length == 1 && props.head.name == "values"){
+						Fix(TMap(props.head.tpe))
+					} else {
+						Fix(
+							TRecord(name = /*null*/ "record", namespace = None, aliases = List(), doc = None,
 								fields = props.map(p ⇒ property2Field(p))
-							))
+							)
+						)
 					}
 					result
 				}
@@ -115,7 +120,7 @@ object Skeuo_Skeuo {
 			
 			def coalgebra: Coalgebra[AvroSchema_S, Fix[JsonSchema_S]] = Coalgebra {
 				// Null
-				case Fix(ObjectF(List(), List())) ⇒ TNull()
+				//case Fix(ObjectF(List(), List())) ⇒ TNull()
 				// Integer
 				case Fix(IntegerF()) ⇒ TInt()
 				// String
@@ -136,13 +141,25 @@ object Skeuo_Skeuo {
 				// Map
 				
 				// Record
-				case Fix(ObjectF(props: List[Property[Fix[JsonSchema_S]]],
-				reqs: List[String])) ⇒ {
+				case Fix(ObjectF(props: List[Property[Fix[JsonSchema_S]]], reqs: List[String])) ⇒ /*props.isEmpty && reqs.isEmpty match*/ {
 					
-					// TODO required - where does it go?
-					// TODO - what is name of trecord?
 					
-					TRecord(name = "record", namespace = None, aliases = List(), doc = None, fields = props.map(p ⇒ property2Field(p)))
+					println(s"INSIDE PROJECT'S COALGEBRA: " +
+					        s"\nproperties = $props" +
+					        s"\nrequired = $reqs")
+					
+					
+					val result: AvroSchema_S[Fix[JsonSchema_S]] = if (props.isEmpty && reqs.isEmpty) {
+						TNull()
+					} else if (props.length == 1 && props.head.name == "values") {
+						TMap(props.head.tpe)
+					} else {
+					
+						TRecord(name = /*null*/ "TODO_OBJ_NAME", namespace = None, aliases = List(), doc = None,
+							fields = props.map(p ⇒ property2Field(p))
+						)
+					}
+					result
 				}
 			}
 		}

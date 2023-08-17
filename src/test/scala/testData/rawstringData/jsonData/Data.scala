@@ -12,6 +12,15 @@ object Data {
 	
 	// (1) From json-skeuo:
 	// ObjectF(properties = List(), required = List())
+	
+	// Wrong - yields Left decoding error ' not well formed type' when converting funCirceToJson/AvroSkeuo
+	/*val nullJson_simple_R: String =
+	"""
+	  |{
+	  |  "type": "null"
+	  |}
+	  |""".stripMargin.trim()*/
+	  
 	val nullJson_R: String =
 		"""
 		  |{
@@ -135,8 +144,53 @@ object Data {
 		  |""".stripMargin.trim
 	
 	
+	val map1IntJson_R: String =
+		"""
+		  |{
+		  |  "type": "object",
+		  |  "additionalProperties": {
+		  |     "type": "integer",
+		  |     "format": "int32"
+		  |  }
+		  |}
+		  |""".stripMargin.manicure
 	
-	// TODO MAP
+	val map1StrJson_R: String =
+		"""
+		  |{
+		  |  "type": "object",
+		  |  "additionalProperties": {
+		  |    "type": "string"
+		  |  }
+		  |}
+		  |""".stripMargin.trim()
+		/*"""
+		  |{
+		  |  "type": "map",
+		  |  "values": {
+		  |    "type": "string"
+		  |  }
+		  |}
+		  |""".stripMargin.trim*/
+	
+	
+	val map3IntJson_R: String =
+		"""
+		  |{
+		  |  "type": "map",
+		  |  "values": {
+		  |    "type": "map",
+		  |    "values": {
+		  |      "type": "map",
+		  |      "values": {
+		  |        "type": "integer",
+		  |        "format": "int32"
+		  |      }
+		  |    }
+		  |  }
+		  |}
+		  |""".stripMargin.trim
+	
 	
 	
 	// TODO: find a way to write the json-skeuo equivalents so that when converted to json-circe the results contain the title too.

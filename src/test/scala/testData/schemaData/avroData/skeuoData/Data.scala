@@ -129,7 +129,7 @@ object Data {
 	
 	
 	
-	//TODO
+	
 	val recordExPositionAvro_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[Nothing]]] = TRecord(
 		name = "Position",
 		namespace = None, aliases = List(), doc = None,
@@ -146,7 +146,7 @@ object Data {
 			)
 		)
 	)
-	val recordExPositionAvro_Circe_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[JsonCirce]]] = TRecord(
+	/*val recordExPositionAvro_Circe_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[JsonCirce]]] = TRecord(
 		name = "Position",
 		namespace = None, aliases = List(), doc = None,
 		fields = List(
@@ -161,10 +161,7 @@ object Data {
 				aliases = List(), doc = None, order = None
 			)
 		)
-	)
-	
-	
-	
+	)*/
 	
 	
 	val recordExPositionAvro_Fix_S: Fix[AvroSchema_S] = Fix(TRecord(
@@ -185,6 +182,41 @@ object Data {
 	))
 	
 	
+	
+	val recordExLocationAvro_S: AvroSchema_S[AvroSchema_S[_]] = TRecord(
+		name = "Location_record",
+		namespace = None, aliases = List(), doc = None,
+		fields = List(
+			FieldAvro(name = "id", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = TString()),
+			FieldAvro(name = "name", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = TString()),
+			FieldAvro(name = "sensorName", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = TString()),
+			FieldAvro(name = "position", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = recordExPositionAvro_S),
+			FieldAvro(name = "symbol", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = TUnion(options = cats.data.NonEmptyList(TNull(), List(TString()))))
+		)
+	)
+	/*val recordExLocationAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TRecord(
+		name = "Location_record",
+		namespace = None, aliases = List(), doc = None,
+		fields = List(
+			FieldAvro(name = "id", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = TString()),
+			FieldAvro(name = "name", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = TString()),
+			FieldAvro(name = "sensorName", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = TString()),
+			FieldAvro(name = "position", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = recordExPositionAvro_S),
+			FieldAvro(name = "symbol", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = TUnion(options = cats.data.NonEmptyList(TNull(), List(TString()))))
+		)
+	)*/
+	val recordExLocationAvro_Fix_S: Fix[AvroSchema_S] = Fix(TRecord(
+		name = "Location_record",
+		namespace = None, aliases = List(), doc = None,
+		fields = List(
+			FieldAvro(name = "id", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = Fix(TString())),
+			FieldAvro(name = "name", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = Fix(TString())),
+			FieldAvro(name = "sensorName", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = Fix(TString())),
+			FieldAvro(name = "position", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = recordExPositionAvro_Fix_S),
+			FieldAvro(name = "symbol", aliases = List(), doc = None, order = Some(Order.Ascending), tpe = Fix(TUnion(options = cats.data.NonEmptyList(Fix(TNull()), List(Fix(TString())))))
+			)
+		)
+	))
 	
 	
 	

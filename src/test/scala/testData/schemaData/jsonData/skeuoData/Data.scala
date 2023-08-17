@@ -78,9 +78,35 @@ object Data {
 	
 	
 	// TODO - map is an ObjectF must think about this
-	/*val map1IntJson_S: JsonSchema_S[JsonSchema_S[Int]] = MapF(IntegerF())
-	val map1IntJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonCirce]] = MapF(IntegerF())*/
-	//val map1IntJson_Fix_S: Fix[JsonSchema_S] = ??? // Fix(MapF(Fix(IntegerF())))
+	val map1IntJson_mapname_S: JsonSchema_S[JsonSchema_S[Int]] = ObjectF(
+		properties = List(
+			Property(name = "map", tpe = IntegerF())
+		),
+		required = List()
+	)
+	val map1IntJson_objectname_S: JsonSchema_S[JsonSchema_S[Int]] = ObjectF(
+		properties = List(
+			Property(name = "object", tpe = IntegerF())
+		),
+		required = List()
+	)
+	
+	//val map1IntJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonCirce]] = MapF(IntegerF())
+	
+	val map1IntJson_mapname_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
+		properties = List(
+			Property(name = "map", tpe = Fix(IntegerF()))
+		),
+		required = List()
+	))
+	val map1IntJson_objectname_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
+		properties = List(
+			Property(name = "object", tpe = Fix(IntegerF()))
+		),
+		required = List()
+	)
+	)
+	
 	
 	/*val map1StrJson_S: JsonSchema_S[JsonSchema_S[String]] = MapF(StringF())
 	val map1StrJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonCirce]] = MapF(StringF())*/

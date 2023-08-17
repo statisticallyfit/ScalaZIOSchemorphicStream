@@ -76,11 +76,19 @@ object ParseADTToCirceToADT {
 		)
 		// TODO compare between above way of declaring array and the below way (jsonType vs. Json.obj)
 		
-		case TMap(values: JsonCirce) =>
-			JsonCirce.obj(
-				"type" -> JsonCirce.fromString("map"),
-				"values" -> values
-			)
+		case TMap(innerValues: JsonCirce) => JsonCirce.obj(
+			"type" -> JsonCirce.fromString("object"),
+			"properties" -> JsonCirce.obj("values" -> innerValues /*JsonCirce.fromString("string")*/)
+		)
+		/*JsonCirce.obj(
+			"type" -> JsonCirce.fromString("object"),
+			"additionalProperties" -> innerValues
+		)*/
+			/*JsonCirce.obj(
+				"type" -> JsonCirce.fromString("object"),
+				"additionalProperties" -> JsonCirce.obj("type" -> innerValues /*JsonCirce.fromString("string")*/)
+			)*/
+			
 			
 		// TODO must make map become an Object
 		
@@ -337,7 +345,7 @@ object ParseADTToCirceToADT {
 
 	
 	
-	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoEmbed_JA /*, skeuoProject_AJ*/}
 	
 	
 	val funcCirceToJsonSkeuo: JsonCirce ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)

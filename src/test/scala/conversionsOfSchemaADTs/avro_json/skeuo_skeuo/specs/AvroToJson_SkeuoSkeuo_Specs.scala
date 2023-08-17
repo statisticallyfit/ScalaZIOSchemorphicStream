@@ -41,9 +41,9 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	
 	val args_avroStr: List[String] = List(nullAvro_R, strAvro_R, intAvro_R, booleanAvro_R, longAvro_R, floatAvro_R, doubleAvro_R, bytesAvro_R,
 		array1IntAvro_R, array1StrAvro_R, array3IntAvro_R,
-		map1IntAvro_R//, map1StrAvro_R, map3IntAvro_R,
-		/*recordStrAvro_R,
-		recordExPositionAvro_conv_R,*/ //recordExLocationAvro_R
+		map1IntAvro_R, map1StrAvro_R, map3IntAvro_R,
+		recordStrAvro_R,
+		recordExPositionAvro_conv_R//, recordExLocationAvro_R
 	)
 	
 	
@@ -77,13 +77,25 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		info(s"\njson-skeuo -> circe -> avro-skeuo: ${DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(theArgJson)}")
 	}
 	
-	/*testCirceToAvroSkeuo("null", nullAvro_Fix_S, nullJson_Fix_S)
-	testCirceToAvroSkeuo("int", intAvro_Fix_S, intJson_Fix_S)
-	testCirceToAvroSkeuo("str", strAvro_Fix_S, strJson_Fix_S)*/
-	testCirceToAvroSkeuo("map thing: map (str avro) --> circe -> avro-skeuo", map1IntAvro_Fix_S, map1IntJson_Fix_S)
-	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))
+	/*val c = unsafeParse(map1StrJson_R)
+	info(s"map: json-str -> circe: ${c.manicure}")
+	val skj = funcCirceToJsonSkeuo(c)
+	val ska = funcCirceToAvroSkeuo(c)
+	info(s"-> json-skeuo: $skj")
+	info(s"---> json-str: ${libRender(skj.right.get)}")
+	info(s"-> avro-skeuo: $ska")
+	info(s"-> apache-str: ${skeuoToApacheAvroSchema(ska.right.get).toString(true).manicure}")
+	info(s"---> avro-str (libtoJsonAl): ${libToJsonAltered(ska.right.get)}")*/
 	
-	//printAvroSkeuoToAvroString(args_avroSkeuo)
+	//testCirceToAvroSkeuo("map thing: map (str avro) --> circe -> avro-skeuo", map1IntAvro_Fix_S, map1IntJson_objectname_Fix_S)
+	printAvroStringToCirceToAvroSkeuo(List(map1StrAvro_R))
+	val stp = AvroStepping(map1StrAvro_R).avroInfoOpt.get
+	info(s"str -> apache: ${stp.parsedApacheAvroStr}")
+	info(s"apache -> skeuo: ${stp.skeuoAvro_fromApache}")
+	info(s"skeuo -> circe: ${stp.interimCirce_fromAvroSKeuo}")
+	info(s"circe -> avro-skeuo: ${funcCirceToAvroSkeuo(stp.interimCirce_fromAvroSKeuo)}")
+	info(s"circe -> json-skeuo: ${funcCirceToJsonSkeuo(stp.interimCirce_fromAvroSKeuo)}")
+	
 	
 	def printAvroStringToCirceToAvroSkeuo(listAvroStrings: List[String]): Unit = {
 		
