@@ -78,46 +78,106 @@ object Data {
 	
 	
 	
-	//val record // TODO record position, location
-	
-	// NOTE; trying to copy avro schema "RawCityMesh - devs - datasource
-	// TODO what is the inner type parameter?
-	/*val recordAvro_S/*: AvroSchema_S[AvroSchema_S[Nothing]]*/ = TRecord("Location", namespace = Some("location namespace"), aliases = List("a1", "a2"), doc = None, fields = List(
-		FieldAvro/*[AvroSchema_S[Nothing]]*/(name = "id", aliases = List("i1", "i2"), doc = None, order = None, tpe = TString()),
-		
-		FieldAvro/*[AvroSchema_S[Nothing]]*/(name = "position", aliases = List(),
-			doc = None, order = None, tpe = TRecord(
-				name = "Position", namespace = Some("position namespace"), aliases = List(), doc = None, fields = List(
-					FieldAvro(name = "coordinates", aliases = List(), doc = None, order = None, tpe = TArray(TFloat())),
-					FieldAvro(name = "type", aliases = List(), doc = None, order = None, tpe = TString())
-				)
-			))
-	))*/
-	
-	// TODO alter these to be more understandable (canonical record datas, not examples)
-	
 	val recordStrAvro_S: AvroSchema_S[AvroSchema_S[Nothing]] = TRecord(
-		name = "StringRecord",
-		namespace = Some("StringNamespace"),
-		aliases = List("a1", "a2"),
+		name = "RecordName",
+		namespace = Some("Namespace"),
+		aliases = List("alias1", "alias2"),
 		doc = None,
 		fields = List(
 			FieldAvro(
-				name = "stringField1",
-				aliases = List(),
+				name = "FieldName1",
+				tpe = TString(),
+				aliases = List("fieldAlias1", "fieldAlias2", "fieldAlias3"),
 				doc = None,
-				order = None,
-				tpe = TString()
+				order = Some(Order.Descending)
+			)
+		)
+	)
+	val recordStrAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TRecord(
+		name = "RecordName",
+		namespace = Some("Namespace"),
+		aliases = List("alias1", "alias2"),
+		doc = None,
+		fields = List(
+			FieldAvro(
+				name = "FieldName1",
+				tpe = TString(),
+				aliases = List("fieldAlias1", "fieldAlias2", "fieldAlias3"),
+				doc = None,
+				order = Some(Order.Descending)
 			)
 		)
 	)
 	
+	
 	val recordStrAvro_Fix_S: Fix[AvroSchema_S] = Fix(TRecord(
-		name = "StringRecord",
+		name = "RecordName",
+		namespace = Some("Namespace"),
+		aliases = List("alias1", "alias2"),
+		doc = None,
+		fields = List(
+			FieldAvro(
+				name = "FieldName1",
+				tpe = Fix(TString()),
+				aliases = List("fieldAlias1", "fieldAlias2", "fieldAlias3"),
+				doc = None,
+				order = Some(Order.Descending)
+			)
+		)
+	))
+	
+	
+	
+	
+	//TODO
+	val recordExPositionAvro_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[Nothing]]] = TRecord(
+		name = "Position",
 		namespace = None, aliases = List(), doc = None,
 		fields = List(
 			FieldAvro(
-				name = "stringField1",
+				name = "coordinates",
+				tpe = TArray(TFloat()),
+				aliases = List(), doc = None, order = None
+			),
+			FieldAvro(
+				name = "type",
+				tpe = TString(),
+				aliases = List(), doc = None, order = None
+			)
+		)
+	)
+	val recordExPositionAvro_Circe_S: AvroSchema_S[AvroSchema_S[AvroSchema_S[JsonCirce]]] = TRecord(
+		name = "Position",
+		namespace = None, aliases = List(), doc = None,
+		fields = List(
+			FieldAvro(
+				name = "coordinates",
+				tpe = TArray(TFloat()),
+				aliases = List(), doc = None, order = None
+			),
+			FieldAvro(
+				name = "type",
+				tpe = TString(),
+				aliases = List(), doc = None, order = None
+			)
+		)
+	)
+	
+	
+	
+	
+	
+	val recordExPositionAvro_Fix_S: Fix[AvroSchema_S] = Fix(TRecord(
+		name = "Position",
+		namespace = None, aliases = List(), doc = None,
+		fields = List(
+			FieldAvro(
+				name = "coordinates",
+				tpe = Fix(TArray(Fix(TFloat()))),
+				aliases = List(), doc = None, order = None
+			),
+			FieldAvro(
+				name = "type",
 				tpe = Fix(TString()),
 				aliases = List(), doc = None, order = None
 			)
@@ -127,8 +187,7 @@ object Data {
 	
 	
 	
-	//TODO
-	//val recordExPositionAvro_Fix_S: Fix[AvroSchema_S] = ???
+	
 	//val recordExLocationAvro_Fix_S: Fix[AvroSchema_S] = ???
 	/**
 	 * TODO

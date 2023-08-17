@@ -1,0 +1,6 @@
+{
+  "type" : "enum",
+  "name" : "GeometryType",
+  "namespace" : "trafficflow.velo.tf_devs.managed",
+  "symbols" : [ "Point", "MultiPolygon" ]
+}

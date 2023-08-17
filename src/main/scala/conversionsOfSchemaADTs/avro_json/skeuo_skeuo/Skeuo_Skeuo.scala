@@ -51,7 +51,7 @@ object Skeuo_Skeuo {
 			// JsonSchema_S [ Fix[AvroSchema_S]] => Fix[AvroSchema_S]
 			def algebra: Algebra[JsonSchema_S, Fix[AvroSchema_S]] = Algebra {
 				// Null
-				case ObjectF(List(), List()) ⇒ Fix(TNull())
+				//case ObjectF(List(), List()) ⇒ Fix(TNull())
 				// Integer
 				case IntegerF() ⇒ Fix(TInt())
 				// String
@@ -78,10 +78,16 @@ object Skeuo_Skeuo {
 					// TODO required - where does it go?
 					// TODO - what is name of trecord?
 					
-					Fix(
-						TRecord(name = "record", namespace = None, aliases = List(), doc = None,
-							fields = props.map(p ⇒ property2Field(p)))
-					)
+					val result: Fix[AvroSchema_S] = props.isEmpty && reqs.isEmpty match {
+						
+						case true ⇒ Fix(TNull())
+						
+						case false ⇒ Fix(
+							TRecord(name = "record", namespace = None, aliases = List(), doc = None,
+								fields = props.map(p ⇒ property2Field(p))
+							))
+					}
+					result
 				}
 			}
 		}

@@ -1,0 +1,25 @@
+@namespace("trafficflow.velo.tf_devs.managed")
+protocol VeloDeviceInputManaged {
+	enum GeometryType {Point, MultiPolygon}
+
+	record PointGeometry {
+		GeometryType type = "Point";
+		map<double> coordinates;
+	}
+
+	record MultiPolygonGeometry {
+		GeometryType type = "MultiPolygon";
+		map<map<map<map<double>>>> coordinates;
+	}
+
+	record Tf_Devs_Managed {
+		PointGeometry geometry;
+		string original_id;
+		string name;
+		string street_address;
+		int postal_code;
+		MultiPolygonGeometry location_range;
+		int id;
+		timestamp_ms ts;
+	}
+}

@@ -105,14 +105,6 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin.manicure
-		/*"""
-		  |{
-		  |  "type": "array",
-		  |  "items": {
-		  |    "type": "integer"
-		  |  }
-		  |}
-		  |""".stripMargin*/
 	
 	val array1StrJson_R: String =
 		"""
@@ -134,7 +126,8 @@ object Data {
 		  |    "items": {
 		  |      "type": "array",
 		  |      "items": {
-		  |        "type": "integer"
+		  |        "type": "integer",
+		  |        "format": "int32"
 		  |      }
 		  |    }
 		  |  }

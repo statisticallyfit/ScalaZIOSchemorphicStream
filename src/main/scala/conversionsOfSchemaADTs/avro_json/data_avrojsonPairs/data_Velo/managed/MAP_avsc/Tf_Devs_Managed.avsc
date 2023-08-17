@@ -1,0 +1,74 @@
+{
+  "type" : "record",
+  "name" : "Tf_Devs_Managed",
+  "namespace" : "trafficflow.velo.tf_devs.managed",
+  "fields" : [ {
+    "name" : "geometry",
+    "type" : {
+      "type" : "record",
+      "name" : "PointGeometry",
+      "fields" : [ {
+        "name" : "type",
+        "type" : {
+          "type" : "enum",
+          "name" : "GeometryType",
+          "symbols" : [ "Point", "MultiPolygon" ]
+        },
+        "default" : "Point"
+      }, {
+        "name" : "coordinates",
+        "type" : {
+          "type" : "map",
+          "values" : "double"
+        }
+      } ]
+    }
+  }, {
+    "name" : "original_id",
+    "type" : "string"
+  }, {
+    "name" : "name",
+    "type" : "string"
+  }, {
+    "name" : "street_address",
+    "type" : "string"
+  }, {
+    "name" : "postal_code",
+    "type" : "int"
+  }, {
+    "name" : "location_range",
+    "type" : {
+      "type" : "record",
+      "name" : "MultiPolygonGeometry",
+      "fields" : [ {
+        "name" : "type",
+        "type" : "GeometryType",
+        "default" : "MultiPolygon"
+      }, {
+        "name" : "coordinates",
+        "type" : {
+          "type" : "map",
+          "values" : {
+            "type" : "map",
+            "values" : {
+              "type" : "map",
+              "values" : {
+                "type" : "map",
+                "values" : "double"
+              }
+            }
+          }
+        }
+      } ]
+    }
+  }, {
+    "name" : "id",
+    "type" : "int"
+  }, {
+    "name" : "ts",
+    "type" : {
+      "type" : "long",
+      "logicalType" : "timestamp-millis"
+    }
+  } ]
+}

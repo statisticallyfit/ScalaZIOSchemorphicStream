@@ -6,7 +6,6 @@ package testData.rawstringData.avroData
 object Data {
 
 	
-	// NOTE: either use the single quote with escaping OR the triple quote with no escaping
 	
 	val nullAvro_R: String = "\"null\""
 	
@@ -14,15 +13,15 @@ object Data {
 	
 	val strAvro_R: String = "\"string\""
 	
-	val booleanAvro_R: String = """boolean"""
+	val booleanAvro_R: String = "\"boolean\""
 	
-	val longAvro_R: String = """long"""
+	val longAvro_R: String = "\"long\""
 	
-	val floatAvro_R: String = """float"""
+	val floatAvro_R: String = "\"float\""
 	
-	val doubleAvro_R: String = """double"""
+	val doubleAvro_R: String = "\"double\""
 	
-	val bytesAvro_R: String = """bytes"""
+	val bytesAvro_R: String = "\"bytes\""
 	
 	// -------------------------
 	
@@ -63,7 +62,7 @@ object Data {
 		"""
 		  |{
 		  |  "type": "map",
-		  |  "items": "int"
+		  |  "values": "int"
 		  |}
 		  |""".stripMargin.trim
 	
@@ -72,7 +71,7 @@ object Data {
 		"""
 		  |{
 		  |  "type": "map",
-		  |  "items": "string"
+		  |  "values": "string"
 		  |}
 		  |""".stripMargin.trim
 	
@@ -81,11 +80,11 @@ object Data {
 		"""
 		  |{
 		  |  "type": "map",
-		  |  "items": {
+		  |  "values": {
 		  |    "type": "map",
-		  |    "items": {
+		  |    "values": {
 		  |      "type": "map",
-		  |      "items": "int"
+		  |      "values": "int"
 		  |    }
 		  |  }
 		  |}
@@ -94,42 +93,24 @@ object Data {
 	
 	// -------------------------
 	
-	
+	// default order = Ascending, when not passing it in the constructor of Field
 	val recordStrAvro_R: String =
 		"""
 		  |{
 		  |  "type": "record",
-		  |  "name": "StringRecord",
-		  |  "namespace": "StringNamespace",
+		  |  "name": "RecordName",
+		  |  "namespace": "Namespace",
 		  |  "fields": [ {
-		  |    "name": "stringField1",
-		  |    "type": "string",
-		  |    "order": "ignore"
+		  |    "name": "FieldName1",
+		  |    "type": "string"
 		  |  } ],
-		  |  "aliases": [ "a1", "a2" ]
+		  |  "aliases": [ "alias1", "alias2" ]
 		  |}
-		  |""".stripMargin
-		/*"""
-		  |{
-		  |  "type": "record",
-		  |  "name": "StringRecord",
-		  |  "namespace": "StringNamespace",
-		  |  "fields": [
-		  |    {
-		  |      "name": "stringField1",
-		  |      "type": "string",
-		  |      "order": "ignore"
-		  |    }
-		  |  ],
-		  |  "aliases": [
-		  |    "a1",
-		  |    "a2"
-		  |  ]
-		  |}
-		  |""".stripMargin.trim*/
+		  |""".stripMargin.trim()
 		  
 	
-	val recordExPositionAvro_R: String =
+	// NOTE: given, from the .avsc file (converted from .avdl)
+	val recordExPositionAvro_avsc_R: String =
 		"""
 		  |{
 		  |  "type": "record",
@@ -150,6 +131,24 @@ object Data {
 		  |}
 		  |""".stripMargin.trim()
 		  
+	// NOTE: from converting: avro-skeuo -> avro-str
+	val recordExPositionAvro_conv_R: String =
+		"""
+		  |{
+		  |  "type": "record",
+		  |  "name": "Position",
+		  |  "fields": [ {
+		  |    "name": "coordinates",
+		  |    "type": {
+		  |      "type": "array",
+		  |      "items": "float"
+		  |    }
+		  |  }, {
+		  |    "name": "type",
+		  |    "type": "string"
+		  |  } ]
+		  |}
+		  |""".stripMargin
 	
 	val recordExLocationAvro_R: String = """"""
 	

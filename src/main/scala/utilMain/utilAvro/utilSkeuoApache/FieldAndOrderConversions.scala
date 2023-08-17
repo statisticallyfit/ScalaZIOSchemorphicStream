@@ -27,6 +27,7 @@ object FieldAndOrderConversions {
 		case OrderSkeuo.Ascending ⇒ OrderApache.ASCENDING
 		case OrderSkeuo.Descending ⇒ OrderApache.DESCENDING
 		case OrderSkeuo.Ignore ⇒ OrderApache.IGNORE
+		case null ⇒ null
 	}
 	
 	def field2Field_SA: FieldS[AvroSchema_A] ⇒ FieldA =
@@ -46,9 +47,11 @@ object FieldAndOrderConversions {
 			//: JsonNodeType = JsonNodeType.STRING // TODO temporary to make the string test pass.
 			//FieldApache.NULL_DEFAULT_VALUE
 			//val fieldApache_defaultValue: util.List[String] = fieldS.aliases.asJava // HELP: apache has no 'aliases' while skeuo does and skeuo has no 'default value' while apache does -- are they the same?
-			val fOrder: OrderA = order2Order_SA(fieldS.order.getOrElse(OrderSkeuo.Ignore))
+			val fOrder: OrderA = order2Order_SA(fieldS.order.getOrElse(/*FieldApache.NULL_DEFAULT_VALUE*/OrderSkeuo.Ignore))
 			
-			new FieldApache(fName, fSchema, fDoc, fDefaultValue, fOrder)
+			
+			//NOTE:  using Order.Ascending (this constructor) results in order not appearing in the generated avro-str -- GOOD
+			new FieldApache(fName, fSchema, fDoc, fDefaultValue/*, fOrder*/)
 		}
 	
 }
