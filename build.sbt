@@ -135,7 +135,8 @@ lazy val global = project
 			allDependencies.drosteMacros,
 			allDependencies.drosteScalaCheck,
 			
-			allDependencies.skeuomorph,
+			//allDependencies.skeuomorph,
+			allDependencies.skeuomorph_publishLocal,
 			
 			allDependencies.andyGlowScalaJsonSchema,
 			allDependencies.andyGlow_jsonschema_Macros,
@@ -328,7 +329,9 @@ lazy val allDependencies =
 		
 		
 		// Other schema libraries
-		val skeuomorph = "io.higherkindness" %% "skeuomorph" % versionOfSkeuomorph
+		//val skeuomorph = "io.higherkindness" %% "skeuomorph" % versionOfSkeuomorph
+		//val skeuomorph = "io.higherkindness" % "skeuomorph" % "v0.2.1"
+		val skeuomorph_publishLocal = "io.higherkindness" %% "skeuomorph" % "7164525f-SNAPSHOT" //"0.0.0+1149-7164525f-SNAPSHOT"///
 		
 		val andyGlowScalaJsonSchema = "com.github.andyglow" %% "scala-jsonschema" % versionOfAndyGlowScalaJsonSchema
 		val andyGlow_jsonschema_Macros = "com.github.andyglow" %% "scala-jsonschema-macros" % versionOfAndyGlowScalaJsonSchema % Provided // <-- transitive
@@ -421,6 +424,8 @@ lazy val commonSettings = Seq(
 	resolvers ++= (Resolver.sonatypeOssRepos("releases")
 				++ Resolver.sonatypeOssRepos("snapshots")
 				++ Seq("jitpack" at "https://jitpack.io") // jitpack for opetushallitus
+				++ Seq("Local Ivy Repository" at ("file://" + Path.userHome.absolutePath + "/.ivy2/local"))
+		//ThisBuild / useCoursier := false)
 		) /*Seq(
 //"Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
 Resolver.sonatypeOssRepos("releases"), //Resolver.sonatypeRepo("releases"),
@@ -432,8 +437,8 @@ Resolver.sonatypeRepo("snapshots") //Resolver.sonatypeRepo("snapshots"),
 )*/
 )
 
-/*
 
+/*
 lazy val externalScalaRecordsProject: RootProject =
 	RootProject(uri("git://github.com/scala-records/scala-records.git"))
 // TODO - find out how to specify file path - need to specify file path to make this work ?
@@ -441,3 +446,13 @@ lazy val root: Project = Project("root", file(".")) dependsOn (externalScalaReco
 */
 
 
+// SOURCE of info = https://stackoverflow.com/questions/20136075/using-git-local-repository-as-dependency-in-sbt-project
+/*
+
+lazy val externalSkeuoNonsealedJsonSchema: RootProject =
+	RootProject(uri("https://github.com/statisticallyfit/skeuomorph.git"))
+
+lazy val root: Project = Project("root", file(".")) dependsOn (externalSkeuoNonsealedJsonSchema)
+*/
+
+// OR:  project in file(".") dependsOn 'projectanme'

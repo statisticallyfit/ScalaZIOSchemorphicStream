@@ -76,13 +76,17 @@ object ParseADTToCirceToADT {
 		)
 		// TODO compare between above way of declaring array and the below way (jsonType vs. Json.obj)
 		
+		
+		// METHOD 2: the 'additionalProperties' way
 		case TMap(innerValues: JsonCirce) => JsonCirce.obj(
 			"type" -> JsonCirce.fromString("object"),
-			"properties" -> JsonCirce.obj("values" -> innerValues /*JsonCirce.fromString("string")*/)
-		)
-		/*JsonCirce.obj(
-			"type" -> JsonCirce.fromString("object"),
 			"additionalProperties" -> innerValues
+		)
+		
+		// METHOD 1: the 'properties' and 'values' way
+			/*JsonCirce.obj(
+			"type" -> JsonCirce.fromString("object"),
+			"properties" -> JsonCirce.obj("values" -> innerValues /*JsonCirce.fromString("string")*/)
 		)*/
 			/*JsonCirce.obj(
 				"type" -> JsonCirce.fromString("object"),

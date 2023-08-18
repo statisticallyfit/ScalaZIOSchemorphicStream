@@ -70,6 +70,10 @@ object Skeuo_Skeuo {
 				case ArrayF(inner: Fix[AvroSchema_S]) ⇒ Fix(TArray(inner)) // TODO just inner or wrap with TArray?
 				
 				// Map
+				// METHOD 1: using the 'additionalProperties' way of declaring a map
+				/*case ObjectMapF(additionalProps: List[Property[Fix[AvroSchema_S]]]) ⇒ {
+				
+				}*/
 				
 				// Record
 				case ObjectF(props: List[Property[Fix[AvroSchema_S]]],
@@ -83,7 +87,9 @@ object Skeuo_Skeuo {
 					
 					val result: Fix[AvroSchema_S] = if(props.isEmpty && reqs.isEmpty) {
 						Fix(TNull())
-					} else if(props.length == 1 && props.head.name == "values"){
+					}
+					// METHOD 2: the 'properties' / 'values' way
+					else if(props.length == 1 && props.head.name == "values"){
 						Fix(TMap(props.head.tpe))
 					} else {
 						Fix(
@@ -141,7 +147,7 @@ object Skeuo_Skeuo {
 				// Map
 				
 				// Record
-				case Fix(ObjectF(props: List[Property[Fix[JsonSchema_S]]], reqs: List[String])) ⇒ /*props.isEmpty && reqs.isEmpty match*/ {
+				case Fix(ObjectF(props: List[Property[Fix[JsonSchema_S]]], reqs: List[String])) ⇒  {
 					
 					
 					println(s"INSIDE PROJECT'S COALGEBRA: " +
@@ -151,7 +157,9 @@ object Skeuo_Skeuo {
 					
 					val result: AvroSchema_S[Fix[JsonSchema_S]] = if (props.isEmpty && reqs.isEmpty) {
 						TNull()
-					} else if (props.length == 1 && props.head.name == "values") {
+					}
+					// METHOD 2: the 'properties' / 'values' way
+					else if (props.length == 1 && props.head.name == "values") {
 						TMap(props.head.tpe)
 					} else {
 					
