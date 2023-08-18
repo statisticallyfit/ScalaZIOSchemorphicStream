@@ -6,7 +6,7 @@ scalaVersion := "2.12.17" //"2.13.10" //"2.12.17"
 
 
 //crossScalaVersions := Seq("2.11.11", "2.12.17")
-
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "2.0.8")
 
 //set global / Test /
 Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary
@@ -76,6 +76,21 @@ sbt:SchaemeowMorphism> compile
 
 */
 
+libraryDependencySchemes ++= Seq(
+	"org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+)
+// For below errors when trying to download coursier sbt plugin:
+/*
+found version conflict(s) in library dependencies; some are suspected to be binary incompatible:
+[error]
+[error] 	* org.scala-lang.modules:scala-xml_2.12:2.1.0 (early-semver) is selected over {1.3.0, 1.2.0}
+[error] 	    +- org.scala-lang:scala-compiler:2.12.17              (depends on 2.1.0)
+[error] 	    +- org.scala-sbt:librarymanagement-core_2.12:1.3.4    (depends on 1.2.0)
+[error] 	    +- io.get-coursier:coursier-core_2.12:2.0.15          (depends on 1.3.0)
+
+ */
+
+
 //addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10")
 
 
@@ -135,8 +150,8 @@ lazy val global = project
 			allDependencies.drosteMacros,
 			allDependencies.drosteScalaCheck,
 			
-			//allDependencies.skeuomorph,
-			allDependencies.skeuomorph_publishLocal,
+			allDependencies.skeuomorph,
+			//allDependencies.skeuomorph_publishLocal,
 			
 			allDependencies.andyGlowScalaJsonSchema,
 			allDependencies.andyGlow_jsonschema_Macros,
@@ -329,9 +344,9 @@ lazy val allDependencies =
 		
 		
 		// Other schema libraries
-		//val skeuomorph = "io.higherkindness" %% "skeuomorph" % versionOfSkeuomorph
+		val skeuomorph = "io.higherkindness" %% "skeuomorph" % versionOfSkeuomorph
 		//val skeuomorph = "io.higherkindness" % "skeuomorph" % "v0.2.1"
-		val skeuomorph_publishLocal = "io.higherkindness" %% "skeuomorph" % "7164525f-SNAPSHOT" //"0.0.0+1149-7164525f-SNAPSHOT"///
+		//val skeuomorph_publishLocal = "io.higherkindness" %% "skeuomorph" % "7164525f-SNAPSHOT" //"0.0.0+1149-7164525f-SNAPSHOT"///
 		
 		val andyGlowScalaJsonSchema = "com.github.andyglow" %% "scala-jsonschema" % versionOfAndyGlowScalaJsonSchema
 		val andyGlow_jsonschema_Macros = "com.github.andyglow" %% "scala-jsonschema-macros" % versionOfAndyGlowScalaJsonSchema % Provided // <-- transitive
@@ -424,7 +439,8 @@ lazy val commonSettings = Seq(
 	resolvers ++= (Resolver.sonatypeOssRepos("releases")
 				++ Resolver.sonatypeOssRepos("snapshots")
 				++ Seq("jitpack" at "https://jitpack.io") // jitpack for opetushallitus
-				++ Seq("Local Ivy Repository" at ("file://" + Path.userHome.absolutePath + "/.ivy2/local"))
+				++ Seq("Local Coursier Repository" at ("file://" + "/development/tmp/.coursier"))
+				//++ Seq("Local Ivy Repository" at ("file://" + Path.userHome.absolutePath + "/.ivy2/local"))
 		//ThisBuild / useCoursier := false)
 		) /*Seq(
 //"Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
@@ -445,14 +461,16 @@ lazy val externalScalaRecordsProject: RootProject =
 lazy val root: Project = Project("root", file(".")) dependsOn (externalScalaRecordsProject)
 */
 
-
-// SOURCE of info = https://stackoverflow.com/questions/20136075/using-git-local-repository-as-dependency-in-sbt-project
 /*
 
-lazy val externalSkeuoNonsealedJsonSchema: RootProject =
+// SOURCE of info = https://stackoverflow.com/questions/20136075/using-git-local-repository-as-dependency-in-sbt-project
+
+lazy val externalSkeuoExtendedJsonSchema: RootProject =
 	RootProject(uri("https://github.com/statisticallyfit/skeuomorph.git"))
 
-lazy val root: Project = Project("root", file(".")) dependsOn (externalSkeuoNonsealedJsonSchema)
+lazy val root: Project = Project("root", file(".")) dependsOn (externalSkeuoExtendedJsonSchema)
 */
 
-// OR:  project in file(".") dependsOn 'projectanme'
+// Source = https://stackoverflow.com/a/67908451
+lazy val B = ProjectRef(file("path/to/B"), "nameOfSubproject")
+lazy val A = (project in file(".")).dependsOn(B)

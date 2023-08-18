@@ -15,8 +15,10 @@ import JsonSchema_S._
 object SkeuoObjectExtensions {
 	
 	
-	case class ObjectWithNameF[A](name: String, override val properties: List[Property[A]], override val required: List[String]) extends ObjectF[A](properties, required)
-
+	/*case class ObjectWithNameF[A](name: String, override val properties: List[Property[A]], override val required: List[String]) extends ObjectF[A](properties, required)
+*/
+	def trythis[A](variableHere: ObjectWithNameF[A]): Unit = println(variableHere)
+	
 	/*sealed trait MyJsonSchema_S[A]
 	case class SecondJSchema[A](name: String, obj: JsonSchema_S[A]) extends MyJsonSchema_S[A]
 	/*case class ObjectWithNameF[A](name: String, ps: List[Property[A]], rs: List[String])  extends SecondJSchema[A]*/

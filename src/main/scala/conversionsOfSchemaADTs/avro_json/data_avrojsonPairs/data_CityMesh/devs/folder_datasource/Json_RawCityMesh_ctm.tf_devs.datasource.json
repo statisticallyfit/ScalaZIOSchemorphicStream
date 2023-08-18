@@ -18,7 +18,7 @@
   "$defs": {
     "device": {
       "type": "object",
-      "properties": {
+      "roperties": {
         "id": {
           "type": "string"
         },
