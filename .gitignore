@@ -7,12 +7,12 @@ src/test/scala/testData/testDataPrivateTati/
 src/test/scala/testData/testDataPrivateTati/*
 
 # Not committing the avro-tools-jar (too big?)
-src/test/scala/testTools/ 
+src/test/scala/testTools/
 src/test/scala/testTools/*
 
 
 #project/*
-project
+#project
 
 project/.boot/
 project/.boot/*
