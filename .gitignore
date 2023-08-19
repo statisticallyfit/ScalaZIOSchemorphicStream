@@ -1,3 +1,6 @@
+# has github token - don't want it seen
+.env
+
 # Keeping this .avdl / .avsc / .json data private (from tati's office)
 # /development/projects/statisticallyfit/github/learningdataflow/SchaemeowMorphism/src/test/scala/testData/testDataPrivateTati
 src/test/scala/testData/testDataPrivateTati/
@@ -8,7 +11,7 @@ src/test/scala/testTools/
 src/test/scala/testTools/*
 
 
-project/*
+#project/*
 project
 
 project/.boot/
@@ -23,8 +26,8 @@ project/.ivy/
 project/target
 project/target/*
 
-project/project/*
-project/project/
+#project/project/*
+#project/project/
 
 
 
