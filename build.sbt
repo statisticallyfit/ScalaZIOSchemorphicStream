@@ -4,9 +4,10 @@ version := "0.1"
 
 scalaVersion := "2.12.17" //"2.13.10" //"2.12.17"
 
+//ThisBuild / useCoursier := false
+
 
 //crossScalaVersions := Seq("2.11.11", "2.12.17")
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "2.0.8")
 
 //set global / Test /
 Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary
@@ -22,6 +23,7 @@ libraryDependencySchemes += "org.scala-lang.modules" %% "scala-java8-compat" % V
 // Solution below: https://stackoverflow.com/a/75246146
 libraryDependencySchemes ++= Seq(
 	"org.typelevel" %% "cats-core" % VersionScheme.Always,
+	"io.circe" %% "circe-parser" % VersionScheme.Always,
 	"io.circe" %% "circe-parser" % VersionScheme.Always,
 	"io.circe" %% "circe-core" % VersionScheme.Always,
 	"org.typelevel" %% "cats-kernel" % VersionScheme.Always,
@@ -192,6 +194,10 @@ lazy val global = project
 			allDependencies.avro4s_core,
 			allDependencies.avro4s_json,
 			
+			/*allDependencies.coursierrepo,
+			allDependencies.sbtdotenv,
+			allDependencies.sbtgitpackages,
+			allDependencies.sbtbuildinfo*/
 			//allDependencies.scala_records
 		)
 	)
@@ -391,6 +397,16 @@ lazy val allDependencies =
 		val avro4s_json = "com.sksamuel.avro4s" %% "avro4s-json" % versionOfAvro4S
 		
 		val scala_records =  "ch.epfl.lamp" %% "scala-records" % versionOfScalaRecords
+		
+		
+		/*val coursierrepo = "io.get-coursier" % "sbt-coursier" % "2.0.8"
+		
+		val sbtgitpackages = "com.codecommit" % "sbt-github-packages" % "0.3.1"
+		
+		val sbtdotenv = "nl.gn0s1s" % "sbt-dotenv" % "2.1.233"
+		
+		val sbtbuildinfo = "com.eed3si9n" % "sbt-buildinfo" % "0.11.0"*/
+		
 	}
 
 
@@ -436,7 +452,9 @@ lazy val compilerOptions = Seq(
 
 lazy val commonSettings = Seq(
 	scalacOptions ++= compilerOptions,
-	resolvers ++= (Resolver.sonatypeOssRepos("releases")
+	resolvers ++= (Seq(Resolver.githubPackages("statisticallyfit"))
+		          ++ Resolver.sonatypeOssRepos("releases")
+				++ Seq(Resolver.mavenLocal)
 				++ Resolver.sonatypeOssRepos("snapshots")
 				++ Seq("jitpack" at "https://jitpack.io") // jitpack for opetushallitus
 				++ Seq("Local Coursier Repository" at ("file://" + "/development/tmp/.coursier"))
@@ -454,23 +472,65 @@ Resolver.sonatypeRepo("snapshots") //Resolver.sonatypeRepo("snapshots"),
 )
 
 
-/*
-lazy val externalScalaRecordsProject: RootProject =
-	RootProject(uri("git://github.com/scala-records/scala-records.git"))
-// TODO - find out how to specify file path - need to specify file path to make this work ?
-lazy val root: Project = Project("root", file(".")) dependsOn (externalScalaRecordsProject)
-*/
+
+
+
+
+// ---------- TRYING TO MAKE SBT HERE PICK UP CHANGES IN COURSIER:
+
+// Way 1 - setting coursier-time-limit-pickup
+// Sources:
+// https://stackoverflow.com/a/67862862
+// https://stackoverflow.com/a/60776765
+
+import scala.concurrent.duration.DurationInt
+import lmcoursier.definitions.CachePolicy
+
+
+csrConfiguration := csrConfiguration.value
+	.withTtl(Some(0.seconds))
+	.withCachePolicies(Vector(CachePolicy.LocalOnly))
+
+
+// Way 2 - adding local subproject dependency
+
 
 /*
-
-// SOURCE of info = https://stackoverflow.com/questions/20136075/using-git-local-repository-as-dependency-in-sbt-project
-
-lazy val externalSkeuoExtendedJsonSchema: RootProject =
-	RootProject(uri("https://github.com/statisticallyfit/skeuomorph.git"))
-
-lazy val root: Project = Project("root", file(".")) dependsOn (externalSkeuoExtendedJsonSchema)
+sbt:SchaemeowMorphism> plugins
+In build /development/projects/statisticallyfit/github/learningdataflow/SchaemeowMorphism/:
+Enabled plugins in global:
+au.com.onegeek.sbtdotenv.SbtDotenv
+sbt.plugins.CorePlugin
+sbt.plugins.Giter8TemplatePlugin
+sbt.plugins.IvyPlugin
+sbt.plugins.JUnitXmlReportPlugin
+sbt.plugins.JvmPlugin
+sbt.plugins.MiniDependencyTreePlugin
+sbt.plugins.SemanticdbPlugin
+sbtbuildinfo.BuildInfoPlugin
+sbtghpackages.GitHubPackagesPlugin
+Plugins that are loaded to the build but not enabled in any subprojects:
+sbt.ScriptedPlugin
+sbt.plugins.SbtPlugin
 */
+enablePlugins(BuildInfoPlugin)
+//enablePlugins(SbtCoursierPlugin)
+enablePlugins(SbtDotenv)
+enablePlugins(GitHubPackagesPlugin)
 
-// Source = https://stackoverflow.com/a/67908451
-lazy val B = ProjectRef(file("path/to/B"), "nameOfSubproject")
-lazy val A = (project in file(".")).dependsOn(B)
+
+
+// Source
+// https://stackoverflow.com/a/67908451
+// https://xebia.com/blog/git-subproject-compile-time-dependencies-in-sbt/
+// https://stackoverflow.com/questions/42206668/scala-sbt-file-dependency-from-github-repository
+//https://stackoverflow.com/questions/20136075/using-git-local-repository-as-dependency-in-sbt-project
+//https://stackoverflow.com/questions/67861343/sbt-how-to-ensure-that-local-snapshot-dependency-is-picked-up
+lazy val skeuomorphExtendedInLocalCoursier = ProjectRef(file("/development/tmp/.coursier"), "skeuomorph_2.13-0.0.0+1149-7164525f+20230818-1637-SNAPSHOT")
+lazy val skeuomorphExtendedInGit = ProjectRef(uri("https://github.com/statisticallyfit/skeuomorph.git#master"), "skeuomorph")
+lazy val SchaemeowMorphism = Project("SchaemeowMorphism", file("."))
+	.enablePlugins(BuildInfoPlugin) // TODO how to know what is the name of my declared plugins in the plugins.sbt file?
+	.enablePlugins(SbtDotenv)
+	.enablePlugins(GitHubPackagesPlugin)
+	.dependsOn(skeuomorphExtendedInLocalCoursier)
+
