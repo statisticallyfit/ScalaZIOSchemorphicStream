@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/SchaemeowMorphism.iml" filepath="$PROJECT_DIR$/.idea/modules/SchaemeowMorphism.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/SchaemeowMorphism-build.iml" filepath="$PROJECT_DIR$/.idea/modules/SchaemeowMorphism-build.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../libs/scala-records/.idea/modules/synthPlugin.iml" filepath="$PROJECT_DIR$/../libs/scala-records/.idea/modules/synthPlugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/../libs/scala-records/.idea/modules/tests.iml" filepath="$PROJECT_DIR$/../libs/scala-records/.idea/modules/tests.iml" />
     </modules>
   </component>

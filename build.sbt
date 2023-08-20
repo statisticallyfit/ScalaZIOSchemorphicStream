@@ -1,17 +1,33 @@
-name := "SchaemeowMorphism"
+ThisBuild / organization := "statisticallyfit"
+ThisBuild / name := "SchaemeowMorphism"
 
-version := "0.1"
+ThisBuild / version := "0.1"
 
-scalaVersion := "2.12.17" //"2.13.10" //"2.12.17"
+ThisBuild / scalaVersion := "2.12.17" //"2.13.10" //"2.12.17"
 
 //ThisBuild / useCoursier := false
 
+// Sources:
+// https://stackoverflow.com/questions/66228218/intellij-doesnt-recognize-code-in-build-sbt-and-doesnt-compile
+// https://medium.com/@supermanue/how-to-publish-a-scala-library-in-github-bfb0fa39c1e4
+ThisBuild / githubOwner := "statisticallyfit"
+ThisBuild / githubRepository := "SchaemeowMorphism"
+// source of this tokensource declaration = https://stackoverflow.com/questions/66228218/intellij-doesnt-recognize-code-in-build-sbt-and-doesnt-compile
+/*
+ThisBuild / githubTokenSource := TokenSource.Environment("GITHUB_TOKEN")
+
+ThisBuild / scmInfo := Some(
+	ScmInfo(url("http://example.com"), "scm:git:https://github.com/alejandrohdezma/sbt-github.git")
+)
+*/
 
 //crossScalaVersions := Seq("2.11.11", "2.12.17")
 
 //set global / Test /
 Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary
 //Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
+
+
 
 
 /*assumedEvictionErrorLevel := Level.Error
@@ -350,7 +366,7 @@ lazy val allDependencies =
 		
 		
 		// Other schema libraries
-		val skeuomorph = "io.higherkindness" %% "skeuomorph" % versionOfSkeuomorph
+		val skeuomorph = "io.higherkindness" %% "skeuomorph" % "0.0.0+1150-dc2f08c4+20230820-1843-SNAPSHOT"//versionOfSkeuomorph
 		//val skeuomorph = "io.higherkindness" % "skeuomorph" % "v0.2.1"
 		//val skeuomorph_publishLocal = "io.higherkindness" %% "skeuomorph" % "7164525f-SNAPSHOT" //"0.0.0+1149-7164525f-SNAPSHOT"///
 		
@@ -452,9 +468,9 @@ lazy val compilerOptions = Seq(
 
 lazy val commonSettings = Seq(
 	scalacOptions ++= compilerOptions,
-	resolvers ++= (Seq(Resolver.githubPackages("statisticallyfit"))
-		          ++ Resolver.sonatypeOssRepos("releases")
-				++ Seq(Resolver.mavenLocal)
+	resolvers ++= (/*Seq(Resolver.githubPackages("statisticallyfit"))
+		          ++ */Resolver.sonatypeOssRepos("releases")
+				//++ Seq(Resolver.mavenLocal)
 				++ Resolver.sonatypeOssRepos("snapshots")
 				++ Seq("jitpack" at "https://jitpack.io") // jitpack for opetushallitus
 				++ Seq("Local Coursier Repository" at ("file://" + "/development/tmp/.coursier"))
@@ -526,8 +542,14 @@ enablePlugins(GitHubPackagesPlugin)
 // https://stackoverflow.com/questions/42206668/scala-sbt-file-dependency-from-github-repository
 //https://stackoverflow.com/questions/20136075/using-git-local-repository-as-dependency-in-sbt-project
 //https://stackoverflow.com/questions/67861343/sbt-how-to-ensure-that-local-snapshot-dependency-is-picked-up
-lazy val skeuomorphExtendedInLocalCoursier = ProjectRef(file("/development/tmp/.coursier"), "skeuomorph_2.13-0.0.0+1149-7164525f+20230818-1637-SNAPSHOT")
+lazy val skeuomorphExtendedInLocalCoursier = ProjectRef(
+	//file("/development/tmp/.coursier"),
+	file("/development/tmp/.coursier"),
+	"skeuomorph"
+)
+
 lazy val skeuomorphExtendedInGit = ProjectRef(uri("https://github.com/statisticallyfit/skeuomorph.git#master"), "skeuomorph")
+
 lazy val SchaemeowMorphism = Project("SchaemeowMorphism", file("."))
 	.enablePlugins(BuildInfoPlugin) // TODO how to know what is the name of my declared plugins in the plugins.sbt file?
 	.enablePlugins(SbtDotenv)
