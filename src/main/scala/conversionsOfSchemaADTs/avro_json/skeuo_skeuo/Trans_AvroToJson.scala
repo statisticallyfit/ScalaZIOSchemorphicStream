@@ -47,7 +47,7 @@ object Trans_AvroToJson {
 		case TArray(inner: Fix[JsonSchema_S]) ⇒ ArrayF(inner)
 		
 		// Source: avro map -> json map = https://hyp.is/ixmlxio5Ee6pv28sNQ9XaA/docs.airbyte.com/understanding-airbyte/json-avro-conversion/
-		// TODO find in file: map example
+		
 		case TMap(inner: Fix[JsonSchema_S]) ⇒ {
 			
 			val ps: List[Property[Fix[JsonSchema_S]]] = List(

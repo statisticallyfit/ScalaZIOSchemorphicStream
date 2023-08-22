@@ -99,13 +99,21 @@ object Data {
 		),
 		required = List()
 	))
-	val map1IntJson_objectname_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
+	val map1IntJson_objectname_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNameF(
+		name = "MapNameObj",
+		properties = List(Property(name = "map", tpe = Fix(IntegerF()))),
+		required = List()
+	))
+	/*Fix(ObjectF(
 		properties = List(
 			Property(name = "object", tpe = Fix(IntegerF()))
 		),
 		required = List()
 	)
-	)
+	)*/
+	val map1IntJson_addprops_Fix_S: Fix[JsonSchema_S] = Fix(ObjectMapF(name = "MapNameAddProps",
+		additionalProperties = AdditionalProperties(tpe = Fix(IntegerF()))
+	))
 	
 	
 	/*val map1StrJson_S: JsonSchema_S[JsonSchema_S[String]] = MapF(StringF())

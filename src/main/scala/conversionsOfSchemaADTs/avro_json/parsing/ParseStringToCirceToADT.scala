@@ -141,7 +141,7 @@ object ParseStringToCirceToADT {
 			
 			// Generate circes from the starting skeuos
 			val jsonCirce_fromAvroSkeuo: JsonCirce = libToJsonAltered(skeuoAvro_fromRaw.right.get)
-			val jsonCirce_fromJsonSkeuo: JsonCirce = libRender(skeuoJson_fromRaw.right.get)
+			val jsonCirce_fromJsonSkeuo: JsonCirce = libRenderAltered(skeuoJson_fromRaw.right.get)
 			
 			// Generate skeuos from the starting skeuos (for showing decoding capability)
 			val skeuoAvro_fromDecodeAvroSkeuo: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(jsonCirce_fromAvroSkeuo)

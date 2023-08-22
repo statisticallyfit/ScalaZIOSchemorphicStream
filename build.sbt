@@ -274,7 +274,7 @@ lazy val allDependencies =
 		val versionOfMatryoshka = "0.21.3"
 		
 		
-		val versionOfSkeuomorph = "0.2.1"
+		val versionOfSkeuomorph = "0.0.0+1151-0f9aaa29+20230821-1816-SNAPSHOT" //"0.2.1"
 		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
 		
 		val versionOfSaulAutoschema = "1.0.4"
@@ -366,7 +366,7 @@ lazy val allDependencies =
 		
 		
 		// Other schema libraries
-		val skeuomorph = "io.higherkindness" %% "skeuomorph" % "0.0.0+1150-dc2f08c4+20230820-1843-SNAPSHOT"//versionOfSkeuomorph
+		val skeuomorph = "io.higherkindness" %% "skeuomorph" % versionOfSkeuomorph // "0.0.0+1150-dc2f08c4+20230820-1843-SNAPSHOT"//versionOfSkeuomorph
 		//val skeuomorph = "io.higherkindness" % "skeuomorph" % "v0.2.1"
 		//val skeuomorph_publishLocal = "io.higherkindness" %% "skeuomorph" % "7164525f-SNAPSHOT" //"0.0.0+1149-7164525f-SNAPSHOT"///
 		

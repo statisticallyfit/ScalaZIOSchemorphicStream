@@ -69,17 +69,44 @@ object Skeuo_Skeuo {
 				// Array
 				case ArrayF(inner: Fix[AvroSchema_S]) ⇒ Fix(TArray(inner)) // TODO just inner or wrap with TArray?
 				
-				// Map
-				// METHOD 1: using the 'additionalProperties' way of declaring a map
-				/*case ObjectMapF(additionalProps: List[Property[Fix[AvroSchema_S]]]) ⇒ {
 				
-				}*/
+				// Object with name
+				case ObjectNameF(name: String, props: List[Property[Fix[AvroSchema_S]]],
+				reqs: List[String]) ⇒ {
+					
+					println(s"ObjectNameF: INSIDE EMBED'S ALGEBRA: " +
+					        s"\nname = $name" +
+					        s"\nproperties = $props" +
+					        s"\nrequired = $reqs"
+					)
+					
+					Fix(
+						TRecord(name = name, namespace = None, aliases = List(), doc = None,
+							fields = props.map(p ⇒ property2Field(p))
+						)
+					)
+					
+				}
+				
+				// Map
+				
+				// METHOD 1: using the 'additionalProperties' way of declaring a map
+				case ObjectMapF(name: String, additionalProperties: AdditionalProperties[Fix[AvroSchema_S]]) ⇒ {
+					
+					println(s"ObjectMapF: INSIDE EMBED'S ALGEBRA: " +
+					        s"\nname = $name" +
+					        s"\nadditionalProperties = $additionalProperties"
+					)
+					
+					// TODO what about name now?
+					Fix(TMap(additionalProperties.tpe))
+				}
 				
 				// Record
 				case ObjectF(props: List[Property[Fix[AvroSchema_S]]],
 				reqs: List[String]) ⇒ {
 					
-					println(s"INSIDE EMBED'S ALGEBRA: " +
+					println(s"ObjectF: INSIDE EMBED'S ALGEBRA: " +
 					        s"\nproperties = $props" +
 					        s"\nrequired = $reqs"
 					)
@@ -89,9 +116,9 @@ object Skeuo_Skeuo {
 						Fix(TNull())
 					}
 					// METHOD 2: the 'properties' / 'values' way
-					else if(props.length == 1 && props.head.name == "values"){
+					/*else if(props.length == 1 && props.head.name == "values"){
 						Fix(TMap(props.head.tpe))
-					} else {
+					}*/ else {
 						Fix(
 							TRecord(name = /*null*/ "record", namespace = None, aliases = List(), doc = None,
 								fields = props.map(p ⇒ property2Field(p))
@@ -145,12 +172,35 @@ object Skeuo_Skeuo {
 				case Fix(ArrayF(inner: Fix[JsonSchema_S])) ⇒ TArray(inner)
 				
 				// Map
+				case Fix(ObjectMapF(name: String, additionalProperties: AdditionalProperties[Fix[JsonSchema_S]])) ⇒ {
+					
+					println(s"ObjectMapF: INSIDE PROJECT'S COALGEBRA: " +
+					        s"\nname = $name" +
+					        s"\naddedproperties = $additionalProperties"
+					)
+					
+					TMap(additionalProperties.tpe)
+				}
+				
+				// Object Name
+				case Fix(ObjectNameF(name: String, props: List[Property[Fix[JsonSchema_S]]], reqs: List[String])) ⇒ {
+					
+					println(s"ObjectNameF: INSIDE PROJECT'S COALGEBRA: " +
+					        s"\nname = $name" +
+					        s"\nproperties = $props" +
+					        s"\nrequired = $reqs"
+					)
+					
+					TRecord(name = name, namespace = None, aliases = List(), doc = None,
+						fields = props.map(p ⇒ property2Field(p))
+					)
+				}
 				
 				// Record
 				case Fix(ObjectF(props: List[Property[Fix[JsonSchema_S]]], reqs: List[String])) ⇒  {
 					
 					
-					println(s"INSIDE PROJECT'S COALGEBRA: " +
+					println(s"ObjectF: INSIDE PROJECT'S COALGEBRA: " +
 					        s"\nproperties = $props" +
 					        s"\nrequired = $reqs")
 					
@@ -159,9 +209,9 @@ object Skeuo_Skeuo {
 						TNull()
 					}
 					// METHOD 2: the 'properties' / 'values' way
-					else if (props.length == 1 && props.head.name == "values") {
+					/*else if (props.length == 1 && props.head.name == "values") {
 						TMap(props.head.tpe)
-					} else {
+					}*/ else {
 					
 						TRecord(name = /*null*/ "TODO_OBJ_NAME", namespace = None, aliases = List(), doc = None,
 							fields = props.map(p ⇒ property2Field(p))

@@ -72,24 +72,23 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		
 		
 		// json-skeuo --> circe
-		info(s"\njson-skeuo -> circe: ${libRender(theArgJson)}")
+		info(s"\njson-skeuo -> circe: ${libRenderAltered(theArgJson)}")
 		// json-skeuo --> avro-skeuo
 		info(s"\njson-skeuo -> circe -> avro-skeuo: ${DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(theArgJson)}")
 	}
 	
-	/*val c = unsafeParse(map1StrJson_R)
-	info(s"map: json-str -> circe: ${c.manicure}")
-	val skj = funcCirceToJsonSkeuo(c)
-	val ska = funcCirceToAvroSkeuo(c)
-	info(s"-> json-skeuo: $skj")
-	info(s"---> json-str: ${libRender(skj.right.get)}")
-	info(s"-> avro-skeuo: $ska")
-	info(s"-> apache-str: ${skeuoToApacheAvroSchema(ska.right.get).toString(true).manicure}")
-	info(s"---> avro-str (libtoJsonAl): ${libToJsonAltered(ska.right.get)}")*/
 	
 	//testCirceToAvroSkeuo("map thing: map (str avro) --> circe -> avro-skeuo", map1IntAvro_Fix_S, map1IntJson_objectname_Fix_S)
-	printAvroStringToCirceToAvroSkeuo(List(map1StrAvro_R))
-	val stp = AvroStepping(map1StrAvro_R).avroInfoOpt.get
+	/*info(s"\n\nnow map avro: ")
+	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))
+	
+	info(s"\n\nnow map json:")
+	printJsonStringToCirceToAvroSkeuo(List(map1IntJson_R))*/
+	
+	
+	//info(s"\n\n avro-skeuo -> json-skeuo")
+	
+	val stp = AvroStepping(map1IntAvro_R).avroInfoOpt.get
 	info(s"str -> apache: ${stp.parsedApacheAvroStr}")
 	info(s"apache -> skeuo: ${stp.skeuoAvro_fromApache}")
 	info(s"skeuo -> circe: ${stp.interimCirce_fromAvroSKeuo}")
@@ -102,6 +101,13 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		def printer(arg: String) = info(s"${DecodingStr.decodeAvroStringToCirceToAvroSkeuo(arg)}")
 		
 		listAvroStrings.map(printer(_))
+	}
+	
+	def printJsonStringToCirceToAvroSkeuo(listJsonStrings: List[String]): Unit = {
+		
+		def printer(arg: String) = info(s"${DecodingStr.decodeJsonStringToCirceToAvroSkeuo(arg)}")
+		
+		listJsonStrings.map(printer(_))
 	}
 	
 	////////------------------------------
@@ -119,13 +125,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		listAvroSkeuo.map(arg ⇒ printer(arg))
 	}
 	
-	def printAvroSkeuoToJsonSkeuo(listAvroSkeuo: List[Fix[AvroSchema_S]]): Unit = {
-		
-		// avro-skeuo --> circe (decoder) --> json-skeuo
-		def printer(arg: Fix[AvroSchema_S]) = info(s"${DecodingSkeuo.decodeAvroSkeuoToCirceToJsonSkeuo(arg)}")
-		
-		listAvroSkeuo.map(printer(_))
-	}
+	
 	
 	/// ------------------------
 	
@@ -148,10 +148,20 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		
 		// json skeuo --> circe --> json-str
 		def printer(arg: Fix[JsonSchema_S]): Unit = {
-			info(libRender(arg).manicure)
+			info(libRenderAltered(arg).manicure)
 		}
 		
 		listJsonSkeuo.map(printer(_))
+	}
+	
+	// ------------------
+	
+	def printAvroSkeuoToJsonSkeuo(listAvroSkeuo: List[Fix[AvroSchema_S]]): Unit = {
+		
+		// avro-skeuo --> circe (decoder) --> json-skeuo
+		def printer(arg: Fix[AvroSchema_S]) = info(s"${DecodingSkeuo.decodeAvroSkeuoToCirceToJsonSkeuo(arg)}")
+		
+		listAvroSkeuo.map(printer(_))
 	}
 	
 	def printJsonSkeuoToAvroSkeuo(listJsonSkeuo: List[Fix[JsonSchema_S]]): Unit = {
@@ -162,8 +172,8 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		listJsonSkeuo.map(printer(_))
 	}
 	
-	/*info(s"record position (json circe): \n${libRender(recordEXPositionJson_Fix_S).manicure}")
-	info(s"record location (json circe): \n${libRender(recordEXLocationJson_Fix_S).manicure}")
+	/*info(s"record position (json circe): \n${libRenderAltered(recordEXPositionJson_Fix_S).manicure}")
+	info(s"record location (json circe): \n${libRenderAltered(recordEXLocationJson_Fix_S).manicure}")
 	info(s"record position (avro-skeuo): \n${DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(recordEXPositionJson_Fix_S)}")
 	info(s"record location (avro-skeuo): \n${DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(recordEXLocationJson_Fix_S)}")
 	info(s"record position (avro-str): \n${skeuoToApacheAvroSchema(DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(recordEXPositionJson_Fix_S).right.get).toString(true).manicure}")

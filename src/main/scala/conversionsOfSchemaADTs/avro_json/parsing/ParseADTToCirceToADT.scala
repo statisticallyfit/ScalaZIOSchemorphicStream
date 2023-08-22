@@ -34,7 +34,9 @@ object ParseADTToCirceToADT {
 	val libToJson: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(AvroSchema_S.toJson).apply(_)
 	
 	
-	val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(toCirceJsonString).apply(_)
+	val libRenderAltered: Fix[JsonSchema_S] ⇒ JsonCirce = scheme.cata(toCirceJsonString_fromJsonSkeuo).apply(_)
+	
+	val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(toCirceJsonString_fromAvroSkeuo).apply(_)
 	
 	
 	// Copied from skeuomorph (is private) = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L88
@@ -47,9 +49,67 @@ object ParseADTToCirceToADT {
 		"format" -> JsonCirce.fromString(value)
 	
 	
+	
+	
+	
+	
+	// Alterign this function to include my own ObjectF-alike types: https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94
+	def toCirceJsonString_fromJsonSkeuo: Algebra[JsonSchema_S, JsonCirce] =
+		Algebra {
+			case IntegerF() => jsonType("integer", format("int32"))
+			case LongF() => jsonType("integer", format("int64"))
+			case FloatF() => jsonType("number", format("float"))
+			case DoubleF() => jsonType("number", format("double"))
+			case StringF() => jsonType("string")
+			case ByteF() => jsonType("string", format("byte"))
+			case BinaryF() => jsonType("string", format("binary"))
+			case BooleanF() => jsonType("boolean")
+			case DateF() => jsonType("string", format("date"))
+			case DateTimeF() => jsonType("string", format("date-time"))
+			case PasswordF() => jsonType("string", format("password"))
+			
+			case ObjectF(properties: List[Property[JsonCirce]], required: List[String]) =>
+				JsonCirce.obj(
+					"type" -> JsonCirce.fromString("object"),
+					"properties" -> JsonCirce.obj(properties.map(prop => prop.name -> prop.tpe): _*),
+					"required" -> JsonCirce.fromValues(required.map(JsonCirce.fromString))
+				)
+				
+			case ObjectNameF(name: String, properties: List[Property[JsonCirce]], required: List[String]) ⇒ JsonCirce.obj(
+				"title" -> JsonCirce.fromString(name),
+				"type" -> JsonCirce.fromString("object"),
+				"properties" -> JsonCirce.obj(properties.map(prop => prop.name -> prop.tpe): _*),
+				"required" -> JsonCirce.fromValues(required.map(JsonCirce.fromString))
+			  )
+			
+			case ObjectMapF(name: String, addProps: AdditionalProperties[JsonCirce]) ⇒ JsonCirce.obj(
+				"title" -> JsonCirce.fromString(name),
+				"type" -> JsonCirce.fromString("object"),
+				"additionalProperties" -> addProps.tpe
+			)
+			
+			
+			case ArrayF(values) =>
+				jsonType(
+					"array",
+					"items" -> values
+				)
+			case EnumF(cases) =>
+				jsonType("string", "enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString)))
+			case SumF(cases) =>
+				JsonCirce.obj("oneOf" -> JsonCirce.arr(cases: _*))
+			case ReferenceF(value) =>
+				JsonCirce.obj(
+					s"$$ref" -> JsonCirce.fromString(value)
+				)
+			
+		}
+	
+	
+	
 	// TODO how to alter libToJsonAltered so that null works? (funcCirceToAvroSkeuo not worknig)
 	
-	def toCirceJsonString: Algebra[AvroSchema_S, JsonCirce] = Algebra {
+	def toCirceJsonString_fromAvroSkeuo: Algebra[AvroSchema_S, JsonCirce] = Algebra {
 		
 		// ObjectF(List(Property(name = "null", tpe = StringF())), List())
 		
@@ -93,15 +153,25 @@ object ParseADTToCirceToADT {
 				"additionalProperties" -> JsonCirce.obj("type" -> innerValues /*JsonCirce.fromString("string")*/)
 			)*/
 			
-			
+		// TODO find example of named type (avro -> json) in data files ?
+		
+		case TNamedType(namespace: String, name: String) ⇒ {
+			JsonCirce.obj(
+				"name" -> JsonCirce.fromString(name),
+				"namespace" -> JsonCirce.fromString(namespace),
+			)
+		}
+		
 		// TODO must make map become an Object
 		
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[JsonCirce]]) ⇒ {
 			
 			val base: JsonCirce = JsonCirce.obj(
+				"title" -> JsonCirce.fromString(name),
 				"type" -> JsonCirce.fromString("record"),
-				"name" -> JsonCirce.fromString(name),
 				"fields" -> JsonCirce.arr(fields.map(field2Obj): _*) // TODO update this function (field2Obj) to preserve all the args from Field (like order, doc, etc)
+				
+				// TODO must rename fields to be properties
 			)
 			
 			val withNamespace: JsonCirce = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
@@ -119,8 +189,8 @@ object ParseADTToCirceToADT {
 		case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) ⇒ {
 			
 			val base: JsonCirce = JsonCirce.obj(
+				"title" -> JsonCirce.fromString(name),
 				"type" → JsonCirce.fromString("enum"),
-				"name" → JsonCirce.fromString(name),
 				"symbols" → JsonCirce.arr(symbols.map(JsonCirce.fromString): _*)
 			)
 			val withNamespace: JsonCirce = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
@@ -141,8 +211,8 @@ object ParseADTToCirceToADT {
 		case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) => {
 			
 			val base: JsonCirce = JsonCirce.obj(
+				"title" -> JsonCirce.fromString(name),
 				"type" -> JsonCirce.fromString("fixed"),
-				"name" -> JsonCirce.fromString(name),
 				"size" -> JsonCirce.fromInt(size)
 			)
 			
@@ -195,7 +265,7 @@ object ParseADTToCirceToADT {
 	
 	
 	// TODO MAJOR - this thing is resulting in avro-string-like not strictly json-circe ---- see they say 'record' instead of 'object'. Need to clean this up to be purely avro-string and compare it to the original avro-string, and need to clean up above one and make it purely JSON-circe to compare it to original json-string
-	def toCirceAvroString: Algebra[AvroSchema_S, JsonCirce] = Algebra {
+	/*def toCirceAvroString: Algebra[AvroSchema_S, JsonCirce] = Algebra {
 		
 		// ObjectF(List(Property(name = "null", tpe = StringF())), List())
 		case TNull() ⇒ jsonType(
@@ -345,7 +415,7 @@ object ParseADTToCirceToADT {
 		
 		/*case PasswordF() => jsonType("string", format("password"))*/
 		
-	}
+	}*/
 
 	
 	
@@ -361,11 +431,11 @@ object ParseADTToCirceToADT {
 		
 		def decodeAvroSkeuoToCirceToJsonSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libToJsonAltered
 		
-		def decodeJsonSkeuoToCirceToJsonSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libRender
+		def decodeJsonSkeuoToCirceToJsonSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libRenderAltered
 		
 		def decodeAvroSkeuoToCirceToAvroSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libToJsonAltered
 		
-		def decodeJsonSkeuoToCirceToAvroSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libRender
+		def decodeJsonSkeuoToCirceToAvroSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libRenderAltered
 		
 	}
 }
