@@ -115,118 +115,33 @@ found version conflict(s) in library dependencies; some are suspected to be bina
 // PROJECTS
 
 
+enablePlugins(BuildInfoPlugin)
+//enablePlugins(SbtCoursierPlugin)
+/*enablePlugins(SbtDotenv)
+enablePlugins(GitHubPackagesPlugin)*/
+
+
+lazy val skeuomorphExtendedInGit = ProjectRef(uri("https://github.com/statisticallyfit/skeuomorph.git#master"), "skeuomorph")
+
+lazy val skeuomorphExtendedInLocalCoursier = ProjectRef(
+	//file("/development/tmp/.coursier"),
+	file("/development/tmp/.coursier"),
+	"root--coursier"
+)
+
+
 // global is the parent project, which aggregates all the other projects
 lazy val global = project
 	.in(file("."))
 	.settings(
-		name := "SchaemeowMorphism",
-		mysettings,
-		libraryDependencies ++= commonDependencies ++ Seq(
-			
-			allDependencies.scalaLibrary,
-			allDependencies.scalaCompiler,
-			allDependencies.scalaReflect,
-			
-			allDependencies.scalaCheck,
-			allDependencies.scalaCheckCats,
-			
-			allDependencies.specs2Core,
-			allDependencies.specs2ScalaCheck,
-			
-			allDependencies.scalaTest,
-			
-			//allDependencies.discipline,
-			//allDependencies.discipline_core,
-			//allDependencies.discipline_scalatest,
-			//allDependencies.discipline_specs2,
-			
-			
-			allDependencies.cats_core,
-			allDependencies.cats_kernel,
-			allDependencies.cats_laws,
-			allDependencies.cats_free,
-			allDependencies.cats_macros,
-			allDependencies.cats_testkit,
-			allDependencies.cats_effects,
-			
-			allDependencies.shapeless,
-			//allDependencies.kindProjector,
-			
-			allDependencies.zio,
-			allDependencies.zioSchema,
-			allDependencies.zioSchemaAvro,
-			allDependencies.zioSchemaJson,
-			allDependencies.zioSchemaProtobuf,
-			allDependencies.zioSchemaDerivation,
-			allDependencies.zioStream,
-			allDependencies.zioTest,
-			
-			allDependencies.matryoshka,
-			
-			allDependencies.drosteCore,
-			allDependencies.drosteLaws,
-			allDependencies.drosteMacros,
-			allDependencies.drosteScalaCheck,
-			
-			allDependencies.skeuomorph,
-			//allDependencies.skeuomorph_publishLocal,
-			
-			allDependencies.andyGlowScalaJsonSchema,
-			allDependencies.andyGlow_jsonschema_Macros,
-			allDependencies.andyGlow_jsonschema_PlayJson,
-			allDependencies.andyGlow_jsonschema_SprayJson,
-			allDependencies.andyGlow_jsonschema_CirceJson,
-			allDependencies.andyGlow_jsonschema_Json4sJson,
-			allDependencies.andyGlow_jsonschema_UJson,
-			allDependencies.andyGlow_jsonschema_Joda,
-			allDependencies.andyGlow_jsonschema_Cats,
-			allDependencies.andyGlow_jsonschema_Refined,
-			allDependencies.andyGlow_jsonschema_Derived,
-			allDependencies.andyGlow_jsonschema_Enumeratum,
-			allDependencies.andyGlow_jsonschema_Parser,
-			
-			allDependencies.saul_autoschema,
-			
-			allDependencies.docless,
-			/*allDependencies.opetushallitus_scalaschema,
-			// Dependency (fge) for opetus hallitus - was not pulled in by itself, why?
-			allDependencies.fge_jsonschemavalidator,
-			// Dependecy (json4s-core, ast, jackson) - versioning error. If for all the json4s libs, if I don't keep
-			// the version the same, and state them explciitly here, then compiler complains with classpath error (jvalue not found)
-			// Solution source = https://stackoverflow.com/a/47669923
-			//allDependencies.json4s,
-			allDependencies.json4s_jackson,
-			//allDependencies.json4s_jackson_core,
-			//allDependencies.json4s_core,
-			allDependencies.json4s_ast,
-			//allDependencies.json4s_native,
-			//allDependencies.json4s_native_core,
-			allDependencies.json4s_ext,
-			//allDependencies.json4s_scalap,*/
-			
-			allDependencies.avroTools_for_avdlToAvsc,
-			
-			
-			allDependencies.avro4s_core,
-			allDependencies.avro4s_json,
-			
-			/*allDependencies.coursierrepo,
-			allDependencies.sbtdotenv,
-			allDependencies.sbtgitpackages,
-			allDependencies.sbtbuildinfo*/
-			//allDependencies.scala_records
-		)
+		name := "SchaemeowMorphism",/*
+		commonSettings,*/ //mysettings,
 	)
-	.aggregate(
-		//common,
-		//OddsLibrary
-		//multi2
-	
-	)
-	.dependsOn(
-		//OddsLibrary
-	)
-
+	.settings(commonSettings)
+	.enablePlugins(BuildInfoPlugin) // TODO how to know what is the name of my declared plugins in the plugins.sbt file?
+	/*.enablePlugins(SbtDotenv)
+	.enablePlugins(GitHubPackagesPlugin)*/
+	.dependsOn(skeuomorphExtendedInLocalCoursier)
 
 
 
@@ -256,6 +171,9 @@ lazy val allDependencies =
 		
 		//val versionOfAlgebra =  "2.0.0" //"2.0.1"
 		
+		val versionOfSpireKindProjector = "0.9.10"
+		val versionOfTypelevelKindProjector = "0.13.2"
+		
 		val versionOfCats = "2.9.0" // "2.2.0-M3"
 		val versionOfCats_effects = "3.4.8"
 		val versionOfCats_macros = "2.1.1"
@@ -274,7 +192,7 @@ lazy val allDependencies =
 		val versionOfMatryoshka = "0.21.3"
 		
 		
-		val versionOfSkeuomorph = "0.0.0+1151-0f9aaa29+20230821-1816-SNAPSHOT" //"0.2.1"
+		val versionOfSkeuomorph = "0.0.0+1152-fc2e0848+20230823-1625-SNAPSHOT" //"0.2.1"
 		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
 		
 		val versionOfSaulAutoschema = "1.0.4"
@@ -319,6 +237,8 @@ lazy val allDependencies =
 		//val discipline_scalatest = "org.typelevel" %% "discipline-scalatest" % versionOfDiscipline_scalatest % Test
 		//val discipline_specs2 = "org.typelevel" %% "discipline-specs2" % versionOfDiscipline_specs2 % Test
 		
+		val spireKindProjector = "org.spire-math" %% "kind-projector" % versionOfSpireKindProjector
+		val typelevelKindProjector = "org.typelevel" %% "kind-projector" % versionOfTypelevelKindProjector cross CrossVersion.full
 		
 		val cats_core = "org.typelevel" %% "cats-core" % versionOfCats
 		val cats_kernel = "org.typelevel" %% "cats-kernel" % versionOfCats
@@ -426,27 +346,31 @@ lazy val allDependencies =
 	}
 
 
-lazy val commonDependencies = Seq(
-	/*dependencies.logback,
-	dependencies.logstash,
-	dependencies.scalaLogging,
-	dependencies.slf4j,
-	dependencies.typesafeConfig,
-	dependencies.akka,
-	dependencies.scalatest  % "test",
-	dependencies.scalacheck % "test"*/
-)
+//addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10")
+addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
+
+
+//lazy val commonDependencies = Seq(
+//	/*dependencies.logback,
+//	dependencies.logstash,
+//	dependencies.scalaLogging,
+//	dependencies.slf4j,
+//	dependencies.typesafeConfig,
+//	dependencies.akka,
+//	dependencies.scalatest  % "test",
+//	dependencies.scalacheck % "test"*/
+//)
 
 
 
 
 
 // SETTINGS
-
-lazy val mysettings =
-	commonSettings /*++
-		wartremoverSettings ++
-		scalafmtSettings*/
+//
+//lazy val mysettings =
+//	commonSettings
+//		/*wartremoverSettings ++
+//		scalafmtSettings*/
 
 // Recommended scala 2.13 compiler options = https://nathankleyn.com/2019/05/13/recommended-scalac-flags-for-2-13/
 lazy val compilerOptions = Seq(
@@ -468,24 +392,131 @@ lazy val compilerOptions = Seq(
 
 lazy val commonSettings = Seq(
 	scalacOptions ++= compilerOptions,
+	
 	resolvers ++= (/*Seq(Resolver.githubPackages("statisticallyfit"))
-		          ++ */Resolver.sonatypeOssRepos("releases")
-				//++ Seq(Resolver.mavenLocal)
-				++ Resolver.sonatypeOssRepos("snapshots")
-				++ Seq("jitpack" at "https://jitpack.io") // jitpack for opetushallitus
-				++ Seq("Local Coursier Repository" at ("file://" + "/development/tmp/.coursier"))
-				//++ Seq("Local Ivy Repository" at ("file://" + Path.userHome.absolutePath + "/.ivy2/local"))
-		//ThisBuild / useCoursier := false)
-		) /*Seq(
-//"Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
-Resolver.sonatypeOssRepos("releases"), //Resolver.sonatypeRepo("releases"),
-Resolver.sonatypeRepo("snapshots") //Resolver.sonatypeRepo("snapshots"),
-// Resolver for Rainier library
-//Resolver.bintrayRepo("rainier", "maven"),
-// Resolver for evilplot (dependency of Rainier)
-//Resolver.bintrayRepo("cibotech", "public")
-)*/
-)
+				++ */ Resolver.sonatypeOssRepos("releases") // for the kind projector plugin
+	                     //++ Seq(Resolver.mavenLocal)
+	                     ++ Resolver.sonatypeOssRepos("snapshots")
+		              //++ Seq("jitpack" at "https://jitpack.io") // jitpack for opetushallitus
+		              ++ Seq("Local Coursier Repository" at ("file://" + "/development/tmp/.coursier"))
+		              //++ Seq("Local Ivy Repository" at ("file://" + Path.userHome.absolutePath + "/.ivy2/local"))
+		              //ThisBuild / useCoursier := false)
+		              ),
+	libraryDependencies ++= Seq(/*commonDependencies ++*/
+		
+		allDependencies.scalaLibrary,
+		allDependencies.scalaCompiler,
+		allDependencies.scalaReflect,
+		
+		allDependencies.scalaCheck,
+		allDependencies.scalaCheckCats,
+		
+		allDependencies.specs2Core,
+		allDependencies.specs2ScalaCheck,
+		
+		allDependencies.scalaTest,
+		
+		//allDependencies.discipline,
+		//allDependencies.discipline_core,
+		//allDependencies.discipline_scalatest,
+		//allDependencies.discipline_specs2,
+		
+		
+		allDependencies.cats_core,
+		allDependencies.cats_kernel,
+		allDependencies.cats_laws,
+		allDependencies.cats_free,
+		allDependencies.cats_macros,
+		allDependencies.cats_testkit,
+		allDependencies.cats_effects,
+		
+		allDependencies.shapeless,
+		
+		allDependencies.zio,
+		allDependencies.zioSchema,
+		allDependencies.zioSchemaAvro,
+		allDependencies.zioSchemaJson,
+		allDependencies.zioSchemaProtobuf,
+		allDependencies.zioSchemaDerivation,
+		allDependencies.zioStream,
+		allDependencies.zioTest,
+		
+		allDependencies.matryoshka,
+		
+		//allDependencies.spireKindProjector,
+		//allDependencies.typelevelKindProjector,
+		
+		allDependencies.drosteCore,
+		allDependencies.drosteLaws,
+		allDependencies.drosteMacros,
+		allDependencies.drosteScalaCheck,
+		
+		allDependencies.skeuomorph,
+		//allDependencies.skeuomorph_publishLocal,
+		
+		allDependencies.andyGlowScalaJsonSchema,
+		allDependencies.andyGlow_jsonschema_Macros,
+		allDependencies.andyGlow_jsonschema_PlayJson,
+		allDependencies.andyGlow_jsonschema_SprayJson,
+		allDependencies.andyGlow_jsonschema_CirceJson,
+		allDependencies.andyGlow_jsonschema_Json4sJson,
+		allDependencies.andyGlow_jsonschema_UJson,
+		allDependencies.andyGlow_jsonschema_Joda,
+		allDependencies.andyGlow_jsonschema_Cats,
+		allDependencies.andyGlow_jsonschema_Refined,
+		allDependencies.andyGlow_jsonschema_Derived,
+		allDependencies.andyGlow_jsonschema_Enumeratum,
+		allDependencies.andyGlow_jsonschema_Parser,
+		
+		allDependencies.saul_autoschema,
+		
+		allDependencies.docless,
+		/*allDependencies.opetushallitus_scalaschema,
+		// Dependency (fge) for opetus hallitus - was not pulled in by itself, why?
+		allDependencies.fge_jsonschemavalidator,
+		// Dependecy (json4s-core, ast, jackson) - versioning error. If for all the json4s libs, if I don't keep
+		// the version the same, and state them explciitly here, then compiler complains with classpath error (jvalue not found)
+		// Solution source = https://stackoverflow.com/a/47669923
+		//allDependencies.json4s,
+		allDependencies.json4s_jackson,
+		//allDependencies.json4s_jackson_core,
+		//allDependencies.json4s_core,
+		allDependencies.json4s_ast,
+		//allDependencies.json4s_native,
+		//allDependencies.json4s_native_core,
+		allDependencies.json4s_ext,
+		//allDependencies.json4s_scalap,*/
+		
+		allDependencies.avroTools_for_avdlToAvsc,
+		
+		
+		allDependencies.avro4s_core,
+		allDependencies.avro4s_json,
+		
+		/*allDependencies.coursierrepo,
+		allDependencies.sbtdotenv,
+		allDependencies.sbtgitpackages,
+		allDependencies.sbtbuildinfo*/
+		//allDependencies.scala_records
+	)
+) ++ compilerPlugins
+
+
+lazy val compilerPlugins = Seq(
+	libraryDependencies ++= /*(CrossVersion.partialVersion(scalaVersion.value) match {
+		case Some((2, _)) =>*/
+			Seq(
+				//compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10" /*cross CrossVersion.full*/),
+				compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full),
+				
+				// NOTE: got withFilter error (in objectJsonSchemaDecoder) in for-comprehension so using this plugin = https://github.com/oleg-py/better-monadic-for
+				compilerPlugin("com.olegpy"   %% "better-monadic-for" % "0.3.1")
+				//compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
+			)
+	/*case _ => Seq.empty
+}*/)
+
+//addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10")
 
 
 
@@ -507,52 +538,4 @@ csrConfiguration := csrConfiguration.value
 	.withTtl(Some(0.seconds))
 	.withCachePolicies(Vector(CachePolicy.LocalOnly))
 
-
-// Way 2 - adding local subproject dependency
-
-
-/*
-sbt:SchaemeowMorphism> plugins
-In build /development/projects/statisticallyfit/github/learningdataflow/SchaemeowMorphism/:
-Enabled plugins in global:
-au.com.onegeek.sbtdotenv.SbtDotenv
-sbt.plugins.CorePlugin
-sbt.plugins.Giter8TemplatePlugin
-sbt.plugins.IvyPlugin
-sbt.plugins.JUnitXmlReportPlugin
-sbt.plugins.JvmPlugin
-sbt.plugins.MiniDependencyTreePlugin
-sbt.plugins.SemanticdbPlugin
-sbtbuildinfo.BuildInfoPlugin
-sbtghpackages.GitHubPackagesPlugin
-Plugins that are loaded to the build but not enabled in any subprojects:
-sbt.ScriptedPlugin
-sbt.plugins.SbtPlugin
-*/
-enablePlugins(BuildInfoPlugin)
-//enablePlugins(SbtCoursierPlugin)
-enablePlugins(SbtDotenv)
-enablePlugins(GitHubPackagesPlugin)
-
-
-
-// Source
-// https://stackoverflow.com/a/67908451
-// https://xebia.com/blog/git-subproject-compile-time-dependencies-in-sbt/
-// https://stackoverflow.com/questions/42206668/scala-sbt-file-dependency-from-github-repository
-//https://stackoverflow.com/questions/20136075/using-git-local-repository-as-dependency-in-sbt-project
-//https://stackoverflow.com/questions/67861343/sbt-how-to-ensure-that-local-snapshot-dependency-is-picked-up
-lazy val skeuomorphExtendedInLocalCoursier = ProjectRef(
-	//file("/development/tmp/.coursier"),
-	file("/development/tmp/.coursier"),
-	"skeuomorph"
-)
-
-lazy val skeuomorphExtendedInGit = ProjectRef(uri("https://github.com/statisticallyfit/skeuomorph.git#master"), "skeuomorph")
-
-lazy val SchaemeowMorphism = Project("SchaemeowMorphism", file("."))
-	.enablePlugins(BuildInfoPlugin) // TODO how to know what is the name of my declared plugins in the plugins.sbt file?
-	.enablePlugins(SbtDotenv)
-	.enablePlugins(GitHubPackagesPlugin)
-	.dependsOn(skeuomorphExtendedInLocalCoursier)
 

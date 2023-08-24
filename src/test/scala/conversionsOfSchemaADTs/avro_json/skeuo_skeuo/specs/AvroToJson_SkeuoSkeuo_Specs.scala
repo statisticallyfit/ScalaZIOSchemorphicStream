@@ -89,11 +89,12 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	//info(s"\n\n avro-skeuo -> json-skeuo")
 	
 	val stp = AvroStepping(map1IntAvro_R).avroInfoOpt.get
+	
 	info(s"str -> apache: ${stp.parsedApacheAvroStr}")
 	info(s"apache -> skeuo: ${stp.skeuoAvro_fromApache}")
 	info(s"skeuo -> circe: ${stp.interimCirce_fromAvroSKeuo}")
-	info(s"circe -> avro-skeuo: ${funcCirceToAvroSkeuo(stp.interimCirce_fromAvroSKeuo)}")
-	info(s"circe -> json-skeuo: ${funcCirceToJsonSkeuo(stp.interimCirce_fromAvroSKeuo)}")
+	info(s"circe -> avro-skeuo: ${stp.skInfo.skeuoAvro_fromRaw /*funcCirceToAvroSkeuo(stp.interimCirce_fromAvroSKeuo)*/}")
+	info(s"circe -> json-skeuo: ${stp.skInfo.skeuoJson_fromRaw /*funcCirceToJsonSkeuo(stp.interimCirce_fromAvroSKeuo)*/}")
 	
 	
 	def printAvroStringToCirceToAvroSkeuo(listAvroStrings: List[String]): Unit = {

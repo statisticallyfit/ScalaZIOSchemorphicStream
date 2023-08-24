@@ -1,11 +1,34 @@
 package conversionsOfSchemaADTs.avro_json.skeuo_skeuo
 
+// Imports for the jsonSchemaDecoder (from JsonDecoders file from skeuomorph)
+import io.circe._
+import io.circe.Decoder
+import io.circe.Decoder.Result
+
+import cats.syntax.all._
+//import cats.implicits._
+//import cats.syntax._
+
+
+
 import higherkindness.droste._
 import higherkindness.droste.data._
-import higherkindness.skeuomorph.avro.AvroF._
+import higherkindness.droste.syntax.all._
+import higherkindness.droste.syntax.embed._
+import higherkindness.skeuomorph.openapi.schema._
+
+import scala.language.postfixOps
+import scala.language.higherKinds
+//import scala.language.implicitConversions
+
+
+
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import higherkindness.skeuomorph.openapi.JsonSchemaF._
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
+import JsonSchema_S._
+import AvroSchema_S._
+
+
 import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
 
 // TODO look here avro-json map of equivalent types: https://avro.apache.org/docs/1.11.1/specification/_print/
@@ -34,6 +57,285 @@ object Skeuo_Skeuo {
 	// TODO: do all these conversions using Trans (because itis F[A => G[A]): https://github.com/higherkindness/droste/blob/76b206db3ee073aa2ecbf72d4e85d5595aabf913/modules/core/src/main/scala/higherkindness/droste/package.scala#L80
 	
 	/// -----------------------------
+	
+	
+	object TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject {
+		
+		
+		
+		
+		implicit def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
+			referenceJsonSchemaDecoder orElse
+			sumJsonSchemaDecoder orElse
+			objectJsonSchemaDecoder orElse
+			arrayJsonSchemaDecoder orElse
+			enumJsonSchemaDecoder orElse
+			basicJsonSchemaDecoder
+		def objectJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
+			
+			Decoder.instance { c: HCursor =>
+				
+				def propertyExists(name: String): Decoder.Result[Unit] =
+					c.downField(name)
+						.success
+						.fold(DecodingFailure(s"$name property does not exist", c.history).asLeft[Unit])(_ =>
+							().asRight[DecodingFailure]
+						)
+				
+				// TODO is this the meaning of the orElse version below?
+				/*def isObject: Boolean =
+					validateType(c, "object").isRight ||
+					propertyExists("properties").isRight ||
+					propertyExists("allOf").isRight*/
+				
+				def isObject: Boolean =
+					validateType(c, "object").isRight &&
+					propertyExists("properties").isRight ||
+					propertyExists("required").isRight ||
+					propertyExists("allOf").isRight
+				
+				
+				// HELP don't know why orElse here is not working
+				/*def isObject_HELP_ORELSE: Decoder.Result[Unit] =
+					validateType(c, "object") orElse
+					propertyExists("properties") orElse
+					propertyExists("allOf")*/
+				
+				// Added by @statisticallyfit
+				def isObjectNamed: Boolean =
+					isObject &&
+					propertyExists("title").isRight
+					
+					/*validateType(c, "object").isRight &&
+					propertyExists("title").isRight &&
+					propertyExists("properties").isRight ||
+					propertyExists("required").isRight*/ // not mandatory that is why use OR instead of AND
+				
+				
+				// Added by @statisticallyfit
+				def isObjectMap: Boolean =
+					validateType(c, "object").isRight &&
+					propertyExists("title").isRight &&
+					propertyExists("additionalProperties").isRight
+				
+				
+				
+				// Added by @statisticallyfit:
+				// Separating by different kinds of object classes so can properly interpret a MAP from avro into json
+				def makeJsonCirceObjectMap: Result[A] = {
+					
+					val objmap: (String, JsonSchema_S.AdditionalProperties[A]) => JsonSchema_S[A] = (title, addProps) => JsonSchema_S.objectMap[A](name = title, additionalProperties = addProps)
+					
+					
+					val resultArgs: Result[(String, JsonSchema_S.AdditionalProperties[A])] = for {
+						
+						// NOTE: got withFilter error here in for-comprehension so using this plugin = https://github.com/oleg-py/better-monadic-for
+						
+						title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
+						addProps: JsonSchema_S.AdditionalProperties[A] <- {
+							//.as[Option[A]]
+							
+							val resOptMap: Result[Option[Map[String, A]]] = c.downField("additionalProperties").as[Option[Map[String, A]]](
+								Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, jsonSchemaDecoder[A]))
+							)
+							
+							val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
+							
+							val resAddedProps: Result[JsonSchema_S.AdditionalProperties[A]] = {
+								resMap.map(_.toList.map(tup => JsonSchema_S.AdditionalProperties.apply[A](tup._2)).head)
+								//resMap.map((mapStrA: Map[String, A]) => mapStrA.toList.map((tup: (String, A)) => JsonSchema_S.AdditionalProperties(tup._2) ).head )
+								
+							}
+							println(s"\n\nINSIDE makeJsonCirceObjectMap:")
+							println(s"resOptMap  = $resOptMap")
+							println(s"resMap  = $resMap")
+							println(s"resAddedProps = $resAddedProps")
+							
+							resAddedProps
+						}
+					} yield /*objmap*/ (title, addProps) //JsonSchema_S.objectMap[A](name = title, additionalProperties = addProps).embed
+					
+					
+					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case (title, addProps) => objmap(title, addProps) }
+					val result_embed: Result[A] = resultArgs.map { case (title, addProps) => objmap(title, addProps).embed }
+					
+					println(s"\n\nINSIDE makeJsonCirceObjectMap:")
+					println(s"result (not embed) = $result_noEmbed")
+					println(s"result (embed) = $result_embed")
+					
+					result_embed
+				}
+				
+				
+				def makeJsonCirceObjectNamed: Result[A] = {
+					
+					val objname: (String, List[JsonSchema_S.Property[A]], List[String]) => JsonSchema_S[A] = (title, properties, required) => JsonSchema_S.objectName[A](name = title, properties = properties, required = required)
+					
+					val resultArgs: Result[(String, List[JsonSchema_S.Property[A]], List[String])] =
+						for {
+							title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
+							required: List[String] <- c.downField("required").as[Option[List[String]]].map(_.getOrElse(List.empty))
+							properties: List[JsonSchema_S.Property[A]] <- {
+								//.as[Option[A]]
+								val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
+									Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, jsonSchemaDecoder[A]))
+								)
+								
+								val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
+								
+								val resListProps: Result[List[JsonSchema_S.Property[A]]] = resMap
+									.map((mapStrA: Map[String, A]) => mapStrA.toList.map((JsonSchema_S.Property.apply[A] _).tupled /*{
+									val funcTup: ((String, A)) => JsonSchema_S.Property[A] = (JsonSchema_S.Property.apply[A] _).tupled
+									funcTup(tup)
+								}*/
+									)
+									)
+								
+								
+								println(s"\n\nINSIDE makeJsonCirceObjectNamed:")
+								println(s"resOptMap  = $resOptMap")
+								println(s"resMap  = $resMap")
+								println(s"resListProps = $resListProps")
+								
+								resListProps
+							}
+						} yield (title, properties, required) //JsonSchema_S.objectName[A](title, properties, required).embed
+					
+					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case (title, ps, rs) => objname(title, ps, rs) }
+					val result_embed: Result[A] = resultArgs.map { case (title, ps, rs) => objname(title, ps, rs).embed }
+					
+					println(s"\n\nINSIDE makeJsonCirceObjectNamed:")
+					println(s"result (not embed) = $result_noEmbed")
+					println(s"result (embed) = $result_embed")
+					
+					result_embed
+					
+				}
+				
+				
+				def makeJsonCirceObjectSimple = {
+					
+					val objsimple: (List[JsonSchema_S.Property[A]], List[String]) => JsonSchema_S[A] = (properties, required) => JsonSchema_S.`object`[A](properties, required)
+					
+					
+					val resultArgs: Result[(List[JsonSchema_S.Property[A]], List[String])] =
+						for {
+							//itle: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
+							required: List[String] <- c.downField("required").as[Option[List[String]]].map(_.getOrElse(List.empty))
+							properties: List[JsonSchema_S.Property[A]] <- {
+								//.as[Option[A]]
+								val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
+									Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, jsonSchemaDecoder[A]))
+								)
+								
+								val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
+								
+								val resListProps: Result[List[JsonSchema_S.Property[A]]] = resMap
+									.map((mapStrA: Map[String, A]) => mapStrA.toList.map((JsonSchema_S.Property.apply[A] _).tupled /*{
+									val funcTup: ((String, A)) => JsonSchema_S.Property[A] = (JsonSchema_S.Property.apply[A] _).tupled
+									funcTup(tup)
+								}*/
+									)
+									)
+								
+								
+								println(s"\n\nINSIDE makeJsonCirceObjectNamed:")
+								println(s"resOptMap  = $resOptMap")
+								println(s"resMap  = $resMap")
+								println(s"resListProps = $resListProps")
+								
+								resListProps
+							}
+						} yield (properties, required) // JsonSchema_S.`object`[A](properties, required.getOrElse(List.empty)).embed
+					
+					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case (ps, rs) => objsimple(ps, rs) }
+					val result_embed: Result[A] = resultArgs.map { case (ps, rs) => objsimple(ps, rs).embed }
+					
+					println(s"\n\nINSIDE makeJsonCirceObjectSimple:")
+					println(s"result (not embed) = $result_noEmbed")
+					println(s"result (embed) = $result_embed")
+					
+					result_embed
+				}
+				
+				
+				// Case matching to decide which object-type to use
+				isObjectMap match {
+					
+					case true => makeJsonCirceObjectMap
+					
+					case false => isObjectNamed match {
+						
+						case true => makeJsonCirceObjectNamed
+						
+						case false => makeJsonCirceObjectSimple
+					}
+				}
+				
+				
+			}
+		
+		
+		
+		
+		
+		implicit val referenceDecoder: Decoder[Reference] = Decoder.forProduct1(s"$$ref")(Reference.apply)
+		
+		implicit def orReferenceDecoder[A: Decoder]: Decoder[Either[A, Reference]] =
+			Decoder[Reference].map(_.asRight[A]) orElse Decoder[A].map(_.asLeft[Reference])
+		
+		private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+			import JsonSchema_S._
+			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
+				case ("integer", Some("int32")) => integer[A]().embed.asRight
+				case ("integer", Some("int64")) => long[A]().embed.asRight
+				case ("integer", _) => integer[A]().embed.asRight
+				case ("number", Some("float")) => float[A]().embed.asRight
+				case ("number", Some("double")) => double[A]().embed.asRight
+				case ("number", _) => float[A]().embed.asRight
+				case ("string", Some("byte")) => byte[A]().embed.asRight
+				case ("string", Some("binary")) => binary[A]().embed.asRight
+				case ("boolean", _) => boolean[A]().embed.asRight
+				case ("string", Some("date")) => date[A]().embed.asRight
+				case ("string", Some("date-time")) => dateTime[A]().embed.asRight
+				case ("string", Some("password")) => password[A]().embed.asRight
+				case ("string", _) => string[A]().embed.asRight
+				case (x, _) => s"$x is not well formed type".asLeft
+			}
+		}
+		
+		private def validateType(c: HCursor, expected: String): Decoder.Result[Unit] =
+			c.downField("type").as[String].flatMap {
+				case `expected` => ().asRight
+				case actual => DecodingFailure(s"$actual is not expected type $expected", c.history).asLeft
+			}
+		
+		private def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
+			Decoder.instance(c =>
+				for {
+					values <- c.downField("enum").as[List[String]]
+					_ <- validateType(c, "string")
+				} yield JsonSchema_S.enum[A](values).embed
+			)
+		
+		private def sumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
+			Decoder.instance(_.downField("oneOf").as[List[A]].map(JsonSchema_S.sum[A](_).embed))
+		
+		
+		private def arrayJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
+			Decoder.instance { c =>
+				for {
+					items <- c.downField("items").as[A](jsonSchemaDecoder[A])
+					_ <- validateType(c, "array")
+				} yield JsonSchema_S.array(items).embed
+			}
+		
+		private def referenceJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
+			Decoder[Reference].map(x => JsonSchema_S.reference[A](x.ref).embed)
+		
+		
+		
+	}
 	
 	
 	object TransSchemaImplicits {

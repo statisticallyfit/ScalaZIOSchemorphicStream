@@ -6,10 +6,16 @@ import higherkindness.droste._
 import higherkindness.droste.data.Fix
 
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import higherkindness.skeuomorph.openapi.JsonDecoders._
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
 import JsonSchema_S._
 import AvroSchema_S.{Field ⇒ FieldAvro, _}
+
+
+// NOTE: commenting out the JsonDecoders file so I can import the jsonSchemaDecoders from my Skeuo_Skeuo file (to easily update) instead of having to publish skeuomorph each time I make a change.
+import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject.{jsonSchemaDecoder, _}
+//import higherkindness.skeuomorph.openapi.JsonDecoders._
+
+
 
 import io.circe.Decoder.Result
 import io.circe.{Decoder, Json ⇒ JsonCirce}
@@ -418,7 +424,7 @@ object ParseADTToCirceToADT {
 	}*/
 
 	
-	
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
 	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoEmbed_JA /*, skeuoProject_AJ*/}
 	
 	
@@ -428,7 +434,7 @@ object ParseADTToCirceToADT {
 	
 	
 	object DecodingSkeuo {
-		
+		//jsonSchemaDecoder
 		def decodeAvroSkeuoToCirceToJsonSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libToJsonAltered
 		
 		def decodeJsonSkeuoToCirceToJsonSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libRenderAltered

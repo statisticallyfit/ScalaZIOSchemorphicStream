@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ScalaCompilerConfiguration">
-    <profile name="sbt 1" modules="root,scala-records_2722,scala-records_9848,scalazioschemorphicstream_573" />
-    <profile name="sbt 2" modules="10_misc.SchaemeowMorphism,ScalaZIOSchemorphicStream,SchaemeowMorphism">
+    <profile name="sbt 1" modules="root,root--coursier,scala-records_2722,scala-records_9848,scalazioschemorphicstream_573" />
+    <profile name="sbt 2" modules="10_misc.SchaemeowMorphism,ScalaZIOSchemorphicStream">
       <option name="postfixOps" value="true" />
       <option name="implicitConversions" value="true" />
       <option name="higherKinds" value="true" />
@@ -29,6 +29,19 @@
     <profile name="sbt 5" modules="synthPlugin,tests">
       <option name="deprecationWarnings" value="true" />
       <option name="featureWarnings" value="true" />
+    </profile>
+    <profile name="sbt 6" modules="SchaemeowMorphism">
+      <option name="postfixOps" value="true" />
+      <option name="implicitConversions" value="true" />
+      <option name="higherKinds" value="true" />
+      <option name="existentials" value="true" />
+      <option name="deprecationWarnings" value="true" />
+      <option name="uncheckedWarnings" value="true" />
+      <option name="featureWarnings" value="true" />
+      <plugins>
+        <plugin path="$PROJECT_DIR$/../../../../../tmp/.coursier/https/repo1.maven.org/maven2/org/typelevel/kind-projector_2.12.17/0.13.2/kind-projector_2.12.17-0.13.2.jar" />
+        <plugin path="$PROJECT_DIR$/../../../../../tmp/.coursier/https/repo1.maven.org/maven2/com/olegpy/better-monadic-for_2.12/0.3.1/better-monadic-for_2.12-0.3.1.jar" />
+      </plugins>
     </profile>
   </component>
 </project>
