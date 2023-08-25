@@ -7,12 +7,12 @@ import utilMain.UtilMain.implicits._
  *
  */
 object Data {
-	
+
 	// TODO which definition to use for null?
-	
+
 	// (1) From json-skeuo:
 	// ObjectF(properties = List(), required = List())
-	
+
 	// Wrong - yields Left decoding error ' not well formed type' when converting funCirceToJson/AvroSkeuo
 	/*val nullJson_simple_R: String =
 	"""
@@ -20,7 +20,7 @@ object Data {
 	  |  "type": "null"
 	  |}
 	  |""".stripMargin.trim()*/
-	  
+
 	val nullJson_R: String =
 		"""
 		  |{
@@ -29,7 +29,7 @@ object Data {
 		  |  "required": []
 		  |}
 		  |""".stripMargin.trim
-		  
+
 	 // (2) From json-skeuo:
 	// ObjectF(List(Property(name = "null", tpe = StringF())), List())
 	val nullJson_complicated_R: String = """
@@ -43,9 +43,9 @@ object Data {
 	  |  "required": []
 	  |}
 	  |""".stripMargin
-	
-	
-	
+
+
+
 	val intJson_R: String =
 		"""
 		  |{
@@ -53,23 +53,23 @@ object Data {
 		  |  "format": "int32"
 		  |}
 		  |""".stripMargin.trim
-	
-	
+
+
 	val strJson_R: String =
 		"""
 		  |{
 		  |  "type": "string"
 		  |}
 		  |""".stripMargin.trim
-	
+
 	val booleanJson_R: String =
 		"""
 		  |{
 		  |  "type": "boolean"
 		  |}
 		  |""".stripMargin.trim
-	
-	
+
+
 	val longJson_R: String =
 		"""
 		  |{
@@ -77,7 +77,7 @@ object Data {
 		  |  "format": "int64"
 		  |}
 		  |""".stripMargin.trim
-	
+
 	val floatJson_R: String =
 		"""
 		  |{
@@ -85,7 +85,7 @@ object Data {
 		  |  "format": "float"
 		  |}
 		  |""".stripMargin.trim
-	
+
 	val doubleJson_R: String =
 		"""
 		  |{
@@ -93,8 +93,8 @@ object Data {
 		  |  "format": "double"
 		  |}
 		  |""".stripMargin.trim
-	
-	
+
+
 	val bytesJson_R: String =
 		"""
 		  |{
@@ -102,8 +102,8 @@ object Data {
 		  |  "format": "byte"
 		  |}
 		  |""".stripMargin.trim()
-		  
-	
+
+
 	val array1IntJson_R: String =
 		"""
 		  |{
@@ -114,7 +114,7 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin.manicure
-	
+
 	val array1StrJson_R: String =
 		"""
 		  |{
@@ -124,8 +124,8 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin.trim
-	
-	
+
+
 	val array3IntJson_R: String =
 		"""
 		  |{
@@ -142,11 +142,12 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin.trim
-	
-	
+
+
 	val map1IntJson_R: String =
 		"""
 		  |{
+		  |  "title": "TITLE_NAME",
 		  |  "type": "object",
 		  |  "additionalProperties": {
 		  |     "type": "integer",
@@ -154,7 +155,7 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin.manicure
-	
+
 	val map1StrJson_R: String =
 		"""
 		  |{
@@ -172,8 +173,8 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin.trim*/
-	
-	
+
+
 	val map3IntJson_R: String =
 		"""
 		  |{
@@ -190,11 +191,11 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin.trim
-	
-	
-	
+
+
+
 	// TODO: find a way to write the json-skeuo equivalents so that when converted to json-circe the results contain the title too.
-	
+
 	// NOTE (from autoschema generation not from original json file)
 	val recordExPositionJson_AR: String =
 		"""
@@ -213,7 +214,16 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin.trim()
-		  
+//	val map1StrJson_R: String =
+//		"""
+//		  |{
+//		  |  "type": "object",
+//		  |  "additionalProperties": {
+//		  |    "type": "string"
+//		  |  }
+//		  |}
+//		  |""".stripMargin.trim()
+
 	// NOTE: from tati original data file
 	val recordExPositionJson_R: String =
 		"""
@@ -248,7 +258,7 @@ object Data {
 			}
 		}
 		   */
-	
+
 	// NOTE (from autoschema generation not from original json file)
 	val recordExLocationJson_R: String =
 		"""{
@@ -293,8 +303,8 @@ object Data {
 		  |  }
 		  |}
 		  |""".stripMargin.trim
-	
-	
+
+
 	/**
 	 * TODO
 	 * null, int, string
