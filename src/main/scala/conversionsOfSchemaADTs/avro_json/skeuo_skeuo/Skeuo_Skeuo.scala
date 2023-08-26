@@ -65,23 +65,36 @@ object Skeuo_Skeuo {
 	object TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject {
 
 
+		private def identifyDecoderWithPriorityBasicDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+
+
+			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
+
+				case ("integer", _) | ("number", _) | ("string", _) | ("boolean", _) => basicJsonSchemaDecoder[A]
+
+				//case (x, _) => s"$x is not well formed type".asLeft
+				case _ => jsonSchemaDecoder[A]
+			}
+		}
 
 
 		implicit def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
+			    // TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
+		     //identifyDecoderWithPriorityBasicDecoder orElse
 			referenceJsonSchemaDecoder orElse
 			sumJsonSchemaDecoder orElse
-			objectJsonSchemaDecoder orElse
 			arrayJsonSchemaDecoder orElse
-			enumJsonSchemaDecoder orElse
-			basicJsonSchemaDecoder
+			objectJsonSchemaDecoder orElse
+			enumJsonSchemaDecoder /*orElse
+			basicJsonSchemaDecoder*/
 
-		def additionalPropsJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[JsonSchema_S.AdditionalProperties[A]] =
+		/*def additionalPropsJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[JsonSchema_S.AdditionalProperties[A]] =
 			Decoder.instance { c =>
 				for {
 					addedProps: A <- c.downField("additionalProperties").as[A](jsonSchemaDecoder[A])
 					_ <- validateType(c, "object")
 				} yield JsonSchema_S.AdditionalProperties[A](addedProps)
-			}
+			}*/
 
 
 		def objectJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
@@ -160,50 +173,13 @@ object Skeuo_Skeuo {
 
 						addProps: AdditionalProperties[A] <- {
 
-							val resTpe: Result[A] = c.downField("additionalProperties").as[A](basicJsonSchemaDecoder[A])
+							val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyDecoderWithPriorityBasicDecoder[A])
 
 							val resAddProps: Result[JsonSchema_S.AdditionalProperties[A]] = resTpe.map(tpe => JsonSchema_S.AdditionalProperties(tpe = tpe))
-
-							//-----------
-
-							/*val resOptMap: Result[Option[Map[String, AdditionalProperties[A]]]] = c.downField("additionalProperties").as[Option[Map[String, AdditionalProperties[A]]]](
-								Decoder.decodeOption(Decoder.decodeMap[String, AdditionalProperties[A]](KeyDecoder.decodeKeyString, additionalPropsJsonSchemaDecoder[A]))
-							)
-
-							val resMap: Result[Map[String, AdditionalProperties[A]]] = resOptMap.map(_.getOrElse(Map.empty))
-
-
-							val resAddProps: Result[AdditionalProperties[A]] = resMap
-								.map((mapStrA: Map[String, AdditionalProperties[A]]) => mapStrA.toList.head._2)*/
-
-							// --------------------------------------------
-
-							/*val resOptHCursor: Result[A] = c.downField("additionalProperties").as[A](Decoder.instance { cInner: HCursor =>
-								for {
-									tpeInner: A <- cInner.downField("type").as[A](jsonSchemaDecoder[A])
-								} yield tpeInner
-							})
-
-							val resAddProps: Result[AdditionalProperties[A]] = resOptHCursor.map((tpe: A) => AdditionalProperties[A](tpe = tpe))*/
-
-
-							// -----------------
-
-							/*val resOptStr: Result[Option[String]] = c.downField("additionalProperties").as[Option[String]](
-								Decoder.decodeOption(Decoder.decodeString))
-							// TODO if this doens't work try with converting str -> circe and using again decodeJson(_) where the _ is the part { type: "something" } after additionalproperties (confirm)
-
-							val resStr: Result[String] = resOptStr.map(_.getOrElse(""))*/
-
 
 							println(s"\n\nINSIDE makeJsonCirceObjectMap:")
 							println(s"resTpe = $resTpe")
 							println(s"resAddProps = $resAddProps")
-							/*println(s"resOptHCursor  = $resOptHCursor")
-							println(s"resAddProps: $resAddProps")
-							println(s"resOptStr  = $resOptStr")
-							println(s"resStr  = $resStr")*/
-
 
 							resAddProps
 						}
@@ -233,7 +209,7 @@ object Skeuo_Skeuo {
 							properties: List[JsonSchema_S.Property[A]] <- {
 								//.as[Option[A]]
 								val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
-									Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, jsonSchemaDecoder[A]))
+									Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyDecoderWithPriorityBasicDecoder[A]))
 								)
 
 								val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
@@ -280,7 +256,7 @@ object Skeuo_Skeuo {
 							properties: List[JsonSchema_S.Property[A]] <- {
 								//.as[Option[A]]
 								val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
-									Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, jsonSchemaDecoder[A]))
+									Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyDecoderWithPriorityBasicDecoder[A]))
 								)
 
 								val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
@@ -341,9 +317,12 @@ object Skeuo_Skeuo {
 		implicit def orReferenceDecoder[A: Decoder]: Decoder[Either[A, Reference]] =
 			Decoder[Reference].map(_.asRight[A]) orElse Decoder[A].map(_.asLeft[Reference])
 
+
 		private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 			import JsonSchema_S._
+
 			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
+
 				case ("integer", Some("int32")) => integer[A]().embed.asRight
 				case ("integer", Some("int64")) => long[A]().embed.asRight
 				case ("integer", _) => integer[A]().embed.asRight
@@ -382,7 +361,7 @@ object Skeuo_Skeuo {
 		private def arrayJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 			Decoder.instance { c =>
 				for {
-					items <- c.downField("items").as[A](jsonSchemaDecoder[A])
+					items <- c.downField("items").as[A](identifyDecoderWithPriorityBasicDecoder[A]) // NOTE: was jsonSchemaDecoder[A]
 					_ <- validateType(c, "array")
 				} yield JsonSchema_S.array(items).embed
 			}
@@ -391,8 +370,6 @@ object Skeuo_Skeuo {
 			Decoder[Reference].map((x: Reference) => JsonSchema_S.reference[A](x.ref).embed)
 
 
-		private def myStringJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[String] =
-			Decoder[String].map((typ: String) => typ)
 
 	}
 

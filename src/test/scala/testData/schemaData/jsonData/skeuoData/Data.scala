@@ -151,7 +151,8 @@ object Data {
 		),
 		required = List()
 	)
-	val recordExPositionJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
+	val recordExPositionJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNameF(
+		name = "Position",
 		properties = List(
 			Property(name = "coordinates", tpe = Fix(ArrayF(Fix(FloatF()))))
 		),
@@ -207,7 +208,7 @@ object Data {
 
 	val testAddProps2: Fix[JsonSchema_S] = Fix(ObjectMapF(
 		name = "upper_name_here",
-		additionalProperties = AdditionalProperties(tpe = Fix(StringF()))
+		additionalProperties = AdditionalProperties(tpe = recordExPositionJson_Fix_S)
 	))
 
 	val recordExLocationJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNameF(

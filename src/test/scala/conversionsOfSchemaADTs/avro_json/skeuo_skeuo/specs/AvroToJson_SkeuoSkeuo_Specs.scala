@@ -95,6 +95,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	val skj: Json = libRenderAltered(testAddProps2)
 	info(s"skeuo-json -> json-circe-str: ${skj.manicure}")
 	info(s"json-circe-str --> skeuo-json: ${funcCirceToJsonSkeuo(skj)}")
+	info(s"json-circe-str --> skeuo-avro: ${funcCirceToAvroSkeuo(skj)}")
 
 //	info(s"\nTESTING OBJECT NAME:")
 //	info(s"skeuo-json: ${recordExLocationJson_Fix_S}")
