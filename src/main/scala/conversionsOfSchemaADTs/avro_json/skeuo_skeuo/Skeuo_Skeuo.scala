@@ -160,42 +160,50 @@ object Skeuo_Skeuo {
 
 						addProps: AdditionalProperties[A] <- {
 
-							/*val resTpe: Result[A] = c.downField("additionalProperties").as[A](jsonSchemaDecoder[A])
+							val resTpe: Result[A] = c.downField("additionalProperties").as[A](basicJsonSchemaDecoder[A])
 
-							val resAddProps: Result[JsonSchema_S.AdditionalProperties[A]] = resTpe.map(tpe => JsonSchema_S.AdditionalProperties(tpe = tpe))*/
+							val resAddProps: Result[JsonSchema_S.AdditionalProperties[A]] = resTpe.map(tpe => JsonSchema_S.AdditionalProperties(tpe = tpe))
+
+							//-----------
 
 							/*val resOptMap: Result[Option[Map[String, AdditionalProperties[A]]]] = c.downField("additionalProperties").as[Option[Map[String, AdditionalProperties[A]]]](
 								Decoder.decodeOption(Decoder.decodeMap[String, AdditionalProperties[A]](KeyDecoder.decodeKeyString, additionalPropsJsonSchemaDecoder[A]))
-							)*/
+							)
+
+							val resMap: Result[Map[String, AdditionalProperties[A]]] = resOptMap.map(_.getOrElse(Map.empty))
 
 
+							val resAddProps: Result[AdditionalProperties[A]] = resMap
+								.map((mapStrA: Map[String, AdditionalProperties[A]]) => mapStrA.toList.head._2)*/
 
-							val resOptHCursor: Result[A] = c.downField("additionalProperties").as[A]((Decoder.instance {
-								cInsideAddProps : HCursor => for {
-									typeInsideAddProps: A <- cInsideAddProps.downField("type").as[A](jsonSchemaDecoder[A])
-								} yield typeInsideAddProps
-							}))
+							// --------------------------------------------
+
+							/*val resOptHCursor: Result[A] = c.downField("additionalProperties").as[A](Decoder.instance { cInner: HCursor =>
+								for {
+									tpeInner: A <- cInner.downField("type").as[A](jsonSchemaDecoder[A])
+								} yield tpeInner
+							})
+
+							val resAddProps: Result[AdditionalProperties[A]] = resOptHCursor.map((tpe: A) => AdditionalProperties[A](tpe = tpe))*/
 
 
-							val resAddProps: Result[AdditionalProperties[A]] = resOptHCursor.map((tpe: A) => AdditionalProperties[A](tpe = tpe))
+							// -----------------
 
-
-
-							////-----
 							/*val resOptStr: Result[Option[String]] = c.downField("additionalProperties").as[Option[String]](
 								Decoder.decodeOption(Decoder.decodeString))
 							// TODO if this doens't work try with converting str -> circe and using again decodeJson(_) where the _ is the part { type: "something" } after additionalproperties (confirm)
 
-							val resStr: Result[String] = resOptStr.map(_.getOrElse(""))
+							val resStr: Result[String] = resOptStr.map(_.getOrElse(""))*/
 
-
-							val resCirce: Result[JsonCirce] = resStr.flatMap(str => Decoder[JsonCirce].decodeJson(unsafeParse(str)))
-
-							val resAddProps: Result[AdditionalProperties[A]] = resStr.map(_.head._2)*/
 
 							println(s"\n\nINSIDE makeJsonCirceObjectMap:")
-							println(s"resOptHCursor  = $resOptHCursor")
+							println(s"resTpe = $resTpe")
+							println(s"resAddProps = $resAddProps")
+							/*println(s"resOptHCursor  = $resOptHCursor")
 							println(s"resAddProps: $resAddProps")
+							println(s"resOptStr  = $resOptStr")
+							println(s"resStr  = $resStr")*/
+
 
 							resAddProps
 						}
