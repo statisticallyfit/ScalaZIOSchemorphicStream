@@ -78,27 +78,7 @@ object Data {
 
 
 	// TODO - map is an ObjectF must think about this
-	/*val map1IntJson_mapname_S: JsonSchema_S[JsonSchema_S[Int]] = ObjectF(
-		properties = List(
-			Property(name = "map", tpe = IntegerF())
-		),
-		required = List()
-	)
-	val map1IntJson_objectname_S: JsonSchema_S[JsonSchema_S[Int]] = ObjectF(
-		properties = List(
-			Property(name = "object", tpe = IntegerF())
-		),
-		required = List()
-	)*/
 
-	//val map1IntJson_Circe_S: JsonSchema_S[JsonSchema_S[JsonCirce]] = MapF(IntegerF())
-
-	/*val map1IntJson_mapname_Fix_S: Fix[JsonSchema_S] = Fix(ObjectF(
-		properties = List(
-			Property(name = "map", tpe = Fix(IntegerF()))
-		),
-		required = List()
-	))*/
 	val map1IntJson_objname_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNameF(
 		name = "MapNameObj",
 		properties = List(Property(name = "map", tpe = Fix(IntegerF()))),
@@ -114,6 +94,8 @@ object Data {
 	val map1IntJson_objmap_Fix_S: Fix[JsonSchema_S] = Fix(ObjectMapF(name = "MapNameAddProps",
 		additionalProperties = AdditionalProperties(tpe = Fix(IntegerF()))
 	))
+
+
 
 
 	/*val map1StrJson_S: JsonSchema_S[JsonSchema_S[String]] = MapF(StringF())
@@ -160,6 +142,12 @@ object Data {
 	))
 
 
+	val map1IntJson_innerPosRecord_Fix_S: Fix[JsonSchema_S] = Fix(ObjectMapF(
+		name = "upper_name_here",
+		additionalProperties = AdditionalProperties(tpe = recordExPositionJson_Fix_S)
+	))
+
+
 
 	// TODO test diff between Float and Nothing in innermost type.
 	val recordExLocationJson_S: JsonSchema_S[JsonSchema_S[JsonSchema_S[JsonSchema_S[Float]]]] = ObjectF(
@@ -198,18 +186,6 @@ object Data {
 		required = List("position", "sensorName", "name", "id")
 	)
 
-	/*val testAddProps: Fix[JsonSchema_S] = Fix(ObjectNameF(
-		name = "upper_name_here",
-		properties = List(
-			Property(name = "additionalProperties", tpe = Fix(StringF()))
-		),
-		required = List()
-	))*/
-
-	val testAddProps2: Fix[JsonSchema_S] = Fix(ObjectMapF(
-		name = "upper_name_here",
-		additionalProperties = AdditionalProperties(tpe = recordExPositionJson_Fix_S)
-	))
 
 	val recordExLocationJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNameF(
 		name = "Locations",

@@ -19,7 +19,7 @@ import utilMain.UtilMain
 import utilMain.UtilMain.implicits._
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo._
 import io.circe.Decoder.Result
-import io.circe.Json
+import io.circe.{Json => JsonCirce}
 import org.apache.avro.Schema
 import org.specs2.reporter.Reporter
 
@@ -65,21 +65,27 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 		info(s"\nTesting this kind: ${title}")
 
-		val theCirce = libToJsonAltered(theArgAvro)
-		info(s"\n avro-skeuo ---> json-circe: ${theCirce}")
-		val theAvroSkeuo = funcCirceToAvroSkeuo(theCirce)
-		info(s"\ncirce --> avro-skeuo: ${theAvroSkeuo}")
-		//printAvroStringToCirceToAvroSkeuo(args_avroStr)
+		val ca: JsonCirce = libToJsonAltered(theArgAvro)
+		info(s"\n avro-skeuo ---> circe: ${ca}")
+		//val theAvroSkeuo = funcCirceToAvroSkeuo(theCirce)
+		info(s"\navro-skeuo --> circe --> avro-skeuo: ${funcCirceToAvroSkeuo(ca)}")
+		info(s"\navro-skeuo --> circe --> json-skeuo: ${funcCirceToJsonSkeuo(ca)}")
+		/*info(s"\navro-skeuo --> circe --> avro-skeuo: ${DecodingSkeuo.decodeAvroSkeuoToCirceToAvroSkeuo(theArgAvro)}")
+		info(s"\navro-skeuo --> circe --> json-skeuo: ${DecodingSkeuo.decodeAvroSkeuoToCirceToJsonSkeuo(theArgAvro)}")*/
 
 
 		// json-skeuo --> circe
-		info(s"\njson-skeuo -> circe: ${libRenderAltered(theArgJson)}")
+		val cj: JsonCirce = libRenderAltered(theArgJson)
+		info(s"\njson-skeuo -> circe: ${cj}")
 		// json-skeuo --> avro-skeuo
-		info(s"\njson-skeuo -> circe -> avro-skeuo: ${DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(theArgJson)}")
+		info(s"\njson-skeuo --> circe -> avro-skeuo: ${funcCirceToAvroSkeuo(cj)}")
+		info(s"\njson-skeuo --> circe -> json-skeuo: ${funcCirceToJsonSkeuo(cj)}")
+		/*info(s"\njson-skeuo --> circe -> avro-skeuo: ${DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(theArgJson)}")
+		info(s"\njson-skeuo --> circe -> json-skeuo: ${DecodingSkeuo.decodeJsonSkeuoToCirceToJsonSkeuo(theArgJson)}")*/
 	}
 
 
-	//testCirceToAvroSkeuo("map thing: map (str avro) --> circe -> avro-skeuo", map1IntAvro_Fix_S, map1IntJson_objectname_Fix_S)
+	testCirceToAvroSkeuo("map : skeuo -> circe -> skeuo", map1IntAvro_Fix_S, map1IntJson_objmap_Fix_S/*map1IntJson_innerPosRecord_Fix_S*/)
 	/*info(s"\n\nnow map avro: ")
 	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))
 
@@ -87,19 +93,6 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	printJsonStringToCirceToAvroSkeuo(List(map1IntJson_R))*/
 
 
-	//info(s"\n\n avro-skeuo -> json-skeuo")
-
-
-	info(s"\nTESTING ADD PROPS:")
-	info(s"skeuo-json: ${testAddProps2}")
-	val skj: Json = libRenderAltered(testAddProps2)
-	info(s"skeuo-json -> json-circe-str: ${skj.manicure}")
-	info(s"json-circe-str --> skeuo-json: ${funcCirceToJsonSkeuo(skj)}")
-	info(s"json-circe-str --> skeuo-avro: ${funcCirceToAvroSkeuo(skj)}")
-
-//	info(s"\nTESTING OBJECT NAME:")
-//	info(s"skeuo-json: ${recordExLocationJson_Fix_S}")
-//	info(s"skeuo-json -> json-str: ${libRenderAltered(recordExLocationJson_Fix_S).manicure}")
 
 
 	// NOTE first debug object simple first to see how decodermap is extracting the fields - only then do object map (below)
