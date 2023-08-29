@@ -145,9 +145,15 @@ object Skeuo_Skeuo {
 				def isObjectNamedMap: Boolean =
 					validateType(c, "object").isRight &&
 					propertyExists("title").isRight &&
+						propertyExists("type").isRight &&
 					propertyExists("additionalProperties").isRight
 
-
+				// Added by @statisticallyfit
+				def isObjectMap: Boolean =
+					validateType(c, "object").isRight &&
+						propertyExists("type").isRight &&
+						//propertyExists("title").isRight &&
+						propertyExists("additionalProperties").isRight
 
 				// Added by @statisticallyfit:
 
@@ -161,10 +167,10 @@ object Skeuo_Skeuo {
 				// Separating by different kinds of object classes so can properly interpret a MAP from avro into json
 				def makeJsonCirceObjectMap: Result[A] = {
 
-					val objmap: (String, JsonSchema_S.AdditionalProperties[A]) => JsonSchema_S[A] = (title, addProps) => JsonSchema_S.objectMap[A](additionalProperties = addProps)
+					val objmap: JsonSchema_S.AdditionalProperties[A] => JsonSchema_S[A] = ( addProps) => JsonSchema_S.objectMap[A](additionalProperties = addProps)
 
 
-					val resultArgs: Either[DecodingFailure, (String, JsonSchema_S.AdditionalProperties[A])] = for {
+					val resultArgs: Result[JsonSchema_S.AdditionalProperties[A]] = for {
 
 						// NOTE: got withFilter error here in for-comprehension so using this plugin = https://github.com/oleg-py/better-monadic-for
 
@@ -186,8 +192,8 @@ object Skeuo_Skeuo {
 					} yield /*objnamedmap*/ (addProps) //JsonSchema_S.objectNamedMap[A](name = title, additionalProperties = addProps).embed
 
 
-					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case (title, addProps) => objmap(addProps) }
-					val result_embed: Result[A] = resultArgs.map { case (title, addProps) => objmap(addProps).embed }
+					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case ( addProps) => objmap(addProps) }
+					val result_embed: Result[A] = resultArgs.map { case ( addProps) => objmap(addProps).embed }
 
 					println(s"\n\nINSIDE makeJsonCirceObjectNamedMap:")
 					println(s"result (not embed) = $result_noEmbed")
@@ -239,7 +245,7 @@ object Skeuo_Skeuo {
 
 				def makeJsonCirceObjectNamed: Result[A] = {
 
-					val objname: (String, List[JsonSchema_S.Property[A]], List[String]) => JsonSchema_S[A] = (title, properties, required) => JsonSchema_S.objectName[A](name = title, properties = properties, required = required)
+					val objnamed: (String, List[JsonSchema_S.Property[A]], List[String]) => JsonSchema_S[A] = (title, properties, required) => JsonSchema_S.objectNamed[A](name = title, properties = properties, required = required)
 
 					val resultArgs: Result[(String, List[JsonSchema_S.Property[A]], List[String])] =
 						for {
@@ -271,8 +277,8 @@ object Skeuo_Skeuo {
 							}
 						} yield (title, properties, required) //JsonSchema_S.objectName[A](title, properties, required).embed
 
-					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case (title, ps, rs) => objname(title, ps, rs) }
-					val result_embed: Result[A] = resultArgs.map { case (title, ps, rs) => objname(title, ps, rs).embed }
+					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case (title, ps, rs) => objnamed(title, ps, rs) }
+					val result_embed: Result[A] = resultArgs.map { case (title, ps, rs) => objnamed(title, ps, rs).embed }
 
 					println(s"\n\nINSIDE makeJsonCirceObjectNamed:")
 					println(s"result (not embed) = $result_noEmbed")
@@ -331,8 +337,18 @@ object Skeuo_Skeuo {
 				val titleStr: ACursor = c.downField("title")
 				println(s"\n\nDOWNFIELD TITLE = $titleStr")
 
+
+				if(isObjectMap) {
+					makeJsonCirceObjectMap
+				} else if(isObjectNamedMap) {
+					makeJsonCirceObjectNamedMap
+				} else if(isObjectNamed){
+					makeJsonCirceObjectNamed
+				} else {
+					makeJsonCirceObjectSimple
+				}
 				// Case matching to decide which object-type to use
-				isObjectNamedMap match {
+				/*isObjectNamedMap match {
 
 					case true => makeJsonCirceObjectNamedMap
 
@@ -342,7 +358,7 @@ object Skeuo_Skeuo {
 
 						case false => makeJsonCirceObjectSimple
 					}
-				}
+				}*/
 
 
 			}
@@ -448,10 +464,10 @@ object Skeuo_Skeuo {
 
 
 				// Object with name
-				case ObjectNameF(name: String, props: List[Property[Fix[AvroSchema_S]]],
+				case ObjectNamedF(name: String, props: List[Property[Fix[AvroSchema_S]]],
 				reqs: List[String]) ⇒ {
 
-					println(s"ObjectNameF: INSIDE EMBED'S ALGEBRA: " +
+					println(s"ObjectNamedF: INSIDE EMBED'S ALGEBRA: " +
 					        s"\nname = $name" +
 					        s"\nproperties = $props" +
 					        s"\nrequired = $reqs"
@@ -473,6 +489,17 @@ object Skeuo_Skeuo {
 					println(s"ObjectNamedMapF: INSIDE EMBED'S ALGEBRA: " +
 					        s"\nname = $name" +
 					        s"\nadditionalProperties = $additionalProperties"
+					)
+
+					// TODO what about name now?
+					Fix(TMap(additionalProperties.tpe))
+				}
+
+				case ObjectMapF(additionalProperties: AdditionalProperties[Fix[AvroSchema_S]]) ⇒ {
+
+					println(s"ObjectMapF: INSIDE EMBED'S ALGEBRA: " +
+						//s"\nname = $name" +
+						s"\nadditionalProperties = $additionalProperties"
 					)
 
 					// TODO what about name now?
@@ -560,9 +587,9 @@ object Skeuo_Skeuo {
 				}
 
 				// Object Name
-				case Fix(ObjectNameF(name: String, props: List[Property[Fix[JsonSchema_S]]], reqs: List[String])) ⇒ {
+				case Fix(ObjectNamedF(name: String, props: List[Property[Fix[JsonSchema_S]]], reqs: List[String])) ⇒ {
 
-					println(s"ObjectNameF: INSIDE PROJECT'S COALGEBRA: " +
+					println(s"ObjectNamedF: INSIDE PROJECT'S COALGEBRA: " +
 					        s"\nname = $name" +
 					        s"\nproperties = $props" +
 					        s"\nrequired = $reqs"

@@ -85,7 +85,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	}
 
 
-	testCirceToAvroSkeuo("map : skeuo -> circe -> skeuo", map1IntAvro_Fix_S, map1IntJson_objmap_Fix_S/*map1IntJson_innerPosRecord_Fix_S*/)
+	testCirceToAvroSkeuo("map : skeuo -> circe -> skeuo", map1PosRecordAvro_Fix_S, map1PosRecordJson_Fix_S/*map1IntJson_innerPosRecord_Fix_S*/)
 	/*info(s"\n\nnow map avro: ")
 	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))
 

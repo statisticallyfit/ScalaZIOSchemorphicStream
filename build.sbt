@@ -116,6 +116,7 @@ found version conflict(s) in library dependencies; some are suspected to be bina
 
 
 enablePlugins(BuildInfoPlugin)
+enablePlugins(SbtGithubPlugin)
 //enablePlugins(SbtCoursierPlugin)
 /*enablePlugins(SbtDotenv)
 enablePlugins(GitHubPackagesPlugin)*/
@@ -141,6 +142,7 @@ lazy val global = project
 	.enablePlugins(BuildInfoPlugin) // TODO how to know what is the name of my declared plugins in the plugins.sbt file?
 	/*.enablePlugins(SbtDotenv)
 	.enablePlugins(GitHubPackagesPlugin)*/
+	.enablePlugins(SbtGithubPlugin)
 	.dependsOn(skeuomorphExtendedInLocalCoursier)
 
 
@@ -150,51 +152,51 @@ lazy val global = project
 
 lazy val allDependencies =
 	new {
-		
+
 		// Listing the versions as values
 		val versionOfScala = "2.12.17" //"2.13.10" //"2.12.17" //"2.13.10" // TODO how to use the `scalaVersion` variable above?
-		
+
 		val versionOfScalaTest = "3.2.15" //"3.3.0-SNAP2"
-		
+
 		val versionOfScalaCheck = "1.17.0"
-		
+
 		val versionOfScalaCheckCats = "0.3.2"
-		
+
 		val versionOfSpecs2 = "4.19.2" //4.9.4
-		
+
 		//val versionOfDiscipline = "0.11.1"
 		//val versionOfDiscipline_core = "1.5.1" //"1.0.2"
 		//val versionOfDiscipline_scalatest = "2.2.0" //"1.0.1"
 		//val versionOfDiscipline_specs2 = "1.4.0" //"1.1.0"
-		
+
 		//val versionOfSpire = "0.17.0-M1"
-		
+
 		//val versionOfAlgebra =  "2.0.0" //"2.0.1"
-		
+
 		val versionOfSpireKindProjector = "0.9.10"
 		val versionOfTypelevelKindProjector = "0.13.2"
-		
+
 		val versionOfCats = "2.9.0" // "2.2.0-M3"
 		val versionOfCats_effects = "3.4.8"
 		val versionOfCats_macros = "2.1.1"
-		
+
 		//val versionOfKindProjector = "0.13.2" // TODO how to get back to using it?
-		
+
 		val versionOfZIO = "2.0.13"
 		val versionOfZIO_streams = "2.0.13"
 		val versionOfZIO_test = "2.0.13"
-		
+
 		val versionOfZIO_schema = "0.4.11" //"0.4.8"
-		
+
 		val versionOfShapeless = "2.3.10"
-		
+
 		val versionOfDroste = "0.9.0"
 		val versionOfMatryoshka = "0.21.3"
-		
-		
-		val versionOfSkeuomorph = "0.0.0+1152-fc2e0848+20230823-1625-SNAPSHOT" //"0.2.1"
+
+
+		val versionOfSkeuomorph = "0.0.0+1154-22efeb37+20230829-1435-SNAPSHOT" //"0.2.1"
 		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
-		
+
 		val versionOfSaulAutoschema = "1.0.4"
 		val versionOfOpetushallitus = "2.33.0_2.12_beta" //"2.23.0_2.12"
 		// Try downgrading to 3.6.6 because of "NoClassDefFoundError" for Jvalue
@@ -203,43 +205,43 @@ lazy val allDependencies =
 		val versionOfJson4s_others = "4.0.6" //"3.6.6" //3.6.6"//"4.0.6"
 		val versionofFge = "2.2.6"
 		val versionOfDocless = "0.5.0"
-		
+
 		val versionOfAvroTools = "1.11.1"
-		
+
 		val versionOfAvro4S = "4.1.1"
-		
+
 		val versionOfScalaRecords = "0.4"
-		
+
 		//------------------
-		
+
 		// Listing the different dependencies
 		val scalaLibrary = "org.scala-lang" % "scala-library" % versionOfScala
 		val scalaCompiler = "org.scala-lang" % "scala-compiler" % versionOfScala
 		val scalaReflect = "org.scala-lang" % "scala-reflect" % versionOfScala
-		
-		
+
+
 		//val scalactic = "org.scalactic" %% "scalactic" % versionOfScalactic
-		
+
 		val scalaTest = "org.scalatest" %% "scalatest" % versionOfScalaTest % Test
-		
+
 		val scalaCheck = "org.scalacheck" %% "scalacheck" % versionOfScalaCheck % Test
 		// https://mvnrepository.com/artifact/io.chrisdavenport/cats-scalacheck
 		val scalaCheckCats = "io.chrisdavenport" %% "cats-scalacheck" % "0.3.2" % Test
-		
-		
+
+
 		val specs2Core = "org.specs2" %% "specs2-core" % versionOfSpecs2 % Test
 		val specs2ScalaCheck = "org.specs2" %% "specs2-scalacheck" % versionOfSpecs2 % Test
 		// TODO - difference between specs2-scalacheck and the ordinary scalacheck???
-		
-		
+
+
 		//val discipline = "org.typelevel" %% "discipline" % versionOfDiscipline
 		//val discipline_core = "org.typelevel" %% "discipline-core" % versionOfDiscipline_core
 		//val discipline_scalatest = "org.typelevel" %% "discipline-scalatest" % versionOfDiscipline_scalatest % Test
 		//val discipline_specs2 = "org.typelevel" %% "discipline-specs2" % versionOfDiscipline_specs2 % Test
-		
+
 		val spireKindProjector = "org.spire-math" %% "kind-projector" % versionOfSpireKindProjector
 		val typelevelKindProjector = "org.typelevel" %% "kind-projector" % versionOfTypelevelKindProjector cross CrossVersion.full
-		
+
 		val cats_core = "org.typelevel" %% "cats-core" % versionOfCats
 		val cats_kernel = "org.typelevel" %% "cats-kernel" % versionOfCats
 		val cats_laws = "org.typelevel" %% "cats-laws" % versionOfCats % Test
@@ -248,10 +250,10 @@ lazy val allDependencies =
 		//versionOfCats_macros
 		val cats_testkit = "org.typelevel" %% "cats-testkit" % versionOfCats % Test
 		val cats_effects = "org.typelevel" %% "cats-effect" % versionOfCats_effects % Test
-		
+
 		//Shapeless
 		val shapeless = "com.chuusai" %% "shapeless" % versionOfShapeless
-		
+
 		// Kind projector plugin
 		// technicalities here = https://github.com/typelevel/kind-projector
 		//val kindProjector = compilerPlugin("org.typelevel" %% "kind-projector" % versionOfKindProjector)
@@ -259,7 +261,7 @@ lazy val allDependencies =
 		//val kindProjector = "org.typelevel" %% "kind-projector" % versionOfKindProjector
 		//"org.typelevel" %% "kind-projector" %
 		//val kindProjector = compilerPlugin("org.spire-math" %% "kind-projector" % versionOfKindProjector)
-		
+
 		// ZIO-schema
 		val zio = "dev.zio" %% "zio" % versionOfZIO
 		val zioSchema = "dev.zio" %% "zio-schema" % versionOfZIO_schema
@@ -270,12 +272,12 @@ lazy val allDependencies =
 		val zioSchemaDerivation = "dev.zio" %% "zio-schema-derivation" % versionOfZIO_schema
 		val zioStream = "dev.zio" %% "zio-streams" % versionOfZIO_streams
 		val zioTest = "dev.zio" %% "zio-test" % versionOfZIO_test
-		
-		
+
+
 		// Matryoshka recursion schemes
 		val matryoshka = "com.slamdata" %% "matryoshka-core" % "0.21.3"
 		// TODO WARNING matryoshka is the only lib that doesn't support over scala 2.12
-		
+
 		//Droste recursion schemes
 		val drosteCore = "io.higherkindness" %% "droste-core" % versionOfDroste
 		val drosteLaws = "io.higherkindness" %% "droste-laws" % versionOfDroste
@@ -283,13 +285,13 @@ lazy val allDependencies =
 		/*"io.higherkindness" %% "droste-meta" % "0.8.0",
 		"io.higherkindness" %% "droste-reftree" % "0.8.0",*/
 		val drosteScalaCheck = "io.higherkindness" %% "droste-scalacheck" % versionOfDroste
-		
-		
+
+
 		// Other schema libraries
 		val skeuomorph = "io.higherkindness" %% "skeuomorph" % versionOfSkeuomorph // "0.0.0+1150-dc2f08c4+20230820-1843-SNAPSHOT"//versionOfSkeuomorph
 		//val skeuomorph = "io.higherkindness" % "skeuomorph" % "v0.2.1"
 		//val skeuomorph_publishLocal = "io.higherkindness" %% "skeuomorph" % "7164525f-SNAPSHOT" //"0.0.0+1149-7164525f-SNAPSHOT"///
-		
+
 		val andyGlowScalaJsonSchema = "com.github.andyglow" %% "scala-jsonschema" % versionOfAndyGlowScalaJsonSchema
 		val andyGlow_jsonschema_Macros = "com.github.andyglow" %% "scala-jsonschema-macros" % versionOfAndyGlowScalaJsonSchema % Provided // <-- transitive
 		// json bridge. pick one
@@ -304,14 +306,14 @@ lazy val allDependencies =
 		val andyGlow_jsonschema_Cats = "com.github.andyglow" %% "scala-jsonschema-cats" % versionOfAndyGlowScalaJsonSchema // <-- optional
 		// refined support
 		val andyGlow_jsonschema_Refined = "com.github.andyglow" %% "scala-jsonschema-refined" % versionOfAndyGlowScalaJsonSchema // <-- optional
-		
+
 		val andyGlow_jsonschema_Derived = "com.github.andyglow" %% "scala-jsonschema-derived" % versionOfAndyGlowScalaJsonSchema
 		// enumeratum support
 		val andyGlow_jsonschema_Enumeratum = "com.github.andyglow" %% "scala-jsonschema-enumeratum" % versionOfAndyGlowScalaJsonSchema // <-- optional
 		// zero-dependency json and jsonschema parser
 		val andyGlow_jsonschema_Parser = "com.github.andyglow" %% "scala-jsonschema-parser" % versionOfAndyGlowScalaJsonSchema // <-- optional
-		
-		
+
+
 		val saul_autoschema = "com.sauldhernandez" %% "autoschema" % versionOfSaulAutoschema
 		val docless = "com.timeout" %% "docless" % versionOfDocless
 		val opetushallitus_scalaschema = "com.github.Opetushallitus" % "scala-schema" % versionOfOpetushallitus
@@ -325,24 +327,24 @@ lazy val allDependencies =
 		val json4s_ext = "org.json4s" %% "json4s-ext" % versionOfJson4s_others
 		val json4s_scalap = "org.json4s" %% "json4s-scalap" % versionOfJson4s_others
 		val fge_jsonschemavalidator = "com.github.fge" % "json-schema-validator" % versionofFge
-		
+
 		// https://mvnrepository.com/artifact/org.apache.avro/avro-tools
 		val avroTools_for_avdlToAvsc = "org.apache.avro" % "avro-tools" % versionOfAvroTools
-		
+
 		val avro4s_core = "com.sksamuel.avro4s" %% "avro4s-core" % versionOfAvro4S
 		val avro4s_json = "com.sksamuel.avro4s" %% "avro4s-json" % versionOfAvro4S
-		
+
 		val scala_records =  "ch.epfl.lamp" %% "scala-records" % versionOfScalaRecords
-		
-		
+
+
 		/*val coursierrepo = "io.get-coursier" % "sbt-coursier" % "2.0.8"
-		
+
 		val sbtgitpackages = "com.codecommit" % "sbt-github-packages" % "0.3.1"
-		
+
 		val sbtdotenv = "nl.gn0s1s" % "sbt-dotenv" % "2.1.233"
-		
+
 		val sbtbuildinfo = "com.eed3si9n" % "sbt-buildinfo" % "0.11.0"*/
-		
+
 	}
 
 
@@ -383,7 +385,7 @@ lazy val compilerOptions = Seq(
 	"-language:postfixOps",
 	//"-Ylog-classpath"
 	// TODO try putting Xnojline:off = https://hyp.is/Ard1uM71Ee2sWMf7uSXXaQ/docs.scala-lang.org/overviews/compiler-options/index.html
-	
+
 	//"-XJline:off" // TODO trying to stop this message from appearing on REPL: warning: -Xnojline is
 	// deprecated: Replaced by -Xjline:off
 	//"-Ypartial-unification" //todo got error in sbt compilation " error: bad option" why?
@@ -392,7 +394,7 @@ lazy val compilerOptions = Seq(
 
 lazy val commonSettings = Seq(
 	scalacOptions ++= compilerOptions,
-	
+
 	resolvers ++= (/*Seq(Resolver.githubPackages("statisticallyfit"))
 				++ */ Resolver.sonatypeOssRepos("releases") // for the kind projector plugin
 	                     //++ Seq(Resolver.mavenLocal)
@@ -403,25 +405,25 @@ lazy val commonSettings = Seq(
 		              //ThisBuild / useCoursier := false)
 		              ),
 	libraryDependencies ++= Seq(/*commonDependencies ++*/
-		
+
 		allDependencies.scalaLibrary,
 		allDependencies.scalaCompiler,
 		allDependencies.scalaReflect,
-		
+
 		allDependencies.scalaCheck,
 		allDependencies.scalaCheckCats,
-		
+
 		allDependencies.specs2Core,
 		allDependencies.specs2ScalaCheck,
-		
+
 		allDependencies.scalaTest,
-		
+
 		//allDependencies.discipline,
 		//allDependencies.discipline_core,
 		//allDependencies.discipline_scalatest,
 		//allDependencies.discipline_specs2,
-		
-		
+
+
 		allDependencies.cats_core,
 		allDependencies.cats_kernel,
 		allDependencies.cats_laws,
@@ -429,9 +431,9 @@ lazy val commonSettings = Seq(
 		allDependencies.cats_macros,
 		allDependencies.cats_testkit,
 		allDependencies.cats_effects,
-		
+
 		allDependencies.shapeless,
-		
+
 		allDependencies.zio,
 		allDependencies.zioSchema,
 		allDependencies.zioSchemaAvro,
@@ -440,20 +442,20 @@ lazy val commonSettings = Seq(
 		allDependencies.zioSchemaDerivation,
 		allDependencies.zioStream,
 		allDependencies.zioTest,
-		
+
 		allDependencies.matryoshka,
-		
+
 		//allDependencies.spireKindProjector,
 		//allDependencies.typelevelKindProjector,
-		
+
 		allDependencies.drosteCore,
 		allDependencies.drosteLaws,
 		allDependencies.drosteMacros,
 		allDependencies.drosteScalaCheck,
-		
+
 		allDependencies.skeuomorph,
 		//allDependencies.skeuomorph_publishLocal,
-		
+
 		allDependencies.andyGlowScalaJsonSchema,
 		allDependencies.andyGlow_jsonschema_Macros,
 		allDependencies.andyGlow_jsonschema_PlayJson,
@@ -467,9 +469,9 @@ lazy val commonSettings = Seq(
 		allDependencies.andyGlow_jsonschema_Derived,
 		allDependencies.andyGlow_jsonschema_Enumeratum,
 		allDependencies.andyGlow_jsonschema_Parser,
-		
+
 		allDependencies.saul_autoschema,
-		
+
 		allDependencies.docless,
 		/*allDependencies.opetushallitus_scalaschema,
 		// Dependency (fge) for opetus hallitus - was not pulled in by itself, why?
@@ -486,13 +488,13 @@ lazy val commonSettings = Seq(
 		//allDependencies.json4s_native_core,
 		allDependencies.json4s_ext,
 		//allDependencies.json4s_scalap,*/
-		
+
 		allDependencies.avroTools_for_avdlToAvsc,
-		
-		
+
+
 		allDependencies.avro4s_core,
 		allDependencies.avro4s_json,
-		
+
 		/*allDependencies.coursierrepo,
 		allDependencies.sbtdotenv,
 		allDependencies.sbtgitpackages,
@@ -508,7 +510,7 @@ lazy val compilerPlugins = Seq(
 			Seq(
 				//compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10" /*cross CrossVersion.full*/),
 				compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full),
-				
+
 				// NOTE: got withFilter error (in objectJsonSchemaDecoder) in for-comprehension so using this plugin = https://github.com/oleg-py/better-monadic-for
 				compilerPlugin("com.olegpy"   %% "better-monadic-for" % "0.3.1")
 				//compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")

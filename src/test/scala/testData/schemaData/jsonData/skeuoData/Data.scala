@@ -79,7 +79,7 @@ object Data {
 
 	// TODO - map is an ObjectF must think about this
 
-	val map1IntJson_objname_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNameF(
+	val map1IntJson_objname_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNamedF(
 		name = "MapNameObj",
 		properties = List(Property(name = "map", tpe = Fix(IntegerF()))),
 		required = List()
@@ -91,7 +91,7 @@ object Data {
 		required = List()
 	)
 	)*/
-	val map1IntJson_objmap_Fix_S: Fix[JsonSchema_S] = Fix(ObjectMapF(name = "MapNameAddProps",
+	val map1IntJson_objnamedmap_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNamedMapF(name = "MapNameAddProps",
 		additionalProperties = AdditionalProperties(tpe = Fix(IntegerF()))
 	))
 
@@ -133,7 +133,7 @@ object Data {
 		),
 		required = List()
 	)
-	val recordExPositionJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNameF(
+	val recordExPositionJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNamedF(
 		name = "Position",
 		properties = List(
 			Property(name = "coordinates", tpe = Fix(ArrayF(Fix(FloatF()))))
@@ -142,7 +142,7 @@ object Data {
 	))
 
 
-	val map1IntJson_innerPosRecord_Fix_S: Fix[JsonSchema_S] = Fix(ObjectMapF(
+	val map1PosRecordJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNamedMapF(
 		name = "upper_name_here",
 		additionalProperties = AdditionalProperties(tpe = recordExPositionJson_Fix_S)
 	))
@@ -187,12 +187,12 @@ object Data {
 	)
 
 
-	val recordExLocationJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNameF(
+	val recordExLocationJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNamedF(
 		name = "Locations",
 		properties = List(
 			Property(name = "id", tpe = Fix(StringF())),
 			Property(name = "name", tpe = Fix(StringF())),
-			Property(name = "position", tpe = Fix(ObjectNameF(
+			Property(name = "position", tpe = Fix(ObjectNamedF(
 				name = "Position",
 				properties = List(
 					Property(name = "coordinates", tpe = Fix(ArrayF(Fix(FloatF()))))
@@ -200,7 +200,7 @@ object Data {
 				required = List())
 			)),
 			Property(name = "sensorName", tpe = Fix(StringF())),
-			Property(name = "symbol", tpe = Fix(ObjectNameF(
+			Property(name = "symbol", tpe = Fix(ObjectNamedF(
 				name = "Symbol",
 				properties = List(),
 				required = List()

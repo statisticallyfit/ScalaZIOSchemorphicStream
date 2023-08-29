@@ -20,5 +20,6 @@ Seq[(String, ModuleID)](
 	"COURSIER" -> "io.get-coursier" % "sbt-coursier" % "2.0.8",
 	"GITHUBPACKAGES" -> "com.codecommit" % "sbt-github-packages" % "0.5.2",
 	"DOTENV" -> "nl.gn0s1s" % "sbt-dotenv" % "3.0.0",
-	"BUILDINFO" -> "com.eed3si9n" % "sbt-buildinfo" % "0.11.0"
+	"BUILDINFO" -> "com.eed3si9n" % "sbt-buildinfo" % "0.11.0",
+	"SBTGITHUB" -> "com.alejandrohdezma" % "sbt-github" % "0.11.11"
 ).flatMap(maybeEnable)
