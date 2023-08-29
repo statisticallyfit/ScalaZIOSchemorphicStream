@@ -21,69 +21,62 @@ import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
  * trans = https://github.com/higherkindness/droste/blob/76b206db3ee073aa2ecbf72d4e85d5595aabf913/modules/core/src/main/scala/higherkindness/droste/package.scala#L76
  */
 object Trans_AvroToJson {
-	
+
 	def transJ /*[T: TypeTag]*/ : Trans[AvroSchema_S, JsonSchema_S, Fix[JsonSchema_S]] = Trans {
-		
+
 		// TODO find out if this mapping is correct
 		case TNull() ⇒
 			ObjectF(List(
 				Property(name = "null", tpe = Fix(StringF()))
 			), List())
-		
+
 		case TInt() ⇒ IntegerF()
-		
+
 		case TString() ⇒ StringF()
-		
+
 		case TBoolean() ⇒ BooleanF()
-		
+
 		case TLong() ⇒ LongF()
-		
+
 		case TFloat() ⇒ FloatF()
-		
+
 		case TDouble() ⇒ DoubleF()
-		
+
 		case TBytes() ⇒ ByteF()
-		
+
 		case TArray(inner: Fix[JsonSchema_S]) ⇒ ArrayF(inner)
-		
+
 		// Source: avro map -> json map = https://hyp.is/ixmlxio5Ee6pv28sNQ9XaA/docs.airbyte.com/understanding-airbyte/json-avro-conversion/
-		
+
 		case TMap(inner: Fix[JsonSchema_S]) ⇒ {
-			
-			val ps: List[Property[Fix[JsonSchema_S]]] = List(
-				Property(name = "map", tpe = inner)
-			)
-			
-			val rs: List[String] = List()
-			
-			ObjectF(ps, rs)
+
+			ObjectMapF(additionalProperties = AdditionalProperties[Fix[JsonSchema_S]](tpe = inner))
 		}
-		
+
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fixed]]) ⇒ {
-			
+
 			val ps: List[Property[Fix[JsonSchema_S]]] = fields.map((f: FieldAvro[Fix[JsonSchema_S]]) ⇒ field2Property(f))
 			val rs: List[String] = fields.map(f ⇒ f.name)
-			
+
 			//ObjectF(ps, rs)
-			ObjectF(
-				properties = List(
-					Property(name = name, tpe = Fix(ObjectF(ps, rs)))
-				), // TODO compare to below structure
-				required = List("name") // TODO
+			ObjectNamedF(
+				name = name,
+				properties = ps,
+				required = rs
 			)
-			
+
 		}
-		
+
 		// TODO HELP  cannot create property because no tpe: A object is provided ...
 		//case TNamedType(namespace: String, name: String) ⇒ transJ(TRecord)
-		
-		
+
+
 		case TEnum(name: String,
 		namespace: Option[String],
 		aliases: List[String],
 		doc: Option[String],
 		symbols: List[String]) ⇒ {
-			
+
 			// TODO what happens to the rest of the info?
 			//EnumF(cases = symbols)
 			ObjectF(
@@ -104,17 +97,17 @@ object Trans_AvroToJson {
 				required = List("name", "namespace", "symbols") // TODO
 			)
 		}
-		
+
 		// Source: unions (avro) --> arrays (json)
 		// Source 2: toJson (data) function = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L274
 		case TUnion(options: cats.data.NonEmptyList[Fix[JsonSchema_S]]) ⇒
 			ArrayF(options.head)
 		// TODO check how to get just one value to get the type Fix[JsonSchema_S] for array
-		
-		
-		
+
+
+
 		case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) ⇒ {
-			
+
 			// TODO trying out a new layering strategy:
 			val ps: List[Property[Fix[JsonSchema_S]]] = List(
 				Property(name = "fixed", tpe = Fix(ObjectF(
@@ -125,10 +118,10 @@ object Trans_AvroToJson {
 				Property(name = "size", tpe = Fix(IntegerF()))
 			)
 			val rs: List[String] = List() // TODO ??
-			
+
 			ObjectF(ps, rs)
 		}
-		
+
 		case TDate() ⇒ ObjectF(
 			properties = List(
 				Property(name = "type", tpe = Fix(IntegerF())),
@@ -160,13 +153,13 @@ object Trans_AvroToJson {
 			required = List() //List("decimal", "precision", "scale") // TODO ??
 		)
 	}
-	
-	
+
+
 	/*def transform_AvroToJsonSkeuo[T: TypeTag]: Trans[AvroSchema_S, JsonSchema_S, T] = Trans {
-		
+
 		// NOTE: in the Avro file here (CityMesh - devs - datasource) the 'symbol' has type 'null' and in json the 'symbol' has type 'object' with  required = [], and properties = {}
 		// path = /development/projects/statisticallyfit/github/learningdataflow/SchaemeowMorphism/src/test/scala/testData/testDataPrivateTati/asset-schemas/sdp-asset-schemas-citymesh/src/main/trafficflow/ctm.tf_devs/ctm.tf_devs.datasource/
-		
+
 		case TNull() ⇒ ObjectF[T](
 			properties = List[Property[T]](/*Property(name = "", tpe = null.asInstanceOf[T])*/),
 			required = List[String]()
@@ -184,9 +177,9 @@ object Trans_AvroToJson {
 		case TDouble() ⇒ DoubleF[T]()
 
 		case TBytes() ⇒ ByteF[T]()
-		
+
 		case TArray(innerSchema: T) ⇒ ArrayF(innerSchema)
-		
+
 		// TODO where does 'name' go?
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[T]]) ⇒ {
 
@@ -196,6 +189,6 @@ object Trans_AvroToJson {
 			)
 
 		}
-		
+
 	}*/
 }

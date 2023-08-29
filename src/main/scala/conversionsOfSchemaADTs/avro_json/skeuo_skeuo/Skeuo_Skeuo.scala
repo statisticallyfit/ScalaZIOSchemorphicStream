@@ -65,7 +65,7 @@ object Skeuo_Skeuo {
 	object TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject {
 
 
-		private def identifyDecoderWithPriorityBasicDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+		implicit def identifyDecoderWithPriorityBasicDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 
 
 			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
@@ -78,7 +78,7 @@ object Skeuo_Skeuo {
 		}
 
 
-		implicit def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
+		private def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 			    // TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
 		     //identifyDecoderWithPriorityBasicDecoder orElse
 			referenceJsonSchemaDecoder orElse
@@ -144,8 +144,8 @@ object Skeuo_Skeuo {
 				// Added by @statisticallyfit
 				def isObjectNamedMap: Boolean =
 					validateType(c, "object").isRight &&
+					propertyExists("type").isRight &&
 					propertyExists("title").isRight &&
-						propertyExists("type").isRight &&
 					propertyExists("additionalProperties").isRight
 
 				// Added by @statisticallyfit
@@ -439,6 +439,34 @@ object Skeuo_Skeuo {
 			}
 		}*/
 
+
+
+		implicit def skeuoEmbed_AJ: Embed[AvroSchema_S, Fix[JsonSchema_S]] = new Embed[AvroSchema_S, Fix[JsonSchema_S]] {
+
+			// AvroSchema_S [ Fix[JsonSchema_S]] => Fix[JsonSchema_S]
+			def algebra: Algebra[AvroSchema_S, Fix[JsonSchema_S]] = Algebra {
+
+				case TNull() => Fix(ObjectF(List(), List()))
+
+				case TInt() => Fix(IntegerF())
+				case TString() => Fix(StringF())
+				case TBoolean() => Fix(BooleanF())
+
+
+				case TMap(inner: Fix[JsonSchema_S]) => 	{
+
+					Fix(ObjectMapF(additionalProperties = AdditionalProperties[Fix[JsonSchema_S]](inner)))
+				}
+			}
+		}
+		/**
+		 * Trans[F[_], G[_], A]
+		 *
+		 * algebra, Embed is: Embed[G[_], A]
+		 * coalgebra, Project is: Project[F[_], A]
+		 * @return
+		 */
+
 		implicit def skeuoEmbed_JA: Embed[JsonSchema_S, Fix[AvroSchema_S]] = new Embed[JsonSchema_S, Fix[AvroSchema_S]] {
 
 			// JsonSchema_S [ Fix[AvroSchema_S]] => Fix[AvroSchema_S]
@@ -546,7 +574,14 @@ object Skeuo_Skeuo {
 			def algebra: Algebra[JsonSchema_S, Fix[JsonSchema_S]] = ???
 		}
 		*/
-
+		/**
+		 * Trans[F[_], G[_], A]
+		 *
+		 * algebra, Embed is: Embed[G[_], A]
+		 * coalgebra, Project is: Project[F[_], A]
+		 *
+		 * @return
+		 */
 		/**
 		 * Coalgebra means:
 		 * Fix[JsonSchema_S] => AvroSchema_S[ Fix[JsonSchema_S] ]
@@ -581,6 +616,16 @@ object Skeuo_Skeuo {
 					println(s"ObjectNamedMapF: INSIDE PROJECT'S COALGEBRA: " +
 					        s"\nname = $name" +
 					        s"\naddedproperties = $additionalProperties"
+					)
+
+					TMap(additionalProperties.tpe)
+				}
+
+				// Map
+				case Fix(ObjectMapF(additionalProperties: AdditionalProperties[Fix[JsonSchema_S]])) ⇒ {
+
+					println(s"ObjectNamedMapF: INSIDE PROJECT'S COALGEBRA: " +
+						s"\naddedproperties = $additionalProperties"
 					)
 
 					TMap(additionalProperties.tpe)
@@ -643,12 +688,21 @@ object Skeuo_Skeuo {
 
 		*/
 
+		import TransSchemaImplicits.{skeuoEmbed_JA, skeuoProject_AJ} // skeuoProject_AJ
 
+		// algebra: Embed: G[A] => A
+		// coalgebra: Project: A => F[A]
+		 // TODO: declare transA: Trans[JsonSchema, AvroSchema, Fix[?]] with corresponding implicits and see how they pick up at the decoders then see what comes out with the avro-skeuo -> circe -> skeuo conversion
 		val avroToJson_byCataTransAlg: Fix[AvroSchema_S] ⇒ Fix[JsonSchema_S] = scheme.cata(transJ.algebra).apply(_)
 
-		import TransSchemaImplicits.{skeuoEmbed_JA, skeuoProject_AJ} // skeuoProject_AJ
 		//import TransSchemaImplicits.skeuoProject_AJ
 
+		// algebra: Embed:
+		// G[A] => A:
+		// JsonSchema_S[Fix[JsonSchema_S]] => Fix[JsonSchema_S]
+		// coalgebra: Project:
+		// A => F[A]
+		// Fix[JsonSchema_S] => AvroSchema_S [ Fix[JsonSchema_S] ]
 		val jsonToAvro_byAnaTransCoalg: Fix[JsonSchema_S] ⇒ Fix[AvroSchema_S] = scheme.ana(transJ.coalgebra).apply(_)
 
 
