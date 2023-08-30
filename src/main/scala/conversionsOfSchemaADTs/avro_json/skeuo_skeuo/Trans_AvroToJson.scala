@@ -22,13 +22,170 @@ import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
  */
 object Trans_AvroToJson {
 
-	def transJ /*[T: TypeTag]*/ : Trans[AvroSchema_S, JsonSchema_S, Fix[JsonSchema_S]] = Trans {
+	def transJAJ: Trans[JsonSchema_S, AvroSchema_S, Fix[JsonSchema_S]] = Trans {
+
+		case IntegerF() => TInt()
+		case StringF() => TString()
+
+		case ArrayF(inner: Fix[JsonSchema_S]) => TArray(inner)
+
+		case ObjectF(properties: List[Property[Fix[JsonSchema_S]]], required: List[String]) => {
+
+			TRecord(name = "NO_NAME_HELP", namespace = None, aliases = List(), doc = None, fields = properties.map(p => property2Field(p)))
+		}
+
+		case ObjectNamedF(name: String, properties: List[Property[Fix[JsonSchema_S]]], required: List[String]) => {
+
+			// : List[FieldAvro[Fix[JsonSchema_S]]]
+			TRecord(name = name, namespace = None, aliases = List(), doc = None, fields = properties.map(p => property2Field(p)))
+		}
+
+		case ObjectMapF(additionalProperties: AdditionalProperties[Fix[JsonSchema_S]]) => TMap(additionalProperties.tpe)
+
+		case ObjectNamedMapF(name, additionalProperties) => TMap(additionalProperties.tpe)
+	}
+
+	def transAJA: Trans[AvroSchema_S, JsonSchema_S, Fix[AvroSchema_S]] = Trans {
+
+		case TNull() ⇒ ObjectF(List(), List())
+		/*ObjectF(List(
+			Property(name = "null", tpe = Fix(StringF()))
+		), List())*/
+
+		case TInt() ⇒ IntegerF()
+
+		case TString() ⇒ StringF()
+
+		case TBoolean() ⇒ BooleanF()
+
+		case TLong() ⇒ LongF()
+
+		case TFloat() ⇒ FloatF()
+
+		case TDouble() ⇒ DoubleF()
+
+		case TBytes() ⇒ ByteF()
+
+		case TArray(inner: Fix[AvroSchema_S]) ⇒ ArrayF(inner)
+
+		// Source: avro map -> json map = https://hyp.is/ixmlxio5Ee6pv28sNQ9XaA/docs.airbyte.com/understanding-airbyte/json-avro-conversion/
+
+		case TMap(inner: Fix[AvroSchema_S]) ⇒ {
+
+			ObjectMapF(additionalProperties = AdditionalProperties[Fix[AvroSchema_S]](tpe = inner))
+		}
+
+		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[AvroSchema_S]]]) ⇒ {
+
+			val ps: List[Property[Fix[AvroSchema_S]]] = fields.map((f: FieldAvro[Fix[AvroSchema_S]]) ⇒ field2Property(f))
+			val rs: List[String] = fields.map(f ⇒ f.name)
+
+			//ObjectF(ps, rs)
+			ObjectNamedF(
+				name = name,
+				properties = ps,
+				required = rs
+			)
+
+		}
+
+		// TODO HELP  cannot create property because no tpe: A object is provided ...
+		case TNamedType(namespace: String, name: String) ⇒ ObjectNamedF(name = name, List(), List())
+
+
+		/*case tenum@TEnum(name: String,
+		namespace: Option[String],
+		aliases: List[String],
+		doc: Option[String],
+		symbols: List[String]) ⇒ {
+
+
+			// TODO how to set this up???
+			//EnumF(cases = symbols)
+			ObjectNamedF(
+				name = "enum",
+				properties = List(
+					Property(name = "name", tpe = Fix(ObjectF(
+						properties = List(
+							Property(name = name, tpe = Fix(tenum))
+						),
+						required = List()
+					))
+					),
+					Property(name = "namespace", tpe = Fix(ObjectF(
+						properties = List(
+							Property(name = namespace.getOrElse(""), tpe = Fix(TString()))
+						),
+						required = List()
+					)))
+				),
+				required = List("name", "namespace", "symbols") // TODO
+			)
+		}*/
+
+		// Source: unions (avro) --> arrays (json)
+		// Source 2: toJson (data) function = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L274
+		case TUnion(options: cats.data.NonEmptyList[Fix[AvroSchema_S]]) ⇒
+			ArrayF(options.head)
+
+
+		// TODO check how to get just one value to get the type Fix[JsonSchema_S] for array
+
+
+
+		/*case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) ⇒ {
+
+			// TODO trying out a new layering strategy:
+			val ps: List[Property[Fix[AvroSchema_S]]] = List(
+				Property(name = "fixed", tpe = Fix() ),
+				Property(name = "name", tpe = Fix(TString())), // TODO or name out here?
+				Property(name = "size", tpe = Fix(TInt()))
+			)
+			val rs: List[String] = List() // TODO ??
+
+			ObjectNamedF(name = name, ps, rs)
+		}*/
+
+		case TDate() ⇒ ObjectF(
+			properties = List(
+				Property(name = "type", tpe = Fix(TInt())),
+				Property(name = "logicalType", tpe = Fix(TDate()))
+			),
+			required = List()
+		)
+		/*case TTimestampMillis() ⇒ ObjectF(
+			properties = List(
+				Property(name = "type", tpe = Fix(TLong())),
+				Property(name = "logicalType", tpe = Fix(T()))
+			),
+			required = List()
+		)*/
+		/*case TTimeMillis() ⇒ ObjectF(
+			properties = List(
+				Property(name = "type", tpe = Fix(IntegerF())),
+				Property(name = "logicalType", tpe = Fix(DateTimeF()))
+			),
+			required = List()
+		)
+		case TDecimal(precision: Int, scale: Int) ⇒ ObjectF(
+			properties = List(
+				Property(name = "type", tpe = Fix(ByteF())), // TODO byte or fixed? (make another objectf to be fixed instead of byte here)
+				Property(name = "logicalType", tpe = Fix(DateTimeF())),
+				Property(name = "precision", tpe = Fix(IntegerF())),
+				Property(name = "scale", tpe = Fix(IntegerF()))
+			),
+			required = List() //List("decimal", "precision", "scale") // TODO ??
+		)*/
+
+	}
+
+	def transAJJ /*[T: TypeTag]*/ : Trans[AvroSchema_S, JsonSchema_S, Fix[JsonSchema_S]] = Trans {
 
 		// TODO find out if this mapping is correct
-		case TNull() ⇒
-			ObjectF(List(
+		case TNull() ⇒ ObjectF(List(), List())
+			/*ObjectF(List(
 				Property(name = "null", tpe = Fix(StringF()))
-			), List())
+			), List())*/
 
 		case TInt() ⇒ IntegerF()
 

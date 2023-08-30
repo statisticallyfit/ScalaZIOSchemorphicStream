@@ -31,7 +31,7 @@ import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
 import JsonSchema_S._
 import AvroSchema_S._
 
-
+import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldAvro, _}
 import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
 
 // TODO look here avro-json map of equivalent types: https://avro.apache.org/docs/1.11.1/specification/_print/
@@ -65,7 +65,7 @@ object Skeuo_Skeuo {
 	object TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject {
 
 
-		implicit def identifyDecoderWithPriorityBasicDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+		implicit def identifyJsonDecoderWithPriorityBasicDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 
 
 			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
@@ -77,6 +77,18 @@ object Skeuo_Skeuo {
 			}
 		}
 
+		/*implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+
+			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
+
+				case ("null", _) | ("int", _) | ("string", _) | ("boolean", _) | ("long", _) | ("float", _) | ("double", _) | ("bytes", _)  => basicAvroSchemaDecoder[A]
+
+				//case (x, _) => s"$x is not well formed type".asLeft
+				case _ => avroSchemaDecoder[A]
+			}
+		}*/
+
 
 		private def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 			    // TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
@@ -87,6 +99,10 @@ object Skeuo_Skeuo {
 			objectJsonSchemaDecoder orElse
 			enumJsonSchemaDecoder /*orElse
 			basicJsonSchemaDecoder*/
+
+
+		/*private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
+			arrayAvroSchemaDecoder //orElse*/
 
 		/*def additionalPropsJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[JsonSchema_S.AdditionalProperties[A]] =
 			Decoder.instance { c =>
@@ -178,7 +194,7 @@ object Skeuo_Skeuo {
 
 						addProps: AdditionalProperties[A] <- {
 
-							val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyDecoderWithPriorityBasicDecoder[A])
+							val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyJsonDecoderWithPriorityBasicDecoder[A])
 
 							val resAddProps: Result[JsonSchema_S.AdditionalProperties[A]] = resTpe.map(tpe => JsonSchema_S.AdditionalProperties(tpe = tpe))
 
@@ -218,7 +234,7 @@ object Skeuo_Skeuo {
 
 						addProps: AdditionalProperties[A] <- {
 
-							val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyDecoderWithPriorityBasicDecoder[A])
+							val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyJsonDecoderWithPriorityBasicDecoder[A])
 
 							val resAddProps: Result[JsonSchema_S.AdditionalProperties[A]] = resTpe.map(tpe => JsonSchema_S.AdditionalProperties(tpe = tpe))
 
@@ -254,7 +270,7 @@ object Skeuo_Skeuo {
 							properties: List[JsonSchema_S.Property[A]] <- {
 								//.as[Option[A]]
 								val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
-									Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyDecoderWithPriorityBasicDecoder[A]))
+									Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyJsonDecoderWithPriorityBasicDecoder[A]))
 								)
 
 								val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
@@ -301,7 +317,7 @@ object Skeuo_Skeuo {
 							properties: List[JsonSchema_S.Property[A]] <- {
 								//.as[Option[A]]
 								val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
-									Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyDecoderWithPriorityBasicDecoder[A]))
+									Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyJsonDecoderWithPriorityBasicDecoder[A]))
 								)
 
 								val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
@@ -373,6 +389,16 @@ object Skeuo_Skeuo {
 			Decoder[Reference].map(_.asRight[A]) orElse Decoder[A].map(_.asLeft[Reference])
 
 
+		/*private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+			import AvroSchema_S._
+
+			Decoder.forProduct1[String, String]("type")(Tuple1.apply).emap {
+
+				case ("int") => int[A]().embed.asRight
+			}
+		}*/
+
 		private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 			import JsonSchema_S._
 
@@ -414,12 +440,20 @@ object Skeuo_Skeuo {
 
 
 		private def arrayJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
-			Decoder.instance { c =>
+			Decoder.instance { c: HCursor =>
 				for {
-					items <- c.downField("items").as[A](identifyDecoderWithPriorityBasicDecoder[A]) // NOTE: was jsonSchemaDecoder[A]
+					items <- c.downField("items").as[A](identifyJsonDecoderWithPriorityBasicDecoder[A]) // NOTE: was jsonSchemaDecoder[A]
 					_ <- validateType(c, "array")
 				} yield JsonSchema_S.array(items).embed
 			}
+
+		/*private def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
+			Decoder.instance { c: HCursor =>
+				for {
+					items <- c.downField("items").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) // NOTE: was jsonSchemaDecoder[A]
+					_ <- validateType(c, "array")
+				} yield AvroSchema_S.array(items).embed
+			}*/
 
 		private def referenceJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 			Decoder[Reference].map((x: Reference) => JsonSchema_S.reference[A](x.ref).embed)
@@ -451,11 +485,21 @@ object Skeuo_Skeuo {
 				case TInt() => Fix(IntegerF())
 				case TString() => Fix(StringF())
 				case TBoolean() => Fix(BooleanF())
+				case TLong() => Fix(LongF())
+				case TFloat() => Fix(FloatF())
+				case TDouble() => Fix(DoubleF())
+				case TBytes() => Fix(ByteF())
+				case TArray(inner: Fix[JsonSchema_S]) => Fix(ArrayF(inner))
 
 
 				case TMap(inner: Fix[JsonSchema_S]) => 	{
 
 					Fix(ObjectMapF(additionalProperties = AdditionalProperties[Fix[JsonSchema_S]](inner)))
+				}
+
+				case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[JsonSchema_S]]]) => {
+
+					Fix(ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List()))
 				}
 			}
 		}
@@ -574,6 +618,34 @@ object Skeuo_Skeuo {
 			def algebra: Algebra[JsonSchema_S, Fix[JsonSchema_S]] = ???
 		}
 		*/
+
+
+		/**
+		 * Coalgebra[F[_], A]
+		 * A => F[A]
+		 * Fix[AvroSchema_S] ===> JsonSchema_S[ Fix[AvroSchema_S] ]
+		 *
+		 * @return
+		 */
+		implicit def skeuoProject_JA: Project[JsonSchema_S, Fix[AvroSchema_S]] = new Project[JsonSchema_S, Fix[AvroSchema_S]] {
+
+			def coalgebra: Coalgebra[JsonSchema_S, Fix[AvroSchema_S]] = Coalgebra {
+
+				case Fix(TInt()) => IntegerF()
+				case Fix(TString()) => StringF()
+				case Fix(TBoolean()) => BooleanF()
+
+
+				case Fix(TArray(inner: Fix[AvroSchema_S])) => ArrayF(inner)
+
+				case Fix(TMap(inner: Fix[AvroSchema_S])) => ObjectMapF(additionalProperties = AdditionalProperties[Fix[AvroSchema_S]](tpe = inner))
+
+				case Fix(TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[AvroSchema_S]]])) => {
+
+					ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List())
+				}
+			}
+		}
 		/**
 		 * Trans[F[_], G[_], A]
 		 *
@@ -688,14 +760,15 @@ object Skeuo_Skeuo {
 
 		*/
 
-		import TransSchemaImplicits.{skeuoEmbed_JA, skeuoProject_AJ} // skeuoProject_AJ
+		import TransSchemaImplicits.{ skeuoEmbed_AJ, skeuoProject_JA} // skeuoProject_AJ
 
 		// algebra: Embed: G[A] => A
 		// coalgebra: Project: A => F[A]
 		 // TODO: declare transA: Trans[JsonSchema, AvroSchema, Fix[?]] with corresponding implicits and see how they pick up at the decoders then see what comes out with the avro-skeuo -> circe -> skeuo conversion
-		val avroToJson_byCataTransAlg: Fix[AvroSchema_S] ⇒ Fix[JsonSchema_S] = scheme.cata(transJ.algebra).apply(_)
+		val avroToJson_byCataTransAlg: Fix[AvroSchema_S] => Fix[JsonSchema_S] = scheme.cata(transJAJ.algebra).apply(_)
 
-		//import TransSchemaImplicits.skeuoProject_AJ
+
+		import TransSchemaImplicits.{skeuoEmbed_JA, skeuoProject_AJ}
 
 		// algebra: Embed:
 		// G[A] => A:
@@ -703,7 +776,7 @@ object Skeuo_Skeuo {
 		// coalgebra: Project:
 		// A => F[A]
 		// Fix[JsonSchema_S] => AvroSchema_S [ Fix[JsonSchema_S] ]
-		val jsonToAvro_byAnaTransCoalg: Fix[JsonSchema_S] ⇒ Fix[AvroSchema_S] = scheme.ana(transJ.coalgebra).apply(_)
+		val jsonToAvro_byAnaTransCoalg: Fix[JsonSchema_S] ⇒ Fix[AvroSchema_S] = scheme.ana(transAJJ.coalgebra).apply(_)
 
 
 

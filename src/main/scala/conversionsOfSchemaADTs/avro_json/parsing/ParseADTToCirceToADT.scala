@@ -2,7 +2,7 @@ package conversionsOfSchemaADTs.avro_json.parsing
 
 import cats.data.NonEmptyList
 
-import higherkindness.droste._
+import higherkindness.droste.{scheme, Algebra, Coalgebra}
 import higherkindness.droste.data.Fix
 
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
@@ -12,7 +12,7 @@ import AvroSchema_S.{Field ⇒ FieldAvro, _}
 
 
 // NOTE: commenting out the JsonDecoders file so I can import the jsonSchemaDecoders from my Skeuo_Skeuo file (to easily update) instead of having to publish skeuomorph each time I make a change.
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject.{identifyDecoderWithPriorityBasicDecoder, _}
+import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
 //import higherkindness.skeuomorph.openapi.JsonDecoders._
 
 
@@ -40,7 +40,7 @@ object ParseADTToCirceToADT {
 	val libToJson: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(AvroSchema_S.toJson).apply(_)
 
 
-	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
+	//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
 
 	val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(toCirceJsonString_fromAvroSkeuo).apply(_)
 
@@ -437,6 +437,8 @@ object ParseADTToCirceToADT {
 
 	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoEmbed_JA /*, skeuoProject_AJ*/}
 
+
+	// TODO figure out if  must create decoder for AvroSchema (like identifyDecoderWithPrioerity but with AvroSchema instead)
 	val funcCirceToAvroSkeuo: JsonCirce ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
 
 	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._

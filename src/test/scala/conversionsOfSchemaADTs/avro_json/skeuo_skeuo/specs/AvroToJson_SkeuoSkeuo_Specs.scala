@@ -84,6 +84,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		info(s"\njson-skeuo --> circe -> json-skeuo: ${DecodingSkeuo.decodeJsonSkeuoToCirceToJsonSkeuo(theArgJson)}")*/
 	}
 
+	// HELP: not converting avro-skeuo -> circe -> skeuo properly (result is null)
 
 	testCirceToAvroSkeuo("map : skeuo -> circe -> skeuo", recordExPositionAvro_Fix_S, map1PosRecordJson_Fix_S/*map1IntJson_innerPosRecord_Fix_S*/)
 	/*info(s"\n\nnow map avro: ")
