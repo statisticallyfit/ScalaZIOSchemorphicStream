@@ -72,69 +72,20 @@ object Skeuo_Skeuo {
 	object TEMP_AvroSchemaDecoderImplicit {
 		implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
-			Decoder.decodeString.flatMap{
-				case "null" | "int" | "string" | "boolean" | "long" | "float" | "double" | "bytes" => basicAvroSchemaDecoder[A]
+			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
+
+				case ("integer", _) | ("number", _) | ("string", _) | ("boolean", _) => basicAvroSchemaDecoder[A]
 
 				//case (x, _) => s"$x is not well formed type".asLeft
 				case _ => avroSchemaDecoder[A]
 			}
-
-
-			/*
-			NOTE: error log:
-			 
-			[info] AvroToJson_SkeuoSkeuo_Specs:
-			[info] + VARIABLE PRINT OUTS
-			[info] +
-			[info] Testing this kind: map : skeuo -> circe -> skeuo
-			[info] +
-			[info]  avro-skeuo ---> circe: {
-			[info]   "type" : "integer",
-			[info]   "format" : "int32"
-			[info] }
-			[info] +
-			[info] avro-skeuo --> circe --> avro-skeuo: Left(DecodingFailure at : Got value '{"type":"integer","format":"int32"}' with wrong type, expecting string)
-			[info] +
-			[info] avro-skeuo --> circe --> json-skeuo: Right(IntegerF())
-			[info] +
-			[info] json-skeuo -> circe: {
-			[info]   "title" : "upper_name_here",
-			[info]   "type" : "object",
-			[info]   "additionalProperties" : {
-			[info]     "title" : "Position",
-			[info]     "type" : "object",
-			[info]     "properties" : {
-			[info]       "coordinates" : {
-			[info]         "type" : "array",
-			[info]         "items" : {
-			[info]           "type" : "number",
-			[info]           "format" : "float"
-			[info]         }
-			[info]       }
-			[info]     },
-			[info]     "required" : [
-			[info]     ]
-			[info]   }
-			[info] }
-			[info] +
-			[info] json-skeuo --> circe -> avro-skeuo: Left(DecodingFailure at : Got value '{"title":"upper_name_here","type":"object","additionalProperties":{"title":"Position","type":"object","properties":{"coordinates":{"type":"array","items":{"type":"number","format":"float"}}},"required":[]}}' with wrong type, expecting string)
-			[info] +
-			[info] json-skeuo --> circe -> json-skeuo: Right(ObjectMapF(AdditionalProperties(ObjectNamedF(Position,List(Property(coordinates,ArrayF(FloatF()))),List()))))
-
-			 */
-
-			/*Decoder.forProduct1[String, String]("type")(Tuple1[String](_)._1).flatMap {
-
-				case "null" | "int" | "string" | "boolean" | "long" | "float" | "double" | "bytes"  => basicAvroSchemaDecoder[A]
-
-				//case (x, _) => s"$x is not well formed type".asLeft
-				case _ => avroSchemaDecoder[A]
-			}*/
 		}
 
 
-		private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
-			arrayAvroSchemaDecoder /*orElse
+		private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+			logicalTypeAvroSchemaDecoder orElse
+			arrayAvroSchemaDecoder
+		} /*orElse
 				mapAvroSchemaDecoder orElse
 				recordAvroSchemaDecoder orElse
 				namedTypeAvroSchemaDecoder orElse
@@ -143,11 +94,54 @@ object Skeuo_Skeuo {
 				enumAvroSchemaDecoder*/
 
 
+		private def logicalTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+			import AvroSchema_S._
+
+
+			Decoder.forProduct4[(String, Option[String], Option[Int], Option[Int]), String, Option[String], Option[Int], Option[Int]]("type", "logicalType", "precision", "scale")(Tuple4.apply).emap {
+
+				case ("int", Some("date"), None, None) => date[A]().embed.asRight
+				case ("long", Some("timestamp-millis"), None, None) => timestampMillis[A]().embed.asRight
+				case ("int", Some("time-millis"), None, None) => timeMillis[A]().embed.asRight
+				case ("bytes", Some("decimal"), Some(precision), Some(scale)) => decimal[A](precision, scale).embed.asRight
+
+				case (x, _, _, _) => s"$x is not well formed type".asLeft
+			}
+		}
+
 		private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
 			import AvroSchema_S._
 
-			Decoder.forProduct1[String, String]("type")(Tuple1[String](_)._1).emap  {
+
+			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
+
+				case ("integer", Some("int32")) => int[A]().embed.asRight
+				case ("integer", Some("int64")) => long[A]().embed.asRight
+				case ("number", Some("float")) => float[A]().embed.asRight
+				case ("number", Some("double")) => double[A]().embed.asRight
+
+				case ("string", Some("byte")) => bytes[A]().embed.asRight
+				//case ("string", Some("binary")) => binary[A]().embed.asRight
+				case ("boolean", _) => boolean[A]().embed.asRight
+
+				/*// Logical types:
+				// Source = https://hyp.is/QGAf_knVEe6TsC_bpOcmJw/docs.airbyte.com/understanding-airbyte/json-avro-conversion/
+				case ("string", Some("date")) => date[A]().embed.asRight
+				// Source = https://hyp.is/UEBSwknVEe6MM1sQBZZdfQ/docs.airbyte.com/understanding-airbyte/json-avro-conversion/
+				case ("string", Some("date-time")) => timestampMillis[A]().embed.asRight
+				// Source = https://hyp.is/M62zKknVEe6WIGvlurzrGQ/docs.airbyte.com/understanding-airbyte/json-avro-conversion/
+				case ("string", Some("time")) => timeMillis[A]().embed.asRight
+				//case ("string", Some("password")) => password[A]().embed.asRight
+				// TODO no decimal from json*/
+
+
+				case ("string", _) => string[A]().embed.asRight
+				case (x, _) => s"$x is not well formed type".asLeft
+			}
+
+/*			Decoder.forProduct1[String, String]("type")(Tuple1[String](_)._1).emap  {
 
 				case "null" => `null`[A]().embed.asRight
 				case "int" => int[A]().embed.asRight
@@ -159,7 +153,7 @@ object Skeuo_Skeuo {
 				case "bytes" => bytes[A]().embed.asRight
 
 				case x => s"$x is not well formed type".asLeft
-			}
+			}*/
 		}
 
 		private def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =

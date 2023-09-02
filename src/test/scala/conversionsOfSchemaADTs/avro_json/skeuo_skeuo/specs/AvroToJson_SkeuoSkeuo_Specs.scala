@@ -94,12 +94,14 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	//info(s"APACHE INT STR: ${skeuoToApacheAvroSchema(jsonToAvro_byAnaTransCoalg(funcCirceToJsonSkeuo(unsafeParse(strJson_R)).right.get))}")
 
 	testCirceToAvroSkeuo("map : skeuo -> circe -> skeuo",
-		intAvro_Fix_S, //array3IntAvro_Fix_S,
+		//intAvro_Fix_S, //array3IntAvro_Fix_S,
+		array3IntAvro_Fix_S,
 		//map1StrAvro_Fix_S,
 		//intAvro_Fix_S,
 		//recordExPositionAvro_Fix_S,
 		//intJson_Fix_S
-	 	map1PosRecordJson_Fix_S/*map1IntJson_innerPosRecord_Fix_S*/
+		array3IntJson_Fix_S
+	 	//map1PosRecordJson_Fix_S/*map1IntJson_innerPosRecord_Fix_S*/
 	)
 	/*info(s"\n\nnow map avro: ")
 	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))
