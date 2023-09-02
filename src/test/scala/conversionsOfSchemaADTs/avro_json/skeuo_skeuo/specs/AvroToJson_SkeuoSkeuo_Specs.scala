@@ -2,7 +2,11 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.specs
 
 
 import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache._
-import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
+import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT
+import ParseADTToCirceToADT._
+import ParseADTToCirceToADT.CirceToAvroSkeuo._
+import ParseADTToCirceToADT.CirceToJsonSkeuo._
+
 import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import higherkindness.droste.data.Fix
@@ -86,7 +90,17 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 	// HELP: not converting avro-skeuo -> circe -> skeuo properly (result is null)
 
-	testCirceToAvroSkeuo("map : skeuo -> circe -> skeuo", recordExPositionAvro_Fix_S, map1PosRecordJson_Fix_S/*map1IntJson_innerPosRecord_Fix_S*/)
+	//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans.jsonToAvro_byAnaTransCoalg
+	//info(s"APACHE INT STR: ${skeuoToApacheAvroSchema(jsonToAvro_byAnaTransCoalg(funcCirceToJsonSkeuo(unsafeParse(strJson_R)).right.get))}")
+
+	testCirceToAvroSkeuo("map : skeuo -> circe -> skeuo",
+		intAvro_Fix_S, //array3IntAvro_Fix_S,
+		//map1StrAvro_Fix_S,
+		//intAvro_Fix_S,
+		//recordExPositionAvro_Fix_S,
+		//intJson_Fix_S
+	 	map1PosRecordJson_Fix_S/*map1IntJson_innerPosRecord_Fix_S*/
+	)
 	/*info(s"\n\nnow map avro: ")
 	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))
 

@@ -12,7 +12,7 @@ import AvroSchema_S.{Field ⇒ FieldAvro, _}
 
 
 // NOTE: commenting out the JsonDecoders file so I can import the jsonSchemaDecoders from my Skeuo_Skeuo file (to easily update) instead of having to publish skeuomorph each time I make a change.
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
+//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
 //import higherkindness.skeuomorph.openapi.JsonDecoders._
 
 
@@ -435,17 +435,35 @@ object ParseADTToCirceToADT {
 
 
 
-	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoEmbed_JA /*, skeuoProject_AJ*/}
+	object CirceToAvroSkeuo {
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoEmbed_JA,  skeuoProject_AJ}
+
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicit._
+
+		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
+
+		val funcCirceToAvroSkeuo: JsonCirce ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
+
+	}
+	// json decoder: Embed[JsonSchema_S, *]
+	// implicit: Embed[JsonSchema_S, Fix[AvroSchema_S]]
 
 
-	// TODO figure out if  must create decoder for AvroSchema (like identifyDecoderWithPrioerity but with AvroSchema instead)
-	val funcCirceToAvroSkeuo: JsonCirce ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
+	// -----------------
+	object CirceToJsonSkeuo {
 
-	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
 
-	val funcCirceToJsonSkeuo: JsonCirce ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{ skeuoEmbed_AJ }//, skeuoProject_AJ}
 
+		val funcCirceToJsonSkeuo: JsonCirce ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
+	}
 
+	// avro decoder: Embed[AvroSchema_S, *]
+	// implicit: Embed[AvroSchema_S, Fix[JsonSchema_F]] == skeuoEmbed_AJ
+
+	import CirceToAvroSkeuo._
+	import CirceToJsonSkeuo._
 
 
 	object DecodingSkeuo {

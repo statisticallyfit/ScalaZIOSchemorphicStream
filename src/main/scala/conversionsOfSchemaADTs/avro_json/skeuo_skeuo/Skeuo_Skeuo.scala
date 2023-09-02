@@ -62,6 +62,124 @@ object Skeuo_Skeuo {
 	/// -----------------------------
 
 
+	private def validateType(c: HCursor, expected: String): Decoder.Result[Unit] =
+		c.downField("type").as[String].flatMap {
+			case `expected`: String => ().asRight
+			case actual: String => DecodingFailure(s"$actual is not expected type $expected", c.history).asLeft
+		}
+
+
+	object TEMP_AvroSchemaDecoderImplicit {
+		implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+			Decoder.decodeString.flatMap{
+				case "null" | "int" | "string" | "boolean" | "long" | "float" | "double" | "bytes" => basicAvroSchemaDecoder[A]
+
+				//case (x, _) => s"$x is not well formed type".asLeft
+				case _ => avroSchemaDecoder[A]
+			}
+
+
+			/*
+			NOTE: error log:
+			 
+			[info] AvroToJson_SkeuoSkeuo_Specs:
+			[info] + VARIABLE PRINT OUTS
+			[info] +
+			[info] Testing this kind: map : skeuo -> circe -> skeuo
+			[info] +
+			[info]  avro-skeuo ---> circe: {
+			[info]   "type" : "integer",
+			[info]   "format" : "int32"
+			[info] }
+			[info] +
+			[info] avro-skeuo --> circe --> avro-skeuo: Left(DecodingFailure at : Got value '{"type":"integer","format":"int32"}' with wrong type, expecting string)
+			[info] +
+			[info] avro-skeuo --> circe --> json-skeuo: Right(IntegerF())
+			[info] +
+			[info] json-skeuo -> circe: {
+			[info]   "title" : "upper_name_here",
+			[info]   "type" : "object",
+			[info]   "additionalProperties" : {
+			[info]     "title" : "Position",
+			[info]     "type" : "object",
+			[info]     "properties" : {
+			[info]       "coordinates" : {
+			[info]         "type" : "array",
+			[info]         "items" : {
+			[info]           "type" : "number",
+			[info]           "format" : "float"
+			[info]         }
+			[info]       }
+			[info]     },
+			[info]     "required" : [
+			[info]     ]
+			[info]   }
+			[info] }
+			[info] +
+			[info] json-skeuo --> circe -> avro-skeuo: Left(DecodingFailure at : Got value '{"title":"upper_name_here","type":"object","additionalProperties":{"title":"Position","type":"object","properties":{"coordinates":{"type":"array","items":{"type":"number","format":"float"}}},"required":[]}}' with wrong type, expecting string)
+			[info] +
+			[info] json-skeuo --> circe -> json-skeuo: Right(ObjectMapF(AdditionalProperties(ObjectNamedF(Position,List(Property(coordinates,ArrayF(FloatF()))),List()))))
+
+			 */
+
+			/*Decoder.forProduct1[String, String]("type")(Tuple1[String](_)._1).flatMap {
+
+				case "null" | "int" | "string" | "boolean" | "long" | "float" | "double" | "bytes"  => basicAvroSchemaDecoder[A]
+
+				//case (x, _) => s"$x is not well formed type".asLeft
+				case _ => avroSchemaDecoder[A]
+			}*/
+		}
+
+
+		private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
+			arrayAvroSchemaDecoder /*orElse
+				mapAvroSchemaDecoder orElse
+				recordAvroSchemaDecoder orElse
+				namedTypeAvroSchemaDecoder orElse
+				unionAvroSchemaDecoder orElse
+				fixedAvroSchemaDecoder orElse
+				enumAvroSchemaDecoder*/
+
+
+		private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+			import AvroSchema_S._
+
+			Decoder.forProduct1[String, String]("type")(Tuple1[String](_)._1).emap  {
+
+				case "null" => `null`[A]().embed.asRight
+				case "int" => int[A]().embed.asRight
+				case "string" => string[A]().embed.asRight
+				case "boolean" => boolean[A]().embed.asRight
+				case "long" => long[A]().embed.asRight
+				case "float" => float[A]().embed.asRight
+				case "double" => double[A]().embed.asRight
+				case "bytes" => bytes[A]().embed.asRight
+
+				case x => s"$x is not well formed type".asLeft
+			}
+		}
+
+		private def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
+			Decoder.instance { c: HCursor =>
+				for {
+					items: A <- c.downField("items").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+					//_ <- validateType(c, "array")
+				} yield AvroSchema_S.array(items).embed
+			}
+
+		private def mapAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+
+		private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+		private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+		private def unionAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+		private def fixedAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+
+		private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+	}
+
 	object TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject {
 
 
@@ -77,18 +195,6 @@ object Skeuo_Skeuo {
 			}
 		}
 
-		/*implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-
-
-			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
-
-				case ("null", _) | ("int", _) | ("string", _) | ("boolean", _) | ("long", _) | ("float", _) | ("double", _) | ("bytes", _)  => basicAvroSchemaDecoder[A]
-
-				//case (x, _) => s"$x is not well formed type".asLeft
-				case _ => avroSchemaDecoder[A]
-			}
-		}*/
-
 
 		private def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 			    // TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
@@ -101,19 +207,7 @@ object Skeuo_Skeuo {
 			basicJsonSchemaDecoder*/
 
 
-		/*private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
-			arrayAvroSchemaDecoder //orElse*/
-
-		/*def additionalPropsJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[JsonSchema_S.AdditionalProperties[A]] =
-			Decoder.instance { c =>
-				for {
-					addedProps: A <- c.downField("additionalProperties").as[A](jsonSchemaDecoder[A])
-					_ <- validateType(c, "object")
-				} yield JsonSchema_S.AdditionalProperties[A](addedProps)
-			}*/
-
-
-		def objectJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
+		private def objectJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 
 			Decoder.instance { c: HCursor =>
 
@@ -389,15 +483,7 @@ object Skeuo_Skeuo {
 			Decoder[Reference].map(_.asRight[A]) orElse Decoder[A].map(_.asLeft[Reference])
 
 
-		/*private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
-			import AvroSchema_S._
-
-			Decoder.forProduct1[String, String]("type")(Tuple1.apply).emap {
-
-				case ("int") => int[A]().embed.asRight
-			}
-		}*/
 
 		private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 			import JsonSchema_S._
@@ -421,11 +507,7 @@ object Skeuo_Skeuo {
 			}
 		}
 
-		private def validateType(c: HCursor, expected: String): Decoder.Result[Unit] =
-			c.downField("type").as[String].flatMap {
-				case `expected` => ().asRight
-				case actual => DecodingFailure(s"$actual is not expected type $expected", c.history).asLeft
-			}
+
 
 		private def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 			Decoder.instance(c =>
@@ -447,13 +529,6 @@ object Skeuo_Skeuo {
 				} yield JsonSchema_S.array(items).embed
 			}
 
-		/*private def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
-			Decoder.instance { c: HCursor =>
-				for {
-					items <- c.downField("items").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) // NOTE: was jsonSchemaDecoder[A]
-					_ <- validateType(c, "array")
-				} yield AvroSchema_S.array(items).embed
-			}*/
 
 		private def referenceJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 			Decoder[Reference].map((x: Reference) => JsonSchema_S.reference[A](x.ref).embed)
@@ -503,6 +578,49 @@ object Skeuo_Skeuo {
 				}
 			}
 		}
+
+
+		/*implicit def basisAvroAvro(implicit ev: Basis[AvroSchema_S, Fix[AvroSchema_S]]): Basis[AvroSchema_S, Fix[AvroSchema_S]] = {
+			def algebra: Algebra[AvroSchema_S, Fix[AvroSchema_S]] = Algebra {
+
+				case TInt() => Fix(TInt())
+
+				case TArray(inner: Fix[AvroSchema_S]) => inner
+			}
+
+			def coalgebra: Coalgebra[AvroSchema_S, Fix[AvroSchema_S]] = Coalgebra {
+				case Fix(TInt()) => TInt()
+				case Fix(ta@TArray(inner: Fix[AvroSchema_S])) => ta
+			}
+		}*/
+
+		implicit def skeuoEmbed_AA: Embed[AvroSchema_S, Fix[AvroSchema_S]] = new Embed[AvroSchema_S, Fix[AvroSchema_S]] {
+			def algebra: Algebra[AvroSchema_S, Fix[AvroSchema_S]] = Algebra {
+				case TInt() => Fix(TInt())
+
+				case TArray(inner: Fix[AvroSchema_S]) => inner
+			}
+		}
+		implicit def skeuoProject_AA: Project[AvroSchema_S, Fix[AvroSchema_S]] = new Project[AvroSchema_S, Fix[AvroSchema_S]] {
+			def coalgebra: Coalgebra[AvroSchema_S, Fix[AvroSchema_S]] = Coalgebra {
+				case Fix(TInt()) => TInt()
+				case Fix(ta@TArray(inner: Fix[AvroSchema_S])) => ta
+			}
+		}
+		/*implicit def basis_AA: Basis[AvroSchema_S, Fix[AvroSchema_S]] = new Basis[AvroSchema_S, Fix[AvroSchema_S]] {
+			def algebra: Algebra[AvroSchema_S, Fix[AvroSchema_S]] = Algebra {
+
+				case TInt() => Fix(TInt())
+
+				case TArray(inner: Fix[AvroSchema_S]) => inner
+			}
+
+			def coalgebra: Coalgebra[AvroSchema_S, Fix[AvroSchema_S]] = Coalgebra {
+				case Fix(TInt()) => TInt()
+				case Fix(ta @ TArray(inner: Fix[AvroSchema_S])) => ta
+			}
+		}*/
+
 		/**
 		 * Trans[F[_], G[_], A]
 		 *
@@ -762,20 +880,26 @@ object Skeuo_Skeuo {
 
 		import TransSchemaImplicits.{ skeuoEmbed_AJ, skeuoProject_JA} // skeuoProject_AJ
 
-		// algebra: Embed: G[A] => A
-		// coalgebra: Project: A => F[A]
+		// algebra: Embed: G[A] => A     :  AvroF [ Fix[JsonF] ] => Fix[JsonF]
+		// coalgebra: Project: A => F[A]   :  Fix[JsonF] => JsonF [ Fix[JsonF] ]
+		// CATA = algebra . coalgebra
+
 		 // TODO: declare transA: Trans[JsonSchema, AvroSchema, Fix[?]] with corresponding implicits and see how they pick up at the decoders then see what comes out with the avro-skeuo -> circe -> skeuo conversion
+
 		val avroToJson_byCataTransAlg: Fix[AvroSchema_S] => Fix[JsonSchema_S] = scheme.cata(transJAJ.algebra).apply(_)
 
 
 		import TransSchemaImplicits.{skeuoEmbed_JA, skeuoProject_AJ}
 
-		// algebra: Embed:
-		// G[A] => A:
+		// algebra: Embed:  G[A] => A:
 		// JsonSchema_S[Fix[JsonSchema_S]] => Fix[JsonSchema_S]
 		// coalgebra: Project:
 		// A => F[A]
 		// Fix[JsonSchema_S] => AvroSchema_S [ Fix[JsonSchema_S] ]
+
+		// algebra: Embed: G[A] => A     :  JsonF [ Fix[JsonF] ] => Fix[JsonF]
+		// coalgebra: Project: A => F[A]   :  Fix[JsonF] => AvroF [ Fix[JsonF] ]
+		// ANA = algebra . coalgebra
 		val jsonToAvro_byAnaTransCoalg: Fix[JsonSchema_S] ⇒ Fix[AvroSchema_S] = scheme.ana(transAJJ.coalgebra).apply(_)
 
 
