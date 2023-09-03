@@ -136,7 +136,8 @@ object Data {
 	val recordExPositionJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNamedF(
 		name = "Position",
 		properties = List(
-			Property(name = "coordinates", tpe = Fix(ArrayF(Fix(FloatF()))))
+			Property(name = "coordinates", tpe = Fix(ArrayF(Fix(FloatF())))),
+			Property(name = "type", tpe = Fix(StringF()))
 		),
 		required = List()
 	))

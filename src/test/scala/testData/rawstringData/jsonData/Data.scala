@@ -197,6 +197,7 @@ object Data {
 	// TODO: find a way to write the json-skeuo equivalents so that when converted to json-circe the results contain the title too.
 
 	// NOTE (from autoschema generation not from original json file)
+	// TODO warning - this string does not contain the 'type' field while the skeuo-json equivalent DOES (to match the avro-skeuo (and the avro-skeuo has the 'type' field because the avro-str has it))
 	val recordExPositionJson_AR: String =
 		"""
 		  |{

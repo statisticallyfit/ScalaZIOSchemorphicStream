@@ -68,6 +68,53 @@ object Skeuo_Skeuo {
 			case actual: String => DecodingFailure(s"$actual is not expected type $expected", c.history).asLeft
 		}
 
+	private def propertyExists(c: HCursor, name: String): Decoder.Result[Unit] =
+		c.downField(name)
+			.success
+			.fold(DecodingFailure(s"$name property does not exist", c.history).asLeft[Unit])(_ =>
+				().asRight[DecodingFailure]
+			)
+
+
+
+
+	// Added by @statisticallyfit
+	private def hasObjectProperty(c: HCursor): Boolean =
+		validateType(c, "object").isRight &&
+			propertyExists(c, "type").isRight
+
+	private def hasNameProperty(c: HCursor): Boolean =
+		/*hasObjectProperty(c) &&*/
+			propertyExists(c, "title").isRight
+
+	private def hasMapProperty(c: HCursor): Boolean =
+		propertyExists(c, "additionalProperties").isRight
+
+
+	private def isObject(c: HCursor): Boolean = {
+		hasObjectProperty(c) &&
+			propertyExists(c, "properties").isRight &&
+			propertyExists(c, "required").isRight
+	} /*||
+			propertyExists(c, "allOf").isRight*/
+
+	private def isObjectNamed(c: HCursor): Boolean = {
+		isObject(c) &&
+			hasNameProperty(c)
+	}
+
+	private def isObjectNamedMap(c: HCursor): Boolean =
+		hasObjectProperty(c) && // does not include props, reqs
+		hasNameProperty(c) &&
+			hasMapProperty(c)
+
+	// Added by @statisticallyfit
+	private def isObjectMap(c: HCursor): Boolean =
+		isObject(c) &&
+			hasMapProperty(c)
+
+
+
 
 	object TEMP_AvroSchemaDecoderImplicit {
 		implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
@@ -84,7 +131,8 @@ object Skeuo_Skeuo {
 
 		private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 			logicalTypeAvroSchemaDecoder orElse
-			arrayAvroSchemaDecoder
+			arrayAvroSchemaDecoder orElse
+			mapAvroSchemaDecoder
 		} /*orElse
 				mapAvroSchemaDecoder orElse
 				recordAvroSchemaDecoder orElse
@@ -106,7 +154,7 @@ object Skeuo_Skeuo {
 				case ("int", Some("time-millis"), None, None) => timeMillis[A]().embed.asRight
 				case ("bytes", Some("decimal"), Some(precision), Some(scale)) => decimal[A](precision, scale).embed.asRight
 
-				case (x, _, _, _) => s"$x is not well formed type".asLeft
+				case (x, _, _, _) => s"$x is not well formed logical-type".asLeft
 			}
 		}
 
@@ -140,20 +188,6 @@ object Skeuo_Skeuo {
 				case ("string", _) => string[A]().embed.asRight
 				case (x, _) => s"$x is not well formed type".asLeft
 			}
-
-/*			Decoder.forProduct1[String, String]("type")(Tuple1[String](_)._1).emap  {
-
-				case "null" => `null`[A]().embed.asRight
-				case "int" => int[A]().embed.asRight
-				case "string" => string[A]().embed.asRight
-				case "boolean" => boolean[A]().embed.asRight
-				case "long" => long[A]().embed.asRight
-				case "float" => float[A]().embed.asRight
-				case "double" => double[A]().embed.asRight
-				case "bytes" => bytes[A]().embed.asRight
-
-				case x => s"$x is not well formed type".asLeft
-			}*/
 		}
 
 		private def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
@@ -164,7 +198,58 @@ object Skeuo_Skeuo {
 				} yield AvroSchema_S.array(items).embed
 			}
 
-		private def mapAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+		private def mapAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+			Decoder.instance { c: HCursor =>
+
+				// Added by @statisticallyfit:
+
+				/**
+				 * Extract the string { "type": "something" } that comes after 'additionalProperties'
+				 *
+				 * @return
+				 */
+				// Added by @statisticallyfit:
+				// Separating by different kinds of object classes so can properly interpret a MAP from avro into json
+				def makeAvroCirceMap: Result[A] = {
+
+					val tmap: A => AvroSchema_S[A] = (inner) => AvroSchema_S.map[A](inner)
+
+
+					val resultArgs: Result[A] = for {
+
+						inner: A <- {
+
+							val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+
+							val resMap: Result[TMap[A]] = resTpe.map(tpe => AvroSchema_S.TMap(tpe))
+
+							println(s"\n\nINSIDE makeAvroCirceObjectNamedMap:")
+							println(s"resTpe = $resTpe")
+							println(s"resMap = $resMap")
+
+							resTpe
+						}
+
+					} yield inner
+
+
+					val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (inner) => tmap(inner) }
+					val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+					println(s"\n\nINSIDE makeAvroCirceMap:")
+					println(s"result (not embed) = $result_noEmbed")
+					println(s"result (embed) = $result_embed")
+
+					result_embed
+				}
+
+
+				//assert(isObjectMap)
+
+				makeAvroCirceMap
+			}
+		}
 
 		private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
 		private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
@@ -205,59 +290,6 @@ object Skeuo_Skeuo {
 
 			Decoder.instance { c: HCursor =>
 
-				def propertyExists(name: String): Decoder.Result[Unit] =
-					c.downField(name)
-						.success
-						.fold(DecodingFailure(s"$name property does not exist", c.history).asLeft[Unit])(_ =>
-							().asRight[DecodingFailure]
-						)
-
-				// TODO is this the meaning of the orElse version below?
-				/*def isObject: Boolean =
-					validateType(c, "object").isRight ||
-					propertyExists("properties").isRight ||
-					propertyExists("allOf").isRight*/
-
-				def isObject: Boolean =
-					validateType(c, "object").isRight &&
-					propertyExists("properties").isRight &&
-					propertyExists("required").isRight ||
-					propertyExists("allOf").isRight
-
-
-				// HELP don't know why orElse here is not working
-				/*def isObject_HELP_ORELSE: Decoder.Result[Unit] =
-					validateType(c, "object") orElse
-					propertyExists("properties") orElse
-					propertyExists("allOf")*/
-
-				// Added by @statisticallyfit
-				def isObjectNamed: Boolean =
-					validateType(c, "object").isRight &&
-						propertyExists("type").isRight &&
-						propertyExists("title").isRight &&
-						propertyExists("properties").isRight &&
-					  	propertyExists("required").isRight
-
-				/*validateType(c, "object").isRight &&
-				propertyExists("title").isRight &&
-				propertyExists("properties").isRight ||
-				propertyExists("required").isRight*/ // not mandatory that is why use OR instead of AND
-
-
-				// Added by @statisticallyfit
-				def isObjectNamedMap: Boolean =
-					validateType(c, "object").isRight &&
-					propertyExists("type").isRight &&
-					propertyExists("title").isRight &&
-					propertyExists("additionalProperties").isRight
-
-				// Added by @statisticallyfit
-				def isObjectMap: Boolean =
-					validateType(c, "object").isRight &&
-						propertyExists("type").isRight &&
-						//propertyExists("title").isRight &&
-						propertyExists("additionalProperties").isRight
 
 				// Added by @statisticallyfit:
 
@@ -286,7 +318,7 @@ object Skeuo_Skeuo {
 
 							val resAddProps: Result[JsonSchema_S.AdditionalProperties[A]] = resTpe.map(tpe => JsonSchema_S.AdditionalProperties(tpe = tpe))
 
-							println(s"\n\nINSIDE makeJsonCirceObjectNamedMap:")
+							println(s"\n\nINSIDE makeJsonCirceObjectMap:")
 							println(s"resTpe = $resTpe")
 							println(s"resAddProps = $resAddProps")
 
@@ -297,7 +329,7 @@ object Skeuo_Skeuo {
 
 
 					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case ( addProps) => objmap(addProps) }
-					val result_embed: Result[A] = resultArgs.map { case ( addProps) => objmap(addProps).embed }
+					val result_embed: Result[A] = result_noEmbed.map(_.embed)
 
 					println(s"\n\nINSIDE makeJsonCirceObjectNamedMap:")
 					println(s"result (not embed) = $result_noEmbed")
@@ -315,8 +347,6 @@ object Skeuo_Skeuo {
 
 
 					val resultArgs: Either[DecodingFailure, (String, JsonSchema_S.AdditionalProperties[A])] = for {
-
-						// NOTE: got withFilter error here in for-comprehension so using this plugin = https://github.com/oleg-py/better-monadic-for
 
 						title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
 
@@ -337,7 +367,7 @@ object Skeuo_Skeuo {
 
 
 					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case (title, addProps) => objnamedmap(title, addProps) }
-					val result_embed: Result[A] = resultArgs.map { case (title, addProps) => objnamedmap(title, addProps).embed }
+					val result_embed: Result[A] = result_noEmbed.map(_.embed)
 
 					println(s"\n\nINSIDE makeJsonCirceObjectNamedMap:")
 					println(s"result (not embed) = $result_noEmbed")
@@ -382,7 +412,7 @@ object Skeuo_Skeuo {
 						} yield (title, properties, required) //JsonSchema_S.objectName[A](title, properties, required).embed
 
 					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case (title, ps, rs) => objnamed(title, ps, rs) }
-					val result_embed: Result[A] = resultArgs.map { case (title, ps, rs) => objnamed(title, ps, rs).embed }
+					val result_embed: Result[A] = result_noEmbed.map(_.embed)
 
 					println(s"\n\nINSIDE makeJsonCirceObjectNamed:")
 					println(s"result (not embed) = $result_noEmbed")
@@ -429,7 +459,7 @@ object Skeuo_Skeuo {
 						} yield (properties, required) // JsonSchema_S.`object`[A](properties, required.getOrElse(List.empty)).embed
 
 					val result_noEmbed: Result[JsonSchema_S[A]] = resultArgs.map { case (ps, rs) => objsimple(ps, rs) }
-					val result_embed: Result[A] = resultArgs.map { case (ps, rs) => objsimple(ps, rs).embed }
+					val result_embed: Result[A] = result_noEmbed.map(_.embed)
 
 					println(s"\n\nINSIDE makeJsonCirceObjectSimple:")
 					println(s"result (not embed) = $result_noEmbed")
@@ -439,31 +469,19 @@ object Skeuo_Skeuo {
 				}
 
 				val titleStr: ACursor = c.downField("title")
-				println(s"\n\nDOWNFIELD TITLE = $titleStr")
+				println(s"\n\nDOWNFIELD TITLE = ${titleStr.as[String]}")
 
 
-				if(isObjectMap) {
-					makeJsonCirceObjectMap
-				} else if(isObjectNamedMap) {
-					makeJsonCirceObjectNamedMap
-				} else if(isObjectNamed){
-					makeJsonCirceObjectNamed
-				} else {
-					makeJsonCirceObjectSimple
-				}
-				// Case matching to decide which object-type to use
-				/*isObjectNamedMap match {
-
-					case true => makeJsonCirceObjectNamedMap
-
-					case false => isObjectNamed match {
-
-						case true => makeJsonCirceObjectNamed
-
-						case false => makeJsonCirceObjectSimple
+				hasNameProperty(c) match {
+					case false => hasMapProperty(c) match {
+						case true => makeJsonCirceObjectMap // no name, map
+						case false => makeJsonCirceObjectSimple // no name, no map
 					}
-				}*/
-
+					case true => isObjectNamedMap(c) match {
+						case true => makeJsonCirceObjectNamedMap
+						case false => makeJsonCirceObjectNamed
+					}
+				}
 
 			}
 

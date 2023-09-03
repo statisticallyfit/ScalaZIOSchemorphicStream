@@ -184,8 +184,8 @@ object ParseADTToCirceToADT {
 
 			val base: JsonCirce = JsonCirce.obj(
 				"title" -> JsonCirce.fromString(name),
-				"type" -> JsonCirce.fromString("record"),
-				"fields" -> JsonCirce.arr(fields.map(field2Obj): _*) // TODO update this function (field2Obj) to preserve all the args from Field (like order, doc, etc)
+				"type" -> JsonCirce.fromString("object"),
+				"properties" -> JsonCirce.arr(fields.map(field2Obj): _*) // TODO update this function (field2Obj) to preserve all the args from Field (like order, doc, etc)
 
 				// TODO must rename fields to be properties
 			)
