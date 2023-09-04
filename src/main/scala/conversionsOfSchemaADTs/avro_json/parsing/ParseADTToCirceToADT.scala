@@ -1,14 +1,12 @@
 package conversionsOfSchemaADTs.avro_json.parsing
 
 import cats.data.NonEmptyList
-
-import higherkindness.droste.{scheme, Algebra, Coalgebra}
 import higherkindness.droste.data.Fix
-
-import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
-import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-import JsonSchema_S._
-import AvroSchema_S.{Field ⇒ FieldAvro, _}
+import higherkindness.droste.{Algebra, scheme}
+import higherkindness.skeuomorph.avro.AvroF.{Field => FieldAvro, _}
+import higherkindness.skeuomorph.avro.{AvroF => AvroSchema_S}
+import higherkindness.skeuomorph.openapi.JsonSchemaF._
+import higherkindness.skeuomorph.openapi.{JsonSchemaF => JsonSchema_S}
 
 
 // NOTE: commenting out the JsonDecoders file so I can import the jsonSchemaDecoders from my Skeuo_Skeuo file (to easily update) instead of having to publish skeuomorph each time I make a change.
@@ -18,7 +16,7 @@ import AvroSchema_S.{Field ⇒ FieldAvro, _}
 
 
 import io.circe.Decoder.Result
-import io.circe.{Decoder, Json ⇒ JsonCirce}
+import io.circe.{Decoder, Json => JsonCirce}
 
 
 /**
@@ -436,7 +434,7 @@ object ParseADTToCirceToADT {
 
 
 	object CirceToAvroSkeuo {
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoEmbed_JA,  skeuoProject_AJ}
+		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
 
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicit._
 
@@ -452,9 +450,7 @@ object ParseADTToCirceToADT {
 	// -----------------
 	object CirceToJsonSkeuo {
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
-
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{ skeuoEmbed_AJ }//, skeuoProject_AJ}
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._//, skeuoProject_AJ}
 
 		val funcCirceToJsonSkeuo: JsonCirce ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
 	}

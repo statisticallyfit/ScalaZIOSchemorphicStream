@@ -95,6 +95,9 @@ object Data {
 		additionalProperties = AdditionalProperties(tpe = Fix(IntegerF()))
 	))
 
+	val map1IntJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectMapF(
+		additionalProperties = AdditionalProperties(tpe = Fix(IntegerF()))
+	))
 
 
 

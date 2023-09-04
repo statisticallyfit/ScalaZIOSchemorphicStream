@@ -98,6 +98,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		//intAvro_Fix_S,
 		recordExPositionAvro_Fix_S,
 		map1PosRecordJson_Fix_S
+			//map1IntJson_Fix_S
 	)
 	/*info(s"\n\nnow map avro: ")
 	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))

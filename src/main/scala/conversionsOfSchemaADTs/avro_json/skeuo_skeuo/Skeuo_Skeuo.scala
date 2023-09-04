@@ -132,7 +132,8 @@ object Skeuo_Skeuo {
 		private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 			logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
-			mapAvroSchemaDecoder
+			mapAvroSchemaDecoder orElse
+			recordAvroSchemaDecoder
 		} /*orElse
 				mapAvroSchemaDecoder orElse
 				recordAvroSchemaDecoder orElse
@@ -252,7 +253,64 @@ object Skeuo_Skeuo {
 		}
 
 		private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
-		private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+
+
+		private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = Decoder.instance { c: HCursor =>
+
+
+			def makeAvroCirceObjectNamed: Result[A] = {
+
+				val trecord: (String, Option[String], List[String], Option[String], List[Field[A]]) => AvroSchema_S[A] = (title, namespace, aliases, doc, fields) => AvroSchema_S.record[A](title, namespace, aliases, doc, fields)
+
+				val resultArgs: Result[(String, Option[String], List[String], Option[String], List[Field[A]])] =
+					for {
+						title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
+
+						namespace: Option[String] <- c.downField("namespace").as[Option[Option[String]]].map(_.getOrElse(None))
+
+						aliases: List[String] <- c.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+
+						doc: Option[String] <- c.downField("doc").as[Option[Option[String]]].map(_.getOrElse(None))
+
+						properties: List[AvroSchema_S.Field[A]] <- {
+							//.as[Option[A]]
+							val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
+								Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyAvroDecoderWithPriorityBasicDecoder[A]))
+							)
+
+							val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
+
+							val resListProps: Result[List[AvroSchema_S.Field[A]]] = resMap
+								.map((mapStrA: Map[String, A]) => mapStrA.toList.map((AvroSchema_S.Field.apply[A] _).tupled /*{
+								val funcTup: ((String, A)) => JsonSchema_S.Property[A] = (JsonSchema_S.Property.apply[A] _).tupled
+								funcTup(tup)
+							}*/
+								)
+								)
+
+
+							println(s"\n\nINSIDE makeAvroCirceObjectNamed:")
+							println(s"resOptMap  = $resOptMap")
+							println(s"resMap  = $resMap")
+							println(s"resListProps = $resListProps")
+
+							resListProps
+						}
+					} yield (title, namespace, aliases, doc, fields)
+
+				//(String, Option[String], List[String], Option[String], List[Field[A]]) => AvroSchema_S.TRecord[A] = (title, namespace, aliases, doc, fields)
+
+				val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (title, namespace, aliases, doc, fields) => trecord(title, namespace, aliases, doc, fields) }
+				val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+				println(s"\n\nINSIDE makeJsonCirceObjectNamed:")
+				println(s"result (not embed) = $result_noEmbed")
+				println(s"result (embed) = $result_embed")
+
+				result_embed
+
+			}
+		}
 		private def unionAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
 		private def fixedAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
 
