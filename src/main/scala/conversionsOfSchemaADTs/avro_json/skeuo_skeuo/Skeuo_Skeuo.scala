@@ -272,6 +272,7 @@ object Skeuo_Skeuo {
 
 						doc: Option[String] <- c.downField("doc").as[Option[Option[String]]].map(_.getOrElse(None))
 
+						// NOTE: no point extracting the 'required' because that goes as arg just in the json-skeuo and avro-skeuo has no arg 'required'
 						//required: List[String] <- c.downField("required").as[Option[List[String]]].map(_.getOrElse(List.empty))
 
 						fields: List[AvroSchema_S.Field[A]] <- {
@@ -291,7 +292,7 @@ object Skeuo_Skeuo {
 							}*/
 								))
 
-							// Step 2: convert from the json-skeuo into avro-skeuo. 
+							// Step 2: convert from the json-skeuo into avro-skeuo.
 							val resListFields: Result[List[FieldAvro[A]]] = resListProps.map((lstProps: List[Property[A]]) => lstProps.map((p: Property[A]) => property2Field(p)))
 
 
