@@ -14,6 +14,7 @@ import higherkindness.skeuomorph.openapi.{JsonSchemaF => JsonSchema_S}
 //import higherkindness.skeuomorph.openapi.JsonDecoders._
 
 
+import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
 
 import io.circe.Decoder.Result
 import io.circe.{Decoder, Json => JsonCirce}
@@ -183,7 +184,15 @@ object ParseADTToCirceToADT {
 			val base: JsonCirce = JsonCirce.obj(
 				"title" -> JsonCirce.fromString(name),
 				"type" -> JsonCirce.fromString("object"),
-				"properties" -> JsonCirce.arr(fields.map(field2Obj): _*) // TODO update this function (field2Obj) to preserve all the args from Field (like order, doc, etc)
+				"properties" -> {
+
+					val properties: List[Property[JsonCirce]] = fields.map(field2Property(_))
+
+					JsonCirce.obj(properties.map(prop => prop.name -> prop.tpe): _*)
+				},
+				"required" -> JsonCirce.fromValues(List())
+
+					//JsonCirce.arr(fields.map(field2Obj): _*) // TODO update this function (field2Obj) to preserve all the args from Field (like order, doc, etc)
 
 				// TODO must rename fields to be properties
 			)

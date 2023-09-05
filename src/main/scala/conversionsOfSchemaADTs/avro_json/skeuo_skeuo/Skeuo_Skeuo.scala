@@ -212,7 +212,7 @@ object Skeuo_Skeuo {
 				 */
 				// Added by @statisticallyfit:
 				// Separating by different kinds of object classes so can properly interpret a MAP from avro into json
-				def makeAvroCirceMap: Result[A] = {
+				def makeAvroCirceMap(c: HCursor): Result[A] = {
 
 					val tmap: A => AvroSchema_S[A] = (inner) => AvroSchema_S.map[A](inner)
 
@@ -248,7 +248,7 @@ object Skeuo_Skeuo {
 
 				//assert(isObjectMap)
 
-				makeAvroCirceMap
+				makeAvroCirceMap(c)
 			}
 		}
 
@@ -258,7 +258,7 @@ object Skeuo_Skeuo {
 		private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = Decoder.instance { c: HCursor =>
 
 
-			def makeAvroCirceObjectNamed: Result[A] = {
+			def makeAvroCirceRecord(c: HCursor): Result[A] = {
 
 				val trecord: (String, Option[String], List[String], Option[String], List[Field[A]]) => AvroSchema_S[A] = (title, namespace, aliases, doc, fields) => AvroSchema_S.record[A](title, namespace, aliases, doc, fields)
 
@@ -272,33 +272,38 @@ object Skeuo_Skeuo {
 
 						doc: Option[String] <- c.downField("doc").as[Option[Option[String]]].map(_.getOrElse(None))
 
-						properties: List[AvroSchema_S.Field[A]] <- {
-							//.as[Option[A]]
+						//required: List[String] <- c.downField("required").as[Option[List[String]]].map(_.getOrElse(List.empty))
+
+						fields: List[AvroSchema_S.Field[A]] <- {
+
 							val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
 								Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyAvroDecoderWithPriorityBasicDecoder[A]))
 							)
 
 							val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
 
-							val resListProps: Result[List[AvroSchema_S.Field[A]]] = resMap
-								.map((mapStrA: Map[String, A]) => mapStrA.toList.map((AvroSchema_S.Field.apply[A] _).tupled /*{
+
+							// Step 1: first, since getting from json-circe-string, we are interpreting result into a json-skeuo.
+							val resListProps: Result[List[JsonSchema_S.Property[A]]] = resMap
+								.map((mapStrA: Map[String, A]) => mapStrA.toList.map((JsonSchema_S.Property.apply[A] _).tupled /*{
 								val funcTup: ((String, A)) => JsonSchema_S.Property[A] = (JsonSchema_S.Property.apply[A] _).tupled
 								funcTup(tup)
 							}*/
-								)
-								)
+								))
+
+							// Step 2: convert from the json-skeuo into avro-skeuo. 
+							val resListFields: Result[List[FieldAvro[A]]] = resListProps.map((lstProps: List[Property[A]]) => lstProps.map((p: Property[A]) => property2Field(p)))
 
 
 							println(s"\n\nINSIDE makeAvroCirceObjectNamed:")
 							println(s"resOptMap  = $resOptMap")
 							println(s"resMap  = $resMap")
-							println(s"resListProps = $resListProps")
+							println(s"resListFields = $resListFields")
 
-							resListProps
+							resListFields
 						}
 					} yield (title, namespace, aliases, doc, fields)
 
-				//(String, Option[String], List[String], Option[String], List[Field[A]]) => AvroSchema_S.TRecord[A] = (title, namespace, aliases, doc, fields)
 
 				val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (title, namespace, aliases, doc, fields) => trecord(title, namespace, aliases, doc, fields) }
 				val result_embed: Result[A] = result_noEmbed.map(_.embed)
@@ -310,6 +315,8 @@ object Skeuo_Skeuo {
 				result_embed
 
 			}
+
+			makeAvroCirceRecord(c)
 		}
 		private def unionAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
 		private def fixedAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
@@ -359,7 +366,7 @@ object Skeuo_Skeuo {
 
 				// Added by @statisticallyfit:
 				// Separating by different kinds of object classes so can properly interpret a MAP from avro into json
-				def makeJsonCirceObjectMap: Result[A] = {
+				def makeJsonCirceObjectMap(c: HCursor): Result[A] = {
 
 					val objmap: JsonSchema_S.AdditionalProperties[A] => JsonSchema_S[A] = ( addProps) => JsonSchema_S.objectMap[A](additionalProperties = addProps)
 
@@ -399,7 +406,7 @@ object Skeuo_Skeuo {
 
 				// Added by @statisticallyfit:
 				// Separating by different kinds of object classes so can properly interpret a MAP from avro into json
-				def makeJsonCirceObjectNamedMap: Result[A] = {
+				def makeJsonCirceObjectNamedMap(c: HCursor): Result[A] = {
 
 					val objnamedmap: (String, JsonSchema_S.AdditionalProperties[A]) => JsonSchema_S[A] = (title, addProps) => JsonSchema_S.objectNamedMap[A](name = title, additionalProperties = addProps)
 
@@ -435,7 +442,7 @@ object Skeuo_Skeuo {
 				}
 
 
-				def makeJsonCirceObjectNamed: Result[A] = {
+				def makeJsonCirceObjectNamed(c: HCursor): Result[A] = {
 
 					val objnamed: (String, List[JsonSchema_S.Property[A]], List[String]) => JsonSchema_S[A] = (title, properties, required) => JsonSchema_S.objectNamed[A](name = title, properties = properties, required = required)
 
@@ -481,7 +488,7 @@ object Skeuo_Skeuo {
 				}
 
 
-				def makeJsonCirceObjectSimple = {
+				def makeJsonCirceObjectSimple(c: HCursor): Result[A] = {
 
 					val objsimple: (List[JsonSchema_S.Property[A]], List[String]) => JsonSchema_S[A] = (properties, required) => JsonSchema_S.`object`[A](properties, required)
 
@@ -532,12 +539,12 @@ object Skeuo_Skeuo {
 
 				hasNameProperty(c) match {
 					case false => hasMapProperty(c) match {
-						case true => makeJsonCirceObjectMap // no name, map
-						case false => makeJsonCirceObjectSimple // no name, no map
+						case true => makeJsonCirceObjectMap(c) // no name, map
+						case false => makeJsonCirceObjectSimple(c) // no name, no map
 					}
 					case true => isObjectNamedMap(c) match {
-						case true => makeJsonCirceObjectNamedMap
-						case false => makeJsonCirceObjectNamed
+						case true => makeJsonCirceObjectNamedMap(c)
+						case false => makeJsonCirceObjectNamed(c)
 					}
 				}
 
