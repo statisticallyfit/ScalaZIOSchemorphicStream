@@ -230,6 +230,14 @@ object Data {
 	 */
 
 
+
+	// -----------------------------------------------------------------------
+
+	val namedTypeAvro_S: TNamedType[Nothing] = TNamedType(name = "namedTypeHere", namespace = "namespaceHere")
+	val namedTypeAvro_Fix_S: Fix[AvroSchema_S] = Fix(TNamedType(name = "namedTypeHere", namespace = "namespaceHere"))
+
+
+
 	val unionAvro_S: AvroSchema_S[AvroSchema_S[Nothing]] = TUnion(NonEmptyList(TInt(), List(TString(), TInt(), TBoolean())))
 	val unionAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TUnion(NonEmptyList(TInt(), List(TString(), TInt(), TBoolean())))
 	//val unionAvro_Fix_S: Fix[AvroSchema_S] = ???

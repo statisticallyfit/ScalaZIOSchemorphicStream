@@ -75,7 +75,13 @@ object Skeuo_Skeuo {
 				().asRight[DecodingFailure]
 			)
 
-
+	/*def isnamedtype(c: HCursor, name: String) ={
+		val here: Any => Either[DecodingFailure, Nothing] =
+			for {
+				_ <- propertyExists(c, "name")
+				_ <- propertyExists(c, "namespace")
+			} yield _
+	}*/
 
 
 	// Added by @statisticallyfit
@@ -110,7 +116,7 @@ object Skeuo_Skeuo {
 
 	// Added by @statisticallyfit
 	private def isObjectMap(c: HCursor): Boolean =
-		isObject(c) &&
+		hasObjectProperty(c) &&
 			hasMapProperty(c)
 
 
@@ -133,7 +139,11 @@ object Skeuo_Skeuo {
 			logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
 			mapAvroSchemaDecoder orElse
-			recordAvroSchemaDecoder
+			recordAvroSchemaDecoder orElse
+			namedTypeAvroSchemaDecoder
+			// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
+
+
 		} /*orElse
 				mapAvroSchemaDecoder orElse
 				recordAvroSchemaDecoder orElse
@@ -195,7 +205,7 @@ object Skeuo_Skeuo {
 			Decoder.instance { c: HCursor =>
 				for {
 					items: A <- c.downField("items").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
-					//_ <- validateType(c, "array")
+					_ <- validateType(c, "array")
 				} yield AvroSchema_S.array(items).embed
 			}
 
@@ -218,6 +228,10 @@ object Skeuo_Skeuo {
 
 
 					val resultArgs: Result[A] = for {
+						// validation
+						_ <- validateType(c, "object")
+						_ <- propertyExists(c, "type")
+						_ <- propertyExists(c, "additionalProperties")
 
 						inner: A <- {
 
@@ -225,7 +239,7 @@ object Skeuo_Skeuo {
 
 							val resMap: Result[TMap[A]] = resTpe.map(tpe => AvroSchema_S.TMap(tpe))
 
-							println(s"\n\nINSIDE makeAvroCirceObjectNamedMap:")
+							println(s"\n\nINSIDE makeAvroCirceMap:")
 							println(s"resTpe = $resTpe")
 							println(s"resMap = $resMap")
 
@@ -252,10 +266,73 @@ object Skeuo_Skeuo {
 			}
 		}
 
-		private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+		private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+			// Altered propertyExists function
+			/*def isNamedType(c: HCursor): Decoder.Result[Unit] = {
+				val res1: Result[Unit] = c.downField("name")
+					.success
+					.fold(DecodingFailure(s"'name' property does not exist", c.history).asLeft[Unit])(_ =>
+						().asRight[DecodingFailure]
+					)
+
+				val res2: Result[Unit] = c.downField("namespace")
+					.success
+					.fold(DecodingFailure(s"'namespace' property does not exist", c.history).asLeft[Unit])(_ =>
+						().asRight[DecodingFailure]
+					)
+				val res3 = res1.joinRight(res2)
+				res3
+			}*/
+			/*def isNamedType(c: HCursor): Boolean = {
+				propertyExists(c, name = "name").isRight &&
+					propertyExists(c, name = "namespace").isRight
+			}*/
+
+
+			Decoder.instance { c: HCursor =>
+
+
+				def makeAvroCirceNamedType(c: HCursor): Result[A] = {
+
+					val tnamedtype: (String, Option[String]) => AvroSchema_S[A] = (title, namespace) => AvroSchema_S.namedType[A](namespace.getOrElse(""), title)
+
+					val resultArgs: Result[(String, Option[String])] =
+						for {
+							// TODO: verify property exists for each type-function because otherwise it assigns the wrong class to the situation.
+
+							_ <- propertyExists(c, "title")
+							_ <- propertyExists(c, "namespace")
+
+							title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
+
+							namespace: Option[String] <- c.downField("namespace").as[Option[Option[String]]].map(_.getOrElse(None))
+
+						} yield (title, namespace)
+
+
+					val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (title, namespace) => tnamedtype(title, namespace) }
+					val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+					println(s"\n\nINSIDE makeAvroCirceNamedType:")
+					println(s"result (not embed) = $result_noEmbed")
+					println(s"result (embed) = $result_embed")
+
+					result_embed
+
+				}
+
+				//assert (isNamedType(c))
+
+				makeAvroCirceNamedType(c)
+
+			}
+		}
 
 
 		private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = Decoder.instance { c: HCursor =>
+
+
 
 
 			def makeAvroCirceRecord(c: HCursor): Result[A] = {
@@ -264,6 +341,15 @@ object Skeuo_Skeuo {
 
 				val resultArgs: Result[(String, Option[String], List[String], Option[String], List[Field[A]])] =
 					for {
+						// validation
+						_ <- validateType(c, "object")
+						_ <- propertyExists(c, "title")
+						_ <- propertyExists(c, "type")
+						//_ <- propertyExists(c, "properties")
+						_ <- propertyExists(c, "namespace")
+						_ <- propertyExists(c, "aliases")
+						_ <- propertyExists(c, "doc")
+
 						title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
 
 						namespace: Option[String] <- c.downField("namespace").as[Option[Option[String]]].map(_.getOrElse(None))
@@ -309,7 +395,7 @@ object Skeuo_Skeuo {
 				val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (title, namespace, aliases, doc, fields) => trecord(title, namespace, aliases, doc, fields) }
 				val result_embed: Result[A] = result_noEmbed.map(_.embed)
 
-				println(s"\n\nINSIDE makeJsonCirceObjectNamed:")
+				println(s"\n\nINSIDE makeAvroCirceRecord:")
 				println(s"result (not embed) = $result_noEmbed")
 				println(s"result (embed) = $result_embed")
 
@@ -515,7 +601,7 @@ object Skeuo_Skeuo {
 									)
 
 
-								println(s"\n\nINSIDE makeJsonCirceObjectNamed:")
+								println(s"\n\nINSIDE makeJsonCirceObjectSimple:")
 								println(s"resOptMap  = $resOptMap")
 								println(s"resMap  = $resMap")
 								println(s"resListProps = $resListProps")
