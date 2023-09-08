@@ -17,10 +17,20 @@ import scala.meta._
  *
  */
 object SkeuomorphExample extends App {
-	
-	
+
+
 	val definition =
 		"""
+		  |{
+		  |  "type": "enum",
+		  |  "name": "Colors",
+		  |  "symbols": [
+		  |    "Red",
+		  |    "Orange", "Pink", "Yellow", "Green", "Blue", "Indigo", "Violet"
+		  |  ]
+		  |}
+		  |""".stripMargin
+		/*"""
 		  |{
 		  |  "type": "record",
 		  |  "name": "RawCityMeshMeasurementsSchema",
@@ -57,26 +67,26 @@ object SkeuomorphExample extends App {
 		  |      }
 		  |    }
 		  |  ]
-		  |}""".stripMargin
-	
+		  |}""".stripMargin*/
+
 	val avroSchema: SchemaAvro_Apache = new SchemaAvro_Apache.Parser().parse(definition)
-	
+
 	val toMuSchema: SchemaAvro_Apache => Mu[MuF] =
 		scheme.hylo(transformAvro[Mu[MuF]].algebra, fromAvro)
-	
+
 	val printSchemaAsScala: Mu[MuF] => Either[String, String] =
 		codegen.schema(_).map(_.syntax)
-	
+
 	(toMuSchema >>> println)(avroSchema)
 	println("=====")
 	//(toMuSchema >>> printSchemaAsScala >>> println)(avroSchema)
 	//val res: SchemaAvro_Apache => Either[String, String] = toMuSchema >>> printSchemaAsScala
 	val res: Either[String, String] = (toMuSchema >>> printSchemaAsScala)(avroSchema)
-	
-	
+
+
 	println(UtilMain.cleanScalaTypeNames(res.getOrElse("")))
-	
-	
+
+
 	// HELP result is just:
 	/**
 	 * Mu(TProduct(RawCityMeshMeasurementsSchema,None,List(Field(data,Mu(TProduct(Data,None,List(Field(overview,Mu(TProduct(Overview,None,List(Field(visitorTypeAmount,Mu(TProduct(VisitorTypeAmount,None,List(Field(uniqueVisitorAmount,Mu(TSimpleInt(_32)),None)),List(),List())),None)),List(),List())),None)),List(),List())),None)),List(),List()))
@@ -86,5 +96,5 @@ object SkeuomorphExample extends App {
 	 *
 	 * HELP so that means it doesn't give the entire class nesting, so I DON'T have a way to convert avro schema -> case class.
 	 */
-	
+
 }

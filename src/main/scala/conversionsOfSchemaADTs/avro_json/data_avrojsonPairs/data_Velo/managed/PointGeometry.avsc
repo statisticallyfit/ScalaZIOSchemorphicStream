@@ -1,0 +1,20 @@
+{
+  "type" : "record",
+  "name" : "PointGeometry",
+  "namespace" : "trafficflow.velo.tf_devs.managed",
+  "fields" : [ {
+    "name" : "type",
+    "type" : {
+      "type" : "enum",
+      "name" : "GeometryType",
+      "symbols" : [ "Point", "MultiPolygon" ]
+    },
+    "default" : "Point"
+  }, {
+    "name" : "coordinates",
+    "type" : {
+      "type" : "array",
+      "items" : "double"
+    }
+  } ]
+}

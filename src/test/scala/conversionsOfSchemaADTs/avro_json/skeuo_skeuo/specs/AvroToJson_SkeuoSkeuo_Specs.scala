@@ -93,7 +93,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans.jsonToAvro_byAnaTransCoalg
 	//info(s"APACHE INT STR: ${skeuoToApacheAvroSchema(jsonToAvro_byAnaTransCoalg(funcCirceToJsonSkeuo(unsafeParse(strJson_R)).right.get))}")
 
-	testCirceToAvroSkeuo("map : skeuo -> circe -> skeuo",
+	/*testCirceToAvroSkeuo("map : skeuo -> circe -> skeuo",
 		map3IntAvro_Fix_S,
 		//intAvro_Fix_S,
 		//array1IntAvro_Fix_S,
@@ -102,7 +102,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		map1PosRecordJson_Fix_S
 		//map1IntJson_Fix_S
 		//array1IntJson_Fix_S
-	)
+	)*/
 	/*info(s"\n\nnow map avro: ")
 	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))
 
@@ -132,6 +132,10 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	info(s"circe -> avro-skeuo: ${stpA.skInfo.skeuoAvro_fromRaw }")
 	info(s"circe -> json-skeuo: ${stpA.skInfo.skeuoJson_fromRaw }")*/
 
+	printAvroStringToCirceToAvroSkeuo(List(enumAvro_R))
+	printAvroStringToCirceToJsonSkeuo(List(enumAvro_R))
+	//printJsonStringToCirceToAvroSkeuo(List(enumJson_R))
+	//printJsonStringToCirceToJsonSkeuo(List(enumJson_R))
 
 	def printAvroStringToCirceToAvroSkeuo(listAvroStrings: List[String]): Unit = {
 
@@ -140,9 +144,23 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		listAvroStrings.map(printer(_))
 	}
 
+	def printAvroStringToCirceToJsonSkeuo(listAvroStrings: List[String]): Unit = {
+
+		def printer(arg: String) = info(s"${DecodingStr.decodeAvroStringToCirceToJsonSkeuo(arg)}")
+
+		listAvroStrings.map(printer(_))
+	}
+
 	def printJsonStringToCirceToAvroSkeuo(listJsonStrings: List[String]): Unit = {
 
 		def printer(arg: String) = info(s"${DecodingStr.decodeJsonStringToCirceToAvroSkeuo(arg)}")
+
+		listJsonStrings.map(printer(_))
+	}
+
+	def printJsonStringToCirceToJsonSkeuo(listJsonStrings: List[String]): Unit = {
+
+		def printer(arg: String) = info(s"${DecodingStr.decodeJsonStringToCirceToJsonSkeuo(arg)}")
 
 		listJsonStrings.map(printer(_))
 	}

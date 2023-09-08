@@ -122,7 +122,7 @@ object Skeuo_Skeuo {
 
 
 
-	object TEMP_AvroSchemaDecoderImplicit {
+	object TEMP_AvroSchemaDecoderImplicit_usingJsonCirceString {
 		implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
 			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
@@ -140,7 +140,8 @@ object Skeuo_Skeuo {
 			arrayAvroSchemaDecoder orElse
 			mapAvroSchemaDecoder orElse
 			recordAvroSchemaDecoder orElse
-			namedTypeAvroSchemaDecoder
+			namedTypeAvroSchemaDecoder orElse
+			enumAvroSchemaDecoder
 			// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
 
 
@@ -301,7 +302,7 @@ object Skeuo_Skeuo {
 						for {
 							// TODO: verify property exists for each type-function because otherwise it assigns the wrong class to the situation.
 
-							_ <- propertyExists(c, "title")
+							_ <- propertyExists(c, "title") // name for avro-string, title for json-string
 							_ <- propertyExists(c, "namespace")
 
 							title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
@@ -333,8 +334,6 @@ object Skeuo_Skeuo {
 		private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = Decoder.instance { c: HCursor =>
 
 
-
-
 			def makeAvroCirceRecord(c: HCursor): Result[A] = {
 
 				val trecord: (String, Option[String], List[String], Option[String], List[Field[A]]) => AvroSchema_S[A] = (title, namespace, aliases, doc, fields) => AvroSchema_S.record[A](title, namespace, aliases, doc, fields)
@@ -342,13 +341,15 @@ object Skeuo_Skeuo {
 				val resultArgs: Result[(String, Option[String], List[String], Option[String], List[Field[A]])] =
 					for {
 						// validation
+						// TODO - why error when including namspace, aliases, properties for validation below?
+						// TODO - maybe use the avro-string circe instead of json-string circe (from avro-skeuo) so no more mish-mash between json/avro string parameters.
 						_ <- validateType(c, "object")
 						_ <- propertyExists(c, "title")
 						_ <- propertyExists(c, "type")
-						//_ <- propertyExists(c, "properties")
-						_ <- propertyExists(c, "namespace")
-						_ <- propertyExists(c, "aliases")
-						_ <- propertyExists(c, "doc")
+						_ <- propertyExists(c, "properties")
+						//_ <- propertyExists(c, "namespace")
+						//_ <- propertyExists(c, "aliases")
+						//_ <- propertyExists(c, "doc")
 
 						title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
 
@@ -408,7 +409,55 @@ object Skeuo_Skeuo {
 		private def unionAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
 		private def fixedAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
 
-		private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+
+
+		private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+			Decoder.instance { c: HCursor =>
+
+
+				def makeAvroCirceEnum(c: HCursor): Result[A] = {
+
+					val tenum: (String, List[String], Option[String], List[String], Option[String]) => AvroSchema_S[A] = (title, symbols, namespace, aliases, doc) => AvroSchema_S.`enum`[A](title, namespace, aliases, doc, symbols)
+
+					val resultArgs: Result[(String, List[String], Option[String], List[String], Option[String])] =
+						for {
+							// validation
+							// TODO - why error when including namspace, aliases, properties for validation below?
+							// TODO - maybe use the avro-string circe instead of json-string circe (from avro-skeuo) so no more mish-mash between json/avro string parameters.
+							_ <- validateType(c, "enum")
+							_ <- propertyExists(c, "title")
+							_ <- propertyExists(c, "type")
+							_ <- propertyExists(c, "symbols")
+							//_ <- propertyExists(c, "namespace")
+							//_ <- propertyExists(c, "aliases")
+							//_ <- propertyExists(c, "doc")
+
+							title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
+
+							symbols: List[String] <- c.downField("symbols").as[Option[List[String]]].map(_.getOrElse(List.empty))
+
+							namespace: Option[String] <- c.downField("namespace").as[Option[Option[String]]].map(_.getOrElse(None))
+
+							aliases: List[String] <- c.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+
+							doc: Option[String] <- c.downField("doc").as[Option[Option[String]]].map(_.getOrElse(None))
+
+						} yield (title, symbols, namespace, aliases, doc)
+
+
+					val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (title, symbols, namespace, aliases, doc) => tenum(title, symbols, namespace, aliases, doc) }
+					val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+					println(s"\n\nINSIDE makeAvroCirceEnum:")
+					println(s"result (not embed) = $result_noEmbed")
+					println(s"result (embed) = $result_embed")
+
+					result_embed
+				}
+
+				makeAvroCirceEnum(c)
+			}
+		}
 	}
 
 	object TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject {
@@ -464,6 +513,8 @@ object Skeuo_Skeuo {
 
 						//title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
 
+						_ <- propertyExists(c, "additionalProperties")
+
 						addProps: AdditionalProperties[A] <- {
 
 							val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyJsonDecoderWithPriorityBasicDecoder[A])
@@ -500,6 +551,9 @@ object Skeuo_Skeuo {
 
 					val resultArgs: Either[DecodingFailure, (String, JsonSchema_S.AdditionalProperties[A])] = for {
 
+						_ <- propertyExists(c, "title")
+						_ <- propertyExists(c, "additionalProperties")
+
 						title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
 
 						addProps: AdditionalProperties[A] <- {
@@ -535,6 +589,10 @@ object Skeuo_Skeuo {
 
 					val resultArgs: Result[(String, List[JsonSchema_S.Property[A]], List[String])] =
 						for {
+							_ <- propertyExists(c, "title")
+							_ <- propertyExists(c, "properties")
+							_ <- propertyExists(c, "required")
+
 							title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
 							required: List[String] <- c.downField("required").as[Option[List[String]]].map(_.getOrElse(List.empty))
 							properties: List[JsonSchema_S.Property[A]] <- {
@@ -583,6 +641,9 @@ object Skeuo_Skeuo {
 					val resultArgs: Result[(List[JsonSchema_S.Property[A]], List[String])] =
 						for {
 							//itle: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
+							_ <- propertyExists(c, "properties")
+							_ <- propertyExists(c, "required")
+
 							required: List[String] <- c.downField("required").as[Option[List[String]]].map(_.getOrElse(List.empty))
 							properties: List[JsonSchema_S.Property[A]] <- {
 								//.as[Option[A]]
@@ -676,6 +737,8 @@ object Skeuo_Skeuo {
 		private def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 			Decoder.instance(c =>
 				for {
+					_ <- propertyExists(c, "enum")
+
 					values <- c.downField("enum").as[List[String]]
 					_ <- validateType(c, "string")
 				} yield JsonSchema_S.enum[A](values).embed

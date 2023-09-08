@@ -172,7 +172,7 @@ object ParseADTToCirceToADT {
 
 		case TNamedType(namespace: String, name: String) ⇒ {
 			JsonCirce.obj(
-				"name" -> JsonCirce.fromString(name),
+				"title" -> JsonCirce.fromString(name), // name for avro-string, title for json string
 				"namespace" -> JsonCirce.fromString(namespace),
 			)
 		}
@@ -445,7 +445,7 @@ object ParseADTToCirceToADT {
 	object CirceToAvroSkeuo {
 		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicit._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicit_usingJsonCirceString._
 
 		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
 

@@ -233,10 +233,19 @@ object Data {
 
 	// -----------------------------------------------------------------------
 
-	val namedTypeAvro_S: TNamedType[Nothing] = TNamedType(name = "namedTypeHere", namespace = "namespaceHere")
+	val namedTypeAvro_S: AvroSchema_S[Nothing] = TNamedType(name = "namedTypeHere", namespace = "namespaceHere")
 	val namedTypeAvro_Fix_S: Fix[AvroSchema_S] = Fix(TNamedType(name = "namedTypeHere", namespace = "namespaceHere"))
 
 
+	// -----------------------------------------------------------------------
+
+	val COLORS_LIST: List[String] = List("Red", "Orange", "Pink", "Yellow", "Green", "Blue", "Indigo", "Violet")
+
+	val enumAvro_S: AvroSchema_S[Nothing] = TEnum("Colors",None,List(),None,COLORS_LIST)
+	val enumAvro_Fix_S: Fix[AvroSchema_S] = Fix(TEnum("Colors",None,List(),None,COLORS_LIST))
+
+
+	// -----------------------------------------------------------------------
 
 	val unionAvro_S: AvroSchema_S[AvroSchema_S[Nothing]] = TUnion(NonEmptyList(TInt(), List(TString(), TInt(), TBoolean())))
 	val unionAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TUnion(NonEmptyList(TInt(), List(TString(), TInt(), TBoolean())))

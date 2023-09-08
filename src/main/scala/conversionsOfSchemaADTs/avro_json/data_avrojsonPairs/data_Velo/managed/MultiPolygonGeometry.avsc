@@ -1,0 +1,29 @@
+{
+  "type" : "record",
+  "name" : "MultiPolygonGeometry",
+  "namespace" : "trafficflow.velo.tf_devs.managed",
+  "fields" : [ {
+    "name" : "type",
+    "type" : {
+      "type" : "enum",
+      "name" : "GeometryType",
+      "symbols" : [ "Point", "MultiPolygon" ]
+    },
+    "default" : "MultiPolygon"
+  }, {
+    "name" : "coordinates",
+    "type" : {
+      "type" : "array",
+      "items" : {
+        "type" : "array",
+        "items" : {
+          "type" : "array",
+          "items" : {
+            "type" : "array",
+            "items" : "double"
+          }
+        }
+      }
+    }
+  } ]
+}

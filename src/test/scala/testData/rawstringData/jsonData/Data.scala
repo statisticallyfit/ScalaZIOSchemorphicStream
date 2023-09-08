@@ -313,4 +313,23 @@ object Data {
 	 * array
 	 * map, record, union, enum, union, fixed, date, timestamp-millis, time-mills, decimeal
 	 */
+
+	// ---------------------------------------------
+
+	val enumJson_R: String =
+		"""
+		  |{
+		  |  "title": "TheColorsEnum",
+		  |  "type": "object",
+		  |  "required": [
+		  |    "value"
+		  |  ],
+		  |  "properties": {
+		  |    "value": {
+		  |      "type": "number",
+		  |      "format": "number"
+		  |    }
+		  |  }
+		  |}
+		  |""".stripMargin
 }
