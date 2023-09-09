@@ -109,8 +109,11 @@ object ParseADTToCirceToADT {
 					"array",
 					"items" -> values
 				)
-			case EnumF(cases) =>
-				jsonType("string", "enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString)))
+			case EnumF(cases) => JsonCirce.obj(
+				"type" -> JsonCirce.fromString("string"),
+				"enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString))
+			)
+				//jsonType("string", "enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString)))
 			case SumF(cases) =>
 				JsonCirce.obj("oneOf" -> JsonCirce.arr(cases: _*))
 			case ReferenceF(value) =>

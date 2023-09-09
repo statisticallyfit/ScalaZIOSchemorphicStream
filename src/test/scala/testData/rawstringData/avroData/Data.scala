@@ -159,14 +159,10 @@ object Data {
 
 	// TODO convert to json string
 	val enumAvro_R: String =
-		"""
-		  |{
+		"""{
 		  |  "type": "enum",
 		  |  "name": "Colors",
-		  |  "symbols": [
-		  |    "Red",
-		  |    "Orange", "Pink", "Yellow", "Green", "Blue", "Indigo", "Violet"
-		  |  ]
+		  |  "symbols": [ "Red", "Orange", "Pink", "Yellow", "Green", "Blue", "Indigo", "Violet" ]
 		  |}
 		  |""".stripMargin
 

@@ -65,7 +65,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 
 
-	def testCirceToAvroSkeuo(title: String, theArgAvro: Fix[AvroSchema_S], theArgJson: Fix[JsonSchema_S]) ={
+	def testCirceToSkeuo(title: String, theArgAvro: Fix[AvroSchema_S], theArgJson: Fix[JsonSchema_S]) ={
 
 		info(s"\nTesting this kind: ${title}")
 
@@ -90,19 +90,19 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 	// HELP: not converting avro-skeuo -> circe -> skeuo properly (result is null)
 
-	//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.ByTrans.jsonToAvro_byAnaTransCoalg
-	//info(s"APACHE INT STR: ${skeuoToApacheAvroSchema(jsonToAvro_byAnaTransCoalg(funcCirceToJsonSkeuo(unsafeParse(strJson_R)).right.get))}")
 
-	/*testCirceToAvroSkeuo("map : skeuo -> circe -> skeuo",
-		map3IntAvro_Fix_S,
+	testCirceToSkeuo("map : skeuo -> circe -> skeuo",
+		//map3IntAvro_Fix_S,
+		enumAvro_Fix_S,
 		//intAvro_Fix_S,
 		//array1IntAvro_Fix_S,
 		//recordExPositionAvro_Fix_S,
 		//namedTypeAvro_Fix_S,
-		map1PosRecordJson_Fix_S
+		//map1PosRecordJson_Fix_S
+		enumJson_Fix_S
 		//map1IntJson_Fix_S
 		//array1IntJson_Fix_S
-	)*/
+	)
 	/*info(s"\n\nnow map avro: ")
 	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))
 
@@ -132,10 +132,14 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	info(s"circe -> avro-skeuo: ${stpA.skInfo.skeuoAvro_fromRaw }")
 	info(s"circe -> json-skeuo: ${stpA.skInfo.skeuoJson_fromRaw }")*/
 
-	printAvroStringToCirceToAvroSkeuo(List(enumAvro_R))
-	printAvroStringToCirceToJsonSkeuo(List(enumAvro_R))
+	//printAvroSkeuoToAvroString(List(enumAvro_Fix_S))
+	//printAvroStringToCirceToAvroSkeuo(List(enumAvro_R))
+	//printAvroStringToCirceToJsonSkeuo(List(enumAvro_R))
 	//printJsonStringToCirceToAvroSkeuo(List(enumJson_R))
 	//printJsonStringToCirceToJsonSkeuo(List(enumJson_R))
+
+
+
 
 	def printAvroStringToCirceToAvroSkeuo(listAvroStrings: List[String]): Unit = {
 

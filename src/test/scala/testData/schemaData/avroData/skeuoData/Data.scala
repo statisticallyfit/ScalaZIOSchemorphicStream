@@ -242,7 +242,7 @@ object Data {
 	val COLORS_LIST: List[String] = List("Red", "Orange", "Pink", "Yellow", "Green", "Blue", "Indigo", "Violet")
 
 	val enumAvro_S: AvroSchema_S[Nothing] = TEnum("Colors",None,List(),None,COLORS_LIST)
-	val enumAvro_Fix_S: Fix[AvroSchema_S] = Fix(TEnum("Colors",None,List(),None,COLORS_LIST))
+	val enumAvro_Fix_S: Fix[AvroSchema_S] = Fix(TEnum(name = "Colors", namespace = None,aliases = List(),doc = None,symbols = COLORS_LIST))
 
 
 	// -----------------------------------------------------------------------

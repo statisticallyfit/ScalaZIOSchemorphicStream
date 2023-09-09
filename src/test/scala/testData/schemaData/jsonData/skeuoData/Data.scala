@@ -218,5 +218,8 @@ object Data {
 
 	// ----------------------------------------------------------------------
 
+	val COLORS_LIST: List[String] = List("Red", "Orange", "Pink", "Yellow", "Green", "Blue", "Indigo", "Violet")
+	val enumJson_S: JsonSchema_S[Nothing] = EnumF(cases = COLORS_LIST)
+	val enumJson_Fix_S: Fix[JsonSchema_S] = Fix(EnumF(cases = COLORS_LIST))
 
 }

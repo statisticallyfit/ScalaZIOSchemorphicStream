@@ -136,12 +136,13 @@ object Skeuo_Skeuo {
 
 
 		private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-			logicalTypeAvroSchemaDecoder orElse
+			enumAvroSchemaDecoder orElse
+				logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
 			mapAvroSchemaDecoder orElse
 			recordAvroSchemaDecoder orElse
-			namedTypeAvroSchemaDecoder orElse
-			enumAvroSchemaDecoder
+			namedTypeAvroSchemaDecoder
+
 			// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
 
 
@@ -424,6 +425,7 @@ object Skeuo_Skeuo {
 							// validation
 							// TODO - why error when including namspace, aliases, properties for validation below?
 							// TODO - maybe use the avro-string circe instead of json-string circe (from avro-skeuo) so no more mish-mash between json/avro string parameters.
+
 							_ <- validateType(c, "enum")
 							_ <- propertyExists(c, "title")
 							_ <- propertyExists(c, "type")
@@ -476,16 +478,18 @@ object Skeuo_Skeuo {
 		}
 
 
-		private def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
-			    // TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
-		     //identifyDecoderWithPriorityBasicDecoder orElse
-			referenceJsonSchemaDecoder orElse
-			sumJsonSchemaDecoder orElse
-			arrayJsonSchemaDecoder orElse
-			objectJsonSchemaDecoder orElse
-			enumJsonSchemaDecoder /*orElse
-			basicJsonSchemaDecoder*/
+		private def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+			// TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
+			//identifyDecoderWithPriorityBasicDecoder orElse
 
+			enumJsonSchemaDecoder orElse
+			referenceJsonSchemaDecoder orElse
+				sumJsonSchemaDecoder orElse
+				arrayJsonSchemaDecoder orElse
+				objectJsonSchemaDecoder
+			/*orElse
+			basicJsonSchemaDecoder*/
+		}
 
 		private def objectJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 
@@ -734,15 +738,24 @@ object Skeuo_Skeuo {
 
 
 
-		private def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
-			Decoder.instance(c =>
+		private def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+			Decoder.forProduct2[(String, List[String]), String, List[String]]("type", "enum")(Tuple2.apply).emap {
+
+				case ("string", arrStr) => JsonSchema_S.`enum`[A](cases = arrStr).embed.asRight
+
+				//case (x, _) => s"$x is not well formed type".asLeft
+				//case _ => jsonSchemaDecoder[A].
+			}
+		}
+			/*Decoder.instance(c =>
 				for {
+					_ <- validateType(c, "string")
 					_ <- propertyExists(c, "enum")
 
-					values <- c.downField("enum").as[List[String]]
-					_ <- validateType(c, "string")
+					values <- c.downField("enum") .as[List[String]]
+
 				} yield JsonSchema_S.enum[A](values).embed
-			)
+			)*/
 
 		private def sumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 			Decoder.instance(_.downField("oneOf").as[List[A]].map(JsonSchema_S.sum[A](_).embed))
@@ -803,6 +816,12 @@ object Skeuo_Skeuo {
 
 					Fix(ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List()))
 				}
+
+
+				case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => {
+
+					Fix(EnumF(cases = symbols))
+				}
 			}
 		}
 
@@ -826,12 +845,15 @@ object Skeuo_Skeuo {
 				case TInt() => Fix(TInt())
 
 				case TArray(inner: Fix[AvroSchema_S]) => inner
+
+				case te @ TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => Fix(te)
 			}
 		}
 		implicit def skeuoProject_AA: Project[AvroSchema_S, Fix[AvroSchema_S]] = new Project[AvroSchema_S, Fix[AvroSchema_S]] {
 			def coalgebra: Coalgebra[AvroSchema_S, Fix[AvroSchema_S]] = Coalgebra {
 				case Fix(TInt()) => TInt()
-				case Fix(ta@TArray(inner: Fix[AvroSchema_S])) => ta
+				case Fix(ta @ TArray(inner: Fix[AvroSchema_S])) => ta
+				case Fix(te @ TEnum(_, _, _, _, _)) => te
 			}
 		}
 		/*implicit def basis_AA: Basis[AvroSchema_S, Fix[AvroSchema_S]] = new Basis[AvroSchema_S, Fix[AvroSchema_S]] {
@@ -948,6 +970,8 @@ object Skeuo_Skeuo {
 					}
 					result
 				}
+
+				case EnumF(cases: List[String]) => Fix(TEnum(name = "enum", namespace = None, aliases = List(), doc = None, symbols = cases))
 			}
 		}
 
@@ -989,6 +1013,7 @@ object Skeuo_Skeuo {
 
 					ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List())
 				}
+				case Fix(TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String])) => EnumF(cases = symbols)
 			}
 		}
 		/**
