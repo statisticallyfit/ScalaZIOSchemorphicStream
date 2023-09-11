@@ -28,10 +28,9 @@ import scala.language.higherKinds
 
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
 import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
-import JsonSchema_S._
-import AvroSchema_S._
 
-import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldAvro, _}
+
+import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldAvro}
 import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
 
 // TODO look here avro-json map of equivalent types: https://avro.apache.org/docs/1.11.1/specification/_print/
@@ -121,8 +120,117 @@ object Skeuo_Skeuo {
 
 
 
+	object TEMP_AvroSchemaDecoderImplicits_usingAvroCirceString {
+
+
+		import AvroSchema_S._
+
+
+		implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+			/*Decoder.instance { c: HCursor =>
+
+				val result: Result[AvroSchema_S[A]] = for {
+					nullStr: String <- c.downField("null").as[Option[String]].map(_.getOrElse(""))
+				} yield AvroSchema_S.`null`[A]()
+
+				val resultEmbed: Result[A] = result.map(_.embed)
+
+				resultEmbed
+			}*/
+
+
+			/*Decoder.forProduct1[String, String]("")(Tuple1[String](_)._1).flatMap*/
+			Decoder.decodeString.flatMap {
+				case "\"null\"" | "\"int\"" | "\"string\"" | "\"boolean\"" | "\"long\"" | "\"float\"" | "\"double\"" | "\"bytes\"" => basicAvroSchemaDecoder[A]
+
+				// TODO must use combination of forproduct1 ("type") and the above, where abvoe is just for simple types (primitives) and the "type" extraction for when in composed types (like array)
+
+				//case (x, _) => s"$x is not well formed type".asLeft
+				case _ => avroSchemaDecoder[A]
+			}
+		}
+
+
+
+		private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+			/*Decoder.decodeString.emap {
+				case "null" => AvroSchema_S.`null`[A]()
+					//| "int" | "string" | "boolean" | "long" | "float" | "double" | "bytes" =>
+
+				case x => s"$x is not well formed type".asLeft
+			}*/
+			import AvroSchema_S._
+
+			/*Decoder.forProduct1[String, String]("")(Tuple1[String](_)._1)*/
+
+			Decoder.decodeString.emap {
+
+				case "\"null\"" => `null`[A]().embed.asRight
+				case "\"int\"" => int[A]().embed.asRight
+				case "\"string\"" => string[A]().embed.asRight
+				case "\"boolean\"" => boolean[A]().embed.asRight
+				case "\"long\"" => long[A]().embed.asRight
+				case "\"float\"" => float[A]().embed.asRight
+				case "\"double\"" => double[A]().embed.asRight
+				case "\"bytes\"" => bytes[A]().embed.asRight
+
+				case x => s"$x is not well formed type".asLeft
+			}
+		}
+
+
+		private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+			//enumAvroSchemaDecoder orElse
+				/*logicalTypeAvroSchemaDecoder orElse*/
+				arrayAvroSchemaDecoder /*orElse
+				mapAvroSchemaDecoder orElse
+				recordAvroSchemaDecoder orElse
+				namedTypeAvroSchemaDecoder*/
+
+			// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
+
+
+		}
+
+
+		private def logicalTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+
+			Decoder.forProduct4[(String, Option[String], Option[Int], Option[Int]), String, Option[String], Option[Int], Option[Int]]("type", "logicalType", "precision", "scale")(Tuple4.apply).emap {
+
+				case ("int", Some("date"), None, None) => date[A]().embed.asRight
+				case ("long", Some("timestamp-millis"), None, None) => timestampMillis[A]().embed.asRight
+				case ("int", Some("time-millis"), None, None) => timeMillis[A]().embed.asRight
+				case ("bytes", Some("decimal"), Some(precision), Some(scale)) => decimal[A](precision, scale).embed.asRight
+
+				case (x, _, _, _) => s"$x is not well formed logical-type".asLeft
+			}
+		}
+
+		private def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
+			Decoder.instance { c: HCursor =>
+				for {
+					items: A <- c.downField("items").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+					_ <- validateType(c, "array")
+				} yield AvroSchema_S.array(items).embed
+			}
+
+		private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+		private def mapAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+		private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+		private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+
+	}
+
 
 	object TEMP_AvroSchemaDecoderImplicit_usingJsonCirceString {
+
+
+		import AvroSchema_S._
+
+
 		implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
 			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
@@ -157,9 +265,6 @@ object Skeuo_Skeuo {
 
 		private def logicalTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
-			import AvroSchema_S._
-
-
 			Decoder.forProduct4[(String, Option[String], Option[Int], Option[Int]), String, Option[String], Option[Int], Option[Int]]("type", "logicalType", "precision", "scale")(Tuple4.apply).emap {
 
 				case ("int", Some("date"), None, None) => date[A]().embed.asRight
@@ -172,8 +277,6 @@ object Skeuo_Skeuo {
 		}
 
 		private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-
-			import AvroSchema_S._
 
 
 			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
@@ -337,9 +440,9 @@ object Skeuo_Skeuo {
 
 			def makeAvroCirceRecord(c: HCursor): Result[A] = {
 
-				val trecord: (String, Option[String], List[String], Option[String], List[Field[A]]) => AvroSchema_S[A] = (title, namespace, aliases, doc, fields) => AvroSchema_S.record[A](title, namespace, aliases, doc, fields)
+				val trecord: (String, Option[String], List[String], Option[String], List[FieldAvro[A]]) => AvroSchema_S[A] = (title, namespace, aliases, doc, fields) => AvroSchema_S.record[A](title, namespace, aliases, doc, fields)
 
-				val resultArgs: Result[(String, Option[String], List[String], Option[String], List[Field[A]])] =
+				val resultArgs: Result[(String, Option[String], List[String], Option[String], List[FieldAvro[A]])] =
 					for {
 						// validation
 						// TODO - why error when including namspace, aliases, properties for validation below?
@@ -363,7 +466,7 @@ object Skeuo_Skeuo {
 						// NOTE: no point extracting the 'required' because that goes as arg just in the json-skeuo and avro-skeuo has no arg 'required'
 						//required: List[String] <- c.downField("required").as[Option[List[String]]].map(_.getOrElse(List.empty))
 
-						fields: List[AvroSchema_S.Field[A]] <- {
+						fields: List[FieldAvro[A]] <- {
 
 							val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
 								Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyAvroDecoderWithPriorityBasicDecoder[A]))
@@ -381,7 +484,7 @@ object Skeuo_Skeuo {
 								))
 
 							// Step 2: convert from the json-skeuo into avro-skeuo.
-							val resListFields: Result[List[FieldAvro[A]]] = resListProps.map((lstProps: List[Property[A]]) => lstProps.map((p: Property[A]) => property2Field(p)))
+							val resListFields: Result[List[FieldAvro[A]]] = resListProps.map((lstProps: List[JsonSchema_S.Property[A]]) => lstProps.map((p: JsonSchema_S.Property[A]) => property2Field(p)))
 
 
 							println(s"\n\nINSIDE makeAvroCirceObjectNamed:")
@@ -463,6 +566,9 @@ object Skeuo_Skeuo {
 	}
 
 	object TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject {
+
+
+		import JsonSchema_S._
 
 
 		implicit def identifyJsonDecoderWithPriorityBasicDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
@@ -788,6 +894,8 @@ object Skeuo_Skeuo {
 			}
 		}*/
 
+		import JsonSchema_S._
+		import AvroSchema_S._
 
 
 		implicit def skeuoEmbed_AJ: Embed[AvroSchema_S, Fix[JsonSchema_S]] = new Embed[AvroSchema_S, Fix[JsonSchema_S]] {

@@ -93,14 +93,18 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 	testCirceToSkeuo("map : skeuo -> circe -> skeuo",
 		//map3IntAvro_Fix_S,
-		enumAvro_Fix_S,
+		//nullAvro_Fix_S,
+		//enumAvro_Fix_S,
 		//intAvro_Fix_S,
 		//array1IntAvro_Fix_S,
+		intAvro_Fix_S,
 		//recordExPositionAvro_Fix_S,
 		//namedTypeAvro_Fix_S,
 		//map1PosRecordJson_Fix_S
-		enumJson_Fix_S
+		//nullJson_Fix_S
+		//enumJson_Fix_S
 		//map1IntJson_Fix_S
+		intJson_Fix_S
 		//array1IntJson_Fix_S
 	)
 	/*info(s"\n\nnow map avro: ")
@@ -139,6 +143,11 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	//printJsonStringToCirceToJsonSkeuo(List(enumJson_R))
 
 
+	// TODO MAJOR NOW
+	// 1. make tocirceavrostring_fromAvroSkeuo function - check if it works with int, string, array, map
+	// 2. add record, enum -- check if working still
+	// 3. Make sure this is the one that gets called in the funcCirceAvro function
+	// 4. if this tocirceavrostring_fromAvroSkeuo does nto work: consider doing tocirceavrostring_fromJsonSkeuo (and the other combo as well).
 
 
 	def printAvroStringToCirceToAvroSkeuo(listAvroStrings: List[String]): Unit = {

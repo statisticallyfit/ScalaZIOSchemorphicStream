@@ -41,7 +41,7 @@ object ParseADTToCirceToADT {
 
 	//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
 
-	val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(toCirceJsonString_fromAvroSkeuo).apply(_)
+	val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(toCirceAvroString_fromAvroSkeuo).apply(_) //scheme.cata(toCirceJsonString_fromAvroSkeuo).apply(_)
 
 	val libRenderAltered: Fix[JsonSchema_S] ⇒ JsonCirce = scheme.cata(toCirceJsonString_fromJsonSkeuo).apply(_)
 
@@ -291,67 +291,33 @@ object ParseADTToCirceToADT {
 
 
 	// TODO MAJOR - this thing is resulting in avro-string-like not strictly json-circe ---- see they say 'record' instead of 'object'. Need to clean this up to be purely avro-string and compare it to the original avro-string, and need to clean up above one and make it purely JSON-circe to compare it to original json-string
-	/*def toCirceAvroString: Algebra[AvroSchema_S, JsonCirce] = Algebra {
+	def toCirceAvroString_fromAvroSkeuo: Algebra[AvroSchema_S, JsonCirce] = Algebra {
 
-		// ObjectF(List(Property(name = "null", tpe = StringF())), List())
-		case TNull() ⇒ jsonType(
-			"object",
-			"properties" -> JsonCirce.obj(List(): _*),
-			"required" -> JsonCirce.fromValues(List())
-		)
-		// TODO change the above to be using 'record' - the avro equivalent of json object.
-		// NOTE: will not be able to convert from this form to skeuo using Decoder. Will just have to compare THIS end avro-string version with the original avro-str.
-		/*JsonCirce.obj(
-			"type" -> JsonCirce.fromString("record"),
-			//"name" -> JsonCirce.fromString("null"),
-			"fields" -> JsonCirce.arr(List(): _*)
-		)*/
-		// NO, just string not a null
-		//jsonType("string", "name" -> JsonCirce.fromString("null"))
-		// BAD
-		/*JsonCirce.obj(
-			"type" -> JsonCirce.fromString("record"),
-			"name" -> JsonCirce.fromString("null")
-		)*/
+		case TNull() ⇒ JsonCirce.fromString("null")
+		case TInt() => JsonCirce.fromString("int")
+		case TString() => JsonCirce.fromString("string")
+		case TBoolean() => JsonCirce.fromString("boolean")
+		case TLong() => JsonCirce.fromString("long")
+		case TFloat() => JsonCirce.fromString("float")
+		case TDouble() => JsonCirce.fromString("double")
+		case TBytes() => JsonCirce.fromString("bytes")
 
-		/*JsonCirce.obj(
-			"type" -> JsonCirce.fromString("record"),
-			"name" -> JsonCirce.fromString("null"),
-			"fields" -> JsonCirce.arr(List():_*)
-			)*/
-		//jsonType("null", attr = List():_*)
-
-		case TInt() => jsonType("integer", format("int32"))
-		case TString() => jsonType("string")
-		case TBoolean() => jsonType("boolean")
-		case TLong() => jsonType("integer", format("int64"))
-		case TFloat() => jsonType("number", format("float"))
-		case TDouble() => jsonType("number", format("double"))
-
-		case TBytes() => jsonType("string", format("byte"))
-
-		/*case BinaryF() => jsonType("string", format("binary"))*/
-
-
-		case TArray(inner: JsonCirce) ⇒ jsonType(
-			"array",
+		case TArray(inner: JsonCirce) ⇒ JsonCirce.obj(
+			"type" -> JsonCirce.fromString("array"),
 			"items" -> inner
 		)
-		// TODO compare between above way of declaring array and the below way (jsonType vs. Json.obj)
 
-		case TMap(values: JsonCirce) =>
-			JsonCirce.obj(
-				"type" -> JsonCirce.fromString("map"),
-				"values" -> values
-			)
-
+		case TMap(values: JsonCirce) => JsonCirce.obj(
+			"type" -> JsonCirce.fromString("map"),
+			"values" -> values
+		)
 
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[JsonCirce]]) ⇒ {
 
 			val base: JsonCirce = JsonCirce.obj(
 				"type" -> JsonCirce.fromString("record"),
 				"name" -> JsonCirce.fromString(name),
-				"fields" -> JsonCirce.arr(fields.map(field2Obj): _*) // TODO update this function (field2Obj) to preserve all the args from Field (like order, doc, etc)
+				"fields" -> JsonCirce.arr(fields.map(field2Obj): _*)
 			)
 
 			val withNamespace: JsonCirce = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
@@ -366,6 +332,8 @@ object ParseADTToCirceToADT {
 
 			withDoc
 		}
+
+
 		case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) ⇒ {
 
 			val base: JsonCirce = JsonCirce.obj(
@@ -406,8 +374,8 @@ object ParseADTToCirceToADT {
 
 			withAliases
 		}
-		// Source = https://hyp.is/gcf1CCv3Ee6M4RMGFdKckA/docs.airbyte.com/understanding-airbyte/json-avro-conversion
-		/*case TDate() => jsonType("string", format("date"))
+		/*// Source = https://hyp.is/gcf1CCv3Ee6M4RMGFdKckA/docs.airbyte.com/understanding-airbyte/json-avro-conversion
+		case TDate() => jsonType("string", format("date"))
 
 		// Source = https://hyp.is/b2IUFiv3Ee6z6geHBkITQA/docs.airbyte.com/understanding-airbyte/json-avro-conversion
 		case TTimeMillis() ⇒ jsonType("string", format("time"))
@@ -439,18 +407,20 @@ object ParseADTToCirceToADT {
 				"scale" -> JsonCirce.fromInt(scale)
 			)
 
-		/*case PasswordF() => jsonType("string", format("password"))*/
 
-	}*/
+	}
 
 
 
 	object CirceToAvroSkeuo {
 		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicit_usingJsonCirceString._
-
 		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
+
+		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicit_usingJsonCirceString._
+
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicits_usingAvroCirceString._
+
 
 		val funcCirceToAvroSkeuo: JsonCirce ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
 
