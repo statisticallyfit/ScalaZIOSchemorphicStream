@@ -39,8 +39,10 @@ object ParseADTToCirceToADT {
 	val libToJson: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(AvroSchema_S.toJson).apply(_)
 
 
-	//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoProject_AA, skeuoProject_JJ}
 
+
+	// TODO IMPLICITS (1) = work to manipulate the implicits here (says drosebasisforfix using project[_,_] todo figure out change the Projcet??
 	val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonCirce = scheme.cata(toCirceAvroString_fromAvroSkeuo).apply(_) //scheme.cata(toCirceJsonString_fromAvroSkeuo).apply(_)
 
 	val libRenderAltered: Fix[JsonSchema_S] ⇒ JsonCirce = scheme.cata(toCirceJsonString_fromJsonSkeuo).apply(_)
@@ -411,9 +413,9 @@ object ParseADTToCirceToADT {
 	}
 
 
+	object CirceAvroToSkeuoJson {
 
-	object CirceToAvroSkeuo {
-		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoEmbed_AJ}
 
 		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
 
@@ -422,7 +424,41 @@ object ParseADTToCirceToADT {
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicits_usingAvroCirceString._
 
 
-		val funcCirceToAvroSkeuo: JsonCirce ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
+		val funcCirceAvroToSkeuoJson: JsonCirce ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
+
+
+		// TODO IMPLICITS (2)
+		// basis[AvroF, Fix[AvroF]]
+		// 	algebra: AvroF[Fix[AvroF]] => Fix[AvroF]
+		// 	coalgebra: Fix[AvroF] => AvroF[Fix[AvroF]]
+		// NEED: avro -> avro
+		// 	skeuoEmbed_AA
+		// NEED: json -> avro
+		// 	skeuoEmbed_JA
+	}
+
+
+	object CirceAvroToSkeuoAvro {
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{ skeuoEmbed_AA}
+
+		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
+
+		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicit_usingJsonCirceString._
+
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicits_usingAvroCirceString._
+
+
+		val funcCirceAvroToSkeuoAvro: JsonCirce ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
+
+
+		// TODO IMPLICITS (2)
+		 // basis[AvroF, Fix[AvroF]]
+		// 	algebra: AvroF[Fix[AvroF]] => Fix[AvroF]
+		// 	coalgebra: Fix[AvroF] => AvroF[Fix[AvroF]]
+		// NEED: avro -> avro
+		// 	skeuoEmbed_AA
+		// NEED: json -> avro
+		// 	skeuoEmbed_JA
 
 	}
 	// json decoder: Embed[JsonSchema_S, *]
@@ -430,29 +466,63 @@ object ParseADTToCirceToADT {
 
 
 	// -----------------
-	object CirceToJsonSkeuo {
+	object CirceJsonToSkeuoJson {
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._//, skeuoProject_AJ}
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoEmbed_JJ}
 
-		val funcCirceToJsonSkeuo: JsonCirce ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_usingJsonCirceString._//, skeuoProject_AJ}
+
+		val funcCirceJsonToSkeuoJson: JsonCirce ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
+
+
+		// basis[JsonF, Fix[JsonF]]
+		// 	algebra: JsonF[Fix[JsonF]] => Fix[JsonF]
+		// 	coalgebra: Fix[JsonF] => JsonF[Fix[JsonF]]
+		// NEED: avro -> json
+		// 	skeuoEmbed_AJ
+		// NEED: json -> json
+		// 	skeuoEmbed_JJ
+	}
+
+	object CirceJsonToSkeuoAvro {
+
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoEmbed_JA}
+
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_usingJsonCirceString._ //, skeuoProject_AJ}
+
+		val funcCirceJsonToSkeuoAvro: JsonCirce ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
+
+
+		// basis[JsonF, Fix[JsonF]]
+		// 	algebra: JsonF[Fix[JsonF]] => Fix[JsonF]
+		// 	coalgebra: Fix[JsonF] => JsonF[Fix[JsonF]]
+		// NEED: avro -> json
+		// 	skeuoEmbed_AJ
+		// NEED: json -> json
+		// 	skeuoEmbed_JJ
 	}
 
 	// avro decoder: Embed[AvroSchema_S, *]
 	// implicit: Embed[AvroSchema_S, Fix[JsonSchema_F]] == skeuoEmbed_AJ
 
-	import CirceToAvroSkeuo._
-	import CirceToJsonSkeuo._
+	import CirceAvroToSkeuoAvro._
+	import CirceAvroToSkeuoJson._
+	import CirceJsonToSkeuoJson._
+	import CirceJsonToSkeuoAvro._
+
 
 
 	object DecodingSkeuo {
 		//jsonSchemaDecoder
-		def decodeAvroSkeuoToCirceToJsonSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libToJsonAltered
+		def decodeAvroSkeuoToCirceToJsonSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceAvroToSkeuoJson compose libToJsonAltered
+		// libtojsonaltered: should be: avroskeuo -> circe-avro
+		// funccircetojsonskeuo: should be: circe-avro -> json-skeuo
 
-		def decodeJsonSkeuoToCirceToJsonSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo compose libRenderAltered
+		def decodeJsonSkeuoToCirceToJsonSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[JsonSchema_S]] = funcCirceJsonToSkeuoJson compose libRenderAltered
 
-		def decodeAvroSkeuoToCirceToAvroSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libToJsonAltered
+		def decodeAvroSkeuoToCirceToAvroSkeuo: Fix[AvroSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceAvroToSkeuoAvro compose libToJsonAltered
 
-		def decodeJsonSkeuoToCirceToAvroSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo compose libRenderAltered
+		def decodeJsonSkeuoToCirceToAvroSkeuo: Fix[JsonSchema_S] ⇒ Result[Fix[AvroSchema_S]] = funcCirceJsonToSkeuoAvro compose libRenderAltered
 
 	}
 }

@@ -9,9 +9,9 @@ object Data {
 
 	val nullAvro_R: String = "\"null\""
 
-	val intAvro_R: String = "\"int\""
+	val intAvro_R: String = "int"
 
-	val strAvro_R: String = "\"string\""
+	val strAvro_R: String = """string"""
 
 	val booleanAvro_R: String = "\"boolean\""
 

@@ -16,8 +16,8 @@ import io.circe.{Decoder, Json ⇒ JsonCirce}
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT
 import ParseADTToCirceToADT._
-import ParseADTToCirceToADT.CirceToAvroSkeuo._
-import ParseADTToCirceToADT.CirceToJsonSkeuo._
+import ParseADTToCirceToADT.CirceAvroToSkeuoAvro._
+import ParseADTToCirceToADT.CirceJsonToSkeuoJson._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT.{Info, SchemaKind}
 
 import utilMain.UtilMain.implicits._
@@ -138,8 +138,8 @@ object ParseStringToCirceToADT {
 		def infoSkeuoToCirceToSkeuo(interimCirce: JsonCirce): SkeuoDecodeInfo = {
 
 			// Create the skeuos from str (using the interimCirce)
-			val skeuoAvro_fromRaw: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(interimCirce)
-			val skeuoJson_fromRaw: Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo(interimCirce)
+			val skeuoAvro_fromRaw: Result[Fix[AvroSchema_S]] = funcCirceAvroToSkeuoAvro(interimCirce)
+			val skeuoJson_fromRaw: Result[Fix[JsonSchema_S]] = funcCirceJsonToSkeuoJson(interimCirce)
 
 
 			// Generate circes from the starting skeuos
@@ -147,11 +147,11 @@ object ParseStringToCirceToADT {
 			val jsonCirce_fromJsonSkeuo: JsonCirce = libRenderAltered(skeuoJson_fromRaw.right.get)
 
 			// Generate skeuos from the starting skeuos (for showing decoding capability)
-			val skeuoAvro_fromDecodeAvroSkeuo: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(jsonCirce_fromAvroSkeuo)
-			val skeuoJson_fromDecodeAvroSkeuo: Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo(jsonCirce_fromAvroSkeuo)
+			val skeuoAvro_fromDecodeAvroSkeuo: Result[Fix[AvroSchema_S]] = funcCirceAvroToSkeuoAvro(jsonCirce_fromAvroSkeuo)
+			val skeuoJson_fromDecodeAvroSkeuo: Result[Fix[JsonSchema_S]] = funcCirceJsonToSkeuoJson(jsonCirce_fromAvroSkeuo)
 
-			val skeuoAvro_fromDecodeJsonSkeuo: Result[Fix[AvroSchema_S]] = funcCirceToAvroSkeuo(jsonCirce_fromJsonSkeuo)
-			val skeuoJson_fromDecodeJsonSkeuo: Result[Fix[JsonSchema_S]] = funcCirceToJsonSkeuo(jsonCirce_fromJsonSkeuo)
+			val skeuoAvro_fromDecodeJsonSkeuo: Result[Fix[AvroSchema_S]] = funcCirceAvroToSkeuoAvro(jsonCirce_fromJsonSkeuo)
+			val skeuoJson_fromDecodeJsonSkeuo: Result[Fix[JsonSchema_S]] = funcCirceJsonToSkeuoJson(jsonCirce_fromJsonSkeuo)
 
 
 			SkeuoDecodeInfo(
