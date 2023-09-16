@@ -18,6 +18,7 @@ import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT
 import ParseADTToCirceToADT._
 import ParseADTToCirceToADT.CirceAvroToSkeuoAvro._
 import ParseADTToCirceToADT.CirceJsonToSkeuoJson._
+import ParseADTToCirceToADT.LibFuncs._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT.{Info, SchemaKind}
 
 import utilMain.UtilMain.implicits._
@@ -136,6 +137,8 @@ object ParseStringToCirceToADT {
 		 * @param interimCirce = the intermediate json circe that gets generated from the beginning avro / json strings. Used here to generate the skeuomorphs.
 		 */
 		def infoSkeuoToCirceToSkeuo(interimCirce: JsonCirce): SkeuoDecodeInfo = {
+
+			// TODO must fix this entire file to use the correct funcCirce_ functions
 
 			// Create the skeuos from str (using the interimCirce)
 			val skeuoAvro_fromRaw: Result[Fix[AvroSchema_S]] = funcCirceAvroToSkeuoAvro(interimCirce)

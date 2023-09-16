@@ -8,6 +8,7 @@ import ParseADTToCirceToADT.CirceAvroToSkeuoAvro._
 import ParseADTToCirceToADT.CirceAvroToSkeuoJson._
 import ParseADTToCirceToADT.CirceJsonToSkeuoJson._
 import ParseADTToCirceToADT.CirceJsonToSkeuoAvro._
+import ParseADTToCirceToADT.LibFuncs._
 
 import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
@@ -96,18 +97,18 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	testCirceToSkeuo("map : skeuo -> circe -> skeuo",
 		//map3IntAvro_Fix_S,
 		//nullAvro_Fix_S,
-		//enumAvro_Fix_S,
+		//array1IntAvro_Fix_S,
+		enumAvro_Fix_S,
 		//intAvro_Fix_S,
-		array1IntAvro_Fix_S,
-		//intAvro_Fix_S,
+		//map1IntAvro_Fix_S,
 		//recordExPositionAvro_Fix_S,
 		//namedTypeAvro_Fix_S,
 		//map1PosRecordJson_Fix_S
-		//nullJson_Fix_S
-		//enumJson_Fix_S
+		//nullJson_Fix_S,
+		//array1IntJson_Fix_S
+		enumJson_Fix_S
 		//map1IntJson_Fix_S
 		//intJson_Fix_S
-		array1IntJson_Fix_S
 	)
 	/*info(s"\n\nnow map avro: ")
 	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))

@@ -16,6 +16,8 @@ import io.circe.{Json ⇒ JsonCirce}
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT._
 import conversionsOfSchemaADTs.avro_json.parsing.ParseStringToCirceToADT._
+import conversionsOfSchemaADTs.avro_json.parsing.ParseADTToCirceToADT
+import ParseADTToCirceToADT.LibFuncs._
 
 import org.scalatest.Assertion
 import org.scalatest.Inspectors._
@@ -30,31 +32,31 @@ import utilMain.UtilMain.implicits._
  */
 
 trait CommonDecoderChecks extends DecoderChecks {
-	
-	
+
+
 	def equalityOfInitialAvroSkeuosFromAvroOrJsonInputString(): Assertion
-	
+
 	def equalityOfInitialJsonSkeuosFromAvroOrJsonInputString(): Assertion
-	
+
 	def equalityOfCirceFromAvroOrJsonInputString(): Assertion
 	def equalityOfCirceBySkeuoAvroAndCirceBySkeuoJsonFromAvroOrJsonInputString(): Assertion
-	
+
 	def equalityOfLastAvroSkeuosFromAvroOrJsonInputString(): Assertion
-	
+
 	def equalityOfLastJsonSkeuosFromAvroOrJsonInputString(): Assertion
-	
+
 	def equalityOfSkeuosFromInputAndCirceDecodingAndTrans(): Assertion
-	
+
 	def checking(): Unit = {
 		equalityOfInitialAvroSkeuosFromAvroOrJsonInputString()
 		equalityOfInitialJsonSkeuosFromAvroOrJsonInputString()
-		
+
 		equalityOfCirceFromAvroOrJsonInputString()
 		equalityOfCirceBySkeuoAvroAndCirceBySkeuoJsonFromAvroOrJsonInputString()
-		
+
 		equalityOfLastAvroSkeuosFromAvroOrJsonInputString()
 		equalityOfLastJsonSkeuosFromAvroOrJsonInputString()
-		
+
 		equalityOfSkeuosFromInputAndCirceDecodingAndTrans()
 	}
 }
@@ -62,10 +64,10 @@ trait CommonDecoderChecks extends DecoderChecks {
 
 case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 	extends AnyFunSpec with CommonDecoderChecks with Matchers {
-	
+
 	import imp._
-	
-	
+
+
 	val step: Stepping = new Stepping(Some(rawAvroStr), Some(rawJsonStr))
 	val sa: AvroStringDecodeInfo = step.avroInfoOpt.get
 	val sj: JsonStringDecodeInfo = step.jsonInfoOpt.get
@@ -74,18 +76,18 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 	val jsonStep = JsonStepping(rawJsonStr)*/
 	val sai: SkeuoDecodeInfo = sa.skInfo
 	val sji: SkeuoDecodeInfo = sj.skInfo
-	
-	
+
+
 	val skeuoJson_fromTransOfGivenAvroSkeuo: Fix[JsonSchema_S] = avroToJson_byCataTransAlg(avroFixS)
 	val skeuoAvro_fromTransOfGivenJsonSkeuo: Fix[AvroSchema_S] = jsonToAvro_byAnaTransCoalg(jsonFixS)
-	
-	
-	
+
+
+
 	def showResults(): String = {
-		
+
 		var infoVar: String = s"\n-----------------------------------------------------------"
 		infoVar += s"\nCOMMON DECODER CHECKS:"
-		
+
 		infoVar += (s"\n" +
 				 s"\n--- raw avro str: \n$rawAvroStr" +
 		           s"\n--> apacheAvro (from parse): \n${sa.parsedApacheAvroStr}" +
@@ -101,7 +103,7 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 		s"\n--> json circe (from json-skeuo): \n${sai.jsonCirce_fromJsonSkeuo.manicure}" +
 		s"\n--> skeuoAvro (from decode-json-skeuo): \t${sai.skeuoAvro_fromDecodeJsonSkeuo}" +
 		s"\n    skeuoJson (from decode-json-skeuo): \t${sai.skeuoJson_fromDecodeJsonSkeuo}" +
-		
+
 		s"\n" +
 		s"\n------> skeuoAvro (from JSON STR):      \t${sji.skeuoAvro_fromRaw}" +
 		s"\n--> json circe (from avro-skeuo): \n${sji.jsonCirce_fromAvroSkeuo.manicure}" +
@@ -112,13 +114,13 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 		s"\n--> json circe (from json-skeuo): \n${sji.jsonCirce_fromJsonSkeuo.manicure}" +
 		s"\n--> skeuoAvro (from decode-json-skeuo): \t${sji.skeuoAvro_fromDecodeJsonSkeuo}" +
 		s"\n    skeuoJson (from decode-json-skeuo): \t${sji.skeuoJson_fromDecodeJsonSkeuo}")
-		
+
 		infoVar
 	}
-	
+
 	def equalityOfInitialAvroSkeuosFromAvroOrJsonInputString(): Assertion = {
 		sa.parsedApacheAvroStr shouldEqual rawAvroStr
-		
+
 		forEvery(List(
 			Right(sa.skeuoAvro_fromApache),
 			sai.skeuoAvro_fromRaw,
@@ -128,7 +130,7 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 			ska ⇒ ska.right.get shouldEqual avroFixS
 		}
 	}
-	
+
 	def equalityOfInitialJsonSkeuosFromAvroOrJsonInputString(): Assertion = {
 		forEvery(List(
 			sai.skeuoJson_fromRaw,
@@ -138,19 +140,19 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 			skj ⇒ skj.right.get shouldEqual jsonFixS
 		}
 	}
-	
+
 	def equalityOfCirceFromAvroOrJsonInputString(): Assertion = {
-		
+
 		forEvery(List(
 			sa.interimCirce_fromAvroSKeuo,
 			sj.interimCirce_fromJsonStr,
-		
+
 		)
 		) {
 			jc ⇒ jc should equal(jsonCirceCheck)
 		}
 	}
-	
+
 	def equalityOfCirceBySkeuoAvroAndCirceBySkeuoJsonFromAvroOrJsonInputString(): Assertion = {
 		forEvery(List(
 			jsonCirceCheck,
@@ -163,8 +165,8 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 			jc ⇒ jc.manicure shouldEqual rawJsonStr
 		}
 	}
-	
-	
+
+
 	def equalityOfLastAvroSkeuosFromAvroOrJsonInputString(): Assertion = {
 		forEvery(List(
 			Right(skeuoAvro_fromTransOfGivenJsonSkeuo),
@@ -177,7 +179,7 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 			ska ⇒ ska.right.get should equal(avroFixS)
 		}
 	}
-	
+
 	def equalityOfLastJsonSkeuosFromAvroOrJsonInputString(): Assertion = {
 		forEvery(List(
 			Right(skeuoJson_fromTransOfGivenAvroSkeuo),
@@ -191,8 +193,8 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 			skj ⇒ skj.right.get should equal(jsonFixS)
 		}
 	}
-	
-	
+
+
 	def equalityOfSkeuosFromInputAndCirceDecodingAndTrans(): Assertion = {
 		// Checking the conversions of skeuo through circe
 		SkeuoRoundTrip.avroToAvroSkeuoByCirceDecoderShouldMatchAvroSkeuoByTrans()
@@ -200,10 +202,10 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 		SkeuoRoundTrip.jsonToAvroSkeuoByCirceDecoderShouldMatchAvroSkeuoByTrans()
 		SkeuoRoundTrip.jsonToJsonSkeuoByCirceDecodingShouldMatchJsonSkeuoByTrans()
 	}
-	
-	
+
+
 	object SkeuoRoundTrip {
-		
+
 		def avroToAvroSkeuoByCirceDecoderShouldMatchAvroSkeuoByTrans(): Assertion = {
 			forEvery(List(
 				DecodingSkeuo.decodeAvroSkeuoToCirceToAvroSkeuo(avroFixS),
@@ -213,7 +215,7 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 				ska ⇒ ska should equal(Right(avroFixS))
 			}
 		}
-		
+
 		def avroToJsonSkeuoByCirceDecoderShouldMatchJsonSkeuoByTrans(): Assertion = {
 			forEvery(List(
 				DecodingSkeuo.decodeAvroSkeuoToCirceToJsonSkeuo(avroFixS),
@@ -223,7 +225,7 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 				skj ⇒ skj should equal(Right(jsonFixS))
 			}
 		}
-		
+
 		def jsonToAvroSkeuoByCirceDecoderShouldMatchAvroSkeuoByTrans(): Assertion = {
 			forEvery(List(
 				DecodingSkeuo.decodeJsonSkeuoToCirceToAvroSkeuo(jsonFixS),
@@ -233,9 +235,9 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 				ska ⇒ ska should equal(Right(avroFixS))
 			}
 		}
-		
+
 		def jsonToJsonSkeuoByCirceDecodingShouldMatchJsonSkeuoByTrans(): Assertion = {
-			
+
 			forEvery(List(
 				DecodingSkeuo.decodeJsonSkeuoToCirceToJsonSkeuo(jsonFixS),
 				Right(skeuoJson_fromTransOfGivenAvroSkeuo)
@@ -245,5 +247,5 @@ case class CommonDecoderCheckSpecs(implicit imp: ImplicitArgs)
 			}
 		}
 	}
-	
+
 }

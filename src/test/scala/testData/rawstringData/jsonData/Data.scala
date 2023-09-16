@@ -316,7 +316,7 @@ object Data {
 
 	// ---------------------------------------------
 
-	val enumJson_R: String =
+	/*val enumJson_R: String =
 		"""
 		  |{
 		  |  "title": "TheColorsEnum",
@@ -331,5 +331,23 @@ object Data {
 		  |    }
 		  |  }
 		  |}
-		  |""".stripMargin
+		  |""".stripMargin*/
+
+
+	val enumJson_R: String =
+	"""
+	  |{
+	  |  "type": "string",
+	  |  "enum": [
+	  |    "Red",
+	  |    "Orange",
+	  |    "Pink",
+	  |    "Yellow",
+	  |    "Green",
+	  |    "Blue",
+	  |    "Indigo",
+	  |    "Violet"
+	  |  ]
+	  |}
+	  |""".stripMargin.trim()
 }

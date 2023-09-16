@@ -124,7 +124,7 @@ object Skeuo_Skeuo {
 		import AvroSchema_S._
 
 
-		implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+		implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
 			/*Decoder.instance { c: HCursor =>
 
@@ -150,37 +150,23 @@ object Skeuo_Skeuo {
 			}
 		}
 
-		// NOTE: this decoder to have the non-escaped string types because these primitives are located next to "type" near other composed types (like array, map) and require no /" escape string.
-		/*private def primitiveAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-
-			import AvroSchema_S._
-
-			// HELP not right because avro string has nothing like "type": "int" that is only for json, avro string has only things like "int", not coupled with "type"
-
-			Decoder.forProduct1[String, String]("type")(Tuple1[String](_)._1).emap {
-
-			//Decoder.decodeString.emap {
-
-				case "null" => `null`[A]().embed.asRight
-				case "int" => int[A]().embed.asRight
-				case "string" => string[A]().embed.asRight
-				case "boolean" => boolean[A]().embed.asRight
-				case "long" => long[A]().embed.asRight
-				case "float" => float[A]().embed.asRight
-				case "double" => double[A]().embed.asRight
-				case "bytes" => bytes[A]().embed.asRight
-
-				case x => s"$x is not well formed type".asLeft
-			}
+		/*private def intAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+			Decoder.decodeInt.
 		}*/
 
-		private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+		private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
 			import AvroSchema_S._
 
-			import io.circe.DecodingFailure
-			import io.circe.DecodingFailure.Reason._
+			//import io.circe.DecodingFailure
+			//import io.circe.DecodingFailure.Reason._
 
+			/*Decoder.decodeJsonObject.emap {
+				case JsonObject(ob) => ob match {
+					case "null" =>
+				}
+			}*/
+			 //Decoder.forProduct1[String, String]("items")(Tuple1[String](_)._1).emap {
 			Decoder.decodeString.emap {
 				case "null" => `null`[A]().embed.asRight
 				case "int" => int[A]().embed.asRight
@@ -193,17 +179,18 @@ object Skeuo_Skeuo {
 
 				case x => s"$x is not well formed type".asLeft
 			}
-			// Decoder.forProduct1[String, String]("")(Tuple1[String](_)._1).emap {
-			//Decoder.decodeBoolean
+
 		}
 
 
-		private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-			/*basicAvroSchemaDecoder orElse
+		private def avroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+
 			//enumAvroSchemaDecoder orElse
-				logicalTypeAvroSchemaDecoder orElse*/
-				arrayAvroSchemaDecoder /*orElse
-				mapAvroSchemaDecoder orElse
+				logicalTypeAvroSchemaDecoder orElse
+				arrayAvroSchemaDecoder orElse
+				mapAvroSchemaDecoder  orElse
+				enumAvroSchemaDecoder
+			/*orElse
 				recordAvroSchemaDecoder orElse
 				namedTypeAvroSchemaDecoder*/
 
@@ -213,7 +200,7 @@ object Skeuo_Skeuo {
 		}
 
 
-		private def logicalTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+		private def logicalTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
 
 			Decoder.forProduct4[(String, Option[String], Option[Int], Option[Int]), String, Option[String], Option[Int], Option[Int]]("type", "logicalType", "precision", "scale")(Tuple4.apply).emap {
@@ -227,20 +214,155 @@ object Skeuo_Skeuo {
 			}
 		}
 
-		private def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
+		private def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+
 			Decoder.instance { c: HCursor =>
 				for {
-					items: A <- c.downField("items").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+					items: A <- c.downField("items").as[A]
 					_ <- validateType(c, "array")
 				} yield AvroSchema_S.array[A](items).embed
 			}
+			/*Decoder.forProduct2[(String, A), String, A]("type", "items")(Tuple2.apply).emap {
 
-		private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
-		private def mapAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+				case ("array", items: A) => AvroSchema_S.array[A](items).embed.asRight
+
+				//case (x, _) => s"$x is not well formed type".asLeft
+				case _ => "not right array".asLeft //avroSchemaDecoder[A].embed.asRight
+			}*/
+		}
+
+		private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+			Decoder.instance { c: HCursor =>
+
+
+				/*TEnum[A](
+					name: String,
+					namespace: Option[String],
+					aliases: List[String],
+					doc: Option[String],
+					symbols: List[String]
+				)*/
+
+				// NOTE: the json enum extraction:
+				/*Decoder.instance(c =>
+					for {
+						values <- c.downField("enum").as[List[String]]
+						_ <- validateType(c, "string")
+					} yield JsonSchema_S.enum[A](values).embed
+				)*/
+
+				// NOTE: the avro enum extraction
+				def makeAvroCirceEnum(c: HCursor): Result[A] = {
+
+					val tenum: (String, Option[String], List[String], Option[String],  List[String]) => AvroSchema_S[A] = (name, namespace, aliases, doc, symbols) => AvroSchema_S.`enum`[A](name, namespace, aliases, doc, symbols)
+
+					val resultArgs: Result[(String, Option[String], List[String], Option[String], List[String])] =
+						for {
+							// validation
+							// TODO - why error when including namspace, aliases, properties for validation below?
+							// TODO - maybe use the avro-string circe instead of json-string circe (from avro-skeuo) so no more mish-mash between json/avro string parameters.
+
+							_ <- validateType(c, "enum")
+							_ <- propertyExists(c, "type")
+							_ <- propertyExists(c, "name")
+							_ <- propertyExists(c, "symbols")
+
+							//_ <- propertyExists(c, "namespace")
+							//_ <- propertyExists(c, "aliases")
+							//_ <- propertyExists(c, "doc")
+
+							name: String <- c.downField("name").as[Option[String]].map(_.getOrElse(""))
+
+							namespace: Option[String] <- c.downField("namespace").as[Option[Option[String]]].map(_.getOrElse(None))
+
+							aliases: List[String] <- c.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+
+							doc: Option[String] <- c.downField("doc").as[Option[Option[String]]].map(_.getOrElse(None))
+
+							symbols: List[String] <- c.downField("symbols").as[Option[List[String]]].map(_.getOrElse(List.empty))
+
+						} yield (name, namespace, aliases, doc, symbols)
+
+
+					val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (name, namespace, aliases, doc, symbols) => tenum(name, namespace, aliases, doc, symbols) }
+					val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+					println(s"\n\nINSIDE makeAvroCirceEnum:")
+					println(s"result (not embed) = $result_noEmbed")
+					println(s"result (embed) = $result_embed")
+
+					result_embed
+				}
+
+				makeAvroCirceEnum(c)
+			}
+		}
+
+		// NOW
+		private def mapAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+
+			Decoder.instance { c: HCursor =>
+
+				// Added by @statisticallyfit:
+
+				/**
+				 * Extract the string { "type": "something" } or simple primitive "something" that comes after 'values'
+				 *
+				 * @return
+				 */
+				def makeAvroCirceMap(c: HCursor): Result[A] = {
+
+					val tmap: A => AvroSchema_S[A] = (inner) => AvroSchema_S.map[A](inner)
+
+
+					val resultArgs: Result[A] = for {
+						// validation
+						_ <- validateType(c, "map")
+						_ <- propertyExists(c, "type")
+						_ <- propertyExists(c, "values")
+
+						inner: A <- {
+
+							val resTpe: Result[A] = c.downField("values").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])/*.as[Option[String]].map(_.getOrElse(""))*/
+
+							val resMap: Result[TMap[A]] = resTpe.map(tpe => AvroSchema_S.TMap(tpe))
+
+							println(s"\n\nINSIDE makeAvroCirceMap:")
+							println(s"resTpe = $resTpe")
+							println(s"resMap = $resMap")
+
+							resTpe
+						}
+
+					} yield inner
+
+
+					val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (inner) => tmap(inner) }
+					val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+					println(s"\n\nINSIDE makeAvroCirceMap:")
+					println(s"result (not embed) = $result_noEmbed")
+					println(s"result (embed) = $result_embed")
+
+					result_embed
+				}
+
+
+				//assert(isObjectMap)
+
+				makeAvroCirceMap(c)
+			}
+		}
+
+
 		private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
 		private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
 
 	}
+
+
+
 
 
 	object TEMP_AvroSchemaDecoderImplicit_usingJsonCirceString {
@@ -535,8 +657,15 @@ object Skeuo_Skeuo {
 
 		private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 			Decoder.instance { c: HCursor =>
+				// NOTE: the json enum extraction:
+				/*Decoder.instance(c =>
+					for {
+						values <- c.downField("enum").as[List[String]]
+						_ <- validateType(c, "string")
+					} yield JsonSchema_S.enum[A](values).embed
+				)*/
 
-
+				// NOTE: the avro enum extraction
 				def makeAvroCirceEnum(c: HCursor): Result[A] = {
 
 					val tenum: (String, List[String], Option[String], List[String], Option[String]) => AvroSchema_S[A] = (title, symbols, namespace, aliases, doc) => AvroSchema_S.`enum`[A](title, namespace, aliases, doc, symbols)
@@ -602,6 +731,8 @@ object Skeuo_Skeuo {
 		}
 
 
+
+
 		private def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 			// TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
 			//identifyDecoderWithPriorityBasicDecoder orElse
@@ -613,6 +744,28 @@ object Skeuo_Skeuo {
 				objectJsonSchemaDecoder
 			/*orElse
 			basicJsonSchemaDecoder*/
+		}
+
+		private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+			import JsonSchema_S._
+
+			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
+
+				case ("integer", Some("int32")) => integer[A]().embed.asRight
+				case ("integer", Some("int64")) => long[A]().embed.asRight
+				case ("integer", _) => integer[A]().embed.asRight
+				case ("number", Some("float")) => float[A]().embed.asRight
+				case ("number", Some("double")) => double[A]().embed.asRight
+				case ("number", _) => float[A]().embed.asRight
+				case ("string", Some("byte")) => byte[A]().embed.asRight
+				case ("string", Some("binary")) => binary[A]().embed.asRight
+				case ("boolean", _) => boolean[A]().embed.asRight
+				case ("string", Some("date")) => date[A]().embed.asRight
+				case ("string", Some("date-time")) => dateTime[A]().embed.asRight
+				case ("string", Some("password")) => password[A]().embed.asRight
+				case ("string", _) => string[A]().embed.asRight
+				case (x, _) => s"$x is not well formed type".asLeft
+			}
 		}
 
 		private def objectJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
@@ -838,42 +991,14 @@ object Skeuo_Skeuo {
 
 
 
-		private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
-			import JsonSchema_S._
-
-			Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
-
-				case ("integer", Some("int32")) => integer[A]().embed.asRight
-				case ("integer", Some("int64")) => long[A]().embed.asRight
-				case ("integer", _) => integer[A]().embed.asRight
-				case ("number", Some("float")) => float[A]().embed.asRight
-				case ("number", Some("double")) => double[A]().embed.asRight
-				case ("number", _) => float[A]().embed.asRight
-				case ("string", Some("byte")) => byte[A]().embed.asRight
-				case ("string", Some("binary")) => binary[A]().embed.asRight
-				case ("boolean", _) => boolean[A]().embed.asRight
-				case ("string", Some("date")) => date[A]().embed.asRight
-				case ("string", Some("date-time")) => dateTime[A]().embed.asRight
-				case ("string", Some("password")) => password[A]().embed.asRight
-				case ("string", _) => string[A]().embed.asRight
-				case (x, _) => s"$x is not well formed type".asLeft
-			}
-		}
-
-
-
 		private def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
-			/*Decoder.forProduct2[(String, List[String]), String, List[String]]("type", "enum")(Tuple2.apply).emap {
-
-				case ("string", arrStr) => JsonSchema_S.`enum`[A](cases = arrStr).embed.asRight
-
-				//case (x, _) => s"$x is not well formed type".asLeft
-				//case _ => jsonSchemaDecoder[A].
-			}*/
 			Decoder.instance(c =>
 				for {
-					values <- c.downField("enum").as[List[String]]
 					_ <- validateType(c, "string")
+					_ <- propertyExists(c, "enum")
+
+					values: List[String] <- c.downField("enum").as[Option[List[String]]].map(_.getOrElse(List.empty[String]))
+
 				} yield JsonSchema_S.enum[A](values).embed
 			)
 		}
@@ -995,7 +1120,7 @@ object Skeuo_Skeuo {
 					Fix(ob)
 				}
 
-				case en @ EnumF(cases: List[String]) => Fix(en)
+				case enumf @ EnumF(cases: List[String]) => Fix(enumf)
 			}
 
 		}
@@ -1015,6 +1140,12 @@ object Skeuo_Skeuo {
 				// NOTE: return 'ar' only, don't wrap again in another layer or else stackoverflow error
 				case far @ Fix(ar @ ArrayF(inner: Fix[JsonSchema_S])) => ar
 
+				case Fix(ob @ ObjectMapF(addProps: AdditionalProperties[Fix[JsonSchema_S]])) => ob
+
+				case Fix(ob @ ObjectNamedMapF(name: String, additionalProperties: AdditionalProperties[Fix[JsonSchema_S]])) => ob
+
+
+				case Fix(EnumF(cases: List[String])) => EnumF(cases)
 			}
 		}
 
@@ -1071,12 +1202,15 @@ object Skeuo_Skeuo {
 		}*/
 
 		implicit def skeuoEmbed_AA: Embed[AvroSchema_S, Fix[AvroSchema_S]] = new Embed[AvroSchema_S, Fix[AvroSchema_S]] {
+
 			def algebra: Algebra[AvroSchema_S, Fix[AvroSchema_S]] = Algebra {
 				case TInt() => Fix(TInt())
 
 				case TString() => Fix(TString())
 
-				case ar @ TArray(inner: Fix[AvroSchema_S]) => Fix(TArray(inner)) //inner
+				case tarray @ TArray(inner: Fix[AvroSchema_S]) => Fix(tarray)
+
+				case tmap @ TMap(values: Fix[AvroSchema_S]) => Fix(tmap)
 
 				case te @ TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => Fix(te)
 			}
@@ -1093,7 +1227,10 @@ object Skeuo_Skeuo {
 				case Fix(TInt()) => TInt()
 				case Fix(TString()) => TString()
 				// NOTE: return 'ta' only, don't wrap again in another layer or else stackoverflow error
-				case fta @ Fix(ta @ TArray(inner: Fix[AvroSchema_S])) => ta
+				case Fix(TArray(inner: Fix[AvroSchema_S])) => TArray(inner)
+
+				case Fix(TMap(values: Fix[AvroSchema_S])) => TMap(values)
+
 				case Fix(te @ TEnum(_, _, _, _, _)) => te
 			}
 		}
@@ -1212,7 +1349,8 @@ object Skeuo_Skeuo {
 					result
 				}
 
-				case EnumF(cases: List[String]) => Fix(TEnum(name = "enum", namespace = None, aliases = List(), doc = None, symbols = cases))
+				// TODO Make named enum here in json schema?
+				case EnumF(cases: List[String]) => Fix(TEnum(name = "NAME_ENUM", namespace = None, aliases = List(), doc = None, symbols = cases))
 			}
 		}
 
@@ -1234,7 +1372,8 @@ object Skeuo_Skeuo {
 				case Fix(TBoolean()) => BooleanF()
 
 
-				case Fix(TArray(inner: Fix[AvroSchema_S])) => ArrayF(inner)
+				// HERE overflow 1
+				case Fix(TArray(inner: Fix[AvroSchema_S])) => ArrayF(inner) //ArrayF(inner) // TODO need: ArrayF(inner) or ArrayF(Fix(Tarray(inner))?
 
 				case Fix(TMap(inner: Fix[AvroSchema_S])) => ObjectMapF(additionalProperties = AdditionalProperties[Fix[AvroSchema_S]](tpe = inner))
 
@@ -1265,6 +1404,7 @@ object Skeuo_Skeuo {
 		implicit def skeuoProject_AJ: Project[AvroSchema_S, Fix[JsonSchema_S]] = new Project[AvroSchema_S, Fix[JsonSchema_S]] {
 
 			def coalgebra: Coalgebra[AvroSchema_S, Fix[JsonSchema_S]] = Coalgebra {
+
 				// Null
 				//case Fix(ObjectF(List(), List())) ⇒ TNull()
 				// Integer
@@ -1283,6 +1423,12 @@ object Skeuo_Skeuo {
 				case Fix(ByteF()) ⇒ TBytes()
 				// Array
 				case Fix(ArrayF(inner: Fix[JsonSchema_S])) ⇒ TArray(inner)
+
+				case Fix(ObjectMapF(addProps: AdditionalProperties[Fix[JsonSchema_S]])) => TMap(addProps.tpe)
+				case Fix(ObjectNamedMapF(name, addProps: AdditionalProperties[Fix[JsonSchema_S]])) => TMap(addProps.tpe)
+				// simple and named object ---> TRecord
+				/*case Fix(ObjectNamedF(name: String, properties: List[Property[Fix[JsonSchema_S]]], required: List[String])) => TMap(properties.head.tpe) // TODO correct?
+				case Fix(ObjectF(properties, required))*/
 
 				// Map
 				case Fix(ObjectNamedMapF(name: String, additionalProperties: AdditionalProperties[Fix[JsonSchema_S]])) ⇒ {
@@ -1342,6 +1488,9 @@ object Skeuo_Skeuo {
 					}
 					result
 				}
+
+				// TODO m ake a jsonschema enum to be named?
+				case (Fix(EnumF(cases: List[String]))) => TEnum(name = "ENUM_NAME", namespace = None, aliases = List(), doc = None, symbols = cases)
 			}
 		}
 	}
