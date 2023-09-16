@@ -118,7 +118,7 @@ object Skeuo_Skeuo {
 
 
 
-	object TEMP_AvroSchemaDecoderImplicits_usingAvroCirceString {
+	object TEMP_AvroSchemaDecoderImplicits_usingAvroDialect {
 
 
 		import AvroSchema_S._
@@ -365,7 +365,7 @@ object Skeuo_Skeuo {
 
 
 
-	object TEMP_AvroSchemaDecoderImplicit_usingJsonCirceString {
+	object TEMP_AvroSchemaDecoderImplicit_usingJsonDialect {
 
 
 		import AvroSchema_S._
@@ -384,13 +384,13 @@ object Skeuo_Skeuo {
 
 
 		private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-			enumAvroSchemaDecoder orElse
+
 				logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
 			mapAvroSchemaDecoder orElse
 			recordAvroSchemaDecoder orElse
-			namedTypeAvroSchemaDecoder
-
+			namedTypeAvroSchemaDecoder orElse
+			enumAvroSchemaDecoder
 			// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
 
 
@@ -404,6 +404,8 @@ object Skeuo_Skeuo {
 
 
 		private def logicalTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+			// TODO convert to json string dialect
 
 			Decoder.forProduct4[(String, Option[String], Option[Int], Option[Int]), String, Option[String], Option[Int], Option[Int]]("type", "logicalType", "precision", "scale")(Tuple4.apply).emap {
 
@@ -656,63 +658,21 @@ object Skeuo_Skeuo {
 
 
 		private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-			Decoder.instance { c: HCursor =>
-				// NOTE: the json enum extraction:
-				/*Decoder.instance(c =>
-					for {
-						values <- c.downField("enum").as[List[String]]
-						_ <- validateType(c, "string")
-					} yield JsonSchema_S.enum[A](values).embed
-				)*/
+			Decoder.instance(c =>
+				for {
+					_ <- validateType(c, "string") // type -> string
+					//_ <- propertyExists(c, "title")
+					_ <- propertyExists(c, "type")
+					_ <- propertyExists(c, "enum")
 
-				// NOTE: the avro enum extraction
-				def makeAvroCirceEnum(c: HCursor): Result[A] = {
+					cases: List[String] <- c.downField("enum").as[Option[List[String]]].map(_.getOrElse(List.empty[String]))
 
-					val tenum: (String, List[String], Option[String], List[String], Option[String]) => AvroSchema_S[A] = (title, symbols, namespace, aliases, doc) => AvroSchema_S.`enum`[A](title, namespace, aliases, doc, symbols)
-
-					val resultArgs: Result[(String, List[String], Option[String], List[String], Option[String])] =
-						for {
-							// validation
-							// TODO - why error when including namspace, aliases, properties for validation below?
-							// TODO - maybe use the avro-string circe instead of json-string circe (from avro-skeuo) so no more mish-mash between json/avro string parameters.
-
-							_ <- validateType(c, "enum")
-							_ <- propertyExists(c, "title")
-							_ <- propertyExists(c, "type")
-							_ <- propertyExists(c, "symbols")
-							//_ <- propertyExists(c, "namespace")
-							//_ <- propertyExists(c, "aliases")
-							//_ <- propertyExists(c, "doc")
-
-							title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
-
-							symbols: List[String] <- c.downField("symbols").as[Option[List[String]]].map(_.getOrElse(List.empty))
-
-							namespace: Option[String] <- c.downField("namespace").as[Option[Option[String]]].map(_.getOrElse(None))
-
-							aliases: List[String] <- c.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
-
-							doc: Option[String] <- c.downField("doc").as[Option[Option[String]]].map(_.getOrElse(None))
-
-						} yield (title, symbols, namespace, aliases, doc)
-
-
-					val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (title, symbols, namespace, aliases, doc) => tenum(title, symbols, namespace, aliases, doc) }
-					val result_embed: Result[A] = result_noEmbed.map(_.embed)
-
-					println(s"\n\nINSIDE makeAvroCirceEnum:")
-					println(s"result (not embed) = $result_noEmbed")
-					println(s"result (embed) = $result_embed")
-
-					result_embed
-				}
-
-				makeAvroCirceEnum(c)
-			}
+				} yield AvroSchema_S.`enum`[A](name = "", namespace = None, aliases = List(), doc = None, symbols = cases).embed
+			)
 		}
 	}
 
-	object TEMP_JsonSchemaDecoderImplicit_usingJsonCirceString {
+	object TEMP_JsonSchemaDecoderImplicit_usingJsonDialect {
 
 
 		import JsonSchema_S._
@@ -737,11 +697,12 @@ object Skeuo_Skeuo {
 			// TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
 			//identifyDecoderWithPriorityBasicDecoder orElse
 
-			enumJsonSchemaDecoder orElse
+
 			referenceJsonSchemaDecoder orElse
 				sumJsonSchemaDecoder orElse
 				arrayJsonSchemaDecoder orElse
-				objectJsonSchemaDecoder
+				objectJsonSchemaDecoder orElse
+				enumJsonSchemaDecoder
 			/*orElse
 			basicJsonSchemaDecoder*/
 		}
