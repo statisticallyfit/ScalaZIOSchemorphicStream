@@ -47,15 +47,19 @@ object ParseADTToCirceToADT {
 		val libToJson: Fix[AvroSchema_S] ⇒ JsonDialect = scheme.cata(AvroSchema_S.toJson).apply(_)
 
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{/*skeuoProject_AJ,*/ skeuoProject_AA}
 
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		//import embedImplicits.skeuoEmbed_AJ
+		import projectImplicits.skeuoProject_AA
 
 		// TODO IMPLICITS (1) = work to manipulate the implicits here (says drosebasisforfix using project[_,_] todo figure out change the Projcet??
 
 		val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonDialect = scheme.cata(toCirceAvroDialect_fromAvroSkeuo).apply(_) //scheme.cata(toCirceJsonDialect_fromAvroSkeuo).apply(_)
 
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoProject_JJ}
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		//import embedImplicits.skeuoEmbed_AJ
+		import projectImplicits.skeuoProject_JJ
 
 		val libRenderAltered: Fix[JsonSchema_S] ⇒ JsonDialect = scheme.cata(toCirceJsonDialect_fromJsonSkeuo).apply(_)
 
@@ -327,7 +331,11 @@ object ParseADTToCirceToADT {
 		import org.apache.avro.{Schema ⇒ AvroSchema_A}
 		import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{/*skeuoProject_AA,*/ skeuoProject_AA}
+
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		//import embedImplicits.skeuoEmbed_AA
+		import projectImplicits.skeuoProject_AA
+
 
 		// STEPS:
 		// avro-str-dialect
@@ -482,13 +490,18 @@ object ParseADTToCirceToADT {
 
 	object CirceAvroToSkeuoAvro {
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{ skeuoEmbed_AA, skeuoProject_AA}
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import embedImplicits.skeuoEmbed_AA
+		import projectImplicits.skeuoProject_AA
 
-		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_fromSkeuoProject._
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicit_usingJsonDialect._
 
-		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicits_usingAvroDialect._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
+
+
+		import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 
 
@@ -522,13 +535,18 @@ object ParseADTToCirceToADT {
 
 	object CirceAvroToSkeuoJson {
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.{skeuoEmbed_AJ, skeuoProject_AJ}
 
-		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_usingJsonDialect._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import embedImplicits.skeuoEmbed_AJ
+		import projectImplicits.skeuoProject_AJ
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicit_usingJsonDialect._
 
-		//import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_AvroSchemaDecoderImplicits_usingAvroDialect._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
+
+
+		import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 
 		val decoderAJ: JsonDialect ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
@@ -558,9 +576,18 @@ object ParseADTToCirceToADT {
 	// -----------------
 	object CirceJsonToSkeuoJson {
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JJ
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_usingJsonDialect._//, skeuoProject_AJ}
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import embedImplicits.skeuoEmbed_JJ
+		//import projectImplicits.skeuoProject_AA
+
+
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
+
+
+		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+		import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 		val decoderJJ: JsonDialect ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
 
@@ -578,9 +605,18 @@ object ParseADTToCirceToADT {
 
 	object CirceJsonToSkeuoAvro {
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TransSchemaImplicits.skeuoEmbed_JA
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.Skeuo_Skeuo.TEMP_JsonSchemaDecoderImplicit_usingJsonDialect._ //, skeuoProject_AJ}
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import embedImplicits.skeuoEmbed_JA
+		//import projectImplicits.skeuoProject_AA
+
+
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
+
+
+		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+		import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 		val decoderJA: JsonDialect ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
 
