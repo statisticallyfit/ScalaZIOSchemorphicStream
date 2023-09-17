@@ -73,7 +73,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		info(s"\nTesting this kind: ${title}")
 
 		val ca: JsonCirce = libToJsonAltered(theArgAvro)
-		info(s"\n avro-skeuo ---> circe: ${ca}")
+		info(s"\n avro-skeuo ---> circe: \n${ca}")
 		//val theAvroSkeuo = funcCirceToAvroSkeuo(theCirce)
 		info(s"\navro-skeuo --> circe --> avro-skeuo: ${funcCirceAvroToSkeuoAvro(ca)}")
 		info(s"\navro-skeuo --> circe --> json-skeuo: ${funcCirceAvroToSkeuoJson(ca)}")
@@ -83,7 +83,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 		// json-skeuo --> circe
 		val cj: JsonCirce = libRenderAltered(theArgJson)
-		info(s"\njson-skeuo -> circe: ${cj}")
+		info(s"\njson-skeuo -> circe: \n${cj}")
 		// json-skeuo --> avro-skeuo
 		info(s"\njson-skeuo --> circe -> avro-skeuo: ${funcCirceJsonToSkeuoAvro(cj)}")
 		info(s"\njson-skeuo --> circe -> json-skeuo: ${funcCirceJsonToSkeuoJson(cj)}")
@@ -95,18 +95,19 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 
 	testCirceToSkeuo("map : skeuo -> circe -> skeuo",
-		map3IntAvro_Fix_S,
+		//map3IntAvro_Fix_S,
 		//nullAvro_Fix_S,
 		//array1IntAvro_Fix_S,
-		//enumAvro_Fix_S,
+		enumAvro_Fix_S,
 		//intAvro_Fix_S,
 		//map1IntAvro_Fix_S,
 		//recordExPositionAvro_Fix_S,
+		//map1PosRecordAvro_Fix_S,
 		//namedTypeAvro_Fix_S,
-		map1PosRecordJson_Fix_S
+		//map1PosRecordJson_Fix_S
 		//nullJson_Fix_S,
 		//array1IntJson_Fix_S
-		//enumJson_Fix_S
+		enumJson_Fix_S
 		//map1IntJson_Fix_S
 		//intJson_Fix_S
 	)

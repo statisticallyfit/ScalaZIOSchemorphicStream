@@ -47,9 +47,15 @@ object embedImplicits {
 	implicit def skeuoEmbed_AA: Embed[AvroSchema_S, Fix[AvroSchema_S]] = new Embed[AvroSchema_S, Fix[AvroSchema_S]] {
 
 		def algebra: Algebra[AvroSchema_S, Fix[AvroSchema_S]] = Algebra {
-			case TInt() => Fix(TInt())
 
+			case TNull() => Fix(TNull())
+			case TInt() => Fix(TInt())
 			case TString() => Fix(TString())
+			case TBoolean() => Fix(TBoolean())
+			case TLong() => Fix(TLong())
+			case TFloat() => Fix(TFloat())
+			case TDouble() => Fix(TDouble())
+			case TBytes() => Fix(TBytes())
 
 			case tarray @ TArray(inner: Fix[AvroSchema_S]) => Fix(tarray)
 
