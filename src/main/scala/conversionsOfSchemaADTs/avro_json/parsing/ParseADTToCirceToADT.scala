@@ -499,13 +499,13 @@ object ParseADTToCirceToADT {
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
 
 
-		import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
-		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+		import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
 		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 
 
-		val decoderAA: JsonDialect ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
+		val decoderAA: AvroDialect ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
 
 
 		// NOTE:
@@ -516,7 +516,7 @@ object ParseADTToCirceToADT {
 
 		val f2: AvroDialect => Result[Fix[AvroSchema_S]] = avroDialectToJsonDialect andThen decoderAA
 
-		val funcCirceAvroToSkeuoAvro: AvroDialect => Result[Fix[AvroSchema_S]] = decoderAA compose avroDialectToJsonDialect
+		val funcCirceAvroToSkeuoAvro: AvroDialect => Result[Fix[AvroSchema_S]] = decoderAA //compose avroDialectToJsonDialect
 
 
 		// TODO IMPLICITS (2)

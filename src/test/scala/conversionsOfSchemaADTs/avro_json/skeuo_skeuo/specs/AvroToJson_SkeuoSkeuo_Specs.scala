@@ -93,21 +93,20 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 	// HELP: not converting avro-skeuo -> circe -> skeuo properly (result is null)
 
-
 	testCirceToSkeuo("map : skeuo -> circe -> skeuo",
 		//map3IntAvro_Fix_S,
 		//nullAvro_Fix_S,
 		//array1IntAvro_Fix_S,
-		enumAvro_Fix_S,
+		//enumAvro_Fix_S,
 		//intAvro_Fix_S,
 		//map1IntAvro_Fix_S,
-		//recordExPositionAvro_Fix_S,
+		recordExPositionAvro_Fix_S,
 		//map1PosRecordAvro_Fix_S,
 		//namedTypeAvro_Fix_S,
-		//map1PosRecordJson_Fix_S
+		map1PosRecordJson_Fix_S
 		//nullJson_Fix_S,
 		//array1IntJson_Fix_S
-		enumJson_Fix_S
+		//enumJson_Fix_S
 		//map1IntJson_Fix_S
 		//intJson_Fix_S
 	)
@@ -117,6 +116,121 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	info(s"\n\nnow map json:")
 	printJsonStringToCirceToAvroSkeuo(List(map1IntJson_R))*/
 
+
+	import io.circe._
+	import io.circe.Decoder
+	import io.circe.parser
+	import io.circe.generic.semiauto._
+
+	import AvroSchema_S.{Field => FieldAvro}
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForDialects.Decoder_InputAvroDialect_OutputAvroSkeuo._
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForSkeuoAlgCoalg => impl}
+
+	import impl.embedImplicits.skeuoEmbed_AA
+	import impl.projectImplicits.skeuoProject_AA
+
+	import higherkindness.droste._
+	//import higherkindness.droste.syntax.embed._
+	//import cats.syntax.all._
+
+	import scala.language.postfixOps
+	import scala.language.higherKinds
+
+	object FieldAvroObj {
+
+
+
+		//implicit def fieldDecoderAuto[A]: Decoder[FieldAvro[A]] = deriveDecoder[FieldAvro[A]]
+		implicit def fieldDecoderManual[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = Decoder.instance { (hCursor: HCursor) =>
+			val res: Result[FieldAvro[A]] = for {
+				name: String <- hCursor.get[String]("name")
+				theType: A <- hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+				//aliases: List[String] <- hCursor.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+			} yield FieldAvro[A](name, List(), None, None, theType)
+
+			res
+		}
+
+		def decoder2[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = Decoder[FieldAvro[A]].prepare(_.downField("fields"))
+
+
+		val inputStringField =
+			"""
+			  |[
+			  |  {
+			  |    "name": "coordinates",
+			  |    "type": {
+			  |      "type": "array",
+			  |      "items": "float"
+			  |    }
+			  |  },
+			  |  {
+			  |    "name": "type",
+			  |    "type": "string"
+			  |  }
+			  |]
+			  |""".stripMargin
+
+		val inputStringField2 =
+			"""
+			  |{
+			  |  "fields": [
+			  |    {
+			  |      "name": "coordinates",
+			  |      "type": {
+			  |        "type": "array",
+			  |        "items": "float"
+			  |      }
+			  |    },
+			  |    {
+			  |      "name": "type",
+			  |      "type": "string"
+			  |    }
+			  |  ]
+			  |}
+			  |""".stripMargin
+		def doFieldDecoding[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]] = {
+			parser.decode[List[FieldAvro[A]]](inputStringField)(Decoder.decodeList(fieldDecoderManual[A])) match {
+				case Right(fields) => info(s"FIELDS ARE HERE: ${fields}")
+				case Left(ex) => info(s"OOPS something error $ex")
+			}
+		}
+
+		def doFieldDecoding2[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]] = {
+			parser.decode[List[FieldAvro[A]]](inputStringField2)(Decoder.decodeList(decoder2)) match {
+
+				case Right(fields) => info(s"FIELDS ARE HERE 2: ${fields}")
+				case Left(ex) => info(s"OOPS  2 something error $ex")
+			}
+		}
+	}
+
+	case class Book(book: String)
+
+	object Book {
+
+		implicit val bookDecoderAuto: Decoder[Book] = deriveDecoder[Book]
+		//implicit val bookDecoderManual
+		val inputStringBook =
+			"""
+			  |[
+			  | {"book": "Programming in Scala"},
+			  | {"book": "How to Win Friends and Influence People"},
+			  | {"book": "HomoSapiens"},
+			  | {"book": "Scala OOP"}
+			  |]
+			  |""".stripMargin
+
+		def doBookDecoding = {
+			parser.decode[List[Book]](inputStringBook) match {
+				case Right(books: List[Book]) => info(s"Here are the books ${books}")
+				case Left(ex) => info(s"Ooops something error ${ex}")
+			}
+		}
+	}
+	Book.doBookDecoding
+	FieldAvroObj.doFieldDecoding[Fix[AvroSchema_S]]
+	FieldAvroObj.doFieldDecoding2[Fix[AvroSchema_S]]
 
 
 

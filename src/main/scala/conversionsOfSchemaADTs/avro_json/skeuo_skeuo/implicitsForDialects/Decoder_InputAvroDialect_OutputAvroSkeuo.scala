@@ -6,10 +6,12 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForDialects
 // Imports for the jsonSchemaDecoder (from JsonDecoders file from skeuomorph)
 import io.circe._
 import io.circe.Decoder
-import io.circe.Decoder.{Result, resultInstance}
+import io.circe.Decoder.{Result, decodeInt, resultInstance}
 import io.circe.{Json => JsonCirce}
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import cats.syntax.all._
+import conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.SkeuomorphExample.res
+import higherkindness.skeuomorph.openapi.JsonSchemaF
 //import cats.implicits._
 //import cats.syntax._
 
@@ -57,46 +59,51 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 	implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-		/*Decoder.instance { c: HCursor =>
 
-			val result: Result[AvroSchema_S[A]] = for {
-				nullStr: String <- c.downField("null").as[Option[String]].map(_.getOrElse(""))
-			} yield AvroSchema_S.`null`[A]()
+		// TODO must use combination of forproduct1 ("type") and the above, where abvoe is just for simple types (primitives) and the "type" extraction for when in composed types (like array)
 
-			val resultEmbed: Result[A] = result.map(_.embed)
 
-			resultEmbed
-		}*/
 
+		// Decoder.decodeString.flatMap {
+			//case "\"null\"" | """int""" | "\"string\"" | "\"boolean\"" | "\"long\"" | "\"float\"" | "\"double\"" | "\"bytes\"" => basicAvroSchemaDecoder[A] //primitiveAvroSchemaDecoder[A]
+
+		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
+
+			//case "null" | "int" | "string" | "boolean" | "long" | "float" | "double" | "bytes" => basicAvroSchemaDecoder[A]
+
+			case ("null", _) | ("int", _) | ("string", _) | ("boolean", _) | ("long", _) | ("float", _) | ("double", _) | ("bytes", _) => primitiveAvroSchemaDecoder[A]
+
+			//case (x, _) => s"$x is not well formed type".asLeft
+			case _ => avroSchemaDecoder[A]
+		}
 
 		//Decoder.forProduct1[String, String]("")(Tuple1[String](_)._1).flatMap {
-		Decoder.decodeString.flatMap {
+		//Decoder.decodeString.flatMap {
+		/*Decoder.decodeTuple1[String].flatMap {
 			//case "\"null\"" | """int""" | "\"string\"" | "\"boolean\"" | "\"long\"" | "\"float\"" | "\"double\"" | "\"bytes\"" => basicAvroSchemaDecoder[A] //primitiveAvroSchemaDecoder[A]
-			case "null" | "int" | """string""" | "boolean" | "long" | "float" | "double" | "bytes" => basicAvroSchemaDecoder[A]
+			case ("null", )| ("int", ) | ("string", ) | ("boolean", ) | ("long", ) | ("float", ) | ("double", ) | ("bytes", ) => basicAvroSchemaDecoder[A]
 
 			// TODO must use combination of forproduct1 ("type") and the above, where abvoe is just for simple types (primitives) and the "type" extraction for when in composed types (like array)
 
 			//case (x, _) => s"$x is not well formed type".asLeft
 			case _ => avroSchemaDecoder[A]
-		}
+		}*/
 	}
 
-	/*private def intAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-		Decoder.decodeInt.
-	}*/
+	private def primitiveAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+
+		Decoder.decodeString.flatMap {
+
+			case "null" | "int" | "string" | "boolean" | "long" | "float" | "double" | "bytes" => basicAvroSchemaDecoder[A]
+
+			case _ => avroSchemaDecoder[A]
+		}
+	}
 
 	private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
 		import AvroSchema_S._
 
-		//import io.circe.DecodingFailure
-		//import io.circe.DecodingFailure.Reason._
-
-		/*Decoder.decodeJsonObject.emap {
-			case JsonObject(ob) => ob match {
-				case "null" =>
-			}
-		}*/
 		//Decoder.forProduct1[String, String]("items")(Tuple1[String](_)._1).emap {
 		Decoder.decodeString.emap {
 			case "null" => `null`[A]().embed.asRight
@@ -116,11 +123,14 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 	private def avroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-		//enumAvroSchemaDecoder orElse
+		//fieldAvroSchemaDecoder orElse
+		primitiveAvroSchemaDecoder orElse
 		logicalTypeAvroSchemaDecoder orElse
-			arrayAvroSchemaDecoder orElse
-			mapAvroSchemaDecoder orElse
-			enumAvroSchemaDecoder
+		arrayAvroSchemaDecoder orElse
+		mapAvroSchemaDecoder orElse
+		//enumAvroSchemaDecoder orElse
+		recordAvroSchemaDecoder /*orElse
+		enumAvroSchemaDecoder*/
 		/*orElse
 			recordAvroSchemaDecoder orElse
 			namedTypeAvroSchemaDecoder*/
@@ -153,35 +163,15 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 				_ <- validateType(c, "array")
 			} yield AvroSchema_S.array[A](items).embed
 		}
-		/*Decoder.forProduct2[(String, A), String, A]("type", "items")(Tuple2.apply).emap {
-
-			case ("array", items: A) => AvroSchema_S.array[A](items).embed.asRight
-
-			//case (x, _) => s"$x is not well formed type".asLeft
-			case _ => "not right array".asLeft //avroSchemaDecoder[A].embed.asRight
-		}*/
 	}
+
+
 
 	private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
 		Decoder.instance { c: HCursor =>
 
 
-			/*TEnum[A](
-				name: String,
-				namespace: Option[String],
-				aliases: List[String],
-				doc: Option[String],
-				symbols: List[String]
-			)*/
-
-			// NOTE: the json enum extraction:
-			/*Decoder.instance(c =>
-				for {
-					values <- c.downField("enum").as[List[String]]
-					_ <- validateType(c, "string")
-				} yield JsonSchema_S.enum[A](values).embed
-			)*/
 
 			// NOTE: the avro enum extraction
 			def makeAvroCirceEnum(c: HCursor): Result[A] = {
@@ -196,8 +186,8 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 						_ <- validateType(c, "enum")
 						_ <- propertyExists(c, "type")
-						_ <- propertyExists(c, "name")
-						_ <- propertyExists(c, "symbols")
+						//_ <- propertyExists(c, "name")
+						//_ <- propertyExists(c, "symbols")
 
 						//_ <- propertyExists(c, "namespace")
 						//_ <- propertyExists(c, "aliases")
@@ -219,7 +209,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 				val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (name, namespace, aliases, doc, symbols) => tenum(name, namespace, aliases, doc, symbols) }
 				val result_embed: Result[A] = result_noEmbed.map(_.embed)
 
-				println(s"\n\nINSIDE makeAvroCirceEnum:")
+				println(s"\n\nINSIDE makeAvroCirceEnum (avro -> avro):")
 				println(s"result (not embed) = $result_noEmbed")
 				println(s"result (embed) = $result_embed")
 
@@ -251,7 +241,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 					// validation
 					_ <- validateType(c, "map")
 					_ <- propertyExists(c, "type")
-					_ <- propertyExists(c, "values")
+					//_ <- propertyExists(c, "values")
 
 					inner: A <- {
 
@@ -259,7 +249,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 						val resMap: Result[TMap[A]] = resTpe.map(tpe => AvroSchema_S.TMap(tpe))
 
-						println(s"\n\nINSIDE makeAvroCirceMap:")
+						println(s"\n\nINSIDE makeAvroCirceMap (avro -> avro):")
 						println(s"resTpe = $resTpe")
 						println(s"resMap = $resMap")
 
@@ -287,7 +277,134 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 	}
 
 
-	private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+	private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-	private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = ???
+		Decoder.instance { c: HCursor =>
+
+
+			def makeAvroCirceRecord(c: HCursor): Result[A] = {
+
+				val trecord: (String, Option[String], List[String], Option[String], List[FieldAvro[A]]) => AvroSchema_S[A] = (name, namespace, aliases, doc, fields) => AvroSchema_S.record[A](name, namespace, aliases, doc, fields)
+
+
+				import cats.Traverse
+
+				val resultArgs: Result[(String, Option[String], List[String], Option[String], List[FieldAvro[A]])] =
+					for {
+						// validation
+						// TODO - why error when including namspace, aliases, properties for validation below?
+						// TODO - maybe use the avro-string circe instead of json-string circe (from avro-skeuo) so no more mish-mash between json/avro string parameters.
+						_ <- validateType(c, "record")
+						_ <- propertyExists(c, "type")
+						//_ <- propertyExists(c, "name")
+						//_ <- propertyExists(c, "fields")
+						//_ <- propertyExists(c, "namespace")
+						//_ <- propertyExists(c, "aliases")
+						//_ <- propertyExists(c, "doc")
+
+						name: String <- c.downField("name").as[Option[String]].map(_.getOrElse(""))
+
+						namespace: Option[String] <- c.downField("namespace").as[Option[Option[String]]].map(_.getOrElse(None))
+
+						aliases: List[String] <- c.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+
+						doc: Option[String] <- c.downField("doc").as[Option[Option[String]]].map(_.getOrElse(None))
+
+
+						theFieldsJson <- c.downField("fields").as[List[JsonCirce]]
+
+						listFieldsAvro: List[FieldAvro[A]] <- Traverse[List].traverse(theFieldsJson)(
+							(fj: JsonCirce) => {
+								val inner: Result[FieldAvro[A]] = for {
+									fname: String <- fj.hcursor.downArray.downField("name").as[Option[String]].map(_.getOrElse(""))
+									faliases <- fj.hcursor.downArray.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+									ftype <- fj.hcursor.downArray.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+								} yield FieldAvro[A](fname, faliases, None, None, ftype)
+
+								inner
+							}
+						)
+					} yield (name, namespace, aliases, doc, listFieldsAvro)
+
+
+				val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (name, namespace, aliases, doc, fields) => trecord(name, namespace, aliases, doc, fields) }
+				val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+				println(s"\n\nINSIDE makeAvroCirceRecord (avro -> avro):")
+				println(s"result (not embed) = $result_noEmbed")
+				println(s"result (embed) = $result_embed")
+
+				result_embed
+
+			}
+
+			makeAvroCirceRecord(c)
+		}
+	}
+
+	private implicit def fieldAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = {
+
+		Decoder.instance { c: HCursor =>
+			val res: Result[FieldAvro[A]] = for {
+				name: String <- c.downField("name").as[Option[String]].map(_.getOrElse(""))
+
+				aliases: List[String] <- c.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+
+				doc: Option[String] <- c.downField("doc").as[Option[Option[String]]].map(_.getOrElse(None))
+
+				//TODO make decoder for Order
+				// order: Option[Order] <- c.downField("order").as[Option[Option[Order]]].map(_.getOrElse(None))
+
+				theType: A <- c.downField("type").as[A](/*Decoder.decodeOption(*/identifyAvroDecoderWithPriorityBasicDecoder[A]) //)
+
+			} yield FieldAvro[A](name, aliases, doc, None, theType)
+
+
+			res
+		}
+	}
+
+
+
+	private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+
+		Decoder.instance { c: HCursor =>
+
+
+			def makeAvroCirceNamedType(c: HCursor): Result[A] = {
+
+				val tnamedtype: (String, Option[String]) => AvroSchema_S[A] = (name, namespace) => AvroSchema_S.namedType[A](namespace.getOrElse(""), name)
+
+				val resultArgs: Result[(String, Option[String])] =
+					for {
+						// TODO: verify property exists for each type-function because otherwise it assigns the wrong class to the situation.
+
+						//_ <- propertyExists(c, "name") // name for avro-string, title for json-string
+						//_ <- propertyExists(c, "namespace")
+
+						name: String <- c.downField("name").as[Option[String]].map(_.getOrElse(""))
+
+						namespace: Option[String] <- c.downField("namespace").as[Option[Option[String]]].map(_.getOrElse(None))
+
+					} yield (name, namespace)
+
+
+				val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (name, namespace) => tnamedtype(name, namespace) }
+				val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+				println(s"\n\nINSIDE makeAvroCirceNamedType (avro -> avro):")
+				println(s"result (not embed) = $result_noEmbed")
+				println(s"result (embed) = $result_embed")
+
+				result_embed
+
+			}
+
+			//assert (isNamedType(c))
+
+			makeAvroCirceNamedType(c)
+
+		}
+	}
 }

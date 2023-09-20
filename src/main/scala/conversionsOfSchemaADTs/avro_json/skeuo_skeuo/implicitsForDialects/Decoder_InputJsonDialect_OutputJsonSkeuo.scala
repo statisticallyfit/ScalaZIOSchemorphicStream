@@ -61,7 +61,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 		// TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
 		//identifyDecoderWithPriorityBasicDecoder orElse
 
-
+		logicalTypeJsonSchemaDecoder orElse
 		referenceJsonSchemaDecoder orElse
 			sumJsonSchemaDecoder orElse
 			arrayJsonSchemaDecoder orElse
@@ -92,6 +92,32 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 			case (x, _) => s"$x is not well formed type".asLeft
 		}
 	}
+
+
+	private def logicalTypeJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+
+
+		Decoder.forProduct2[(String, String), String, String]("type", "format")(Tuple2.apply).emap {
+
+			case ("string", "date") => date[A]().embed.asRight
+			case ("string", "date-time") => dateTime[A]().embed.asRight
+			//case ("string", "time") => timeMillis[A]().embed.asRight
+
+			case (x, _) => s"$x is not well formed logical-type (date ,timestamp, or millis)".asLeft
+		}
+
+		// No decimal from json-skeuo
+		/*def decoderForDecimal: Decoder[A] = {
+			Decoder.forProduct4[(String, Option[String], Option[Int], Option[Int]), String, Option[String], Option[Int], Option[Int]]("type", "logicalType", "precision", "scale")(Tuple4.apply).emap {
+
+				case ("bytes", Some("decimal"), Some(precision), Some(scale)) => decimal[A](precision, scale).embed.asRight
+
+				case (x, _, _, _) => s"$x is not well formed (decimal) logical-type".asLeft
+			}
+		}*/
+
+	}
+
 
 	private def objectJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 
@@ -334,7 +360,16 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 	)*/
 
 	private def sumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
-		Decoder.instance(_.downField("oneOf").as[List[A]].map(JsonSchema_S.sum[A](_).embed))
+		Decoder.instance{ (c: HCursor) =>
+			val resListA: Result[List[A]] = for {
+				cases <- c.downField("oneOf").as[List[A]] //.map((cases: List[A]) => JsonSchema_S.sum[A](cases).embed)
+			} yield cases
+
+			val result_noEmbed: Result[JsonSchema_S[A]] = resListA.map((cases: List[A]) => JsonSchema_S.sum[A](cases))
+			val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+			result_embed
+		}
 
 
 	private def arrayJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =

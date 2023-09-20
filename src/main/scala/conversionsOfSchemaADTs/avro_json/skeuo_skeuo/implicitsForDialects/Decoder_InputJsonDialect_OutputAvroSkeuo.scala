@@ -64,42 +64,6 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 		}
 	}
 
-
-	private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-
-		logicalTypeAvroSchemaDecoder orElse
-			arrayAvroSchemaDecoder orElse
-			mapAvroSchemaDecoder orElse
-			recordAvroSchemaDecoder orElse
-			namedTypeAvroSchemaDecoder orElse
-			enumAvroSchemaDecoder
-		// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
-
-
-	} /*orElse
-			mapAvroSchemaDecoder orElse
-			recordAvroSchemaDecoder orElse
-			namedTypeAvroSchemaDecoder orElse
-			unionAvroSchemaDecoder orElse
-			fixedAvroSchemaDecoder orElse
-			enumAvroSchemaDecoder*/
-
-
-	private def logicalTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-
-		// TODO convert to json string dialect
-
-		Decoder.forProduct4[(String, Option[String], Option[Int], Option[Int]), String, Option[String], Option[Int], Option[Int]]("type", "logicalType", "precision", "scale")(Tuple4.apply).emap {
-
-			case ("int", Some("date"), None, None) => date[A]().embed.asRight
-			case ("long", Some("timestamp-millis"), None, None) => timestampMillis[A]().embed.asRight
-			case ("int", Some("time-millis"), None, None) => timeMillis[A]().embed.asRight
-			case ("bytes", Some("decimal"), Some(precision), Some(scale)) => decimal[A](precision, scale).embed.asRight
-
-			case (x, _, _, _) => s"$x is not well formed logical-type".asLeft
-		}
-	}
-
 	private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
 
@@ -129,6 +93,55 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 			case (x, _) => s"$x is not well formed type".asLeft
 		}
 	}
+
+	private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+		logicalTypeAvroSchemaDecoder orElse
+			arrayAvroSchemaDecoder orElse
+			mapAvroSchemaDecoder orElse
+			recordAvroSchemaDecoder orElse
+			namedTypeAvroSchemaDecoder orElse
+			enumAvroSchemaDecoder
+		// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
+
+
+	} /*orElse
+			mapAvroSchemaDecoder orElse
+			recordAvroSchemaDecoder orElse
+			namedTypeAvroSchemaDecoder orElse
+			unionAvroSchemaDecoder orElse
+			fixedAvroSchemaDecoder orElse
+			enumAvroSchemaDecoder*/
+
+
+	private def logicalTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+
+
+		def decoderForDateAndTimestampAndMillis: Decoder[A] = {
+			Decoder.forProduct2[(String, String), String, String]("type", "format")(Tuple2.apply).emap {
+
+				case ("string", "date") => date[A]().embed.asRight
+				case ("string", "date-time") => timestampMillis[A]().embed.asRight
+				case ("string", "time") => timeMillis[A]().embed.asRight
+
+				case (x, _) => s"$x is not well formed logical-type (date ,timestamp, or millis)".asLeft
+			}
+		}
+
+		def decoderForDecimal: Decoder[A] = {
+			Decoder.forProduct4[(String, Option[String], Option[Int], Option[Int]), String, Option[String], Option[Int], Option[Int]]("type", "logicalType", "precision", "scale")(Tuple4.apply).emap {
+
+				case ("bytes", Some("decimal"), Some(precision), Some(scale)) => decimal[A](precision, scale).embed.asRight
+
+				case (x, _, _, _) => s"$x is not well formed (decimal) logical-type".asLeft
+			}
+		}
+
+
+		decoderForDateAndTimestampAndMillis orElse
+			decoderForDecimal
+	}
+
 
 	private def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] =
 		Decoder.instance { c: HCursor =>
@@ -160,7 +173,7 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 					// validation
 					_ <- validateType(c, "object")
 					_ <- propertyExists(c, "type")
-					_ <- propertyExists(c, "additionalProperties")
+					//_ <- propertyExists(c, "additionalProperties")
 
 					inner: A <- {
 
@@ -196,27 +209,6 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 	}
 
 	private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-
-		// Altered propertyExists function
-		/*def isNamedType(c: HCursor): Decoder.Result[Unit] = {
-			val res1: Result[Unit] = c.downField("name")
-				.success
-				.fold(DecodingFailure(s"'name' property does not exist", c.history).asLeft[Unit])(_ =>
-					().asRight[DecodingFailure]
-				)
-
-			val res2: Result[Unit] = c.downField("namespace")
-				.success
-				.fold(DecodingFailure(s"'namespace' property does not exist", c.history).asLeft[Unit])(_ =>
-					().asRight[DecodingFailure]
-				)
-			val res3 = res1.joinRight(res2)
-			res3
-		}*/
-		/*def isNamedType(c: HCursor): Boolean = {
-			propertyExists(c, name = "name").isRight &&
-				propertyExists(c, name = "namespace").isRight
-		}*/
 
 
 		Decoder.instance { c: HCursor =>

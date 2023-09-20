@@ -183,6 +183,8 @@ object Data {
 
 	val map1PosRecordAvro_Fix_S: Fix[AvroSchema_S] = Fix(TMap(values = recordExPositionAvro_Fix_S))
 
+	//val f: FieldAvro[Fix[AvroSchema_S]] = FieldAvro(name = "ser", aliases = List(), doc = None, order = None, tpe = Fix(TFloat()))
+
 	val recordExLocationAvro_S: AvroSchema_S[AvroSchema_S[_]] = TRecord(
 		name = "Location_record",
 		namespace = None, aliases = List(), doc = None,
