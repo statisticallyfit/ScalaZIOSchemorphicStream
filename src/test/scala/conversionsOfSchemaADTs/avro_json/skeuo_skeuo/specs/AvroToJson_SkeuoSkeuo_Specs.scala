@@ -15,23 +15,22 @@ import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import higherkindness.droste.data.Fix
 import higherkindness.skeuomorph.avro.{AvroF => AvroSchema_S}
 import higherkindness.skeuomorph.openapi.{JsonSchemaF => JsonSchema_S}
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should._
+
 import testData.schemaData.avroData.skeuoData.Data._
 import testData.schemaData.jsonData.skeuoData.Data._
-import testData.schemaData.jsonData.circeData.Data._
 import testData.rawstringData.avroData.Data._
 import testData.rawstringData.jsonData.Data._
-import utilMain.UtilMain
+import testData.schemaData.jsonData.circeData.Data._
+
 import utilMain.UtilMain.implicits._
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo._
+
+
 import io.circe.Decoder.Result
 import io.circe.{Json => JsonCirce}
-import org.apache.avro.Schema
-import org.specs2.reporter.Reporter
 
 
-
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should._
 
 /**
  *
@@ -118,40 +117,181 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 
 	import io.circe._
+	import io.circe.syntax._
 	import io.circe.Decoder
 	import io.circe.parser
-	import io.circe.generic.semiauto._
-
-	import AvroSchema_S.{Field => FieldAvro}
-	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForDialects.Decoder_InputAvroDialect_OutputAvroSkeuo._
-	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForSkeuoAlgCoalg => impl}
-
-	import impl.embedImplicits.skeuoEmbed_AA
-	import impl.projectImplicits.skeuoProject_AA
+	import io.circe.parser._
 
 	import higherkindness.droste._
 	//import higherkindness.droste.syntax.embed._
 	//import cats.syntax.all._
 
+
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForDialects.Decoder_InputAvroDialect_OutputAvroSkeuo._
+
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForSkeuoAlgCoalg => impl}
+	import impl.embedImplicits.skeuoEmbed_AA
+	import impl.projectImplicits.skeuoProject_AA
+
+	import AvroSchema_S.{Field => FieldAvro}
+
 	import scala.language.postfixOps
 	import scala.language.higherKinds
 
+	object FieldAvroObj2 {
+
+		import io.circe.generic.auto._
+
+		def decoder2[A: Embed[AvroSchema_S, *]: Project[AvroSchema_S, *]]: Decoder[List[FieldAvro[A]]] = ???
+
+		//Decoder[List[FieldAvro[A]]].prepare((c: ACursor) => c.downField("fields").downArray)
+
+
+		val inputStringField2_noAlias =
+			"""
+			  |{
+			  |  "fields": [
+			  |    {
+			  |      "name": "coordinates",
+			  |      "type": {
+			  |        "type": "array",
+			  |        "items": "float"
+			  |      }
+			  |    },
+			  |    {
+			  |      "name": "type",
+			  |      "type": "string"
+			  |    }
+			  |  ]
+			  |}
+			  |""".stripMargin
+
+		val inputStringField2_alias =
+			"""
+			  |{
+			  |  "fields": [
+			  |    {
+			  |      "name": "coordinates",
+			  |      "aliases": [ ],
+			  |      "type": {
+			  |        "type": "array",
+			  |        "items": "float"
+			  |      }
+			  |    },
+			  |    {
+			  |      "name": "type",
+			  |      "aliases": [ ],
+			  |      "type": "string"
+			  |    }
+			  |  ]
+			  |}
+			  |""".stripMargin
+
+		def doFieldDecoding2[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]] = {
+			parser.decode[List[FieldAvro[A]]](inputStringField2_alias)(decoder2) /*(Decoder.decodeList(decoder2))*/ match {
+
+				case Right(fields: List[FieldAvro[A]]) => info(s"FIELDS ARE HERE 2: ${fields}")
+				case Left(ex) => info(s"OOPS  2 something error $ex")
+			}
+		}
+	}
+
+	/*object FieldAvroObj2 {
+		import io.circe.generic.auto._
+		//import io.circe.generic.semiauto._
+
+		import higherkindness.droste._
+
+		//import higherkindness.droste.syntax.embed._
+		//import cats.syntax.all._
+		implicit def decoder2[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[List[FieldAvro[A]]] = Decoder[List[FieldAvro[A]]].prepare{ aCursor: ACursor => aCursor.downField("fields")
+			/*aCursor: ACursor => {
+				val aCursor_updated: ACursor = aCursor/*.downField("fields").downArray*/.withFocus((json: JsonCirce) => {
+					json.mapObject((jsonObject: JsonObject) => {
+						if (jsonObject.contains("aliases")) {
+							val a = jsonObject
+							info(s"JSON OBJ NO ADDING ALIAS = $a")
+							a
+						} else {
+							val b = jsonObject.add("aliases", JsonCirce.arr(List():_*)) // TODO LEFT OFF HERE
+							info(s"JSON OBJ ADD ALIAS = $b")
+							b
+						}
+					})
+				})
+				//aCursor_updated.downField("fields")
+				aCursor_updated
+			}*/
+
+		}
+
+		val inputStringField2_noAlias =
+			"""
+			  |{
+			  |  "fields": [
+			  |    {
+			  |      "name": "coordinates",
+			  |      "type": {
+			  |        "type": "array",
+			  |        "items": "float"
+			  |      }
+			  |    },
+			  |    {
+			  |      "name": "type",
+			  |      "type": "string"
+			  |    }
+			  |  ]
+			  |}
+			  |""".stripMargin
+
+		val inputStringField2_alias =
+			"""
+			  |{
+			  |  "fields": [
+			  |    {
+			  |      "name": "coordinates",
+			  |      "aliases": [],
+			  |      "type": {
+			  |        "type": "array",
+			  |        "items": "float"
+			  |      }
+			  |    },
+			  |    {
+			  |      "name": "type",
+			  |      "aliases": [],
+			  |      "type": "string"
+			  |    }
+			  |  ]
+			  |}
+			  |""".stripMargin
+
+		def doFieldDecoding2[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]] = {
+			parser.decode[List[FieldAvro[A]]](inputStringField2_alias)/*(Decoder.decodeList(decoder2))*/ match {
+
+				case Right(fields: List[FieldAvro[A]]) => info(s"FIELDS ARE HERE 2: ${fields}")
+				case Left(ex) => info(s"OOPS  2 something error $ex")
+			}
+		}
+	}*/
 	object FieldAvroObj {
 
+		//import io.circe.generic.semiauto._
 
+
+
+		//import cats.syntax.all._
 
 		//implicit def fieldDecoderAuto[A]: Decoder[FieldAvro[A]] = deriveDecoder[FieldAvro[A]]
-		implicit def fieldDecoderManual[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = Decoder.instance { (hCursor: HCursor) =>
+		def fieldDecoderManual[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = Decoder.instance { (hCursor: HCursor) =>
 			val res: Result[FieldAvro[A]] = for {
 				name: String <- hCursor.get[String]("name")
-				theType: A <- hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
-				//aliases: List[String] <- hCursor.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
-			} yield FieldAvro[A](name, List(), None, None, theType)
+				theType: A <- hCursor.downField("type").as[A](identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])
+				aliases: List[String] <- hCursor.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+			} yield FieldAvro[A](name, aliases, None, None, theType)
 
 			res
 		}
 
-		def decoder2[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = Decoder[FieldAvro[A]].prepare(_.downField("fields"))
 
 
 		val inputStringField =
@@ -171,24 +311,6 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 			  |]
 			  |""".stripMargin
 
-		val inputStringField2 =
-			"""
-			  |{
-			  |  "fields": [
-			  |    {
-			  |      "name": "coordinates",
-			  |      "type": {
-			  |        "type": "array",
-			  |        "items": "float"
-			  |      }
-			  |    },
-			  |    {
-			  |      "name": "type",
-			  |      "type": "string"
-			  |    }
-			  |  ]
-			  |}
-			  |""".stripMargin
 		def doFieldDecoding[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]] = {
 			parser.decode[List[FieldAvro[A]]](inputStringField)(Decoder.decodeList(fieldDecoderManual[A])) match {
 				case Right(fields) => info(s"FIELDS ARE HERE: ${fields}")
@@ -196,18 +318,13 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 			}
 		}
 
-		def doFieldDecoding2[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]] = {
-			parser.decode[List[FieldAvro[A]]](inputStringField2)(Decoder.decodeList(decoder2)) match {
 
-				case Right(fields) => info(s"FIELDS ARE HERE 2: ${fields}")
-				case Left(ex) => info(s"OOPS  2 something error $ex")
-			}
-		}
 	}
 
 	case class Book(book: String)
 
 	object Book {
+		import io.circe.generic.semiauto._
 
 		implicit val bookDecoderAuto: Decoder[Book] = deriveDecoder[Book]
 		//implicit val bookDecoderManual
@@ -228,9 +345,13 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 			}
 		}
 	}
+
+
+
+	info("\n\n\n")
 	Book.doBookDecoding
 	FieldAvroObj.doFieldDecoding[Fix[AvroSchema_S]]
-	FieldAvroObj.doFieldDecoding2[Fix[AvroSchema_S]]
+	FieldAvroObj2.doFieldDecoding2[Fix[AvroSchema_S]]
 
 
 

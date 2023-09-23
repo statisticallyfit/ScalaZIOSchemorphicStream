@@ -10,8 +10,6 @@ import io.circe.Decoder.{Result, decodeInt, resultInstance}
 import io.circe.{Json => JsonCirce}
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import cats.syntax.all._
-import conversionsOfSchemaADTs.avro_json.data_avrojsonPairs.SkeuomorphExample.res
-import higherkindness.skeuomorph.openapi.JsonSchemaF
 //import cats.implicits._
 //import cats.syntax._
 
@@ -57,7 +55,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 	import AvroSchema_S._
 
 
-	implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+	implicit def identifyTRUEAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
 
 		// TODO must use combination of forproduct1 ("type") and the above, where abvoe is just for simple types (primitives) and the "type" extraction for when in composed types (like array)
@@ -88,6 +86,24 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 			//case (x, _) => s"$x is not well formed type".asLeft
 			case _ => avroSchemaDecoder[A]
 		}*/
+	}
+
+	private def avroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+
+		//fieldAvroSchemaDecoder orElse
+		primitiveAvroSchemaDecoder orElse
+			logicalTypeAvroSchemaDecoder orElse
+			arrayAvroSchemaDecoder orElse
+			mapAvroSchemaDecoder /*orElse
+		//enumAvroSchemaDecoder orElse
+		recordAvroSchemaDecoder*/
+		/*orElse
+		enumAvroSchemaDecoder*/
+		//namedTypeAvroSchemaDecoder
+
+		// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
+
+
 	}
 
 	private def primitiveAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
@@ -121,24 +137,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 	}
 
 
-	private def avroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-		//fieldAvroSchemaDecoder orElse
-		primitiveAvroSchemaDecoder orElse
-		logicalTypeAvroSchemaDecoder orElse
-		arrayAvroSchemaDecoder orElse
-		mapAvroSchemaDecoder orElse
-		//enumAvroSchemaDecoder orElse
-		recordAvroSchemaDecoder /*orElse
-		enumAvroSchemaDecoder*/
-		/*orElse
-			recordAvroSchemaDecoder orElse
-			namedTypeAvroSchemaDecoder*/
-
-		// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
-
-
-	}
 
 
 	private def logicalTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
@@ -155,13 +154,29 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 		}
 	}
 
-	private def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+	def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
 		Decoder.instance { c: HCursor =>
-			for {
+			val result: Result[A] = for {
 				items: A <- c.downField("items").as[A]
 				_ <- validateType(c, "array")
 			} yield AvroSchema_S.array[A](items).embed
+
+			// HELP DEBUG STATEMENTS
+			println(s"\n\nINSIDE arrayDecoder (avro -> avro):")
+			println(s"hcursor = $c")
+			println(s"c.downField(items).as[A](identify[A]) = ${c.downField("items").as[A](identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])}")
+			println(s"c.get[A](items)(identifyTRUEAvroDecoderWithPriorityBasicDecoder[A]) = ${
+				c.get[A]("items")(identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])
+			}")
+			println(s"c.downArray = ${c.downArray}")
+			println(s"c.values.get.toList = ${c.values/*.get.toList*/}")
+			println(s"c.value = ${c.value}")
+			println(s"c.keys.get.toList = ${c.keys/*.get.toList*/}")
+			println(s"c.key = ${c.key}")
+
+
+			result
 		}
 	}
 
@@ -225,6 +240,8 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 		Decoder.instance { c: HCursor =>
 
+
+
 			// Added by @statisticallyfit:
 
 			/**
@@ -245,7 +262,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 					inner: A <- {
 
-						val resTpe: Result[A] = c.downField("values").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) /*.as[Option[String]].map(_.getOrElse(""))*/
+						val resTpe: Result[A] = c.downField("values").as[A](identifyTRUEAvroDecoderWithPriorityBasicDecoder[A]) /*.as[Option[String]].map(_.getOrElse(""))*/
 
 						val resMap: Result[TMap[A]] = resTpe.map(tpe => AvroSchema_S.TMap(tpe))
 
@@ -262,9 +279,21 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 				val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (inner) => tmap(inner) }
 				val result_embed: Result[A] = result_noEmbed.map(_.embed)
 
-				println(s"\n\nINSIDE makeAvroCirceMap:")
+				// HELP DEBUG STATEMENTS
+				println(s"\n\nINSIDE makeAvroCirceMap (avro -> avro):")
 				println(s"result (not embed) = $result_noEmbed")
 				println(s"result (embed) = $result_embed")
+				println(s"hcursor = $c")
+				println(s"c.downField(values).as[A](identifyTRUEAvroDecoderWithPriorityBasicDecoder[A]) = ${c.downField("values").as[A](identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])}")
+				println(s"c.get[A](values)(identifyTRUEAvroDecoderWithPriorityBasicDecoder[A]) = ${
+					c.get[A]("values")(identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])
+				}")
+				println(s"c.downArray = ${c.downArray}")
+				println(s"c.values.get.toList = ${c.values/*.get.toList*/}")
+				println(s"c.value = ${c.value}")
+				println(s"c.keys.get.toList = ${c.keys/*.get.toList*/}")
+				println(s"c.key = ${c.key}")
+
 
 				result_embed
 			}
@@ -318,7 +347,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 								val inner: Result[FieldAvro[A]] = for {
 									fname: String <- fj.hcursor.downArray.downField("name").as[Option[String]].map(_.getOrElse(""))
 									faliases <- fj.hcursor.downArray.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
-									ftype <- fj.hcursor.downArray.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+									ftype <- fj.hcursor.downArray.downField("type").as[A](identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])
 								} yield FieldAvro[A](fname, faliases, None, None, ftype)
 
 								inner
@@ -355,7 +384,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 				//TODO make decoder for Order
 				// order: Option[Order] <- c.downField("order").as[Option[Option[Order]]].map(_.getOrElse(None))
 
-				theType: A <- c.downField("type").as[A](/*Decoder.decodeOption(*/identifyAvroDecoderWithPriorityBasicDecoder[A]) //)
+				theType: A <- c.downField("type").as[A](/*Decoder.decodeOption(*/identifyTRUEAvroDecoderWithPriorityBasicDecoder[A]) //)
 
 			} yield FieldAvro[A](name, aliases, doc, None, theType)
 
