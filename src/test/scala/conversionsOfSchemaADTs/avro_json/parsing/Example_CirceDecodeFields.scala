@@ -46,7 +46,7 @@ object Example_CirceDecodeFields {
 
 
 	// Method 3 - decode manual list of blobs
-	/*implicit def fieldDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = (hCursor: HCursor) => {
+	implicit def fieldDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = (hCursor: HCursor) => {
 
 		val result: Result[FieldAvro[A]] = for {
 			name: String <- hCursor.downField("name").as[Option[String]]. map(_.getOrElse("")) //.get[String]("name")
@@ -64,34 +64,46 @@ object Example_CirceDecodeFields {
 			hCursor.downField("type").as[A](identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])
 		}")
 		println(s"c.downArray = ${hCursor.downArray}")
-		println(s"c.values.get.toList = ${hCursor.values /*.get.toList*/}")
+		println(s"c.values.get.toList = ${hCursor.values }")/*.get.toList}")*/
 		println(s"c.value = ${hCursor.value}")
-		println(s"c.keys.get.toList = ${hCursor.keys /*.get.toList*/}")
+		println(s"c.keys.get.toList = ${hCursor.keys .get.toList}")
 		println(s"c.key = ${hCursor.key}")
 
 		result
-	}*/
+	}
 
 
 	import cats.Traverse
 	import cats.syntax.all._
 
-	implicit def fieldListDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[List[FieldAvro[A]]] = new Decoder[List[FieldAvro[A]]] {
+	implicit def fieldListDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[(List[String], List[List[A]])] = new Decoder[(List[String], List[List[A]])] {
 
-		override def apply(hCursor: HCursor):  Result[List[FieldAvro[A]]] = {
-
-			val result: Result[List[FieldAvro[A]]] = for {
+		override def apply(hCursor: HCursor):  Result[(List[String], List[List[A]])] = {
+			val result: Result[(List[String], List[List[A]])] = for {
 
 				theFieldsJson: List[Json] <- hCursor.downField("fields").as[List[Json]]
 
-				digName: List[String] <- Traverse[List].traverse(theFieldsJson)(
+				digNames: List[String] <- Traverse[List].traverse(theFieldsJson)(
 					(itj: Json) => itj.hcursor.downField("name").as[String]
 				)
 
-				digType: List[A] <- Traverse[List].traverse(theFieldsJson)(
-					(itj: Json) => itj.hcursor.downField("type").as[A]
+
+				digTypes: List[List[A]] <- Traverse[List].traverse(theFieldsJson)(
+					(itj: Json) => {
+
+						val resOptMap: Result[Option[Map[String, A]]] = itj.hcursor.downField("type").as[Option[Map[String, A]]](Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])))
+
+						val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
+
+						val typesList: Result[List[A]] = resMap.map(_.values.toList)
+
+						typesList
+					}
+
+					/*itj.hcursor.downField("type").as[A]*/
 				)
-			} yield digName.zip(digType).map { case (n, t) => FieldAvro[A](n, List(), None, None, t)}
+
+			} yield (digNames, digTypes)
 
 			result
 		}
@@ -141,8 +153,24 @@ class Example_CirceDecodeFields_Runner  /*App*/ extends  AnyFunSpec with Matcher
 		  |}
 		  |""".stripMargin
 
+	val inputStringField2_float =
+		"""
+		  |{
+		  |  "fields": [
+		  |    {
+		  |      "name": "coordinates",
+		  |      "type": "float"
+		  |    },
+		  |    {
+		  |      "name": "type",
+		  |      "type": "string"
+		  |    }
+		  |  ]
+		  |}
+		  |""".stripMargin
 
-	def parseMethod1(input: String) = {
+
+	/*def parseMethod1(input: String) = {
 		val r: Either[Error, List[FieldAvro[Fix[AvroSchema_S]]]] = for {
 			doc: Json <- parse(input)
 			e: List[FieldAvro[Fix[AvroSchema_S]]] <- doc.as[List[FieldAvro[Fix[AvroSchema_S]]]]
@@ -156,8 +184,38 @@ class Example_CirceDecodeFields_Runner  /*App*/ extends  AnyFunSpec with Matcher
 			case Right(fs) => s"fields = ${fs}"
 			case Left(ex) => s"OOPS something went wrong (2): ${ex}"
 		}
+	}*/
+
+	type PreField = (List[String], List[List[Fix[AvroSchema_S]]])
+
+	// SOURCE of parsing method = https://hyp.is/cs-SzlruEe6tkc9GektlMA/archive.ph/galSn
+	// NOTE: uses fieldDecoder
+	def parseMethod1(input: String) = {
+		val r: Either[Error, List[FieldAvro[Fix[AvroSchema_S]]]] = for {
+			doc: Json <- parse(input)
+			e: List[FieldAvro[Fix[AvroSchema_S]]] <- doc.as[List[FieldAvro[Fix[AvroSchema_S]]]]
+		} yield e
+
+		r
 	}
 
-	info(s"\n\ndecoded result 1 = ${parseMethod1(inputStringField2_startFields)}")
-	info(s"\n\ndecoded result 2 = ${parseMethod2(inputStringField2_startFields)}")
+	// SOURCE of parsing method = https://hyp.is/4CvsPFruEe6L5XOiwPDmNQ/www.edward-huang.com/scala/tech/soft-development/etl/circe/2019/11/28/6-quick-tips-to-parse-json-with-circe/
+	// NOTE: uses fieldDecoder
+	def parseMethod2(input: String) = {
+		parser.decode[List[FieldAvro[Fix[AvroSchema_S]]]](input) match {
+			case Right(fs) => s"fields = ${fs}"
+			case Left(ex) => s"OOPS something went wrong (2): ${ex}"
+		}
+	}
+
+	def parsestrings(input: String) = {
+		parser.decode[PreField](input) match {
+			case Right(lst: PreField) => s"lst = ${lst._1}\n\n${lst._2}"
+			case Left(ex) => s"OOPS 3: ${ex}"
+		}
+	}
+
+	info(s"\n\ndecoded result 1 = ${parseMethod1(inputStringField)}")
+	info(s"\n\ndecoded result 2 = ${parseMethod2(inputStringField)}")
+	info(s"\n\ndecoded result 3 = ${parsestrings(inputStringField2_startFields)}")
 }

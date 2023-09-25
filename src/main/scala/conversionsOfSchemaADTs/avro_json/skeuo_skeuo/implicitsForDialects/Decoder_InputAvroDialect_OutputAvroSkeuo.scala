@@ -65,62 +65,81 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 		// Decoder.decodeString.flatMap {
 			//case "\"null\"" | """int""" | "\"string\"" | "\"boolean\"" | "\"long\"" | "\"float\"" | "\"double\"" | "\"bytes\"" => basicAvroSchemaDecoder[A] //primitiveAvroSchemaDecoder[A]
 
+		/*Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {*/
+		//Decoder.forProduct1[String, String]("type")(Tuple1[String](_)._1).flatMap{
+		/*Decoder.decodeString.flatMap {*/
+
 		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
 
 			//case "null" | "int" | "string" | "boolean" | "long" | "float" | "double" | "bytes" => basicAvroSchemaDecoder[A]
 
-			case ("null", _) | ("int", _) | ("string", _) | ("boolean", _) | ("long", _) | ("float", _) | ("double", _) | ("bytes", _) => primitiveAvroSchemaDecoder[A]
+			case ("null", _) | ("int", _) | ("string", _) | ("boolean", _) | ("long", _) | ("float", _) | ("double", _) | ("bytes", _) => basicAvroSchemaDecoder[A]//primitiveAvroSchemaDecoder[A]
 
 			//case (x, _) => s"$x is not well formed type".asLeft
 			case _ => avroSchemaDecoder[A]
 		}
-
 		//Decoder.forProduct1[String, String]("")(Tuple1[String](_)._1).flatMap {
-		//Decoder.decodeString.flatMap {
-		/*Decoder.decodeTuple1[String].flatMap {
-			//case "\"null\"" | """int""" | "\"string\"" | "\"boolean\"" | "\"long\"" | "\"float\"" | "\"double\"" | "\"bytes\"" => basicAvroSchemaDecoder[A] //primitiveAvroSchemaDecoder[A]
-			case ("null", )| ("int", ) | ("string", ) | ("boolean", ) | ("long", ) | ("float", ) | ("double", ) | ("bytes", ) => basicAvroSchemaDecoder[A]
 
-			// TODO must use combination of forproduct1 ("type") and the above, where abvoe is just for simple types (primitives) and the "type" extraction for when in composed types (like array)
+		// TODO must use combination of forproduct1 ("type") and the above, where abvoe is just for simple types (primitives) and the "type" extraction for when in composed types (like array)
 
-			//case (x, _) => s"$x is not well formed type".asLeft
-			case _ => avroSchemaDecoder[A]
-		}*/
 	}
 
 	private def avroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-		//fieldAvroSchemaDecoder orElse
-		primitiveAvroSchemaDecoder orElse
-			logicalTypeAvroSchemaDecoder orElse
-			arrayAvroSchemaDecoder orElse
-			mapAvroSchemaDecoder /*orElse
+		product1AvroSchemaDecoder orElse
+	product2AvroSchemaDecoder orElse
+	basicAvroSchemaDecoder orElse logicalTypeAvroSchemaDecoder orElse arrayAvroSchemaDecoder// orElse
+			//mapAvroSchemaDecoder /*orElse
 		//enumAvroSchemaDecoder orElse
-		recordAvroSchemaDecoder*/
+		//recordAvroSchemaDecoder
 		/*orElse
 		enumAvroSchemaDecoder*/
 		//namedTypeAvroSchemaDecoder
 
 		// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
 
-
 	}
 
-	private def primitiveAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+	private def product2AvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-		Decoder.decodeString.flatMap {
+		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
 
+			case ("null", _) => `null`[A]().embed.asRight
+			case ("int", _) => int[A]().embed.asRight
+			case ("string", _) => string[A]().embed.asRight
+			case ("boolean", _) => boolean[A]().embed.asRight
+			case ("long", _) => long[A]().embed.asRight
+			case ("float", _) => float[A]().embed.asRight
+			case ("double", _) => double[A]().embed.asRight
+			case ("bytes", _) => bytes[A]().embed.asRight
+
+			case x => s"$x is not well formed type".asLeft
+		}
+	}
+	private def product1AvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+		/*Decoder.decodeString.flatMap {
 			case "null" | "int" | "string" | "boolean" | "long" | "float" | "double" | "bytes" => basicAvroSchemaDecoder[A]
+			case _ => identifyTRUEAvroDecoderWithPriorityBasicDecoder[A]
+		}*/
 
-			case _ => avroSchemaDecoder[A]
+		Decoder.forProduct1[String, String]("type")(Tuple1[String](_)._1).emap {
+			//Decoder.decodeString.emap {
+			case "null" => `null`[A]().embed.asRight
+			case "int" => int[A]().embed.asRight
+			case "string" => string[A]().embed.asRight
+			case "boolean" => boolean[A]().embed.asRight
+			case "long" => long[A]().embed.asRight
+			case "float" => float[A]().embed.asRight
+			case "double" => double[A]().embed.asRight
+			case "bytes" => bytes[A]().embed.asRight
+
+			case x => s"$x is not well formed type".asLeft
 		}
 	}
 
 	private def basicAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
 		import AvroSchema_S._
-
-		//Decoder.forProduct1[String, String]("items")(Tuple1[String](_)._1).emap {
 		Decoder.decodeString.emap {
 			case "null" => `null`[A]().embed.asRight
 			case "int" => int[A]().embed.asRight
