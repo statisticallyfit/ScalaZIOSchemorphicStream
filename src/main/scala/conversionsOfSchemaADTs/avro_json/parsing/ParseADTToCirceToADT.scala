@@ -52,7 +52,7 @@ object ParseADTToCirceToADT {
 		//import embedImplicits.skeuoEmbed_AJ
 		import projectImplicits.skeuoProject_AA
 
-		// TODO IMPLICITS (1) = work to manipulate the implicits here (says drosebasisforfix using project[_,_] todo figure out change the Projcet??
+		// TODO IMPLICITS (1) = work to manipulate the implicits here (says drostebasisforfix using project[_,_] todo figure out change the Project??
 
 		val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonDialect = scheme.cata(toCirceAvroDialect_fromAvroSkeuo).apply(_) //scheme.cata(toCirceJsonDialect_fromAvroSkeuo).apply(_)
 
@@ -132,7 +132,7 @@ object ParseADTToCirceToADT {
 				)
 			case EnumF(cases: List[String]) => JsonCirce.obj(
 				"type" -> JsonCirce.fromString("string"),
-				"enum" -> JsonCirce.arr(cases.map(JsonCirce.fromString): _*)
+				"enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString)) //JsonCirce.arr(cases.map(JsonCirce.fromString): _*)
 				//JsonCirce.fromValues(cases.map(JsonCirce.fromString))
 			)
 				//jsonType("string", "enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString)))
@@ -241,7 +241,7 @@ object ParseADTToCirceToADT {
 			val base: JsonCirce = JsonCirce.obj(
 				//"title" -> JsonCirce.fromString(name),
 				"type" → JsonCirce.fromString("string"),
-				"enum" → JsonCirce.arr(symbols.map(JsonCirce.fromString): _*)
+				"enum" → JsonCirce.fromValues(symbols.map(JsonCirce.fromString)) //JsonCirce.arr(symbols.map(JsonCirce.fromString): _*)
 			)
 			/*val withNamespace: JsonDialect = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
 
@@ -362,15 +362,13 @@ object ParseADTToCirceToADT {
 		jsonCirce
 	}
 
+
 	def toCirceAvroDialect_fromAvroSkeuo: Algebra[AvroSchema_S, AvroDialect] = Algebra {
 		//import io.circe.JsonObject
 		//JsonCirce.JObject(io.circe.JsonObject.)
-				//JsonCirce.fromJsonObject(JsonObject)
+		//JsonCirce.fromJsonObject(JsonObject)
 		case TNull() ⇒ JsonCirce.fromString("null")
-		case TInt() =>  JsonCirce.fromString("int")
-		/*case TInt() => JsonCirce.fromJsonObject(
-			io.circe.JsonObject.apply(("", JsonCirce.fromString("int")))
-		)*/
+		case TInt() => JsonCirce.fromString("int")
 		case TString() => JsonCirce.fromString("string")
 		case TBoolean() => JsonCirce.fromString("boolean")
 		case TLong() => JsonCirce.fromString("long")
@@ -378,6 +376,21 @@ object ParseADTToCirceToADT {
 		case TDouble() => JsonCirce.fromString("double")
 		case TBytes() => JsonCirce.fromString("bytes")
 
+		// NOTE: converting the avro skeuo (only primitives) -> json dialect
+		/*case TNull() ⇒ JsonCirce.obj(
+			"type" -> JsonCirce.fromString("object"),
+			"properties" -> JsonCirce.obj(/*properties.map(prop => prop.name -> prop.tpe)*/List(): _*),
+			"required" -> JsonCirce.fromValues(/*required*/List().map(JsonCirce.fromString))
+		)
+		case TInt() => jsonType("integer", format("int32"))
+		case TString() => jsonType("string")
+		case TBoolean() => jsonType("boolean")
+		case TLong() => jsonType("integer", format("int64"))
+		case TFloat() => jsonType("number", format("float"))
+		case TDouble() =>jsonType("number", format("double"))
+		case TBytes() => jsonType("string", format("byte"))*/
+
+		// NOTE: rst of the types are avro dialect
 		case TArray(inner: AvroDialect) ⇒ JsonCirce.obj(
 			"type" -> JsonCirce.fromString("array"),
 			"items" -> inner
@@ -412,10 +425,10 @@ object ParseADTToCirceToADT {
 
 		case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) ⇒ {
 
-			val base: JsonDialect = JsonCirce.obj(
+			val base: AvroDialect = JsonCirce.obj(
 				"type" → JsonCirce.fromString("enum"),
 				"name" → JsonCirce.fromString(name),
-				"symbols" → JsonCirce.arr(symbols.map(JsonCirce.fromString): _*)
+				"symbols" → JsonCirce.fromValues(symbols.map(JsonCirce.fromString)) //JsonCirce.arr(symbols.map(JsonCirce.fromString): _*)
 			)
 			val withNamespace: AvroDialect = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
 
@@ -487,6 +500,9 @@ object ParseADTToCirceToADT {
 
 	}
 
+	// NOTE: RULE:
+	//  ---- case 1: avrodialectconverter + jsondialect_outputavroskeuo
+	// ---- case 2: NO avrodialectconverter + avroadialect_outputavroskeuo
 
 	object CirceAvroToSkeuoAvro {
 
@@ -499,6 +515,7 @@ object ParseADTToCirceToADT {
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
 
 
+
 		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
 		import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
 		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
@@ -508,9 +525,6 @@ object ParseADTToCirceToADT {
 		val decoderAA: AvroDialect ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
 
 
-		// NOTE:
-		// --- interpret (before decoder) from avro-dialect
-		// --- decoder: using json-dialect string
 
 		val f1: AvroDialect => Result[Fix[AvroSchema_S]] = (av: AvroDialect)  => decoderAA(avroDialectToJsonDialect(av))
 
@@ -544,8 +558,8 @@ object ParseADTToCirceToADT {
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
 
 
-		import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
-		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+		import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
 		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 
@@ -556,7 +570,7 @@ object ParseADTToCirceToADT {
 		// --- interpret (before decoder) from avro-dialect
 		// --- decoder: using json-dialect string
 
-		val funcCirceAvroToSkeuoJson: AvroDialect => Result[Fix[JsonSchema_S]] = decoderAJ compose avroDialectToJsonDialect
+		val funcCirceAvroToSkeuoJson: AvroDialect => Result[Fix[JsonSchema_S]] = decoderAJ //compose avroDialectToJsonDialect
 
 
 		// TODO IMPLICITS (2)

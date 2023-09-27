@@ -143,7 +143,7 @@ object embedImplicits {
 				Fix(ob)
 			}
 
-			case enumf @ EnumF(cases: List[String]) => Fix(enumf)
+			case EnumF(cases: List[String]) => Fix(EnumF(cases))
 		}
 
 	}

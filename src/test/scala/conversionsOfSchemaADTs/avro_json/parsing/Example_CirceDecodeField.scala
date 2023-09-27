@@ -32,10 +32,58 @@ import scala.language.higherKinds
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should._
 
+
 /**
  *
  */
-object Example_CirceDecodeFields {
+
+
+object DecodingField_1 {
+
+	//import io.circe.generic.semiauto._
+	//import cats.syntax.all._
+
+	//implicit def fieldDecoderAuto[A]: Decoder[FieldAvro[A]] = deriveDecoder[FieldAvro[A]]
+	def fieldDecoderManual[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = Decoder.instance { (hCursor: HCursor) =>
+		val res: Result[FieldAvro[A]] = for {
+			name: String <- hCursor.get[String]("name")
+			theType: A <- hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+			aliases: List[String] <- hCursor.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+		} yield FieldAvro[A](name, aliases, None, None, theType)
+
+		res
+	}
+
+
+	val inputStringField =
+		"""
+		  |[
+		  |  {
+		  |    "name": "coordinates",
+		  |    "type": {
+		  |      "type": "array",
+		  |      "items": "float"
+		  |    }
+		  |  },
+		  |  {
+		  |    "name": "type",
+		  |    "type": "string"
+		  |  }
+		  |]
+		  |""".stripMargin
+
+	def doFieldDecoding[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]] = {
+		parser.decode[List[FieldAvro[A]]](inputStringField)(Decoder.decodeList(fieldDecoderManual[A])) match {
+			case Right(fields) => println(s"FIELDS ARE HERE: ${fields}")
+			case Left(ex) => println(s"OOPS something error $ex")
+		}
+	}
+
+
+}
+
+
+object DecodingField_2 {
 
 
 	//def doFieldDecoding2[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]
@@ -50,7 +98,7 @@ object Example_CirceDecodeFields {
 
 		val result: Result[FieldAvro[A]] = for {
 			name: String <- hCursor.downField("name").as[Option[String]]. map(_.getOrElse("")) //.get[String]("name")
-			theType: A <- hCursor.downField("type").as[A](identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])
+			theType: A <- hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
 			aliases: List[String] <- hCursor.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
 		} yield FieldAvro[A](name, aliases, None, None, theType)
 
@@ -60,8 +108,8 @@ object Example_CirceDecodeFields {
 
 		println(s"hcursor = $hCursor")
 		println(s"c.downField(name) = ${hCursor.downField("name").as[Option[String]]. map(_.getOrElse(""))}")
-		println(s"hCursor.downField(type).as[A](identifyTRUEAvroDecoderWithPriorityBasicDecoder[A]) = ${
-			hCursor.downField("type").as[A](identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])
+		println(s"hCursor.downField(type).as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${
+			hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
 		}")
 		println(s"c.downArray = ${hCursor.downArray}")
 		println(s"c.values.get.toList = ${hCursor.values }")/*.get.toList}")*/
@@ -91,7 +139,7 @@ object Example_CirceDecodeFields {
 				digTypes: List[List[A]] <- Traverse[List].traverse(theFieldsJson)(
 					(itj: Json) => {
 
-						val resOptMap: Result[Option[Map[String, A]]] = itj.hcursor.downField("type").as[Option[Map[String, A]]](Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyTRUEAvroDecoderWithPriorityBasicDecoder[A])))
+						val resOptMap: Result[Option[Map[String, A]]] = itj.hcursor.downField("type").as[Option[Map[String, A]]](Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyAvroDecoderWithPriorityBasicDecoder[A])))
 
 						val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
 
@@ -114,7 +162,7 @@ object Example_CirceDecodeFields {
 class Example_CirceDecodeFields_Runner  /*App*/ extends  AnyFunSpec with Matchers {
 
 
-	import Example_CirceDecodeFields._
+	import DecodingField_2._
 
 	val inputStringField =
 		"""
@@ -204,7 +252,7 @@ class Example_CirceDecodeFields_Runner  /*App*/ extends  AnyFunSpec with Matcher
 	def parseMethod2(input: String) = {
 		parser.decode[List[FieldAvro[Fix[AvroSchema_S]]]](input) match {
 			case Right(fs) => s"fields = ${fs}"
-			case Left(ex) => s"OOPS something went wrong (2): ${ex}"
+			case Left(ex) => s"OOPS 2 : ${ex}"
 		}
 	}
 

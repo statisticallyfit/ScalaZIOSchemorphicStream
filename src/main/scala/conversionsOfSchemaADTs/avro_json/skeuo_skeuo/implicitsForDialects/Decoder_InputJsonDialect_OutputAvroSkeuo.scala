@@ -333,16 +333,44 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 
 
 	private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
-		Decoder.instance(c =>
-			for {
+		Decoder.instance { c: HCursor =>
+			val result: Result[List[String]] = for {
 				_ <- validateType(c, "string") // type -> string
 				//_ <- propertyExists(c, "title")
 				_ <- propertyExists(c, "type")
 				_ <- propertyExists(c, "enum")
 
-				cases: List[String] <- c.downField("enum").as[Option[List[String]]].map(_.getOrElse(List.empty[String]))
+				cases: List[String] <- {
 
-			} yield AvroSchema_S.`enum`[A](name = "", namespace = None, aliases = List(), doc = None, symbols = cases).embed
-		)
+					val casesValue: Result[List[String]] = c.downField("enum").as[Option[List[String]]].map(_.getOrElse(List.empty[String]))
+
+					println(s"\n\nINSIDE ENUM AVRO DECODER (json dialect):")
+					println(s"c.downField(enum) = ${c.downField("enum")}")
+					println(s"cases = ${casesValue}")
+
+					casesValue
+				}
+
+			} yield cases
+
+
+
+			val result_noEmbed: Result[AvroSchema_S[A]] = result.map(vals => AvroSchema_S.`enum`[A](name = "NO_NAME", namespace = None, aliases = List(), doc = None, symbols = vals))
+			val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+			result_embed
+		}
 	}
+
+	/*Decoder.instance(c =>
+		for {
+			_ <- validateType(c, "string") // type -> string
+			//_ <- propertyExists(c, "title")
+			_ <- propertyExists(c, "type")
+			_ <- propertyExists(c, "enum")
+
+			cases: List[String] <- c.downField("enum").as[Option[List[String]]].map(_.getOrElse(List.empty[String]))
+
+		} yield AvroSchema_S.`enum`[A](name = "", namespace = None, aliases = List(), doc = None, symbols = cases).embed
+	)*/
 }

@@ -339,15 +339,32 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 
 	private def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
-		Decoder.instance(c =>
-			for {
+		Decoder.instance { (c: HCursor) =>
+
+			val result: Result[List[String]] = for {
 				_ <- validateType(c, "string")
 				_ <- propertyExists(c, "enum")
 
-				values: List[String] <- c.downField("enum").as[Option[List[String]]].map(_.getOrElse(List.empty[String]))
+				cases: List[String] <- {
 
-			} yield JsonSchema_S.enum[A](values).embed
-		)
+					val casesValue: Result[List[String]] = c.downField("enum").as[Option[List[String]]].map(_.getOrElse(List.empty[String]))
+
+					println(s"\n\nINSIDE ENUM JSON DECODER:")
+					println(s"c.downField(enum) = ${c.downField("enum")}")
+					println(s"cases = ${casesValue}")
+
+					casesValue
+				}
+
+			} yield cases
+
+
+
+			val result_noEmbed: Result[JsonSchema_S[A]] = result.map(vals => JsonSchema_S.`enum`[A](vals))
+			val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+			result_embed
+		}
 	}
 	/*Decoder.instance(c =>
 		for {
