@@ -92,6 +92,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 	// HELP: not converting avro-skeuo -> circe -> skeuo properly (result is null)
 
+
 	testCirceToSkeuo("map : skeuo -> circe -> skeuo",
 		//map3IntAvro_Fix_S,
 		//nullAvro_Fix_S,
@@ -115,6 +116,33 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	info(s"\n\nnow map json:")
 	printJsonStringToCirceToAvroSkeuo(List(map1IntJson_R))*/
 
+	import io.circe.{Decoder, DecodingFailure, Json => JsonCirce}
+
+	/*import higherkindness.skeuomorph.openapi.JsonDecoders._
+	import cats.syntax.all._*/
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+	import embedImplicits.skeuoEmbed_JJ
+	//import projectImplicits.skeuoProject_AA
+
+
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
+
+
+	//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+	//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+	import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
+
+	info(s"\n\nENUM FROM TESTS: ")
+	val enumType = JsonCirce.obj(
+		"type" -> JsonCirce.fromString("string"),
+		"enum" -> JsonCirce.arr(
+			JsonCirce.fromString("green"),
+			JsonCirce.fromString("blue")
+		)
+	)
+	info(s"enum example = $enumType")
+	val dec = Decoder[Fix[JsonSchema_S]](enumJsonSchemaDecoder(skeuoEmbed_JJ)).decodeJson(enumType)
+	info(s"decoded = $dec")
 
 
 	// NOTE first debug object simple first to see how decodermap is extracting the fields - only then do object map (below)

@@ -96,6 +96,7 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 
 	private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
+		basicAvroSchemaDecoder orElse
 		logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
 			mapAvroSchemaDecoder orElse

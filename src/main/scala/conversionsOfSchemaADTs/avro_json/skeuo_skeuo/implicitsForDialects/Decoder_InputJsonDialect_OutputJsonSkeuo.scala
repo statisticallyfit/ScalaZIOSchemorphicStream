@@ -61,12 +61,13 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 		// TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
 		//identifyDecoderWithPriorityBasicDecoder orElse
 
+		enumJsonSchemaDecoder orElse
 		logicalTypeJsonSchemaDecoder orElse
 		referenceJsonSchemaDecoder orElse
 			sumJsonSchemaDecoder orElse
 			arrayJsonSchemaDecoder orElse
-			objectJsonSchemaDecoder orElse
-			enumJsonSchemaDecoder
+			objectJsonSchemaDecoder
+
 		/*orElse
 		basicJsonSchemaDecoder*/
 	}
@@ -74,6 +75,9 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 	private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 		import JsonSchema_S._
 
+		// TODO must split the waters here between basic types and ENUM (opt-list-string)
+
+		
 		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
 
 			case ("integer", Some("int32")) => integer[A]().embed.asRight
@@ -338,7 +342,18 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 		Decoder[Reference].map(_.asRight[A]) orElse Decoder[A].map(_.asLeft[Reference])
 
 
-	private def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+	def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+
+		import JsonSchema_S._
+
+		Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).emap {
+
+			case ("string", casesOpt: Option[List[String]]) => JsonSchema_S.`enum`[A](casesOpt.getOrElse(List.empty)).embed.asRight
+			case _ => s"not enum type".asLeft
+		}
+	}
+
+	/*{
 		Decoder.instance { (c: HCursor) =>
 
 			val result: Result[List[String]] = for {
@@ -360,12 +375,12 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 
 
-			val result_noEmbed: Result[JsonSchema_S[A]] = result.map(vals => JsonSchema_S.`enum`[A](vals))
+			val result_noEmbed: Result[JsonSchema_S[A]] = result.map(vals => JsonSchema_S.enum[A](vals))
 			val result_embed: Result[A] = result_noEmbed.map(_.embed)
 
 			result_embed
 		}
-	}
+	}*/
 	/*Decoder.instance(c =>
 		for {
 			_ <- validateType(c, "string")

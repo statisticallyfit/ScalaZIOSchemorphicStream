@@ -54,7 +54,7 @@ object ParseADTToCirceToADT {
 
 		// TODO IMPLICITS (1) = work to manipulate the implicits here (says drostebasisforfix using project[_,_] todo figure out change the Project??
 
-		val libToJsonAltered: Fix[AvroSchema_S] ⇒ JsonDialect = scheme.cata(toCirceAvroDialect_fromAvroSkeuo).apply(_) //scheme.cata(toCirceJsonDialect_fromAvroSkeuo).apply(_)
+		val libToJsonAltered: Fix[AvroSchema_S] ⇒ AvroDialect = scheme.cata(toCirceAvroDialect_fromAvroSkeuo).apply(_) //scheme.cata(toCirceJsonDialect_fromAvroSkeuo).apply(_)
 
 
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
@@ -130,12 +130,17 @@ object ParseADTToCirceToADT {
 					"array",
 					"items" -> values
 				)
+
 			case EnumF(cases: List[String]) => JsonCirce.obj(
 				"type" -> JsonCirce.fromString("string"),
-				"enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString)) //JsonCirce.arr(cases.map(JsonCirce.fromString): _*)
+				"enum" -> JsonCirce.arr(cases.map(JsonCirce.fromString):_* )
+					//"properties" -> JsonCirce.obj(properties.map(prop => prop.name -> prop.tpe): _*)
+					//JsonCirce.fromValues(cases.map(JsonCirce.fromString))
+				//JsonCirce.arr(cases.map(JsonCirce.fromString): _*)
 				//JsonCirce.fromValues(cases.map(JsonCirce.fromString))
 			)
 				//jsonType("string", "enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString)))
+
 			case SumF(cases: List[JsonCirce]) =>
 				JsonCirce.obj("oneOf" -> JsonCirce.arr(cases: _*))
 			case ReferenceF(value) =>
@@ -343,15 +348,17 @@ object ParseADTToCirceToADT {
 		// skeuo-avro
 		// json dialect (to circe json dialect from skeuoavro)
 
-		// STEP 1: convert from avro-circe (dialect) to apache avro
-		val avroStr: String = avroCirce.toString()
+		type AvroDialectStr = String
+
+		// STEP 1: convert from avro-circe (dialect) --> apache avro
+		val avroStr: AvroDialectStr = avroCirce.toString()
 		val avroApache: AvroSchema_A = new AvroSchema_A.Parser().parse(avroStr)
 		// STEP 2: convert apache-avro -> skeuo-avro
 		val avroSkeuo: Fix[AvroSchema_S] = Skeuo_Apache.apacheToSkeuoAvroSchema(avroApache)
-		// STEP 3: convert avro-skeuo to json dialect
+		// STEP 3: convert avro-skeuo --> json dialect
 		val skeuoAvroToJsonDialect: Fix[AvroSchema_S] => JsonDialect = scheme.cata(toCirceJsonDialect_fromAvroSkeuo).apply(_)
 
-		val jsonCirce: JsonCirce = skeuoAvroToJsonDialect(avroSkeuo)
+		val jsonCirce: JsonDialect = skeuoAvroToJsonDialect(avroSkeuo)
 
 		println("\n\nINSIDE DIALECT CONVERTER: " +
 			s"\navroStr = $avroStr" +
@@ -588,34 +595,7 @@ object ParseADTToCirceToADT {
 
 
 	// -----------------
-	object CirceJsonToSkeuoJson {
 
-
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
-		import embedImplicits.skeuoEmbed_JJ
-		//import projectImplicits.skeuoProject_AA
-
-
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
-
-
-		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
-		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
-		import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
-
-		val decoderJJ: JsonDialect ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
-
-
-		val funcCirceJsonToSkeuoJson: JsonDialect => Result[Fix[JsonSchema_S]] = decoderJJ //compose avroCirceToJsonDialect
-
-		// basis[JsonF, Fix[JsonF]]
-		// 	algebra: JsonF[Fix[JsonF]] => Fix[JsonF]
-		// 	coalgebra: Fix[JsonF] => JsonF[Fix[JsonF]]
-		// NEED: avro -> json
-		// 	skeuoEmbed_AJ
-		// NEED: json -> json
-		// 	skeuoEmbed_JJ
-	}
 
 	object CirceJsonToSkeuoAvro {
 
@@ -645,6 +625,37 @@ object ParseADTToCirceToADT {
 		// NEED: json -> json
 		// 	skeuoEmbed_JJ
 	}
+
+
+	object CirceJsonToSkeuoJson {
+
+
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import embedImplicits.skeuoEmbed_JJ
+		//import projectImplicits.skeuoProject_AA
+
+
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
+
+
+		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+		import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
+
+		val decoderJJ: JsonDialect ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
+
+
+		val funcCirceJsonToSkeuoJson: JsonDialect => Result[Fix[JsonSchema_S]] = decoderJJ //compose avroCirceToJsonDialect
+
+		// basis[JsonF, Fix[JsonF]]
+		// 	algebra: JsonF[Fix[JsonF]] => Fix[JsonF]
+		// 	coalgebra: Fix[JsonF] => JsonF[Fix[JsonF]]
+		// NEED: avro -> json
+		// 	skeuoEmbed_AJ
+		// NEED: json -> json
+		// 	skeuoEmbed_JJ
+	}
+
 
 	// avro decoder: Embed[AvroSchema_S, *]
 	// implicit: Embed[AvroSchema_S, Fix[JsonSchema_F]] == skeuoEmbed_AJ

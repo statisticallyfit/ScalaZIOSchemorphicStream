@@ -55,7 +55,7 @@ object projectImplicits {
 		def coalgebra: Coalgebra[AvroSchema_S, Fix[AvroSchema_S]] = Coalgebra {
 			case Fix(TNull()) => TNull()
 			case Fix(TInt()) => TInt()
-			case Fix(TString()) => TString()
+			case entire @ Fix(TString()) => TString()
 			case Fix(TBoolean()) => TBoolean()
 			case Fix(TFloat()) => TFloat()
 			case Fix(TLong()) => TLong()
@@ -63,7 +63,7 @@ object projectImplicits {
 			case Fix(TBytes()) => TBytes()
 
 			// NOTE: return 'ta' only, don't wrap again in another layer or else stackoverflow error
-			case Fix(TArray(inner: Fix[AvroSchema_S])) => TArray(inner)
+			case entire @ Fix(TArray(inner: Fix[AvroSchema_S])) => TArray(entire) //TArray(inner)
 
 			case Fix(TMap(values: Fix[AvroSchema_S])) => TMap(values)
 
@@ -73,7 +73,7 @@ object projectImplicits {
 				trecord
 			}
 
-			case Fix(te@TEnum(_, _, _, _, _)) => te
+			case entire @ Fix(tenum @ TEnum(_, _, _, _, _)) => tenum
 		}
 	}
 	/*implicit def basis_AA: Basis[AvroSchema_S, Fix[AvroSchema_S]] = new Basis[AvroSchema_S, Fix[AvroSchema_S]] {
@@ -112,7 +112,7 @@ object projectImplicits {
 			case Fix(BinaryF()) => BinaryF()
 
 			// NOTE: return 'ar' only, don't wrap again in another layer or else stackoverflow error
-			case Fix(ar @ ArrayF(inner: Fix[JsonSchema_S])) => ar
+			case entire @ Fix(ar @ ArrayF(inner: Fix[JsonSchema_S])) => ArrayF(entire)
 
 			case Fix(ob @ ObjectMapF(addProps: AdditionalProperties[Fix[JsonSchema_S]])) => ob
 
@@ -151,7 +151,8 @@ object projectImplicits {
 
 
 			// HERE overflow 1
-			case Fix(TArray(inner: Fix[AvroSchema_S])) => ArrayF(inner) //ArrayF(inner) // TODO need: ArrayF(inner) or ArrayF(Fix(Tarray(inner))?
+			case entire @ Fix(TArray(inner: Fix[AvroSchema_S])) => ArrayF(entire)
+			//ArrayF(inner) //ArrayF(inner) // TODO need: ArrayF(inner) or ArrayF(Fix(Tarray(inner))?
 
 			case Fix(TMap(inner: Fix[AvroSchema_S])) => ObjectMapF(additionalProperties = AdditionalProperties[Fix[AvroSchema_S]](tpe = inner))
 
