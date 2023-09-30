@@ -143,7 +143,7 @@ object embedImplicits {
 				Fix(ob)
 			}
 
-			case EnumF(cases: List[String]) => Fix(EnumF(cases))
+			case EnumF(cases: List[String], name: Option[String]) => Fix(EnumF(cases, name))
 		}
 
 	}
@@ -179,7 +179,7 @@ object embedImplicits {
 
 			case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => {
 
-				Fix(EnumF(cases = symbols))
+				Fix(EnumF(cases = symbols, name = Some(name)))
 			}
 		}
 	}
@@ -294,7 +294,7 @@ object embedImplicits {
 
 
 			// TODO Make named enum here in json schema?
-			case EnumF(cases: List[String]) => Fix(TEnum(name = "NAME_ENUM", namespace = None, aliases = List(), doc = None, symbols = cases))
+			case EnumF(cases: List[String], name: Option[String]) => Fix(TEnum(name = name.getOrElse("NO_NAME"), namespace = None, aliases = List(), doc = None, symbols = cases))
 		}
 	}
 

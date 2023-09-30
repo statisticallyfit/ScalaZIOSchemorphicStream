@@ -19,11 +19,11 @@ import utilTest.arbitraryInstances.ArbitraryGeneral._
  * NOTE: file source == https://github.com/higherkindness/skeuomorph/blob/main/src/test/scala/higherkindness/skeuomorph/instances.scala
  */
 object instancesJson {
-	
-	
+
+
 	implicit def JsonSchema_SOpenApiArbitrary: Arbitrary[Fix[JsonSchema_S]] = {
 		import JsonSchema_S.Fixed
-		
+
 		val basicGen: Gen[Fix[JsonSchema_S]] = Gen.oneOf(
 			Fixed.integer().pure[Gen],
 			Fixed.long().pure[Gen],
@@ -36,10 +36,12 @@ object instancesJson {
 			Fixed.date().pure[Gen],
 			Fixed.dateTime().pure[Gen],
 			Fixed.password().pure[Gen],
-			Gen.listOfN(2, nonEmptyString) map Fixed.enum,
+			// NOTE: changed @statisicallyfit - changed line here since made named Enum
+			// Gen.listOfN(2, nonEmptyString) map Fixed.enum
+			Gen.listOfN(2, nonEmptyString).map(lstStr => Fixed.enum(lstStr, None)),
 			nonEmptyString map Fixed.reference
 		)
-		
+
 		def rec(depth: Int): Gen[Fix[JsonSchema_S]] =
 			depth match {
 				case 1 => basicGen
@@ -51,17 +53,17 @@ object instancesJson {
 						}
 					)
 			}
-		
+
 		Arbitrary(rec(2))
 	}
-	
+
 	implicit def jsonSchemaOpenApiArbitrary[T](implicit T: Arbitrary[T]): Arbitrary[JsonSchema_S[T]] = {
 		val propertyGen: Gen[JsonSchema_S.Property[T]] = (nonEmptyString, T.arbitrary).mapN(JsonSchema_S.Property[T])
 		val objectGen: Gen[JsonSchema_S[T]] = (
 			Gen.listOf(propertyGen),
 			Gen.listOf(nonEmptyString)
 		).mapN(JsonSchema_S.`object`[T])
-		
+
 		Arbitrary(
 			Gen.oneOf(
 				JsonSchema_S.integer[T]().pure[Gen],
@@ -76,12 +78,16 @@ object instancesJson {
 				JsonSchema_S.dateTime[T]().pure[Gen],
 				JsonSchema_S.password[T]().pure[Gen],
 				T.arbitrary map JsonSchema_S.array,
-				Gen.listOf(nonEmptyString) map JsonSchema_S.enum[T],
+
+				// NOTE: changed @statisicallyfit - changed line here since made named Enum
+				//Gen.listOf(nonEmptyString) map JsonSchemaF.enum[T],
+				Gen.listOf(nonEmptyString).map(lstStr => JsonSchema_S.enum[T](lstStr, name = None)),
+
 				Gen.listOf(T.arbitrary) map JsonSchema_S.sum[T],
 				objectGen,
 				nonEmptyString.map(JsonSchema_S.reference[T])
 			)
 		)
 	}
-	
+
 }

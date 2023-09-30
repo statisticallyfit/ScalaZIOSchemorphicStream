@@ -131,14 +131,23 @@ object ParseADTToCirceToADT {
 					"items" -> values
 				)
 
-			case EnumF(cases: List[String]) => JsonCirce.obj(
-				"type" -> JsonCirce.fromString("string"),
-				"enum" -> JsonCirce.arr(cases.map(JsonCirce.fromString):_* )
+			case EnumF(cases: List[String], name: Option[String]) => {
+				val base: JsonCirce = JsonCirce.obj(
+					"type" -> JsonCirce.fromString("string"),
+					"enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString))
+				)
+
+				val withName: JsonCirce = name.fold(base)(n => base deepMerge JsonCirce.obj("name" -> JsonCirce.fromString(n)))
+
+				val result: JsonCirce = if (name.isDefined) withName else base
+
+				result
+			}
 					//"properties" -> JsonCirce.obj(properties.map(prop => prop.name -> prop.tpe): _*)
 					//JsonCirce.fromValues(cases.map(JsonCirce.fromString))
 				//JsonCirce.arr(cases.map(JsonCirce.fromString): _*)
 				//JsonCirce.fromValues(cases.map(JsonCirce.fromString))
-			)
+
 				//jsonType("string", "enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString)))
 
 			case SumF(cases: List[JsonCirce]) =>
@@ -263,7 +272,15 @@ object ParseADTToCirceToADT {
 			base  //return just base (no avro-dialect stuff like namespace, doc, aliases)
 		}
 
-		case TUnion(options: NonEmptyList[JsonCirce]) => JsonCirce.arr(options.toList: _*)
+		case TUnion(options: NonEmptyList[JsonCirce], name: Option[String]) => {
+
+			val base: JsonCirce = JsonCirce.arr(options.toList: _*)
+
+			val withName: JsonCirce = name.fold(base)((n: String) => base deepMerge JsonCirce.obj("name" -> JsonCirce.fromString(n)))
+
+			val result: JsonCirce = if(name.isDefined) withName else base
+			result
+		}
 
 
 		// TODO there is no json-dialect for Fixed --- does that mean cannot return anything here?
@@ -275,7 +292,7 @@ object ParseADTToCirceToADT {
 				"size" -> JsonCirce.fromInt(size)
 			)
 
-			val withNamespace: JsonCirce = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
+			/*val withNamespace: JsonCirce = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
 
 			val withAliases: JsonDialect =
 				if (aliases.isEmpty)
@@ -283,7 +300,9 @@ object ParseADTToCirceToADT {
 				else
 					withNamespace deepMerge JsonCirce.obj("aliases" -> JsonCirce.arr(aliases.map(JsonCirce.fromString): _*))
 
-			withAliases
+			withAliases*/
+
+			base
 		}
 		// Source = https://hyp.is/gcf1CCv3Ee6M4RMGFdKckA/docs.airbyte.com/understanding-airbyte/json-avro-conversion
 		/*case TDate() => jsonType("string", format("date"))
@@ -410,6 +429,9 @@ object ParseADTToCirceToADT {
 
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[AvroDialect]]) ⇒ {
 
+
+
+
 			val base: AvroDialect = JsonCirce.obj(
 				"type" -> JsonCirce.fromString("record"),
 				"name" -> JsonCirce.fromString(name),
@@ -450,7 +472,13 @@ object ParseADTToCirceToADT {
 			withDoc
 		}
 
-		case TUnion(options: NonEmptyList[AvroDialect]) => JsonCirce.arr(options.toList: _*)
+
+		case TUnion(options: NonEmptyList[AvroDialect], name: Option[String]) => JsonCirce.obj(
+			"name" -> JsonCirce.fromString(name.getOrElse("")),
+			"type" -> JsonCirce.arr(options.toList: _*)
+		)//JsonCirce.arr(options.toList: _*)
+
+		//case TUnion(options: NonEmptyList[AvroDialect]) => JsonCirce.arr(options.toList: _*)
 
 
 		case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) => {

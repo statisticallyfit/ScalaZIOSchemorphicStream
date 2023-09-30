@@ -194,7 +194,7 @@ lazy val allDependencies =
 		val versionOfMatryoshka = "0.21.3"
 
 
-		val versionOfSkeuomorph = "0.0.0+1155-1a938e79+20230903-0025-SNAPSHOT" //"0.2.1"
+		val versionOfSkeuomorph = "0.0.0+1156-3632aa97+20231001-0125-SNAPSHOT" //"0.2.1"
 		val versionOfAndyGlowScalaJsonSchema = "0.7.9"
 
 		val versionOfSaulAutoschema = "1.0.4"

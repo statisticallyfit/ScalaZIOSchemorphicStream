@@ -123,7 +123,7 @@ object projectImplicits {
 			case Fix ( ob @ ObjectF(properties, required) ) => ob
 
 
-			case Fix(EnumF(cases: List[String])) => EnumF(cases)
+			case Fix(EnumF(cases: List[String], name: Option[String])) => EnumF(cases, name)
 		}
 	}
 
@@ -160,7 +160,7 @@ object projectImplicits {
 
 				ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List())
 			}
-			case Fix(TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String])) => EnumF(cases = symbols)
+			case Fix(TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String])) => EnumF(cases = symbols, name = Some(name))
 		}
 	}
 
@@ -256,7 +256,7 @@ object projectImplicits {
 			}
 
 			// TODO m ake a jsonschema enum to be named?
-			case Fix(EnumF(cases: List[String])) => TEnum(name = "ENUM_NAME", namespace = None, aliases = List(), doc = None, symbols = cases)
+			case Fix(EnumF(cases: List[String], name: Option[String])) => TEnum(name = name.getOrElse("NO_NAME"), namespace = None, aliases = List(), doc = None, symbols = cases)
 		}
 	}
 

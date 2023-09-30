@@ -125,7 +125,8 @@ object Trans_AvroToJson {
 
 		// Source: unions (avro) --> arrays (json)
 		// Source 2: toJson (data) function = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L274
-		case TUnion(options: cats.data.NonEmptyList[Fix[AvroSchema_S]]) ⇒
+		case TUnion(options: cats.data.NonEmptyList[Fix[AvroSchema_S]], name: Option[String]) ⇒ // TODO how to pass in the name?
+			// TODO see json-array, avro-union conversion = https://hyp.is/QpCo2F_jEe69xDtD2tbbzw/docs.airbyte.com/understanding-airbyte/json-avro-conversion/
 			ArrayF(options.head)
 
 
@@ -257,7 +258,7 @@ object Trans_AvroToJson {
 
 		// Source: unions (avro) --> arrays (json)
 		// Source 2: toJson (data) function = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L274
-		case TUnion(options: cats.data.NonEmptyList[Fix[JsonSchema_S]]) ⇒
+		case TUnion(options: cats.data.NonEmptyList[Fix[JsonSchema_S]], name: Option[String]) ⇒
 			ArrayF(options.head)
 		// TODO check how to get just one value to get the type Fix[JsonSchema_S] for array
 
