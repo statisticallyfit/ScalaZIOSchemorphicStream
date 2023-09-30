@@ -44,8 +44,21 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 	import JsonSchema_S._
 
 
-	implicit def identifyJsonDecoderWithPriorityBasicDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+	implicit def identifyJsonDecoderWithPriorityEnumVsBasicDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 
+		// TODO identify here type, enum combo - if -> go to enumdecoder, else -> go to basic decoder where we do THIS dividing (below). Then in the basic2 decoder have what is now in the current basic decoder.
+
+		import JsonSchema_S._
+
+		Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).flatMap {
+
+			case ("string", casesOpt: Option[List[String]]) => enumJsonSchemaDecoder[A]
+
+			case _ => primitiveJsonSchemaDecoder[A]
+		}
+	}
+
+	private def primitiveJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 
 		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
 
@@ -57,27 +70,10 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 	}
 
 
-	private def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
-		// TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
-		//identifyDecoderWithPriorityBasicDecoder orElse
-
-		enumJsonSchemaDecoder orElse
-		logicalTypeJsonSchemaDecoder orElse
-		referenceJsonSchemaDecoder orElse
-			sumJsonSchemaDecoder orElse
-			arrayJsonSchemaDecoder orElse
-			objectJsonSchemaDecoder
-
-		/*orElse
-		basicJsonSchemaDecoder*/
-	}
-
 	private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+
 		import JsonSchema_S._
 
-		// TODO must split the waters here between basic types and ENUM (opt-list-string)
-
-		
 		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
 
 			case ("integer", Some("int32")) => integer[A]().embed.asRight
@@ -96,6 +92,20 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 			case (x, _) => s"$x is not well formed type".asLeft
 		}
 	}
+
+
+	private def jsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
+		// TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
+		//identifyDecoderWithPriorityBasicDecoder orElse
+
+		//enumJsonSchemaDecoder orElse
+		logicalTypeJsonSchemaDecoder orElse
+			referenceJsonSchemaDecoder orElse
+			sumJsonSchemaDecoder orElse
+			arrayJsonSchemaDecoder orElse
+			objectJsonSchemaDecoder
+	}
+
 
 
 	private def logicalTypeJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
@@ -154,7 +164,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 					addProps: AdditionalProperties[A] <- {
 
-						val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyJsonDecoderWithPriorityBasicDecoder[A])
+						val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyJsonDecoderWithPriorityEnumVsBasicDecoder[A])
 
 						val resAddProps: Result[JsonSchema_S.AdditionalProperties[A]] = resTpe.map(tpe => JsonSchema_S.AdditionalProperties(tpe = tpe))
 
@@ -195,7 +205,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 					addProps: AdditionalProperties[A] <- {
 
-						val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyJsonDecoderWithPriorityBasicDecoder[A])
+						val resTpe: Result[A] = c.downField("additionalProperties").as[A](identifyJsonDecoderWithPriorityEnumVsBasicDecoder[A])
 
 						val resAddProps: Result[JsonSchema_S.AdditionalProperties[A]] = resTpe.map(tpe => JsonSchema_S.AdditionalProperties(tpe = tpe))
 
@@ -235,7 +245,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 						properties: List[JsonSchema_S.Property[A]] <- {
 							//.as[Option[A]]
 							val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
-								Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyJsonDecoderWithPriorityBasicDecoder[A]))
+								Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyJsonDecoderWithPriorityEnumVsBasicDecoder[A]))
 							)
 
 							val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
@@ -285,7 +295,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 						properties: List[JsonSchema_S.Property[A]] <- {
 							//.as[Option[A]]
 							val resOptMap: Result[Option[Map[String, A]]] = c.downField("properties").as[Option[Map[String, A]]](
-								Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyJsonDecoderWithPriorityBasicDecoder[A]))
+								Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyJsonDecoderWithPriorityEnumVsBasicDecoder[A]))
 							)
 
 							val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
@@ -346,14 +356,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 		import JsonSchema_S._
 
-		Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).emap {
 
-			case ("string", casesOpt: Option[List[String]]) => JsonSchema_S.`enum`[A](casesOpt.getOrElse(List.empty)).embed.asRight
-			case _ => s"not enum type".asLeft
-		}
-	}
-
-	/*{
 		Decoder.instance { (c: HCursor) =>
 
 			val result: Result[List[String]] = for {
@@ -374,13 +377,21 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 			} yield cases
 
 
-
 			val result_noEmbed: Result[JsonSchema_S[A]] = result.map(vals => JsonSchema_S.enum[A](vals))
 			val result_embed: Result[A] = result_noEmbed.map(_.embed)
 
 			result_embed
 		}
+	}
+
+	// NOTE: either enum decoder works - here below or the one above.
+		/*Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).emap {
+
+			case ("string", casesOpt: Option[List[String]]) => JsonSchema_S.`enum`[A](casesOpt.getOrElse(List.empty)).embed.asRight
+			case _ => s"not enum type".asLeft
+		}
 	}*/
+
 	/*Decoder.instance(c =>
 		for {
 			_ <- validateType(c, "string")
@@ -407,7 +418,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 	private def arrayJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
 		Decoder.instance { c: HCursor =>
 			for {
-				items <- c.downField("items").as[A](identifyJsonDecoderWithPriorityBasicDecoder[A]) // NOTE: was jsonSchemaDecoder[A]
+				items <- c.downField("items").as[A](identifyJsonDecoderWithPriorityEnumVsBasicDecoder[A]) // NOTE: was jsonSchemaDecoder[A]
 				_ <- validateType(c, "array")
 			} yield JsonSchema_S.array(items).embed
 		}
