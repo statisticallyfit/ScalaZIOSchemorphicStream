@@ -235,12 +235,6 @@ object Data {
 
 	// -----------------------------------------------------------------------
 
-	val namedTypeAvro_S: AvroSchema_S[Nothing] = TNamedType(name = "namedTypeHere", namespace = "namespaceHere")
-	val namedTypeAvro_Fix_S: Fix[AvroSchema_S] = Fix(TNamedType(name = "namedTypeHere", namespace = "namespaceHere"))
-
-
-	// -----------------------------------------------------------------------
-
 	val COLORS_LIST: List[String] = List("Red", "Orange", "Pink", "Yellow", "Green", "Blue", "Indigo", "Violet")
 
 	val enumAvro_S: AvroSchema_S[Nothing] = TEnum("Colors",None,List(),None,COLORS_LIST)
@@ -249,7 +243,21 @@ object Data {
 
 	// -----------------------------------------------------------------------
 
-	val unionAvro_S: AvroSchema_S[AvroSchema_S[Nothing]] = TUnion(NonEmptyList(TInt(), List(TString(), TInt(), TBoolean())))
-	val unionAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TUnion(NonEmptyList(TInt(), List(TString(), TInt(), TBoolean())))
+	val unionAvro_S: AvroSchema_S[AvroSchema_S[Nothing]] = TUnion(NonEmptyList(TInt(), List(TString(), TInt(), TBoolean())), name = Some("UnionName"))
+	val unionAvro_Circe_S: AvroSchema_S[AvroSchema_S[JsonCirce]] = TUnion(NonEmptyList(TInt(), List(TString(), TInt(), TBoolean())), name = Some("UnionName"))
+	val unionAvro_Fix_S: Fix[AvroSchema_S] = Fix(TUnion(NonEmptyList(Fix(TInt()), List(Fix(TString()), Fix(TInt()), Fix(TBoolean()))), name = Some("UnionName")))
 	//val unionAvro_Fix_S: Fix[AvroSchema_S] = ???
+
+
+	// -----------------------------------------------------------------------
+
+	val namedTypeAvro_S: AvroSchema_S[Nothing] = TNamedType(name = "NamedTypeExample", namespace = "NamedTypeNamespace")
+	val namedTypeAvro_Fix_S: Fix[AvroSchema_S] = Fix(TNamedType(name = "NamedTypeExample", namespace = "NamedTypeNamespace"))
+
+
+
+	// -----------------------------------------------------------------------
+
+	val fixedAvro_S: AvroSchema_S[Nothing] = TFixed(name = "FixedTypeName", namespace = None/*"FixedNamespace"*/, aliases = List(), size = 25)
+	val fixedAvro_Fix_S: Fix[AvroSchema_S] = Fix(TFixed(name = "FixedName", namespace = None/*"FixedNamespace"*/, aliases = List(), size = 25))
 }

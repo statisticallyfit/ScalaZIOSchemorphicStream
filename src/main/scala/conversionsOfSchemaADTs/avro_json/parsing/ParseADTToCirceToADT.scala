@@ -472,6 +472,14 @@ object ParseADTToCirceToADT {
 			withDoc
 		}
 
+		case TNamedType(namespace: String, name: String) ⇒ {
+
+			JsonCirce.obj(
+				"name" -> JsonCirce.fromString(name), // name for avro-string, title for json string
+				"namespace" -> JsonCirce.fromString(namespace),
+			)
+		}
+
 
 		case TUnion(options: NonEmptyList[AvroDialect], name: Option[String]) => JsonCirce.obj(
 			"name" -> JsonCirce.fromString(name.getOrElse("")),

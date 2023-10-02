@@ -11,7 +11,7 @@ import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import cats.syntax.all._
 //import cats.implicits._
 //import cats.syntax._
-
+import cats.data.NonEmptyList
 
 
 import higherkindness.droste._
@@ -46,6 +46,7 @@ object projectImplicits {
 
 	/**
 	 * A => F[A]
+	 *
 	 * Fix[AvroF] => AvroF[Fix[AvroF]]
 	 *
 	 * @return
@@ -73,7 +74,13 @@ object projectImplicits {
 				trecord
 			}
 
-			case entire @ Fix(tenum @ TEnum(_, _, _, _, _)) => tenum
+			case Fix(tenum @ TEnum(_, _, _, _, _)) => tenum
+
+			case Fix(tunion @ TUnion(options: NonEmptyList[Fix[AvroSchema_S]], name: Option[String])) => tunion
+
+			case tnamedtype@TNamedType(_, _) => Fix(tnamedtype)
+
+			case tfixed@TFixed(_, _, _, _) => Fix(tfixed)
 		}
 	}
 	/*implicit def basis_AA: Basis[AvroSchema_S, Fix[AvroSchema_S]] = new Basis[AvroSchema_S, Fix[AvroSchema_S]] {

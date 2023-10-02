@@ -12,7 +12,7 @@ import cats.syntax.all._
 //import cats.implicits._
 //import cats.syntax._
 
-
+import cats.data.NonEmptyList
 
 import higherkindness.droste._
 import higherkindness.droste.data._
@@ -64,6 +64,13 @@ object embedImplicits {
 			case trecord @ TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[AvroSchema_S]]]) => Fix(trecord)
 
 			case te @TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => Fix(te)
+
+
+			case tunion @ TUnion(options: NonEmptyList[Fix[AvroSchema_S]], name: Option[String]) => Fix(tunion)
+
+			case tnamedtype @ TNamedType(_, _) => Fix(tnamedtype)
+
+			case tfixed @ TFixed(_, _, _, _) => Fix(tfixed)
 		}
 	}
 
@@ -144,6 +151,10 @@ object embedImplicits {
 			}
 
 			case EnumF(cases: List[String], name: Option[String]) => Fix(EnumF(cases, name))
+
+			// No union case
+			// No fixed case
+			// No named type case
 		}
 
 	}
@@ -175,6 +186,16 @@ object embedImplicits {
 
 				Fix(ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List()))
 			}
+
+			// HELP avro union to json?
+			// TODO = https://hyp.is/f-8tzmBxEe6IP8OOZytgXg/avro.apache.org/docs/1.11.1/specification/
+			case TUnion(options: NonEmptyList[Fix[JsonSchema_S]], name: Option[String]) => ???
+
+			// Named type is just like record without fields.
+			case TNamedType(name: String, namespace: String) => Fix(ObjectNamedF(name = name, properties = List(), required = List()))
+
+			// Help avro fixed to json?
+			case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) => ???
 
 
 			case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => {
@@ -229,7 +250,8 @@ object embedImplicits {
 				)
 
 				val result: Fix[AvroSchema_S] = if(props.isEmpty && reqs.isEmpty) {
-					Fix(TNull())
+					//Fix(TNull())
+					Fix(TNamedType(name = name, namespace = ""))
 				} else {
 					Fix(
 						TRecord(name = name, namespace = None, aliases = List(), doc = None,

@@ -182,7 +182,7 @@ object Data {
 
 	// -------------------------------------------------------------------
 
-	// TODO convert to json string?
+
 	val unionAvro_R: String =
 		"""
 		  |{
@@ -191,6 +191,28 @@ object Data {
 		  |    "null",
 		  |    "string"
 		  |  ]
+		  |}
+		  |""".stripMargin
+
+
+	// -------------------------------------------------------------------
+
+	val namedTypeAvro_R: String =
+		"""
+		  |{
+		  |  "name": "NamedTypeExample",
+		  |  "namespace": "NamedTypeNamespace"
+		  |}
+		  |""".stripMargin
+
+	// -------------------------------------------------------------------
+
+	val fixedAvro_R: String =
+		"""
+		  |{
+		  |  "type": "fixed",
+		  |  "name": "FixedTypeName",
+		  |  "size": 25
 		  |}
 		  |""".stripMargin
 
