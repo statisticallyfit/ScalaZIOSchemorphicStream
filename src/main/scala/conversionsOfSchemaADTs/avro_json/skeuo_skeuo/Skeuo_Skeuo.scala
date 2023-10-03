@@ -88,7 +88,7 @@ object Skeuo_Skeuo {
 		 // TODO: declare transA: Trans[JsonSchema, AvroSchema, Fix[?]] with corresponding implicits and see how they pick up at the decoders then see what comes out with the avro-skeuo -> circe -> skeuo conversion
 
 		val avroToJson_byCataTransAlg: Fix[AvroSchema_S] => Fix[JsonSchema_S] = scheme.cata(transJAJ.algebra).apply(_)
-
+		// TODO when commenting ou tabove implicits, the droseBasisForFix has type JJ - do I need projectJJ or projectJA????
 
 
 
@@ -105,6 +105,11 @@ object Skeuo_Skeuo {
 		// coalgebra: Project: A => F[A]   :  Fix[JsonF] => AvroF [ Fix[JsonF] ]
 		// ANA = algebra . coalgebra
 		val jsonToAvro_byAnaTransCoalg: Fix[JsonSchema_S] ⇒ Fix[AvroSchema_S] = scheme.ana(transAJJ.coalgebra).apply(_)
+		// TODO when commenting ou tabove implicits, the droseBasisForFix has type JJ - do I need embedJJ or embedJA????
+
+
+		// TODO experiment with using JJ or JA / AJ here ... what happens to the converted result?
+
 
 
 

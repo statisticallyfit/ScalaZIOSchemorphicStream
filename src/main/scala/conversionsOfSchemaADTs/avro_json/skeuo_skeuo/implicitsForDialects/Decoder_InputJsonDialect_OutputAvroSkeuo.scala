@@ -96,12 +96,13 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 
 	private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
+
 		basicAvroSchemaDecoder orElse
 		logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
 			mapAvroSchemaDecoder orElse
 			recordAvroSchemaDecoder orElse
-			namedTypeAvroSchemaDecoder orElse
+			//namedTypeAvroSchemaDecoder orElse
 			enumAvroSchemaDecoder
 		// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
 
@@ -211,6 +212,7 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 
 	private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
+		// TODO make all named type decoders be like: Decoder.forproduct2 (name, namespace) (like when identifying enum decoder vs. primitive case)
 
 		Decoder.instance { c: HCursor =>
 
@@ -223,10 +225,10 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 					for {
 						// TODO: verify property exists for each type-function because otherwise it assigns the wrong class to the situation.
 
-						_ <- propertyExists(c, "title") // name for avro-string, title for json-string
+						//_ <- propertyExists(c, "title") // name for avro-string, title for json-string
 						_ <- propertyExists(c, "namespace")
 
-						title: String <- c.downField("title").as[Option[String]].map(_.getOrElse(""))
+						title: String <- c.downField("name").as[Option[String]].map(_.getOrElse(""))
 
 						namespace: Option[String] <- c.downField("namespace").as[Option[Option[String]]].map(_.getOrElse(None))
 

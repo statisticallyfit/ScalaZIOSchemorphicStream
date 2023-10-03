@@ -78,9 +78,9 @@ object projectImplicits {
 
 			case Fix(tunion @ TUnion(options: NonEmptyList[Fix[AvroSchema_S]], name: Option[String])) => tunion
 
-			case tnamedtype@TNamedType(_, _) => Fix(tnamedtype)
+			case Fix(tnamedtype @ TNamedType(_, _)) => tnamedtype
 
-			case tfixed@TFixed(_, _, _, _) => Fix(tfixed)
+			case Fix(tfixed @ TFixed(_, _, _, _)) => tfixed
 		}
 	}
 	/*implicit def basis_AA: Basis[AvroSchema_S, Fix[AvroSchema_S]] = new Basis[AvroSchema_S, Fix[AvroSchema_S]] {
@@ -168,6 +168,32 @@ object projectImplicits {
 				ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List())
 			}
 			case Fix(TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String])) => EnumF(cases = symbols, name = Some(name))
+
+
+			// HELP avro union to json = https://hyp.is/VOnIAh_7Ee6fHduAIk6beQ/avro.apache.org/docs/1.11.1/specification/
+			case Fix(TUnion(options: NonEmptyList[Fix[AvroSchema_S]], name: Option[String])) => {
+
+				// TODO check if name of AvroSchema made 'toString' correctly converts it to string (e.g. TString() ==> "string") ?
+				def unionElemToProperty(elem: Fix[AvroSchema_S]): Property[Fix[AvroSchema_S]] = Property(name = elem.toString, tpe = elem)
+
+
+				val props: List[Property[Fix[AvroSchema_S]]] = options.toList.map(sch => unionElemToProperty(sch))
+
+				val result: JsonSchema_S[Fix[AvroSchema_S]] = name.isDefined match {
+					case true => ObjectNamedF(name = name.get, properties = props, required = List())
+
+					case false => ObjectF(properties = props, required = List())
+				}
+
+				result
+			}
+
+
+			case Fix(TNamedType(namespace: String, name: String)) => ObjectNamedF(name = name, properties = List(), required = List())
+
+			case Fix(TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int)) => ???
+
+
 		}
 	}
 
@@ -204,8 +230,6 @@ object projectImplicits {
 
 			case Fix(ArrayF(inner: Fix[JsonSchema_S])) ⇒ TArray(inner)
 
-			case Fix(ObjectMapF(addProps: AdditionalProperties[Fix[JsonSchema_S]])) => TMap(addProps.tpe)
-
 			case Fix(ObjectNamedMapF(name: String, addProps: AdditionalProperties[Fix[JsonSchema_S]])) => TMap(addProps.tpe)
 
 			// Map
@@ -228,7 +252,8 @@ object projectImplicits {
 				)
 
 				val result: AvroSchema_S[Fix[JsonSchema_S]] = if (props.isEmpty && reqs.isEmpty) {
-					TNull()
+					//TNull()
+					TNamedType(namespace = "", name = name)
 				} else {
 					TRecord(name = name, namespace = None, aliases = List(), doc = None,
 						fields = props.map(p ⇒ property2Field(p))

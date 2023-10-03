@@ -206,7 +206,7 @@ object ParseADTToCirceToADT {
 			// NOTE: using 'title' instead of 'name' because that is what autoschema does (when converting from class -> jsonschema)
 
 			JsonCirce.obj(
-				"title" -> JsonCirce.fromString(name), // name for avro-string, title for json string
+				"name" -> JsonCirce.fromString(name), // name for avro-string, title for json string
 				"namespace" -> JsonCirce.fromString(namespace),
 			)
 		}
@@ -601,8 +601,8 @@ object ParseADTToCirceToADT {
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
 
 
-		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
-		import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+		import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
 		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 
@@ -613,7 +613,7 @@ object ParseADTToCirceToADT {
 		// --- interpret (before decoder) from avro-dialect
 		// --- decoder: using json-dialect string
 
-		val funcCirceAvroToSkeuoJson: AvroDialect => Result[Fix[JsonSchema_S]] = decoderAJ //compose avroDialectToJsonDialect
+		val funcCirceAvroToSkeuoJson: AvroDialect => Result[Fix[JsonSchema_S]] = decoderAJ compose avroDialectToJsonDialect
 
 
 		// TODO IMPLICITS (2)

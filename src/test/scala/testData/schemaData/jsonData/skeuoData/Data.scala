@@ -146,6 +146,15 @@ object Data {
 	))
 
 
+
+	// Empty ObjectNamedF ---> TNamedType
+	val objNameToNamedType_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNamedF(
+		name = "ANamedType",
+		properties = List(), required = List()
+	))
+
+
+
 	val map1PosRecordJson_Fix_S: Fix[JsonSchema_S] = Fix(ObjectNamedMapF(
 		name = "A_RANDOM_MAP_NAME_HERE",
 		additionalProperties = AdditionalProperties(tpe = recordExPositionJson_Fix_S)

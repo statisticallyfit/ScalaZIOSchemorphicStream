@@ -63,7 +63,7 @@ object embedImplicits {
 
 			case trecord @ TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[AvroSchema_S]]]) => Fix(trecord)
 
-			case te @TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => Fix(te)
+			case tenum @TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => Fix(tenum)
 
 
 			case tunion @ TUnion(options: NonEmptyList[Fix[AvroSchema_S]], name: Option[String]) => Fix(tunion)
@@ -187,14 +187,30 @@ object embedImplicits {
 				Fix(ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List()))
 			}
 
-			// HELP avro union to json?
-			// TODO = https://hyp.is/f-8tzmBxEe6IP8OOZytgXg/avro.apache.org/docs/1.11.1/specification/
-			case TUnion(options: NonEmptyList[Fix[JsonSchema_S]], name: Option[String]) => ???
+
+			// HELP avro union to json = https://hyp.is/VOnIAh_7Ee6fHduAIk6beQ/avro.apache.org/docs/1.11.1/specification/
+			case TUnion(options: NonEmptyList[Fix[JsonSchema_S]], name: Option[String]) => {
+
+				// TODO check if name of AvroSchema made 'toString' correctly converts it to string (e.g. TString() ==> "string") ?
+				def unionElemToProperty(elem: Fix[JsonSchema_S]): Property[Fix[JsonSchema_S]] = Property(name = elem.toString, tpe = elem)
+
+
+				val props: List[Property[Fix[JsonSchema_S]]] = options.toList.map(sch => unionElemToProperty(sch))
+
+				val result: JsonSchema_S[Fix[JsonSchema_S]] = name.isDefined match {
+					case true => ObjectNamedF(name = name.get, properties = props, required = List())
+
+					case false => ObjectF(properties = props, required = List())
+				}
+
+				Fix(result)
+			}
+
 
 			// Named type is just like record without fields.
 			case TNamedType(name: String, namespace: String) => Fix(ObjectNamedF(name = name, properties = List(), required = List()))
 
-			// Help avro fixed to json?
+			// HELP avro fixed to json?
 			case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) => ???
 
 

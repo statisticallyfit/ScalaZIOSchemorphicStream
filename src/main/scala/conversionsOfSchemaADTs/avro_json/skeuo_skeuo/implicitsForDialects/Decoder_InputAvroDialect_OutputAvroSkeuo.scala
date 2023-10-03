@@ -71,12 +71,16 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 		//product1AvroSchemaDecoder orElse
 			//product2AvroSchemaDecoder orElse
-		basicAvroSchemaDecoder orElse
+
+
+			basicAvroSchemaDecoder orElse
 			logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder  orElse
 			mapAvroSchemaDecoder orElse
 			recordAvroSchemaDecoder orElse
+			//namedTypeAvroSchemaDecoder orElse
 			enumAvroSchemaDecoder
+
 		//enumAvroSchemaDecoder orElse
 		/*orElse
 		enumAvroSchemaDecoder*/
