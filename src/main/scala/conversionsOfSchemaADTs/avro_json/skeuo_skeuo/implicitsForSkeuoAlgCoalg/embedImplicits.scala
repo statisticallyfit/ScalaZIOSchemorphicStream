@@ -3,6 +3,7 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg
 
 
 // Imports for the jsonSchemaDecoder (from JsonDecoders file from skeuomorph)
+
 import io.circe._
 import io.circe.Decoder
 import io.circe.Decoder.{Result, resultInstance}
@@ -12,7 +13,6 @@ import cats.syntax.all._
 //import cats.implicits._
 //import cats.syntax._
 
-import cats.data.NonEmptyList
 
 import higherkindness.droste._
 import higherkindness.droste.data._
@@ -23,7 +23,6 @@ import higherkindness.skeuomorph.openapi.schema._
 import scala.language.postfixOps
 import scala.language.higherKinds
 //import scala.language.implicitConversions
-
 
 
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
@@ -57,25 +56,15 @@ object embedImplicits {
 			case TDouble() => Fix(TDouble())
 			case TBytes() => Fix(TBytes())
 
-			case tarray @ TArray(inner: Fix[AvroSchema_S]) => Fix(tarray)
+			case tarray@TArray(inner: Fix[AvroSchema_S]) => Fix(tarray)
 
-			case tmap @ TMap(values: Fix[AvroSchema_S]) => Fix(tmap)
+			case tmap@TMap(values: Fix[AvroSchema_S]) => Fix(tmap)
 
-			case trecord @ TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[AvroSchema_S]]]) => Fix(trecord)
+			case trecord@TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[AvroSchema_S]]]) => Fix(trecord)
 
-			case te @TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => Fix(te)
-
-
-			case tunion @ TUnion(options: NonEmptyList[Fix[AvroSchema_S]], name: Option[String]) => Fix(tunion)
-
-			case tnamedtype @ TNamedType(_, _) => Fix(tnamedtype)
-
-			case tfixed @ TFixed(_, _, _, _) => Fix(tfixed)
+			case te@TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => Fix(te)
 		}
 	}
-
-
-
 
 
 	implicit def skeuoEmbed_JJ: Embed[JsonSchema_S, Fix[JsonSchema_S]] = new Embed[JsonSchema_S, Fix[JsonSchema_S]] {
@@ -96,11 +85,11 @@ object embedImplicits {
 			// Byte
 			case ByteF() ⇒ Fix(ByteF())
 			// Array
-			case ar @ ArrayF(inner: Fix[JsonSchema_S]) ⇒ Fix(ar) // TODO just inner or wrap with TArray?
+			case ar@ArrayF(inner: Fix[JsonSchema_S]) ⇒ Fix(ar) // TODO just inner or wrap with TArray?
 
 
 			// Object with name
-			case ob @ ObjectNamedF(name: String, props: List[Property[Fix[JsonSchema_S]]], reqs: List[String]) ⇒ {
+			case ob@ObjectNamedF(name: String, props: List[Property[Fix[JsonSchema_S]]], reqs: List[String]) ⇒ {
 
 				println(s"ObjectNamedF: INSIDE EMBED'S ALGEBRA: " +
 					s"\nname = $name" +
@@ -115,7 +104,7 @@ object embedImplicits {
 			// Map
 
 			// METHOD 1: using the 'additionalProperties' way of declaring a map
-			case ob @ ObjectNamedMapF(name: String, additionalProperties: AdditionalProperties[Fix[JsonSchema_S]]) ⇒ {
+			case ob@ObjectNamedMapF(name: String, additionalProperties: AdditionalProperties[Fix[JsonSchema_S]]) ⇒ {
 
 				println(s"ObjectNamedMapF: INSIDE EMBED'S ALGEBRA: " +
 					s"\nname = $name" +
@@ -126,7 +115,7 @@ object embedImplicits {
 				Fix(ob)
 			}
 
-			case ob @ ObjectMapF(additionalProperties: AdditionalProperties[Fix[JsonSchema_S]]) ⇒ {
+			case ob@ObjectMapF(additionalProperties: AdditionalProperties[Fix[JsonSchema_S]]) ⇒ {
 
 				println(s"ObjectMapF: INSIDE EMBED'S ALGEBRA: " +
 					//s"\nname = $name" +
@@ -138,7 +127,7 @@ object embedImplicits {
 			}
 
 			// Record
-			case ob @ ObjectF(props: List[Property[Fix[AvroSchema_S]]],
+			case ob@ObjectF(props: List[Property[Fix[AvroSchema_S]]],
 			reqs: List[String]) ⇒ {
 
 				println(s"ObjectF: INSIDE EMBED'S ALGEBRA: " +
@@ -151,10 +140,6 @@ object embedImplicits {
 			}
 
 			case EnumF(cases: List[String], name: Option[String]) => Fix(EnumF(cases, name))
-
-			// No union case
-			// No fixed case
-			// No named type case
 		}
 
 	}
@@ -186,16 +171,6 @@ object embedImplicits {
 
 				Fix(ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List()))
 			}
-
-			// HELP avro union to json?
-			// TODO = https://hyp.is/f-8tzmBxEe6IP8OOZytgXg/avro.apache.org/docs/1.11.1/specification/
-			case TUnion(options: NonEmptyList[Fix[JsonSchema_S]], name: Option[String]) => ???
-
-			// Named type is just like record without fields.
-			case TNamedType(name: String, namespace: String) => Fix(ObjectNamedF(name = name, properties = List(), required = List()))
-
-			// Help avro fixed to json?
-			case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) => ???
 
 
 			case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => {
@@ -249,9 +224,8 @@ object embedImplicits {
 					s"\nrequired = $reqs"
 				)
 
-				val result: Fix[AvroSchema_S] = if(props.isEmpty && reqs.isEmpty) {
-					//Fix(TNull())
-					Fix(TNamedType(name = name, namespace = ""))
+				val result: Fix[AvroSchema_S] = if (props.isEmpty && reqs.isEmpty) {
+					Fix(TNull())
 				} else {
 					Fix(
 						TRecord(name = name, namespace = None, aliases = List(), doc = None,

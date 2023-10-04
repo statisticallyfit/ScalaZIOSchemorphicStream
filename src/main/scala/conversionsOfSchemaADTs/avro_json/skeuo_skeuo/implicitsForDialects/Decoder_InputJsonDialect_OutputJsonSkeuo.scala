@@ -3,6 +3,7 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForDialects
 
 
 // Imports for the jsonSchemaDecoder (from JsonDecoders file from skeuomorph)
+
 import io.circe._
 import io.circe.Decoder
 import io.circe.Decoder.{Result, resultInstance}
@@ -11,7 +12,6 @@ import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import cats.syntax.all._
 //import cats.implicits._
 //import cats.syntax._
-
 
 
 import higherkindness.droste._
@@ -23,7 +23,6 @@ import higherkindness.skeuomorph.openapi.schema._
 import scala.language.postfixOps
 import scala.language.higherKinds
 //import scala.language.implicitConversions
-
 
 
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
@@ -47,6 +46,8 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 	implicit def identifyJsonDecoderWithPriorityEnumVsBasicDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 
 		// TODO identify here type, enum combo - if -> go to enumdecoder, else -> go to basic decoder where we do THIS dividing (below). Then in the basic2 decoder have what is now in the current basic decoder.
+
+		// TODO do the same for the enumavrodcoder and for namedtypeavrodecoder. (And get changes from the fixedunionnamedtype_branch!)
 
 		import JsonSchema_S._
 
@@ -105,7 +106,6 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 			arrayJsonSchemaDecoder orElse
 			objectJsonSchemaDecoder
 	}
-
 
 
 	private def logicalTypeJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
@@ -361,7 +361,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 			val result: Result[List[String]] = for {
 				_ <- validateType(c, "string")
-				_ <- propertyExists(c, "enum")
+				//_ <- propertyExists(c, "enum")
 
 				cases: List[String] <- {
 
@@ -385,12 +385,12 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 	}
 
 	// NOTE: either enum decoder works - here below or the one above.
-		/*Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).emap {
+	/*Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).emap {
 
-			case ("string", casesOpt: Option[List[String]]) => JsonSchema_S.`enum`[A](casesOpt.getOrElse(List.empty)).embed.asRight
-			case _ => s"not enum type".asLeft
-		}
-	}*/
+		case ("string", casesOpt: Option[List[String]]) => JsonSchema_S.`enum`[A](casesOpt.getOrElse(List.empty)).embed.asRight
+		case _ => s"not enum type".asLeft
+	}
+}*/
 
 	/*Decoder.instance(c =>
 		for {
@@ -403,7 +403,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 	)*/
 
 	private def sumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] =
-		Decoder.instance{ (c: HCursor) =>
+		Decoder.instance { (c: HCursor) =>
 			val resListA: Result[List[A]] = for {
 				cases <- c.downField("oneOf").as[List[A]] //.map((cases: List[A]) => JsonSchema_S.sum[A](cases).embed)
 			} yield cases

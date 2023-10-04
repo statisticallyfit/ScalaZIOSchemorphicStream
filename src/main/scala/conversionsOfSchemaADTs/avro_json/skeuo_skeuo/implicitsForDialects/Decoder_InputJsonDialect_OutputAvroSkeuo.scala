@@ -4,6 +4,7 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForDialects
 
 
 // Imports for the jsonSchemaDecoder (from JsonDecoders file from skeuomorph)
+
 import io.circe._
 import io.circe.Decoder
 import io.circe.Decoder.{Result, resultInstance}
@@ -12,7 +13,6 @@ import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import cats.syntax.all._
 //import cats.implicits._
 //import cats.syntax._
-
 
 
 import higherkindness.droste._
@@ -24,7 +24,6 @@ import higherkindness.skeuomorph.openapi.schema._
 import scala.language.postfixOps
 import scala.language.higherKinds
 //import scala.language.implicitConversions
-
 
 
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
@@ -97,7 +96,7 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 	private def avroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
 
 		basicAvroSchemaDecoder orElse
-		logicalTypeAvroSchemaDecoder orElse
+			logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
 			mapAvroSchemaDecoder orElse
 			recordAvroSchemaDecoder orElse
@@ -353,7 +352,6 @@ object Decoder_InputJsonDialect_OutputAvroSkeuo {
 				}
 
 			} yield cases
-
 
 
 			val result_noEmbed: Result[AvroSchema_S[A]] = result.map(vals => AvroSchema_S.`enum`[A](name = "NO_NAME", namespace = None, aliases = List(), doc = None, symbols = vals))

@@ -47,7 +47,6 @@ object ParseADTToCirceToADT {
 		val libToJson: Fix[AvroSchema_S] ⇒ JsonDialect = scheme.cata(AvroSchema_S.toJson).apply(_)
 
 
-
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
 		//import embedImplicits.skeuoEmbed_AJ
 		import projectImplicits.skeuoProject_AA
@@ -64,8 +63,8 @@ object ParseADTToCirceToADT {
 		val libRenderAltered: Fix[JsonSchema_S] ⇒ JsonDialect = scheme.cata(toCirceJsonDialect_fromJsonSkeuo).apply(_)
 
 	}
-	import LibFuncs._
 
+	import LibFuncs._
 
 
 	// Copied from skeuomorph (is private) = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L88
@@ -76,10 +75,6 @@ object ParseADTToCirceToADT {
 
 	def format(value: String): (String, JsonDialect) =
 		"format" -> JsonCirce.fromString(value)
-
-
-
-
 
 
 	// Alterign this function to include my own ObjectF-alike types: https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/openapi/JsonSchema.scala#L94
@@ -110,7 +105,7 @@ object ParseADTToCirceToADT {
 				"type" -> JsonCirce.fromString("object"),
 				"properties" -> JsonCirce.obj(properties.map(prop => prop.name -> prop.tpe): _*),
 				"required" -> JsonCirce.fromValues(required.map(JsonCirce.fromString))
-			  )
+			)
 
 			case ObjectNamedMapF(name: String, addProps: AdditionalProperties[JsonCirce]) ⇒ JsonCirce.obj(
 				"title" -> JsonCirce.fromString(name),
@@ -143,12 +138,12 @@ object ParseADTToCirceToADT {
 
 				result
 			}
-					//"properties" -> JsonCirce.obj(properties.map(prop => prop.name -> prop.tpe): _*)
-					//JsonCirce.fromValues(cases.map(JsonCirce.fromString))
-				//JsonCirce.arr(cases.map(JsonCirce.fromString): _*)
-				//JsonCirce.fromValues(cases.map(JsonCirce.fromString))
+			//"properties" -> JsonCirce.obj(properties.map(prop => prop.name -> prop.tpe): _*)
+			//JsonCirce.fromValues(cases.map(JsonCirce.fromString))
+			//JsonCirce.arr(cases.map(JsonCirce.fromString): _*)
+			//JsonCirce.fromValues(cases.map(JsonCirce.fromString))
 
-				//jsonType("string", "enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString)))
+			//jsonType("string", "enum" -> JsonCirce.fromValues(cases.map(JsonCirce.fromString)))
 
 			case SumF(cases: List[JsonCirce]) =>
 				JsonCirce.obj("oneOf" -> JsonCirce.arr(cases: _*))
@@ -226,7 +221,7 @@ object ParseADTToCirceToADT {
 				},
 				"required" -> JsonCirce.fromValues(List())
 
-					//JsonCirce.arr(fields.map(field2Obj): _*) // TODO update this function (field2Obj) to preserve all the args from Field (like order, doc, etc)
+				//JsonCirce.arr(fields.map(field2Obj): _*) // TODO update this function (field2Obj) to preserve all the args from Field (like order, doc, etc)
 
 				// TODO must rename fields to be properties
 			)
@@ -247,7 +242,7 @@ object ParseADTToCirceToADT {
 
 			withDoc*/
 
-			base  //return just base (no avro-dialect stuff like namespace, doc, aliases)
+			base //return just base (no avro-dialect stuff like namespace, doc, aliases)
 
 		}
 		case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) ⇒ {
@@ -269,7 +264,7 @@ object ParseADTToCirceToADT {
 
 			withDoc*/
 
-			base  //return just base (no avro-dialect stuff like namespace, doc, aliases)
+			base //return just base (no avro-dialect stuff like namespace, doc, aliases)
 		}
 
 		case TUnion(options: NonEmptyList[JsonCirce], name: Option[String]) => {
@@ -278,7 +273,7 @@ object ParseADTToCirceToADT {
 
 			val withName: JsonCirce = name.fold(base)((n: String) => base deepMerge JsonCirce.obj("name" -> JsonCirce.fromString(n)))
 
-			val result: JsonCirce = if(name.isDefined) withName else base
+			val result: JsonCirce = if (name.isDefined) withName else base
 			result
 		}
 
@@ -318,17 +313,17 @@ object ParseADTToCirceToADT {
 
 		// SOURCE of mapping = https://hyp.is/UEBSwknVEe6MM1sQBZZdfQ/docs.airbyte.com/understanding-airbyte/json-avro-conversion/
 		case TTimestampMillis() => jsonType("string", format("date-time"))
-			/*JsonCirce.obj(
-				"type" -> JsonCirce.fromString("long"),
-				"logicalType" -> JsonCirce.fromString("timestamp-millis")
-			)*/
+		/*JsonCirce.obj(
+			"type" -> JsonCirce.fromString("long"),
+			"logicalType" -> JsonCirce.fromString("timestamp-millis")
+		)*/
 
 		// SOURCE of mapping = https://hyp.is/b2IUFiv3Ee6z6geHBkITQA/docs.airbyte.com/understanding-airbyte/json-avro-conversion
 		case TTimeMillis() => jsonType("string", format("time"))
-			/*JsonCirce.obj(
-				"type" -> JsonCirce.fromString("int"),
-				"logicalType" -> JsonCirce.fromString("time-millis")
-			)*/
+		/*JsonCirce.obj(
+			"type" -> JsonCirce.fromString("int"),
+			"logicalType" -> JsonCirce.fromString("time-millis")
+		)*/
 
 		// TODO no json-dialect equivalent, should I include or not? (like for namedtype, fixed etc)
 		case TDecimal(precision: Int, scale: Int) =>
@@ -345,7 +340,6 @@ object ParseADTToCirceToADT {
 
 
 	// TODO MAJOR - this thing is resulting in avro-string-like not strictly json-circe ---- see they say 'record' instead of 'object'. Need to clean this up to be purely avro-string and compare it to the original avro-string, and need to clean up above one and make it purely JSON-circe to compare it to original json-string
-
 
 
 	// NOTE: converting the avro-circe-str to json-circe-str so that the avro-str primitives can be seen as json-str primitives
@@ -427,9 +421,16 @@ object ParseADTToCirceToADT {
 			"values" -> values
 		)
 
+		case TNamedType(namespace: String, name: String) ⇒ {
+			// NOTE: using 'title' instead of 'name' because that is what autoschema does (when converting from class -> jsonschema)
+
+			JsonCirce.obj(
+				"name" -> JsonCirce.fromString(name), // name for avro-string, title for json string
+				"namespace" -> JsonCirce.fromString(namespace),
+			)
+		}
+
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[AvroDialect]]) ⇒ {
-
-
 
 
 			val base: AvroDialect = JsonCirce.obj(
@@ -472,19 +473,11 @@ object ParseADTToCirceToADT {
 			withDoc
 		}
 
-		case TNamedType(namespace: String, name: String) ⇒ {
-
-			JsonCirce.obj(
-				"name" -> JsonCirce.fromString(name), // name for avro-string, title for json string
-				"namespace" -> JsonCirce.fromString(namespace),
-			)
-		}
-
-
+		// TODO use the mergeing method to create union (in case name is None) so it doesn't look empty
 		case TUnion(options: NonEmptyList[AvroDialect], name: Option[String]) => JsonCirce.obj(
 			"name" -> JsonCirce.fromString(name.getOrElse("")),
 			"type" -> JsonCirce.arr(options.toList: _*)
-		)//JsonCirce.arr(options.toList: _*)
+		) //JsonCirce.arr(options.toList: _*)
 
 		//case TUnion(options: NonEmptyList[AvroDialect]) => JsonCirce.arr(options.toList: _*)
 
@@ -554,7 +547,6 @@ object ParseADTToCirceToADT {
 		import projectImplicits.skeuoProject_AA
 
 
-
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
 
 
@@ -564,12 +556,10 @@ object ParseADTToCirceToADT {
 		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 
-
 		val decoderAA: AvroDialect ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
 
 
-
-		val f1: AvroDialect => Result[Fix[AvroSchema_S]] = (av: AvroDialect)  => decoderAA(avroDialectToJsonDialect(av))
+		val f1: AvroDialect => Result[Fix[AvroSchema_S]] = (av: AvroDialect) => decoderAA(avroDialectToJsonDialect(av))
 
 		val f2: AvroDialect => Result[Fix[AvroSchema_S]] = avroDialectToJsonDialect andThen decoderAA
 
@@ -606,7 +596,7 @@ object ParseADTToCirceToADT {
 		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 
-		val decoderAJ: JsonDialect ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
+		val decoderAJ: AvroDialect ⇒ Result[Fix[JsonSchema_S]] = Decoder[Fix[JsonSchema_S]].decodeJson(_)
 
 
 		// NOTE:
@@ -700,7 +690,6 @@ object ParseADTToCirceToADT {
 	import CirceAvroToSkeuoJson._
 	import CirceJsonToSkeuoJson._
 	import CirceJsonToSkeuoAvro._
-
 
 
 	object DecodingSkeuo {

@@ -3,6 +3,7 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg
 
 
 // Imports for the jsonSchemaDecoder (from JsonDecoders file from skeuomorph)
+
 import io.circe._
 import io.circe.Decoder
 import io.circe.Decoder.{Result, resultInstance}
@@ -11,7 +12,6 @@ import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import cats.syntax.all._
 //import cats.implicits._
 //import cats.syntax._
-import cats.data.NonEmptyList
 
 
 import higherkindness.droste._
@@ -23,7 +23,6 @@ import higherkindness.skeuomorph.openapi.schema._
 import scala.language.postfixOps
 import scala.language.higherKinds
 //import scala.language.implicitConversions
-
 
 
 import higherkindness.skeuomorph.avro.{AvroF ⇒ AvroSchema_S}
@@ -46,7 +45,6 @@ object projectImplicits {
 
 	/**
 	 * A => F[A]
-	 *
 	 * Fix[AvroF] => AvroF[Fix[AvroF]]
 	 *
 	 * @return
@@ -56,7 +54,7 @@ object projectImplicits {
 		def coalgebra: Coalgebra[AvroSchema_S, Fix[AvroSchema_S]] = Coalgebra {
 			case Fix(TNull()) => TNull()
 			case Fix(TInt()) => TInt()
-			case entire @ Fix(TString()) => TString()
+			case entire@Fix(TString()) => TString()
 			case Fix(TBoolean()) => TBoolean()
 			case Fix(TFloat()) => TFloat()
 			case Fix(TLong()) => TLong()
@@ -64,23 +62,17 @@ object projectImplicits {
 			case Fix(TBytes()) => TBytes()
 
 			// NOTE: return 'ta' only, don't wrap again in another layer or else stackoverflow error
-			case entire @ Fix(TArray(inner: Fix[AvroSchema_S])) => TArray(entire) //TArray(inner)
+			case entire @ Fix( arr @ TArray(inner: Fix[AvroSchema_S])) => arr //TArray(entire) //TArray(inner)
 
 			case Fix(TMap(values: Fix[AvroSchema_S])) => TMap(values)
 
 
-			case Fix(trecord @ TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[Property[Fix[AvroSchema_S]]])) => {
+			case Fix(trecord@TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[Property[Fix[AvroSchema_S]]])) => {
 
 				trecord
 			}
 
-			case Fix(tenum @ TEnum(_, _, _, _, _)) => tenum
-
-			case Fix(tunion @ TUnion(options: NonEmptyList[Fix[AvroSchema_S]], name: Option[String])) => tunion
-
-			case tnamedtype@TNamedType(_, _) => Fix(tnamedtype)
-
-			case tfixed@TFixed(_, _, _, _) => Fix(tfixed)
+			case entire@Fix(tenum@TEnum(_, _, _, _, _)) => tenum
 		}
 	}
 	/*implicit def basis_AA: Basis[AvroSchema_S, Fix[AvroSchema_S]] = new Basis[AvroSchema_S, Fix[AvroSchema_S]] {
@@ -96,7 +88,6 @@ object projectImplicits {
 			case Fix(ta @ TArray(inner: Fix[AvroSchema_S])) => ta
 		}
 	}*/
-
 
 
 	/**
@@ -119,15 +110,15 @@ object projectImplicits {
 			case Fix(BinaryF()) => BinaryF()
 
 			// NOTE: return 'ar' only, don't wrap again in another layer or else stackoverflow error
-			case entire @ Fix(ar @ ArrayF(inner: Fix[JsonSchema_S])) => ArrayF(entire)
+			case entire @ Fix(arr @ ArrayF(inner: Fix[JsonSchema_S])) => arr //ArrayF(entire)
 
-			case Fix(ob @ ObjectMapF(addProps: AdditionalProperties[Fix[JsonSchema_S]])) => ob
+			case Fix(ob@ObjectMapF(addProps: AdditionalProperties[Fix[JsonSchema_S]])) => ob
 
-			case Fix(ob @ ObjectNamedMapF(name: String, additionalProperties: AdditionalProperties[Fix[JsonSchema_S]])) => ob
+			case Fix(ob@ObjectNamedMapF(name: String, additionalProperties: AdditionalProperties[Fix[JsonSchema_S]])) => ob
 
-			case Fix( ob @ ObjectNamedF(name, properties, required)) => ob
+			case Fix(ob@ObjectNamedF(name, properties, required)) => ob
 
-			case Fix ( ob @ ObjectF(properties, required) ) => ob
+			case Fix(ob@ObjectF(properties, required)) => ob
 
 
 			case Fix(EnumF(cases: List[String], name: Option[String])) => EnumF(cases, name)
@@ -158,7 +149,7 @@ object projectImplicits {
 
 
 			// HERE overflow 1
-			case entire @ Fix(TArray(inner: Fix[AvroSchema_S])) => ArrayF(entire)
+			case entire@Fix(arr @ TArray(inner: Fix[AvroSchema_S])) => ArrayF(inner)
 			//ArrayF(inner) //ArrayF(inner) // TODO need: ArrayF(inner) or ArrayF(Fix(Tarray(inner))?
 
 			case Fix(TMap(inner: Fix[AvroSchema_S])) => ObjectMapF(additionalProperties = AdditionalProperties[Fix[AvroSchema_S]](tpe = inner))
