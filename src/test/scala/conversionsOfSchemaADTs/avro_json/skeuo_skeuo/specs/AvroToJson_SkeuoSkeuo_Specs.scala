@@ -99,8 +99,8 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		//array1IntAvro_Fix_S,
 		//namedTypeAvro_Fix_S, //unionAvro_R, //fixedAvro_R,
 		//intAvro_Fix_S,
-		//map1IntAvro_Fix_S,
-		enumAvro_Fix_S,
+		map1IntAvro_Fix_S,
+		//enumAvro_Fix_S,
 		//recordExPositionAvro_Fix_S,
 		//map1PosRecordAvro_Fix_S,
 		//namedTypeAvro_Fix_S,
@@ -111,6 +111,19 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		//map1IntJson_Fix_S
 		//intJson_Fix_S
 	)
+
+	import org.apache.avro.{Schema => AvroSchema_A}
+	import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache
+	type AvroDialectStr = String
+
+	// Skeuo avro -> circe -> string -> apache -> skeuo avro
+	val avroCirce: AvroDialect = libToJsonAltered(recordExPositionAvro_Fix_S)
+	val avroStr: AvroDialectStr = avroCirce.toString()
+	val avroApache: AvroSchema_A = new AvroSchema_A.Parser().parse(avroStr)
+	// STEP 2: convert apache-avro -> skeuo-avro
+	val avroSkeuo: Fix[AvroSchema_S] = Skeuo_Apache.apacheToSkeuoAvroSchema(avroApache)
+
+	info(s"\n\nAPACHE STRING TO SKEUO: ${avroSkeuo}")
 
 
 	// NOTE first debug object simple first to see how decodermap is extracting the fields - only then do object map (below)

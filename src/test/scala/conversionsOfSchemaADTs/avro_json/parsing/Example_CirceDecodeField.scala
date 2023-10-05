@@ -47,7 +47,7 @@ object DecodingField_1 {
 	def fieldDecoderManual[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = Decoder.instance { (hCursor: HCursor) =>
 		val res: Result[FieldAvro[A]] = for {
 			name: String <- hCursor.get[String]("name")
-			theType: A <- hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+			theType: A <- hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])
 			aliases: List[String] <- hCursor.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
 		} yield FieldAvro[A](name, aliases, None, None, theType)
 
@@ -98,7 +98,7 @@ object DecodingField_2 {
 
 		val result: Result[FieldAvro[A]] = for {
 			name: String <- hCursor.downField("name").as[Option[String]]. map(_.getOrElse("")) //.get[String]("name")
-			theType: A <- hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+			theType: A <- hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])
 			aliases: List[String] <- hCursor.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
 		} yield FieldAvro[A](name, aliases, None, None, theType)
 
@@ -109,7 +109,7 @@ object DecodingField_2 {
 		println(s"hcursor = $hCursor")
 		println(s"c.downField(name) = ${hCursor.downField("name").as[Option[String]]. map(_.getOrElse(""))}")
 		println(s"hCursor.downField(type).as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${
-			hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+			hCursor.downField("type").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])
 		}")
 		println(s"c.downArray = ${hCursor.downArray}")
 		println(s"c.values.get.toList = ${hCursor.values }")/*.get.toList}")*/
@@ -139,7 +139,7 @@ object DecodingField_2 {
 				digTypes: List[List[A]] <- Traverse[List].traverse(theFieldsJson)(
 					(itj: Json) => {
 
-						val resOptMap: Result[Option[Map[String, A]]] = itj.hcursor.downField("type").as[Option[Map[String, A]]](Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyAvroDecoderWithPriorityBasicDecoder[A])))
+						val resOptMap: Result[Option[Map[String, A]]] = itj.hcursor.downField("type").as[Option[Map[String, A]]](Decoder.decodeOption(Decoder.decodeMap[String, A](KeyDecoder.decodeKeyString, identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])))
 
 						val resMap: Result[Map[String, A]] = resOptMap.map(_.getOrElse(Map.empty))
 

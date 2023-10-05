@@ -53,13 +53,16 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 	import AvroSchema_S._
 
 
-	implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+	implicit def identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
 		Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "symbols")(Tuple2.apply).flatMap {
 
-			case ("enum", symbols: Option[List[String]]) => enumAvroSchemaDecoder[A]
+			case ("enum", symbols: Option[List[String]]) => symbols.isDefined match {
+				case true => enumAvroSchemaDecoder[A]
+				case false => typePrimitiveAvroSchemaDecoder[A]
+			}
 
-			case _ => typePrimitiveAvroSchemaDecoder[A] //avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A]
+			case _ => typePrimitiveAvroSchemaDecoder[A] //avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder
 		}
 
 
@@ -76,6 +79,25 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 			case _ => avroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder[A] //avroSchemaDecoder[A]
 		}
 
+	}
+
+
+	private def typeBasicAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+
+		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
+
+			case ("integer", Some("int32")) => int[A]().embed.asRight
+			case ("integer", Some("int64")) => long[A]().embed.asRight
+			case ("number", Some("float")) => float[A]().embed.asRight
+			case ("number", Some("double")) => double[A]().embed.asRight
+
+			case ("string", Some("byte")) => bytes[A]().embed.asRight
+			//case ("string", Some("binary")) => binary[A]().embed.asRight
+			case ("boolean", _) => boolean[A]().embed.asRight
+
+			case ("string", _) => string[A]().embed.asRight
+			case (x, _) => s"$x is not well formed type".asLeft
+		}
 	}
 
 	def stringPrimitiveAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] =  {
@@ -106,23 +128,6 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 	}
 
-	private def typeBasicAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
-
-		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
-
-			case ("integer", Some("int32")) => int[A]().embed.asRight
-			case ("integer", Some("int64")) => long[A]().embed.asRight
-			case ("number", Some("float")) => float[A]().embed.asRight
-			case ("number", Some("double")) => double[A]().embed.asRight
-
-			case ("string", Some("byte")) => bytes[A]().embed.asRight
-			//case ("string", Some("binary")) => binary[A]().embed.asRight
-			case ("boolean", _) => boolean[A]().embed.asRight
-
-			case ("string", _) => string[A]().embed.asRight
-			case (x, _) => s"$x is not well formed type".asLeft
-		}
-	}
 
 	private def avroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
@@ -132,8 +137,9 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 			logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
-			mapAvroSchemaDecoder orElse
-			recordAvroSchemaDecoder /*orElse
+			recordAvroSchemaDecoder orElse
+				mapAvroSchemaDecoder
+			 /*orElse
 			enumAvroSchemaDecoder*/
 		//enumAvroSchemaDecoder orElse
 		/*orElse
@@ -170,9 +176,9 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 			// HELP DEBUG STATEMENTS
 			println(s"\n\nINSIDE arrayDecoder (avro -> avro):")
 			println(s"hcursor = $c")
-			println(s"c.downField(items).as[A](identify[A]) = ${c.downField("items").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])}")
+			println(s"c.downField(items).as[A](identify[A]) = ${c.downField("items").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])}")
 			println(s"c.get[A](items)(identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${
-				c.get[A]("items")(identifyAvroDecoderWithPriorityBasicDecoder[A])
+				c.get[A]("items")(identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])
 			}")
 			println(s"c.downArray = ${c.downArray}")
 			println(s"c.values.get.toList = ${c.values /*.get.toList*/}")
@@ -204,7 +210,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 						// TODO - maybe use the avro-string circe instead of json-string circe (from avro-skeuo) so no more mish-mash between json/avro string parameters.
 
 						_ <- validateType(c, "enum")
-						_ <- propertyExists(c, "type")
+						//_ <- propertyExists(c, "type")
 						//_ <- propertyExists(c, "name")
 						//_ <- propertyExists(c, "symbols")
 
@@ -261,12 +267,12 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 				val resultArgs: Result[A] = for {
 					// validation
 					_ <- validateType(c, "map")
-					_ <- propertyExists(c, "type")
+					//_ <- propertyExists(c, "type")
 					//_ <- propertyExists(c, "values")
 
 					inner: A <- {
 
-						val resTpe: Result[A] = c.downField("values").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) /*.as[Option[String]].map(_.getOrElse(""))*/
+						val resTpe: Result[A] = c.downField("values").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A]) /*.as[Option[String]].map(_.getOrElse(""))*/
 
 						val resMap: Result[TMap[A]] = resTpe.map(tpe => AvroSchema_S.TMap(tpe))
 
@@ -288,9 +294,9 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 				println(s"result (not embed) = $result_noEmbed")
 				println(s"result (embed) = $result_embed")
 				println(s"hcursor = $c")
-				println(s"c.downField(values).as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${c.downField("values").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])}")
+				println(s"c.downField(values).as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${c.downField("values").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])}")
 				println(s"c.get[A](values)(identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${
-					c.get[A]("values")(identifyAvroDecoderWithPriorityBasicDecoder[A])
+					c.get[A]("values")(identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])
 				}")
 				println(s"c.downArray = ${c.downArray}")
 				println(s"c.values.get.toList = ${c.values /*.get.toList*/}")
@@ -328,7 +334,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 						// TODO - why error when including namspace, aliases, properties for validation below?
 						// TODO - maybe use the avro-string circe instead of json-string circe (from avro-skeuo) so no more mish-mash between json/avro string parameters.
 						_ <- validateType(c, "record")
-						_ <- propertyExists(c, "type")
+						//_ <- propertyExists(c, "type")
 						//_ <- propertyExists(c, "name")
 						//_ <- propertyExists(c, "fields")
 						//_ <- propertyExists(c, "namespace")
@@ -351,7 +357,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 								val inner: Result[FieldAvro[A]] = for {
 									fname: String <- fj.hcursor.downArray.downField("name").as[Option[String]].map(_.getOrElse(""))
 									faliases <- fj.hcursor.downArray.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
-									ftype <- fj.hcursor.downArray.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+									ftype <- fj.hcursor.downArray.downField("type").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])
 								} yield FieldAvro[A](fname, faliases, None, None, ftype)
 
 								inner

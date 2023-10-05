@@ -49,11 +49,14 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 		// TODO do the same for the enumavrodcoder and for namedtypeavrodecoder. (And get changes from the fixedunionnamedtype_branch!)
 
-		import JsonSchema_S._
 
 		Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).flatMap {
 
-			case ("string", casesOpt: Option[List[String]]) => enumJsonSchemaDecoder[A]
+			case ("string", casesOpt: Option[List[String]]) => casesOpt.isDefined match {
+
+				case true => enumJsonSchemaDecoder[A]
+				case false => primitiveJsonSchemaDecoder[A]
+			}
 
 			case _ => primitiveJsonSchemaDecoder[A]
 		}
@@ -73,7 +76,6 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 	private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 
-		import JsonSchema_S._
 
 		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
 
@@ -354,7 +356,6 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 	def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 
-		import JsonSchema_S._
 
 
 		Decoder.instance { (c: HCursor) =>
