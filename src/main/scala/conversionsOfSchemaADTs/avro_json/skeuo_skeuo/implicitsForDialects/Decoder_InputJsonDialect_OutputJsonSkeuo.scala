@@ -106,7 +106,8 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 			referenceJsonSchemaDecoder orElse
 			sumJsonSchemaDecoder orElse
 			arrayJsonSchemaDecoder orElse
-			objectJsonSchemaDecoder
+			objectJsonSchemaDecoder orElse
+			enumJsonSchemaDecoder
 	}
 
 

@@ -7,7 +7,7 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForDialects
 
 import io.circe._
 import io.circe.Decoder
-import io.circe.Decoder.{Result, decodeInt, resultInstance}
+import io.circe.Decoder.{Result, resultInstance}
 import io.circe.{Json => JsonCirce}
 import utilMain.utilJson.utilSkeuo_ParseJsonSchemaStr.UnsafeParser._
 import cats.syntax.all._
@@ -19,7 +19,7 @@ import higherkindness.droste._
 import higherkindness.droste.data._
 //import higherkindness.droste.syntax.all._
 import higherkindness.droste.syntax.embed._
-import higherkindness.skeuomorph.openapi.schema._
+//import higherkindness.skeuomorph.openapi.schema._
 
 import scala.language.postfixOps
 import scala.language.higherKinds
@@ -53,18 +53,24 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 	import AvroSchema_S._
 
 
-	implicit def identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+	implicit def identifyAvroDecoderWithPriorityBasicDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-		Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "symbols")(Tuple2.apply).flatMap {
+		/*Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "symbols")(Tuple2.apply).flatMap {
 
 			case ("enum", symbols: Option[List[String]]) => symbols.isDefined match {
 				case true => enumAvroSchemaDecoder[A]
-				case false => typePrimitiveAvroSchemaDecoder[A]
+				case false => avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A]
 			}
 
-			case _ => typePrimitiveAvroSchemaDecoder[A] //avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder
-		}
+			case _ => avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder
+		}*/
 
+		typePrimitiveAvroSchemaDecoder[A]
+		//stringPrimitiveAvroSchemaDecoder[A]
+
+// TODO stackoverflow error - need to put back the typeprimitive thingies here instead of avroschemadecoder - todo figure ou twhy stack overflow when putting the primitivedecoders in avrodecoder main.
+
+		// TODO - use same method as enum identifier (forproduct) and then do the decdoer instance thingy as a helper stp.e
 
 	}
 
@@ -76,13 +82,13 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 			case ("integer", _) | ("number", _) | ("string", _) | ("boolean", _) => typeBasicAvroSchemaDecoder[A]
 
 			//case (x, _) => s"$x is not well formed type".asLeft
-			case _ => avroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder[A] //avroSchemaDecoder[A]
+			case _ => avroSchemaDecoder[A]//stringPrimitiveAvroSchemaDecoder[A] //avroSchemaDecoder[A]
 		}
 
 	}
 
 
-	private def typeBasicAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+	def typeBasicAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
 		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
 
@@ -111,7 +117,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 	}
 
 
-	private def stringBasicAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A]  = {
+	def stringBasicAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A]  = {
 		Decoder.decodeString.emap {
 
 			case "null" => `null`[A]().embed.asRight
@@ -135,16 +141,13 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 		//product2AvroSchemaDecoder orElse
 		//basicAvroSchemaDecoder orElse
 
-			logicalTypeAvroSchemaDecoder orElse
-			arrayAvroSchemaDecoder orElse
+		//typePrimitiveAvroSchemaDecoder orElse
+		typeBasicAvroSchemaDecoder orElse
+		logicalTypeAvroSchemaDecoder orElse
+			arrayAvroSchemaDecoder /*orElse
 			recordAvroSchemaDecoder orElse
-				mapAvroSchemaDecoder
-			 /*orElse
+			mapAvroSchemaDecoder orElse
 			enumAvroSchemaDecoder*/
-		//enumAvroSchemaDecoder orElse
-		/*orElse
-		enumAvroSchemaDecoder*/
-		//namedTypeAvroSchemaDecoder
 
 		// NOTE; namedtype AFTER record because namedtype is a subset of record and if put it first, the records will incorrectly be put as namedtype
 	}
@@ -167,39 +170,52 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 	def arrayAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-		Decoder.instance { c: HCursor =>
-			val result: Result[A] = for {
-				items: A <- c.downField("items").as[A]
-				_ <- validateType(c, "array")
-			} yield AvroSchema_S.array[A](items).embed
+		def arrayDecoder: Decoder[A] = {
 
-			// HELP DEBUG STATEMENTS
-			println(s"\n\nINSIDE arrayDecoder (avro -> avro):")
-			println(s"hcursor = $c")
-			println(s"c.downField(items).as[A](identify[A]) = ${c.downField("items").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])}")
-			println(s"c.get[A](items)(identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${
-				c.get[A]("items")(identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])
-			}")
-			println(s"c.downArray = ${c.downArray}")
-			println(s"c.values.get.toList = ${c.values /*.get.toList*/}")
-			println(s"c.value = ${c.value}")
-			println(s"c.keys.get.toList = ${c.keys /*.get.toList*/}")
-			println(s"c.key = ${c.key}")
+			Decoder.instance { c: HCursor =>
+
+				val result: Result[A] = for {
+					items: A <- c.downField("items").as[A]
+					_ <- validateType(c, "array")
+				} yield AvroSchema_S.array[A](items).embed
+
+				// HELP DEBUG STATEMENTS
+				println(s"\n\nURGENT OVER HERE: INSIDE arrayDecoder (avro -> avro):")
+				println(s"hcursor = $c")
+				println(s"c.downField(items).as[A](identify[A]) = ${c.downField("items").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])}")
+				println(s"c.get[A](items)(identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${
+					c.get[A]("items")(identifyAvroDecoderWithPriorityBasicDecoder[A])
+				}")
+				println(s"c.downArray = ${c.downArray}")
+				println(s"c.values.get.toList = ${c.values /*.get.toList*/}")
+				println(s"c.value = ${c.value}")
+				println(s"c.keys.get.toList = ${c.keys /*.get.toList*/}")
+				println(s"c.key = ${c.key}")
 
 
-			result
+				result
+			}
 		}
+
+		def arrayIdentifier: Decoder[A] = {
+
+			Decoder.forProduct2[(String, A), String, A]("type", "items")(Tuple2.apply).flatMap {
+
+				case ("array", items: A) => arrayDecoder
+
+				case _ => avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder
+			}
+		}
+
+		arrayDecoder
 	}
 
 
-	private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+	private def enumAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-		Decoder.instance { c: HCursor =>
+		def enumDecoder: Decoder[A] = {
 
-
-
-			// NOTE: the avro enum extraction
-			def makeAvroCirceEnum(c: HCursor): Result[A] = {
+			Decoder.instance { c: HCursor =>
 
 				val tenum: (String, Option[String], List[String], Option[String], List[String]) => AvroSchema_S[A] = (name, namespace, aliases, doc, symbols) => AvroSchema_S.`enum`[A](name, namespace, aliases, doc, symbols)
 
@@ -240,26 +256,30 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 				result_embed
 			}
-
-			makeAvroCirceEnum(c)
 		}
+
+
+		def enumIdentifier: Decoder[A] = {
+			Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "symbols")(Tuple2.apply).flatMap {
+
+				case ("enum", symbols: Option[List[String]]) => symbols.isDefined match {
+					case true => enumDecoder
+					case false => avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A]
+				}
+				case _ => avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder
+			}
+		}
+
+		enumIdentifier
 	}
+
 
 	// NOW
 	private def mapAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-		Decoder.instance { c: HCursor =>
+		def mapDecoder: Decoder[A] = {
 
-
-
-			// Added by @statisticallyfit:
-
-			/**
-			 * Extract the string { "type": "something" } or simple primitive "something" that comes after 'values'
-			 *
-			 * @return
-			 */
-			def makeAvroCirceMap(c: HCursor): Result[A] = {
+			Decoder.instance { c: HCursor =>
 
 				val tmap: A => AvroSchema_S[A] = (inner) => AvroSchema_S.map[A](inner)
 
@@ -272,7 +292,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 					inner: A <- {
 
-						val resTpe: Result[A] = c.downField("values").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A]) /*.as[Option[String]].map(_.getOrElse(""))*/
+						val resTpe: Result[A] = c.downField("values").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) /*.as[Option[String]].map(_.getOrElse(""))*/
 
 						val resMap: Result[TMap[A]] = resTpe.map(tpe => AvroSchema_S.TMap(tpe))
 
@@ -294,9 +314,9 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 				println(s"result (not embed) = $result_noEmbed")
 				println(s"result (embed) = $result_embed")
 				println(s"hcursor = $c")
-				println(s"c.downField(values).as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${c.downField("values").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])}")
+				println(s"c.downField(values).as[A](identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${c.downField("values").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])}")
 				println(s"c.get[A](values)(identifyAvroDecoderWithPriorityBasicDecoder[A]) = ${
-					c.get[A]("values")(identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])
+					c.get[A]("values")(identifyAvroDecoderWithPriorityBasicDecoder[A])
 				}")
 				println(s"c.downArray = ${c.downArray}")
 				println(s"c.values.get.toList = ${c.values /*.get.toList*/}")
@@ -307,26 +327,69 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 				result_embed
 			}
+		}
+
+		def mapIdentifier: Decoder[A] = {
+
+			Decoder.forProduct2[(String, A), String, A]("type", "values")(Tuple2.apply).flatMap {
+
+				case ("map", values: A) => mapDecoder
+
+				case _ => avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder
+			}
+		}
+
+		mapIdentifier
+	}
+
+	import cats.Traverse
+
+	private implicit def fieldDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[List[FieldAvro[A]]] = {
+
+		Decoder.instance { c: HCursor =>
+
+			val result: Result[List[FieldAvro[A]]] = for {
+				theFieldsJson <- c.downField("fields").as[List[JsonCirce]]
+
+				listFieldsAvro: List[FieldAvro[A]]
+					<- Traverse[List].traverse(theFieldsJson)(
+					(fj: JsonCirce) => {
+						val inner: Result[FieldAvro[A]] = for {
+							fname: String <- fj.hcursor.downArray.downField("name").as[Option[String]].map(_.getOrElse(""))
+							faliases <- fj.hcursor.downArray.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+							ftype <- fj.hcursor.downArray.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
+						} yield FieldAvro[A](fname, faliases, None, None, ftype)
+
+						inner
+					}
+				)
+			} yield listFieldsAvro
 
 
-			//assert(isObjectMap)
+			// EMPTY TRECORD, just to hold a field, and so ending type can be Decoder[A]
+			/*val result_noEmbed: Result[AvroSchema_S[A]] = result.map { case (fields: List[FieldAvro[A]]) => AvroSchema_S.record[A](name = "", namespace = None, aliases = List(), doc = None, fields = fields) }
 
-			makeAvroCirceMap(c)
+			val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+			println(s"\n\nINSIDE fieldDecoder (avro -> avro):")
+			println(s"result (not embed) = $result_noEmbed")
+			println(s"result (embed) = $result_embed")
+
+			result_embed*/
+			result
 		}
 	}
 
 
 	private def recordAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
-		Decoder.instance { c: HCursor =>
+		def recordDecoder: Decoder[A] = {
 
-
-			def makeAvroCirceRecord(c: HCursor): Result[A] = {
+			Decoder.instance { c: HCursor =>
 
 				val trecord: (String, Option[String], List[String], Option[String], List[FieldAvro[A]]) => AvroSchema_S[A] = (name, namespace, aliases, doc, fields) => AvroSchema_S.record[A](name, namespace, aliases, doc, fields)
 
 
-				import cats.Traverse
 
 				val resultArgs: Result[(String, Option[String], List[String], Option[String], List[FieldAvro[A]])] =
 					for {
@@ -357,7 +420,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 								val inner: Result[FieldAvro[A]] = for {
 									fname: String <- fj.hcursor.downArray.downField("name").as[Option[String]].map(_.getOrElse(""))
 									faliases <- fj.hcursor.downArray.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
-									ftype <- fj.hcursor.downArray.downField("type").as[A](identifyAvroDecoderWithPriorityEnumVsBasicDecoder[A])
+									ftype <- fj.hcursor.downArray.downField("type").as[A](identifyAvroDecoderWithPriorityBasicDecoder[A])
 								} yield FieldAvro[A](fname, faliases, None, None, ftype)
 
 								inner
@@ -374,11 +437,23 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 				println(s"result (embed) = $result_embed")
 
 				result_embed
-
 			}
-
-			makeAvroCirceRecord(c)
 		}
+
+		def recordIdentifier: Decoder[A] = {
+
+			Decoder.forProduct4[(String, Option[String], Option[String], Option[List[FieldAvro[A]]]), String, Option[String], Option[String], Option[List[FieldAvro[A]]] ]("type", "name", "namespace", "fields")(Tuple4.apply)( Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(fieldDecoder)).flatMap {
+
+				case ("record", name: Option[String], namespace: Option[String], fields: Option[List[FieldAvro[A]]]) => name.isDefined && namespace.isDefined && fields.isDefined match {
+					case true => recordDecoder
+					case false => avroSchemaDecoder[A]
+				}
+
+				case _ => avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder
+			}
+		}
+
+		recordIdentifier
 	}
 
 	//	private implicit def fieldAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = {
@@ -404,13 +479,12 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 	//	}
 
 
-	private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+	private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
 
 
-		Decoder.instance { c: HCursor =>
+		def namedTypeDecoder: Decoder[A] = {
 
-
-			def makeAvroCirceNamedType(c: HCursor): Result[A] = {
+			Decoder.instance { c: HCursor =>
 
 				val tnamedtype: (String, Option[String]) => AvroSchema_S[A] = (name, namespace) => AvroSchema_S.namedType[A](namespace.getOrElse(""), name)
 
@@ -438,11 +512,21 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 				result_embed
 
 			}
-
-			//assert (isNamedType(c))
-
-			makeAvroCirceNamedType(c)
-
 		}
+
+		def namedTypeIdentifier: Decoder[A] = {
+
+			Decoder.forProduct2[(Option[String], Option[String]), Option[String], Option[String]]("name", "namespace")(Tuple2.apply).flatMap {
+
+				case (name: Option[String], namespace: Option[String]) => name.isDefined && namespace.isDefined  match {
+					case true => namedTypeDecoder
+					case false => avroSchemaDecoder[A]
+				}
+
+				case _ => avroSchemaDecoder[A] //typePrimitiveAvroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder
+			}
+		}
+
+		namedTypeIdentifier
 	}
 }

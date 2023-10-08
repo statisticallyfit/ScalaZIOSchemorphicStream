@@ -62,6 +62,10 @@ object ParseADTToCirceToADT {
 
 		val libRenderAltered: Fix[JsonSchema_S] ⇒ JsonDialect = scheme.cata(toCirceJsonDialect_fromJsonSkeuo).apply(_)
 
+
+		/*val lb: Fix[JsonSchema_S] => AvroDialect = scheme.cata(toCirceAvroDialect_fromJsonSkeuo).apply(_)
+
+		def toCirceAvroDialect_fromJsonSkeuo: Algebra[JsonSchema_S, AvroDialect] = ???*/
 	}
 
 	import LibFuncs._
@@ -384,9 +388,7 @@ object ParseADTToCirceToADT {
 
 
 	def toCirceAvroDialect_fromAvroSkeuo: Algebra[AvroSchema_S, AvroDialect] = Algebra {
-		//import io.circe.JsonObject
-		//JsonCirce.JObject(io.circe.JsonObject.)
-		//JsonCirce.fromJsonObject(JsonObject)
+
 		case TNull() ⇒ JsonCirce.fromString("null")
 		case TInt() => JsonCirce.fromString("int")
 		case TString() => JsonCirce.fromString("string")
@@ -397,18 +399,19 @@ object ParseADTToCirceToADT {
 		case TBytes() => JsonCirce.fromString("bytes")
 
 		// NOTE: converting the avro skeuo (only primitives) -> json dialect
-		/*case TNull() ⇒ JsonCirce.obj(
-			"type" -> JsonCirce.fromString("object"),
-			"properties" -> JsonCirce.obj(/*properties.map(prop => prop.name -> prop.tpe)*/List(): _*),
-			"required" -> JsonCirce.fromValues(/*required*/List().map(JsonCirce.fromString))
-		)
-		case TInt() => jsonType("integer", format("int32"))
-		case TString() => jsonType("string")
-		case TBoolean() => jsonType("boolean")
-		case TLong() => jsonType("integer", format("int64"))
-		case TFloat() => jsonType("number", format("float"))
-		case TDouble() =>jsonType("number", format("double"))
-		case TBytes() => jsonType("string", format("byte"))*/
+
+//		case TNull() ⇒ jsonType(
+//			"object",
+//			"properties" -> JsonCirce.obj(List(): _*),
+//			"required" -> JsonCirce.fromValues(List())
+//		)
+//		case TInt() => jsonType("integer", format("int32"))
+//		case TString() => jsonType("string")
+//		case TBoolean() => jsonType("boolean")
+//		case TLong() => jsonType("integer", format("int64"))
+//		case TFloat() => jsonType("number", format("float"))
+//		case TDouble() =>jsonType("number", format("double"))
+//		case TBytes() => jsonType("string", format("byte"))
 
 		// NOTE: rst of the types are avro dialect
 		case TArray(inner: AvroDialect) ⇒ JsonCirce.obj(
@@ -549,10 +552,8 @@ object ParseADTToCirceToADT {
 
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
 
-
-
-		import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
-		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+		import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
 		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 
@@ -563,7 +564,7 @@ object ParseADTToCirceToADT {
 
 		val f2: AvroDialect => Result[Fix[AvroSchema_S]] = avroDialectToJsonDialect andThen decoderAA
 
-		val funcCirceAvroToSkeuoAvro: AvroDialect => Result[Fix[AvroSchema_S]] = decoderAA compose avroDialectToJsonDialect
+		val funcCirceAvroToSkeuoAvro: AvroDialect => Result[Fix[AvroSchema_S]] = decoderAA  //compose avroDialectToJsonDialect
 
 
 		// TODO IMPLICITS (2)
@@ -591,8 +592,8 @@ object ParseADTToCirceToADT {
 		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
 
 
-		import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
-		//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+		import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
 		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
 
 
@@ -603,7 +604,7 @@ object ParseADTToCirceToADT {
 		// --- interpret (before decoder) from avro-dialect
 		// --- decoder: using json-dialect string
 
-		val funcCirceAvroToSkeuoJson: AvroDialect => Result[Fix[JsonSchema_S]] = decoderAJ compose avroDialectToJsonDialect
+		val funcCirceAvroToSkeuoJson: AvroDialect => Result[Fix[JsonSchema_S]] = decoderAJ //compose avroDialectToJsonDialect
 
 
 		// TODO IMPLICITS (2)
