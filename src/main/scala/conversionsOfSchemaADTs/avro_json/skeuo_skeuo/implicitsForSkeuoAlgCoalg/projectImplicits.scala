@@ -62,7 +62,7 @@ object projectImplicits {
 			case Fix(TBytes()) => TBytes()
 
 			// NOTE: return 'ta' only, don't wrap again in another layer or else stackoverflow error
-			case entire@Fix(TArray(inner: Fix[AvroSchema_S])) => TArray(entire) //TArray(inner)
+			case Fix(TArray(inner: Fix[AvroSchema_S])) => TArray(inner)
 
 			case Fix(TMap(values: Fix[AvroSchema_S])) => TMap(values)
 
@@ -72,7 +72,7 @@ object projectImplicits {
 				trecord
 			}
 
-			case entire@Fix(tenum@TEnum(_, _, _, _, _)) => tenum
+			case Fix(tenum @ TEnum(_, _, _, _, _)) => tenum
 		}
 	}
 	/*implicit def basis_AA: Basis[AvroSchema_S, Fix[AvroSchema_S]] = new Basis[AvroSchema_S, Fix[AvroSchema_S]] {
@@ -110,7 +110,7 @@ object projectImplicits {
 			case Fix(BinaryF()) => BinaryF()
 
 			// NOTE: return 'ar' only, don't wrap again in another layer or else stackoverflow error
-			case entire@Fix(ar@ArrayF(inner: Fix[JsonSchema_S])) => ArrayF(entire)
+			case Fix(ArrayF(inner: Fix[JsonSchema_S])) => ArrayF(inner)
 
 			case Fix(ob@ObjectMapF(addProps: AdditionalProperties[Fix[JsonSchema_S]])) => ob
 
@@ -149,8 +149,7 @@ object projectImplicits {
 
 
 			// HERE overflow 1
-			case entire@Fix(TArray(inner: Fix[AvroSchema_S])) => ArrayF(entire)
-			//ArrayF(inner) //ArrayF(inner) // TODO need: ArrayF(inner) or ArrayF(Fix(Tarray(inner))?
+			case Fix(TArray(inner: Fix[AvroSchema_S])) => ArrayF(inner)
 
 			case Fix(TMap(inner: Fix[AvroSchema_S])) => ObjectMapF(additionalProperties = AdditionalProperties[Fix[AvroSchema_S]](tpe = inner))
 
@@ -158,7 +157,7 @@ object projectImplicits {
 
 				ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List())
 			}
-			case Fix(TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String])) => EnumF(cases = symbols)
+			case Fix(TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String])) => EnumF(cases = symbols, name = Some(name))
 		}
 	}
 
@@ -219,7 +218,7 @@ object projectImplicits {
 				)
 
 				val result: AvroSchema_S[Fix[JsonSchema_S]] = if (props.isEmpty && reqs.isEmpty) {
-					TNull()
+					TNull() // TODO TNamedType
 				} else {
 					TRecord(name = name, namespace = None, aliases = List(), doc = None,
 						fields = props.map(p ⇒ property2Field(p))

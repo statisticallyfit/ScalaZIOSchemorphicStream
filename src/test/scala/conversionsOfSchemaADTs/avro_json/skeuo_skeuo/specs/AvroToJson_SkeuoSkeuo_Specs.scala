@@ -92,16 +92,16 @@ class AvroToJson_SkeuoSkeuo_Specs extends AnyFunSpec with Matchers with TraitInh
 		//map3IntAvro_Fix_S,
 		//nullAvro_Fix_S,
 		//array1IntAvro_Fix_S,
-		enumAvro_Fix_S,
+		//enumAvro_Fix_S,
 		//intAvro_Fix_S,
 		//map1IntAvro_Fix_S,
-		//recordExPositionAvro_Fix_S,
+		recordExPositionAvro_Fix_S,
 		//map1PosRecordAvro_Fix_S,
 		//namedTypeAvro_Fix_S,
 		//map1PosRecordJson_Fix_S
 		//nullJson_Fix_S,
-		array1IntJson_Fix_S
-		//enumJson_Fix_S
+		//array1IntJson_Fix_S
+		enumJson_Fix_S
 		//map1IntJson_Fix_S
 		//intJson_Fix_S
 	)

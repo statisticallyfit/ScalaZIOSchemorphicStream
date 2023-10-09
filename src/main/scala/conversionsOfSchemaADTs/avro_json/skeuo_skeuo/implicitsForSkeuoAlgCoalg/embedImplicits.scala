@@ -175,7 +175,7 @@ object embedImplicits {
 
 			case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => {
 
-				Fix(EnumF(cases = symbols))
+				Fix(EnumF(cases = symbols, name = Some(name)))
 			}
 		}
 	}
@@ -211,7 +211,7 @@ object embedImplicits {
 			// Byte
 			case ByteF() ⇒ Fix(TBytes())
 			// Array
-			case ar@ArrayF(inner: Fix[AvroSchema_S]) ⇒ Fix(TArray(inner)) // NOTE: th inner is just the inner type of the array so must create the avrof array with the inner type passed on into it, cannot just return inner alone.
+			case ArrayF(inner: Fix[AvroSchema_S]) ⇒ Fix(TArray(inner)) // NOTE: th inner is just the inner type of the array so must create the avrof array with the inner type passed on into it, cannot just return inner alone.
 
 
 			// Object with name
@@ -225,7 +225,7 @@ object embedImplicits {
 				)
 
 				val result: Fix[AvroSchema_S] = if (props.isEmpty && reqs.isEmpty) {
-					Fix(TNull())
+					Fix(TNull()) // TODO make tnamedtype
 				} else {
 					Fix(
 						TRecord(name = name, namespace = None, aliases = List(), doc = None,

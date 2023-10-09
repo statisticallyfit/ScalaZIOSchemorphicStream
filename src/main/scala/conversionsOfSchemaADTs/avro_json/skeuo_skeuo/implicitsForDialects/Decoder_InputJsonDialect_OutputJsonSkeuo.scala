@@ -47,14 +47,14 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 		// TODO identify here type, enum combo - if -> go to enumdecoder, else -> go to basic decoder where we do THIS dividing (below). Then in the basic2 decoder have what is now in the current basic decoder.
 
+		//primitiveJsonSchemaDecoder[A]
 
-		primitiveJsonSchemaDecoder[A]
-		/*Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).flatMap {
+		Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).flatMap {
 
 			case ("string", casesOpt: Option[List[String]]) => enumJsonSchemaDecoder[A]
 
 			case _ => primitiveJsonSchemaDecoder[A]
-		}*/
+		}
 	}
 
 	private def primitiveJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
@@ -70,8 +70,6 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 
 	private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
-
-		import JsonSchema_S._
 
 		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
 
@@ -97,6 +95,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 		// TODO fix in case the 'type' for objectmap is NOT a simple type - must have a checker checking for the simple types and then decide to pass to jsonschemadecoder (here)
 		//identifyDecoderWithPriorityBasicDecoder orElse
 
+		//enumJsonSchemaDecoder orElse
 		//enumJsonSchemaDecoder orElse
 		logicalTypeJsonSchemaDecoder orElse
 			referenceJsonSchemaDecoder orElse
@@ -354,7 +353,6 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 	def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 
 		def enumDecoder: Decoder[A] = {
-
 			Decoder.instance { (c: HCursor) =>
 
 				val result: Result[List[String]] = for {
@@ -383,11 +381,15 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 		}
 
 		def enumIdentifier: Decoder[A] = {
+
 			Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).flatMap {
 
-				case ("string", casesOpt: Option[List[String]]) => enumDecoder
+				case ("string", casesOpt: Option[List[String]]) => casesOpt.isDefined match {
+					case true => enumDecoder
+					case false => primitiveJsonSchemaDecoder[A]
+				}
 
-				case _ => jsonSchemaDecoder[A]
+				case _ => primitiveJsonSchemaDecoder[A]
 			}
 		}
 		enumIdentifier
