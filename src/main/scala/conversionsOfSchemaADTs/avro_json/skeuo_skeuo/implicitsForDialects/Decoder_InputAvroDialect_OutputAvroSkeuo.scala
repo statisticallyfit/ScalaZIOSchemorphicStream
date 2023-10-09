@@ -217,7 +217,8 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 			}
 		}
 
-		enumIdentifier
+		//enumIdentifier
+		enumDecoder
 	}
 
 	// NOW
@@ -286,7 +287,8 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 			}
 		}
 
-		mapIdentifier
+		//mapIdentifier
+		mapDecoder
 	}
 
 
