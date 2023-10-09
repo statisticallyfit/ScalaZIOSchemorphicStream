@@ -35,7 +35,7 @@ import org.scalatest.matchers.should._
 /**
  *
  */
-class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitInheritFunSpecAndMatchers {
+class AvroToJson_SkeuoSkeuo_Specs extends AnyFunSpec with Matchers with TraitInheritFunSpecAndMatchers {
 
 	info(s"VARIABLE PRINT OUTS")
 
@@ -43,16 +43,15 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 		array1IntAvro_Fix_S, array1StrAvro_Fix_S, array3IntAvro_Fix_S,
 		map1IntAvro_Fix_S, map1StrAvro_Fix_S, map3IntAvro_Fix_S,
 		recordStrAvro_Fix_S,
-		recordExPositionAvro_Fix_S,// recordExLocationAvro_Fix_S
+		recordExPositionAvro_Fix_S, // recordExLocationAvro_Fix_S
 	)
 
 	val args_avroStr: List[String] = List(nullAvro_R, strAvro_R, intAvro_R, booleanAvro_R, longAvro_R, floatAvro_R, doubleAvro_R, bytesAvro_R,
 		array1IntAvro_R, array1StrAvro_R, array3IntAvro_R,
 		map1IntAvro_R, map1StrAvro_R, map3IntAvro_R,
 		recordStrAvro_R,
-		recordExPositionAvro_conv_R//, recordExLocationAvro_R
+		recordExPositionAvro_conv_R //, recordExLocationAvro_R
 	)
-
 
 
 	val args_jsonSkeuo: List[Fix[JsonSchema_S]] = List(nullJson_Fix_S, strJson_Fix_S, intJson_Fix_S, booleanJson_Fix_S, longJson_Fix_S, floatJson_Fix_S, doubleJson_Fix_S, bytesJson_Fix_S,
@@ -63,11 +62,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	)
 
 
-
-
-
-
-	def testCirceToSkeuo(title: String, theArgAvro: Fix[AvroSchema_S], theArgJson: Fix[JsonSchema_S]) ={
+	def testCirceToSkeuo(title: String, theArgAvro: Fix[AvroSchema_S], theArgJson: Fix[JsonSchema_S]) = {
 
 		info(s"\nTesting this kind: ${title}")
 
@@ -92,76 +87,65 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 
 	// HELP: not converting avro-skeuo -> circe -> skeuo properly (result is null)
 
-	def testCONTROLLEDDECODER_CirceToSkeuo(arg: Fix[AvroSchema_S]) = {
-
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
-		import embedImplicits.skeuoEmbed_AA
-		import projectImplicits.skeuoProject_AA
-		import io.circe.Decoder
-
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
-
-		//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
-		import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
-		//import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
-
-		val decoderI: AvroDialect ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]](identifyAvroDecoderWithPriorityBasicDecoder).decodeJson(_)
-
-		val avroStrCirce: AvroDialect = libToJsonAltered(arg)
-		val as = decoderI(avroStrCirce)
-		val js = decoderI(avroStrCirce)
-
-		info("\n\nCONTROLLED DECODER: " +
-			s"\navro-skeuo -> circe -> avro-skeuo: ${as}" +
-			s"\navro-skeuo -> circe -> json-skeuo: ${js}")
-	}
-
-
-
-	def testSkeuoToCirceToApacheToSkeuoAgain(arg: Fix[AvroSchema_S]) = {
-		import org.apache.avro.{Schema => AvroSchema_A}
-		import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache
-		type AvroDialectStr = String
-
-		// Skeuo avro -> circe -> string -> apache -> skeuo avro
-		val avroCirce: AvroDialect = libToJsonAltered(arg)
-		val avroStr: AvroDialectStr = avroCirce.toString()
-		val avroApache: AvroSchema_A = new AvroSchema_A.Parser().parse(avroStr)
-		// STEP 2: convert apache-avro -> skeuo-avro
-		val avroSkeuo: Fix[AvroSchema_S] = Skeuo_Apache.apacheToSkeuoAvroSchema(avroApache)
-
-		info(s"\n\nAPACHE STRING TO SKEUO: ${avroSkeuo}")
-	}
-
 
 	testCirceToSkeuo("map : skeuo -> circe -> skeuo",
 		//map3IntAvro_Fix_S,
 		//nullAvro_Fix_S,
 		//array1IntAvro_Fix_S,
-		//namedTypeAvro_Fix_S, //unionAvro_R, //fixedAvro_R,
-		intAvro_Fix_S,
+		enumAvro_Fix_S,
+		//intAvro_Fix_S,
 		//map1IntAvro_Fix_S,
-		//enumAvro_Fix_S,
 		//recordExPositionAvro_Fix_S,
 		//map1PosRecordAvro_Fix_S,
 		//namedTypeAvro_Fix_S,
-		map1PosRecordJson_Fix_S
+		//map1PosRecordJson_Fix_S
 		//nullJson_Fix_S,
-		//array1IntJson_Fix_S
+		array1IntJson_Fix_S
 		//enumJson_Fix_S
 		//map1IntJson_Fix_S
 		//intJson_Fix_S
 	)
+	/*info(s"\n\nnow map avro: ")
+	printAvroStringToCirceToAvroSkeuo(List(map1IntAvro_R))
 
-	testCONTROLLEDDECODER_CirceToSkeuo(array1IntAvro_Fix_S)
+	info(s"\n\nnow map json:")
+	printJsonStringToCirceToAvroSkeuo(List(map1IntJson_R))*/
 
-	testSkeuoToCirceToApacheToSkeuoAgain(array1IntAvro_Fix_S)
+	import io.circe.{Decoder, DecodingFailure, Json => JsonCirce}
+
+	/*import higherkindness.skeuomorph.openapi.JsonDecoders._
+	import cats.syntax.all._*/
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+	import embedImplicits.skeuoEmbed_JJ
+	//import projectImplicits.skeuoProject_AA
+
+
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForDialects => impl}
+
+
+	//import impl.Decoder_InputJsonDialect_OutputAvroSkeuo._
+	//import impl.Decoder_InputAvroDialect_OutputAvroSkeuo._
+	import impl.Decoder_InputJsonDialect_OutputJsonSkeuo._
+
+	info(s"\n\nENUM FROM TESTS: ")
+	val enumType = JsonCirce.obj(
+		"type" -> JsonCirce.fromString("string"),
+		"enum" -> JsonCirce.arr(
+			JsonCirce.fromString("green"),
+			JsonCirce.fromString("blue")
+		)
+	)
+	info(s"enum example = $enumType")
+	val dec = Decoder[Fix[JsonSchema_S]](enumJsonSchemaDecoder(skeuoEmbed_JJ)).decodeJson(enumType)
+	info(s"decoded = $dec")
 
 
 	// NOTE first debug object simple first to see how decodermap is extracting the fields - only then do object map (below)
 	/*val stpJsonLocation = JsonStepping(recordExLocationJson_R).jsonInfoOpt.get
 	info(s"\n\n\njson circe -> avro-skeuo: ${stpJsonLocation.skInfo.skeuoAvro_fromRaw}")
 	info(s"s\njson circe -> json-skeuo: ${stpJsonLocation.skInfo.skeuoJson_fromRaw}")
+
+
 	//------------
 
 	val stpA = AvroStepping(map1IntAvro_R).avroInfoOpt.get
@@ -325,19 +309,19 @@ class AvroToJson_SkeuoSkeuo_Specs extends  AnyFunSpec with Matchers with TraitIn
 	val arrPath = pckName + "." + "Array1IntSpecs"
 
 	// HELP - way 1
-//	import org.scalatest.tools.Runner
-//	Runner.run(Array(arrPath))
+	//	import org.scalatest.tools.Runner
+	//	Runner.run(Array(arrPath))
 
 	// HELP - way 2
 	//val b = new BooleanSpecs
-//	val arr = new Array1IntSpecs
-//
-//
-//	import org.scalatest.{Args, events, Reporter}
-//
-//	val rep: Reporter = new Reporter { def apply(e:events.Event) = info(s"MESSAGE FROM REPORTER: ${e}") }
-//
-//	arr.run(Some(arrPath), Args(rep)).succeeds
+	//	val arr = new Array1IntSpecs
+	//
+	//
+	//	import org.scalatest.{Args, events, Reporter}
+	//
+	//	val rep: Reporter = new Reporter { def apply(e:events.Event) = info(s"MESSAGE FROM REPORTER: ${e}") }
+	//
+	//	arr.run(Some(arrPath), Args(rep)).succeeds
 
 	/*val argsArray1Int: ExplicitArgs = new ExplicitArgs(rawAvroStr = array1IntAvro_R,
 		rawJsonStr = array1IntJson_R,

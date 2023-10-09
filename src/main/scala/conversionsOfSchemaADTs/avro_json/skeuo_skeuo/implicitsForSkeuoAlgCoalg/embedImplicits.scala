@@ -56,7 +56,7 @@ object embedImplicits {
 			case TDouble() => Fix(TDouble())
 			case TBytes() => Fix(TBytes())
 
-			case tarray @ TArray(inner: Fix[AvroSchema_S]) => Fix(TArray(inner))
+			case tarray@TArray(inner: Fix[AvroSchema_S]) => Fix(tarray)
 
 			case tmap@TMap(values: Fix[AvroSchema_S]) => Fix(tmap)
 
@@ -85,7 +85,7 @@ object embedImplicits {
 			// Byte
 			case ByteF() ⇒ Fix(ByteF())
 			// Array
-			case ar@ArrayF(inner: Fix[JsonSchema_S]) ⇒ Fix(ArrayF(inner)) // TODO just inner or wrap with TArray?
+			case ar@ArrayF(inner: Fix[JsonSchema_S]) ⇒ Fix(ar) // TODO just inner or wrap with TArray?
 
 
 			// Object with name
@@ -175,7 +175,7 @@ object embedImplicits {
 
 			case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => {
 
-				Fix(EnumF(cases = symbols, name = Some(name)))
+				Fix(EnumF(cases = symbols))
 			}
 		}
 	}

@@ -47,19 +47,14 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 		// TODO identify here type, enum combo - if -> go to enumdecoder, else -> go to basic decoder where we do THIS dividing (below). Then in the basic2 decoder have what is now in the current basic decoder.
 
-		// TODO do the same for the enumavrodcoder and for namedtypeavrodecoder. (And get changes from the fixedunionnamedtype_branch!)
 
+		primitiveJsonSchemaDecoder[A]
+		/*Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).flatMap {
 
-		Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).flatMap {
-
-			case ("string", casesOpt: Option[List[String]]) => casesOpt.isDefined match {
-
-				case true => enumJsonSchemaDecoder[A]
-				case false => primitiveJsonSchemaDecoder[A]
-			}
+			case ("string", casesOpt: Option[List[String]]) => enumJsonSchemaDecoder[A]
 
 			case _ => primitiveJsonSchemaDecoder[A]
-		}
+		}*/
 	}
 
 	private def primitiveJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
@@ -76,6 +71,7 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 	private def basicJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 
+		import JsonSchema_S._
 
 		Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).emap {
 
@@ -357,33 +353,44 @@ object Decoder_InputJsonDialect_OutputJsonSkeuo {
 
 	def enumJsonSchemaDecoder[A: Embed[JsonSchema_S, *]]: Decoder[A] = {
 
+		def enumDecoder: Decoder[A] = {
+
+			Decoder.instance { (c: HCursor) =>
+
+				val result: Result[List[String]] = for {
+					_ <- validateType(c, "string")
+					_ <- propertyExists(c, "enum")
+
+					cases: List[String] <- {
+
+						val casesValue: Result[List[String]] = c.downField("enum").as[Option[List[String]]].map(_.getOrElse(List.empty[String]))
+
+						println(s"\n\nINSIDE ENUM JSON DECODER:")
+						println(s"c.downField(enum) = ${c.downField("enum")}")
+						println(s"cases = ${casesValue}")
+
+						casesValue
+					}
+
+				} yield cases
 
 
-		Decoder.instance { (c: HCursor) =>
+				val result_noEmbed: Result[JsonSchema_S[A]] = result.map(vals => JsonSchema_S.enum[A](vals))
+				val result_embed: Result[A] = result_noEmbed.map(_.embed)
 
-			val result: Result[List[String]] = for {
-				_ <- validateType(c, "string")
-				//_ <- propertyExists(c, "enum")
-
-				cases: List[String] <- {
-
-					val casesValue: Result[List[String]] = c.downField("enum").as[Option[List[String]]].map(_.getOrElse(List.empty[String]))
-
-					println(s"\n\nINSIDE ENUM JSON DECODER:")
-					println(s"c.downField(enum) = ${c.downField("enum")}")
-					println(s"cases = ${casesValue}")
-
-					casesValue
-				}
-
-			} yield cases
-
-
-			val result_noEmbed: Result[JsonSchema_S[A]] = result.map(vals => JsonSchema_S.enum[A](vals))
-			val result_embed: Result[A] = result_noEmbed.map(_.embed)
-
-			result_embed
+				result_embed
+			}
 		}
+
+		def enumIdentifier: Decoder[A] = {
+			Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "enum")(Tuple2.apply).flatMap {
+
+				case ("string", casesOpt: Option[List[String]]) => enumDecoder
+
+				case _ => jsonSchemaDecoder[A]
+			}
+		}
+		enumIdentifier
 	}
 
 	// NOTE: either enum decoder works - here below or the one above.

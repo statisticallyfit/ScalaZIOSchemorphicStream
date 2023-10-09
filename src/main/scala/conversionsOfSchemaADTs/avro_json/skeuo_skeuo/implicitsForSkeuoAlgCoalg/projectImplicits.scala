@@ -62,7 +62,7 @@ object projectImplicits {
 			case Fix(TBytes()) => TBytes()
 
 			// NOTE: return 'ta' only, don't wrap again in another layer or else stackoverflow error
-			case entire @ Fix( arr @ TArray(inner: Fix[AvroSchema_S])) => arr //TArray(entire) //TArray(inner)
+			case entire@Fix(TArray(inner: Fix[AvroSchema_S])) => TArray(entire) //TArray(inner)
 
 			case Fix(TMap(values: Fix[AvroSchema_S])) => TMap(values)
 
@@ -110,7 +110,7 @@ object projectImplicits {
 			case Fix(BinaryF()) => BinaryF()
 
 			// NOTE: return 'ar' only, don't wrap again in another layer or else stackoverflow error
-			case entire @ Fix(arr @ ArrayF(inner: Fix[JsonSchema_S])) => arr //ArrayF(entire)
+			case entire@Fix(ar@ArrayF(inner: Fix[JsonSchema_S])) => ArrayF(entire)
 
 			case Fix(ob@ObjectMapF(addProps: AdditionalProperties[Fix[JsonSchema_S]])) => ob
 
@@ -149,7 +149,7 @@ object projectImplicits {
 
 
 			// HERE overflow 1
-			case entire@Fix(arr @ TArray(inner: Fix[AvroSchema_S])) => ArrayF(inner)
+			case entire@Fix(TArray(inner: Fix[AvroSchema_S])) => ArrayF(entire)
 			//ArrayF(inner) //ArrayF(inner) // TODO need: ArrayF(inner) or ArrayF(Fix(Tarray(inner))?
 
 			case Fix(TMap(inner: Fix[AvroSchema_S])) => ObjectMapF(additionalProperties = AdditionalProperties[Fix[AvroSchema_S]](tpe = inner))
@@ -158,7 +158,7 @@ object projectImplicits {
 
 				ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List())
 			}
-			case Fix(TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String])) => EnumF(cases = symbols, name = Some(name))
+			case Fix(TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String])) => EnumF(cases = symbols)
 		}
 	}
 
