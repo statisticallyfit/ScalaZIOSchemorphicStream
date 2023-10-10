@@ -542,6 +542,8 @@ object ParseADTToCirceToADT {
 
 		val decoderAA: AvroDialect ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]].decodeJson(_)
 
+		//val decoderAA: AvroDialect ⇒ Result[Fix[AvroSchema_S]] = Decoder[Fix[AvroSchema_S]](stringBasicAvroSchemaDecoder).decodeJson(_)
+
 
 		val f1: AvroDialect => Result[Fix[AvroSchema_S]] = (av: AvroDialect) => decoderAA(avroDialectToJsonDialect(av))
 
