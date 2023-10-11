@@ -58,9 +58,11 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 		//stringBasicAvroSchemaDecoder[A]
 		//stringPrimitiveAvroSchemaDecoder[A]
-		//avroSchemaDecoder[A]
 
-		val strToStr: String => String = (x: String) => Tuple1.apply(x)._1
+		// NOTE: calling this was making all work except enum (record getting put as enum)
+		avroSchemaDecoder[A]
+
+		/*val strToStr: String => String = (x: String) => Tuple1.apply(x)._1
 
 		Decoder.forProduct1[(String), String]("type")(strToStr).flatMap {
 
@@ -69,7 +71,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 			case "map" => mapAvroSchemaDecoder[A]
 			case "array" => arrayAvroSchemaDecoder[A]
 			case _ => avroSchemaDecoder[A]
-		}
+		}*/
 
 		/*Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
 
@@ -83,7 +85,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 			case (Some("enum"), symbols: Option[List[String]]) => enumAvroSchemaDecoder[A]
 
-			case _ => stringPrimitiveAvroSchemaDecoder[A] //primitiveJsonSchemaDecoder[A]
+			case _ => avroSchemaDecoder[A] //stringPrimitiveAvroSchemaDecoder[A] //primitiveJsonSchemaDecoder[A]
 		}*/
 	}
 
