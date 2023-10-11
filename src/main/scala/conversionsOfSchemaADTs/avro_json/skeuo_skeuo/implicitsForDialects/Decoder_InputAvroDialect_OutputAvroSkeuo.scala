@@ -58,7 +58,18 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 		//stringBasicAvroSchemaDecoder[A]
 		//stringPrimitiveAvroSchemaDecoder[A]
-		avroSchemaDecoder[A]
+		//avroSchemaDecoder[A]
+
+		val strToStr: String => String = (x: String) => Tuple1.apply(x)._1
+
+		Decoder.forProduct1[(String), String]("type")(strToStr).flatMap {
+
+			case ("record") => recordAvroSchemaDecoder[A]
+			case ("string") => enumAvroSchemaDecoder[A] //first
+			case "map" => mapAvroSchemaDecoder[A]
+			case "array" => arrayAvroSchemaDecoder[A]
+			case _ => avroSchemaDecoder[A]
+		}
 
 		/*Decoder.forProduct2[(String, Option[String]), String, Option[String]]("type", "format")(Tuple2.apply).flatMap {
 
@@ -88,8 +99,7 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 			logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
 			mapAvroSchemaDecoder orElse
-			recordAvroSchemaDecoder orElse
-			enumAvroSchemaDecoder
+			enumAvroSchemaDecoder orElse recordAvroSchemaDecoder
 		//enumAvroSchemaDecoder orElse
 		/*orElse
 		enumAvroSchemaDecoder*/
@@ -247,14 +257,17 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 			}*/
 			Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "symbols")(Tuple2.apply).flatMap {
 
-				case ("enum", symbols: Option[List[String]]) => enumDecoder
+				case ("enum", symbols: Option[List[String]]) => symbols.isDefined match {
+					case true => enumDecoder
+					case false => avroSchemaDecoder[A]
+				}
 
 				case _ => avroSchemaDecoder[A]
 			}
 		}
 
-		enumIdentifier
-		//enumDecoder
+		//enumIdentifier
+		enumDecoder
 	}
 
 	// NOW
