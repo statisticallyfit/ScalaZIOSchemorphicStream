@@ -101,7 +101,8 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 			logicalTypeAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
 			mapAvroSchemaDecoder orElse
-			enumAvroSchemaDecoder orElse recordAvroSchemaDecoder
+			recordAvroSchemaDecoder orElse
+			enumAvroSchemaDecoder
 		//enumAvroSchemaDecoder orElse
 		/*orElse
 		enumAvroSchemaDecoder*/
@@ -257,19 +258,16 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 				case _ => avroSchemaDecoder[A]
 			}*/
-			Decoder.forProduct2[(String, Option[List[String]]), String, Option[List[String]]]("type", "symbols")(Tuple2.apply).flatMap {
+			Decoder.forProduct2[(String, List[String]), String, List[String]]("type", "symbols")(Tuple2.apply).flatMap {
 
-				case ("enum", symbols: Option[List[String]]) => symbols.isDefined match {
-					case true => enumDecoder
-					case false => avroSchemaDecoder[A]
-				}
+				case ("enum", symbols: List[String]) => enumDecoder
 
 				case _ => avroSchemaDecoder[A]
 			}
 		}
 
-		//enumIdentifier
-		enumDecoder
+		enumIdentifier
+		//enumDecoder
 	}
 
 	// NOW
@@ -435,17 +433,17 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 		def recordIdentifier: Decoder[A] = {
 
 
-			Decoder.forProduct3[(Option[String], Option[String], Option[List[FieldAvro[A]]]), Option[String], Option[String], Option[List[FieldAvro[A]]]]("type", "name", "fields")(Tuple3.apply).flatMap {
+			Decoder.forProduct3[(String, String, List[FieldAvro[A]]), String, String, List[FieldAvro[A]]]("type", "name", "fields")(Tuple3.apply).flatMap {
 
-				case (Some("record"), Some("name"), Some(_: List[FieldAvro[A]])) => recordDecoder
+				case ("record", name: String, _: List[FieldAvro[A]]) => recordDecoder
 
 				//case (x, _) => s"$x is not well formed type".asLeft
 				case _ => avroSchemaDecoder[A]
 			}
 
 		}
-		recordDecoder
-		//recordIdentifier
+		//recordDecoder
+		recordIdentifier
 	}
 
 	//	private implicit def fieldAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[FieldAvro[A]] = {
