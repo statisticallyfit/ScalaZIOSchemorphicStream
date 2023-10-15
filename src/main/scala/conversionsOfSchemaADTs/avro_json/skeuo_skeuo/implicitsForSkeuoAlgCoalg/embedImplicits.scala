@@ -13,6 +13,8 @@ import cats.syntax.all._
 //import cats.implicits._
 //import cats.syntax._
 
+import cats.data.NonEmptyList
+
 
 import higherkindness.droste._
 import higherkindness.droste.data._
@@ -60,9 +62,16 @@ object embedImplicits {
 
 			case tmap@TMap(values: Fix[AvroSchema_S]) => Fix(tmap)
 
+			case te@TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => Fix(te)
+
+
 			case trecord@TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[AvroSchema_S]]]) => Fix(trecord)
 
-			case te@TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => Fix(te)
+			case tnamedtype@TNamedType(_, _) => Fix(tnamedtype)
+
+			case tunion@TUnion(options: NonEmptyList[Fix[AvroSchema_S]], name: Option[String]) => Fix(tunion)
+
+			case tfixed@TFixed(_, _, _, _) => Fix(tfixed)
 		}
 	}
 
@@ -167,16 +176,39 @@ object embedImplicits {
 				Fix(ObjectMapF(additionalProperties = AdditionalProperties[Fix[JsonSchema_S]](inner)))
 			}
 
-			case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[JsonSchema_S]]]) => {
-
-				Fix(ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List()))
-			}
-
 
 			case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) => {
 
 				Fix(EnumF(cases = symbols, name = Some(name)))
 			}
+
+
+			case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[JsonSchema_S]]]) => {
+
+				Fix(ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List()))
+			}
+
+			// Named type is just like record without fields.
+			case TNamedType(name: String, namespace: String) => Fix(ObjectNamedF(name = name, properties = List(), required = List()))
+
+
+
+			// HELP avro union to json?
+			// TODO = https://hyp.is/f-8tzmBxEe6IP8OOZytgXg/avro.apache.org/docs/1.11.1/specification/
+
+			case TUnion(options: NonEmptyList[Fix[JsonSchema_S]], name: Option[String]) => {
+
+				// TODO use the ADTSimpleNames file to convert each adt to string so can create property name here
+				Fix(ObjectNamedF(name = name, properties = List(
+					Property(name = "", tpe = Fix(TString())
+				)))
+			}
+
+
+
+
+			// Help avro fixed to json?
+			case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) => ???
 		}
 	}
 

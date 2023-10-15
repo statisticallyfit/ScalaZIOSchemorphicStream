@@ -39,6 +39,8 @@ object ParseADTToCirceToADT {
 		 */
 		val libRender: Fix[JsonSchema_S] ⇒ JsonDialect = scheme.cata(JsonSchema_S.render).apply(_)
 
+
+
 		/**
 		 * Definition from skeuomorph library - just make it possible to pass the parameter to it by apply catamorphism over it
 		 * Source = https://github.com/higherkindness/skeuomorph/blob/main/src/main/scala/higherkindness/skeuomorph/avro/schema.scala#L238
@@ -189,56 +191,6 @@ object ParseADTToCirceToADT {
 		)
 
 
-		// TODO find example of named type (avro -> json) in data files ?
-
-		case TNamedType(namespace: String, name: String) ⇒ {
-			// NOTE: using 'title' instead of 'name' because that is what autoschema does (when converting from class -> jsonschema)
-
-			JsonCirce.obj(
-				"title" -> JsonCirce.fromString(name), // name for avro-string, title for json string
-				"namespace" -> JsonCirce.fromString(namespace),
-			)
-		}
-
-		// Avro record ---> json (named) object
-
-		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[JsonCirce]]) ⇒ {
-
-			val base: JsonCirce = JsonCirce.obj(
-				"title" -> JsonCirce.fromString(name),
-				"type" -> JsonCirce.fromString("object"),
-				"properties" -> {
-
-					val properties: List[Property[JsonCirce]] = fields.map(field2Property(_))
-
-					JsonCirce.obj(properties.map(prop => prop.name -> prop.tpe): _*)
-				},
-				"required" -> JsonCirce.fromValues(List())
-
-				//JsonCirce.arr(fields.map(field2Obj): _*) // TODO update this function (field2Obj) to preserve all the args from Field (like order, doc, etc)
-
-				// TODO must rename fields to be properties
-			)
-
-
-
-			// NOTE: not adding namespace , doc , aliases here because the json-objectF does not contain those fields (just the avro-dialect does)
-
-			/*val withNamespace: JsonCirce = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
-
-			val withAliases: JsonCirce =
-				if (aliases.isEmpty)
-					withNamespace
-				else
-					withNamespace deepMerge JsonCirce.obj("aliases" -> JsonCirce.arr(aliases.map(JsonCirce.fromString): _*))
-
-			val withDoc: JsonDialect = doc.fold(withAliases)(f => withAliases deepMerge JsonCirce.obj("doc" -> JsonCirce.fromString(f)))
-
-			withDoc*/
-
-			base //return just base (no avro-dialect stuff like namespace, doc, aliases)
-
-		}
 		case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) ⇒ {
 
 			val base: JsonDialect = JsonCirce.obj(
@@ -260,6 +212,56 @@ object ParseADTToCirceToADT {
 
 			base //return just base (no avro-dialect stuff like namespace, doc, aliases)
 		}
+
+		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[JsonCirce]]) ⇒ {
+
+			val base: JsonCirce = JsonCirce.obj(
+				"title" -> JsonCirce.fromString(name),
+				"type" -> JsonCirce.fromString("object"),
+				"properties" -> {
+
+					val properties: List[Property[JsonCirce]] = fields.map(field2Property(_))
+
+					JsonCirce.obj(properties.map(prop => prop.name -> prop.tpe): _*)
+				},
+				"required" -> JsonCirce.fromValues(List())
+
+				//JsonCirce.arr(fields.map(field2Obj): _*) // TODO update this function (field2Obj) to preserve all the args from Field (like order, doc, etc)
+
+				// TODO must rename fields to be properties
+			)
+
+			// NOTE: not adding namespace , doc , aliases here because the json-objectF does not contain those fields (just the avro-dialect does)
+
+			/*val withNamespace: JsonCirce = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
+
+			val withAliases: JsonCirce =
+				if (aliases.isEmpty)
+					withNamespace
+				else
+					withNamespace deepMerge JsonCirce.obj("aliases" -> JsonCirce.arr(aliases.map(JsonCirce.fromString): _*))
+
+			val withDoc: JsonDialect = doc.fold(withAliases)(f => withAliases deepMerge JsonCirce.obj("doc" -> JsonCirce.fromString(f)))
+
+			withDoc*/
+
+			base //return just base (no avro-dialect stuff like namespace, doc, aliases)
+
+		}
+
+
+		// TODO find example of named type (avro -> json) in data files ?
+
+		case TNamedType(namespace: String, name: String)
+		⇒ {
+			// NOTE: using 'title' instead of 'name' because that is what autoschema does (when converting from class -> jsonschema)
+
+			JsonCirce.obj(
+				"name" -> JsonCirce.fromString(name), // name for avro-string, title for json string
+				"namespace" -> JsonCirce.fromString(namespace),
+			)
+		}
+
 
 		case TUnion(options: NonEmptyList[AvroDialect], name: Option[String]) => {
 
@@ -388,19 +390,6 @@ object ParseADTToCirceToADT {
 		case TDouble() => JsonCirce.fromString("double")
 		case TBytes() => JsonCirce.fromString("bytes")
 
-		// NOTE: converting the avro skeuo (only primitives) -> json dialect
-		/*case TNull() ⇒ JsonCirce.obj(
-			"type" -> JsonCirce.fromString("object"),
-			"properties" -> JsonCirce.obj(/*properties.map(prop => prop.name -> prop.tpe)*/List(): _*),
-			"required" -> JsonCirce.fromValues(/*required*/List().map(JsonCirce.fromString))
-		)
-		case TInt() => jsonType("integer", format("int32"))
-		case TString() => jsonType("string")
-		case TBoolean() => jsonType("boolean")
-		case TLong() => jsonType("integer", format("int64"))
-		case TFloat() => jsonType("number", format("float"))
-		case TDouble() =>jsonType("number", format("double"))
-		case TBytes() => jsonType("string", format("byte"))*/
 
 		// NOTE: rst of the types are avro dialect
 		case TArray(inner: AvroDialect) ⇒ JsonCirce.obj(
@@ -412,6 +401,25 @@ object ParseADTToCirceToADT {
 			"type" -> JsonCirce.fromString("map"),
 			"values" -> values
 		)
+		case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) ⇒ {
+
+			val base: AvroDialect = JsonCirce.obj(
+				"type" → JsonCirce.fromString("enum"),
+				"name" → JsonCirce.fromString(name),
+				"symbols" → JsonCirce.fromValues(symbols.map(JsonCirce.fromString)) //JsonCirce.arr(symbols.map(JsonCirce.fromString): _*)
+			)
+			val withNamespace: AvroDialect = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
+
+			val withAliases: AvroDialect =
+				if (aliases.isEmpty)
+					withNamespace
+				else
+					withNamespace deepMerge JsonCirce.obj("aliases" -> JsonCirce.arr(aliases.map(JsonCirce.fromString): _*))
+
+			val withDoc: AvroDialect = doc.fold(withAliases)(f => withAliases deepMerge JsonCirce.obj("doc" -> JsonCirce.fromString(f)))
+
+			withDoc
+		}
 
 		case TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[AvroDialect]]) ⇒ {
 
@@ -434,26 +442,14 @@ object ParseADTToCirceToADT {
 			withDoc
 		}
 
+		case TNamedType(namespace: String, name: String) ⇒ {
 
-		case TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String]) ⇒ {
-
-			val base: AvroDialect = JsonCirce.obj(
-				"type" → JsonCirce.fromString("enum"),
-				"name" → JsonCirce.fromString(name),
-				"symbols" → JsonCirce.fromValues(symbols.map(JsonCirce.fromString)) //JsonCirce.arr(symbols.map(JsonCirce.fromString): _*)
+			JsonCirce.obj(
+				"name" -> JsonCirce.fromString(name), // name for avro-string, title for json string
+				"namespace" -> JsonCirce.fromString(namespace),
 			)
-			val withNamespace: AvroDialect = namespace.fold(base)(n => base deepMerge JsonCirce.obj("namespace" -> JsonCirce.fromString(n)))
-
-			val withAliases: AvroDialect =
-				if (aliases.isEmpty)
-					withNamespace
-				else
-					withNamespace deepMerge JsonCirce.obj("aliases" -> JsonCirce.arr(aliases.map(JsonCirce.fromString): _*))
-
-			val withDoc: AvroDialect = doc.fold(withAliases)(f => withAliases deepMerge JsonCirce.obj("doc" -> JsonCirce.fromString(f)))
-
-			withDoc
 		}
+
 
 		case TUnion(options: NonEmptyList[AvroDialect], name: Option[String]) => {
 
@@ -560,6 +556,7 @@ object ParseADTToCirceToADT {
 		// 	skeuoEmbed_AA
 		// NEED: json -> avro
 		// 	skeuoEmbed_JA
+
 
 	}
 	// json decoder: Embed[JsonSchema_S, *]
