@@ -191,7 +191,7 @@ object embedImplicits {
 			}
 
 			// Named type is just like record without fields.
-			case TNamedType(name: String, namespace: String) => Fix(ObjectNamedF(name = name, properties = List(), required = List()))
+			case TNamedType(namespace: String, name: String) => Fix(ObjectNamedF(name = name, properties = List(), required = List()))
 
 
 
@@ -199,8 +199,6 @@ object embedImplicits {
 			// TODO = https://hyp.is/f-8tzmBxEe6IP8OOZytgXg/avro.apache.org/docs/1.11.1/specification/
 
 			case TUnion(options: NonEmptyList[Fix[JsonSchema_S]], name: Option[String]) => {
-
-				// TODO use the ADTSimpleNames file to convert each adt to string so can create property name here
 
 				val nameTypePairs: List[(String, Fix[JsonSchema_S])] = options.toList.map(skj => (skeuoJsonToString(skj), skj))
 
@@ -215,14 +213,15 @@ object embedImplicits {
 
 
 
-			// Help avro fixed to json?
+			// HELP avro fixed to json?
+
 			case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) => {
 
 				Fix(ObjectNamedF(name = name,
 					properties = List(
-						Property(name = "fixed", tpe = StringF()),
-						Property(name = "name", tpe = StringF()),
-						Property(name = "size", tpe = IntegerF())
+						Property(name = "fixed", tpe = Fix(StringF())),
+						Property(name = "name", tpe = Fix(StringF())),
+						Property(name = "size", tpe = Fix(IntegerF()))
 					),
 					required = List()
 				))
@@ -342,7 +341,7 @@ object embedImplicits {
 
 
 		}
-		// TODO parsing ObjectF if contains TUnion (canonical names) or TFixed ("fixed" in "tyhpe") 
+		// TODO must return TUnion from ObjectF at some point? And which json to use to return TFixed ?
 	}
 
 }

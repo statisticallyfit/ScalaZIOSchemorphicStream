@@ -265,7 +265,11 @@ object ParseADTToCirceToADT {
 
 		case TUnion(options: NonEmptyList[AvroDialect], name: Option[String]) => {
 
-			val base: JsonDialect = JsonCirce.arr(options.toList: _*)
+			//val base: JsonDialect = JsonCirce.arr(options.toList: _*)
+			val base: AvroDialect = JsonCirce.obj(
+				"type" -> JsonCirce.arr(options.toList: _*)
+			)
+
 
 			val withName: JsonDialect = name.fold(base)((n: String) => base deepMerge JsonCirce.obj("name" -> JsonCirce.fromString(n)))
 
@@ -453,7 +457,9 @@ object ParseADTToCirceToADT {
 
 		case TUnion(options: NonEmptyList[AvroDialect], name: Option[String]) => {
 
-			val base: AvroDialect = JsonCirce.arr(options.toList: _*)
+			val base: AvroDialect = JsonCirce.obj(
+				"type" -> JsonCirce.arr(options.toList: _*)
+			)
 
 			val withName: AvroDialect = name.fold(base)((n: String) => base deepMerge JsonCirce.obj("name" -> JsonCirce.fromString(n)))
 

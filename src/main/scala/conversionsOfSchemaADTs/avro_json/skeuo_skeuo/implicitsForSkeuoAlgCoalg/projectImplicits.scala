@@ -20,6 +20,9 @@ import higherkindness.droste.data._
 import higherkindness.droste.syntax.embed._
 import higherkindness.skeuomorph.openapi.schema._
 
+
+import cats.data.NonEmptyList
+
 import scala.language.postfixOps
 import scala.language.higherKinds
 //import scala.language.implicitConversions
@@ -31,7 +34,7 @@ import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
 
 import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldAvro}
 import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
-
+import utilMain.utilAvroJson.utilSkeuoSkeuo.ADTSimpleNames._
 
 /**
  *
@@ -54,7 +57,7 @@ object projectImplicits {
 		def coalgebra: Coalgebra[AvroSchema_S, Fix[AvroSchema_S]] = Coalgebra {
 			case Fix(TNull()) => TNull()
 			case Fix(TInt()) => TInt()
-			case entire@Fix(TString()) => TString()
+			case Fix(TString()) => TString()
 			case Fix(TBoolean()) => TBoolean()
 			case Fix(TFloat()) => TFloat()
 			case Fix(TLong()) => TLong()
@@ -66,29 +69,18 @@ object projectImplicits {
 
 			case Fix(TMap(values: Fix[AvroSchema_S])) => TMap(values)
 
-
-			case Fix(trecord@TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[Property[Fix[AvroSchema_S]]])) => {
-
-				trecord
-			}
-
 			case Fix(tenum @ TEnum(_, _, _, _, _)) => tenum
+
+			case Fix(trecord@TRecord(_,_,_,_,_)) => trecord
+
+			case Fix(tnamedtype @ TNamedType(_,_)) => tnamedtype
+
+			case Fix(tunion @ TUnion(_, _)) => tunion
+
+			case Fix(tfixed @ TFixed(_,_,_,_)) => tfixed
+
 		}
 	}
-	/*implicit def basis_AA: Basis[AvroSchema_S, Fix[AvroSchema_S]] = new Basis[AvroSchema_S, Fix[AvroSchema_S]] {
-		def algebra: Algebra[AvroSchema_S, Fix[AvroSchema_S]] = Algebra {
-
-			case TInt() => Fix(TInt())
-
-			case TArray(inner: Fix[AvroSchema_S]) => inner
-		}
-
-		def coalgebra: Coalgebra[AvroSchema_S, Fix[AvroSchema_S]] = Coalgebra {
-			case Fix(TInt()) => TInt()
-			case Fix(ta @ TArray(inner: Fix[AvroSchema_S])) => ta
-		}
-	}*/
-
 
 	/**
 	 * A => F[A]
@@ -153,11 +145,46 @@ object projectImplicits {
 
 			case Fix(TMap(inner: Fix[AvroSchema_S])) => ObjectMapF(additionalProperties = AdditionalProperties[Fix[AvroSchema_S]](tpe = inner))
 
+
+			case Fix(TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String])) => EnumF(cases = symbols, name = Some(name))
+
+
+
 			case Fix(TRecord(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], fields: List[FieldAvro[Fix[AvroSchema_S]]])) => {
 
 				ObjectNamedF(name = name, properties = fields.map(f => field2Property(f)), required = List())
 			}
-			case Fix(TEnum(name: String, namespace: Option[String], aliases: List[String], doc: Option[String], symbols: List[String])) => EnumF(cases = symbols, name = Some(name))
+
+
+			case Fix(TNamedType(namespace: String, name: String)) => ObjectNamedF(name = name, properties = List(), required = List())
+
+
+			case Fix(TUnion(options: NonEmptyList[Fix[AvroSchema_S]], name: Option[String]))	=> {
+
+				val nameTypePairs: List[(String, Fix[AvroSchema_S])] = options.toList.map(ska => (skeuoAvroToString(ska), ska))
+
+				val props: List[Property[Fix[AvroSchema_S]]] = nameTypePairs.map(pair => Property(name = pair._1, tpe = pair._2))
+
+				name.isDefined match {
+					case true => ObjectNamedF(name = name.get, properties = props, required = List())
+					case false => ObjectF(properties = props, required = List())
+				}
+			}
+
+
+			// TODO CHECK may not be right
+
+			case Fix(TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int)) => {
+
+				ObjectNamedF(name = name,
+					properties = List(
+						Property(name = "fixed", tpe = Fix(TString())),
+						Property(name = "name", tpe = Fix(TString())),
+						Property(name = "size", tpe = Fix(TInt()))
+					),
+					required = List()
+				)
+			}
 		}
 	}
 
@@ -218,7 +245,7 @@ object projectImplicits {
 				)
 
 				val result: AvroSchema_S[Fix[JsonSchema_S]] = if (props.isEmpty && reqs.isEmpty) {
-					TNull() // TODO TNamedType
+					TNamedType(namespace = "", name = name)
 				} else {
 					TRecord(name = name, namespace = None, aliases = List(), doc = None,
 						fields = props.map(p ⇒ property2Field(p))
@@ -255,6 +282,9 @@ object projectImplicits {
 			// TODO m ake a jsonschema enum to be named?
 			case Fix(EnumF(cases: List[String], name: Option[String])) => TEnum(name = name.getOrElse("NO_NAME"), namespace = None, aliases = List(), doc = None, symbols = cases)
 		}
+
+
+		// TODO to transform some ObjectFs into Union avro? What about TFixed etc?
 	}
 
 }

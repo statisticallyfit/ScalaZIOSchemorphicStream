@@ -5,6 +5,7 @@ package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForDialects
 
 // Imports for the jsonSchemaDecoder (from JsonDecoders file from skeuomorph)
 
+import cats.data.NonEmptyList
 import io.circe._
 import io.circe.Decoder
 import io.circe.Decoder.{Result, decodeInt, resultInstance}
@@ -99,10 +100,13 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 
 		stringBasicAvroSchemaDecoder orElse
 			logicalTypeAvroSchemaDecoder orElse
+			unionAvroSchemaDecoder orElse
 			arrayAvroSchemaDecoder orElse
 			mapAvroSchemaDecoder orElse
 			recordAvroSchemaDecoder orElse
-			enumAvroSchemaDecoder
+			enumAvroSchemaDecoder orElse
+			namedTypeAvroSchemaDecoder  orElse
+			fixedAvroSchemaDecoder
 		//enumAvroSchemaDecoder orElse
 		/*orElse
 		enumAvroSchemaDecoder*/
@@ -469,13 +473,23 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 	//	}
 
 
-	private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *]]: Decoder[A] = {
+	private def namedTypeAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+
+		def namedTypeIdentifier: Decoder[A] = {
+
+			Decoder.forProduct2[(String, String), String, String]("namespace", "name")(Tuple2.apply).flatMap {
+
+				case (namespace: String, name: String) => namedTypeDecoder
+
+				//case (x, _) => s"$x is not well formed type".asLeft
+				case _ => avroSchemaDecoder[A]
+			}
+		}
 
 
-		Decoder.instance { c: HCursor =>
+		def namedTypeDecoder: Decoder[A] = {
 
-
-			def makeAvroCirceNamedType(c: HCursor): Result[A] = {
+			Decoder.instance { c: HCursor =>
 
 				val tnamedtype: (String, Option[String]) => AvroSchema_S[A] = (name, namespace) => AvroSchema_S.namedType[A](namespace.getOrElse(""), name)
 
@@ -501,13 +515,112 @@ object Decoder_InputAvroDialect_OutputAvroSkeuo {
 				println(s"result (embed) = $result_embed")
 
 				result_embed
-
 			}
-
-			//assert (isNamedType(c))
-
-			makeAvroCirceNamedType(c)
-
 		}
+
+		namedTypeIdentifier
+	}
+
+
+	private def unionAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+
+		def unionIdentifier: Decoder[A] = {
+
+			Decoder.forProduct2[(List[String], String), List[String], String]("type", "name")(Tuple2.apply).flatMap {
+
+				case (tpe: List[String], name: String) => unionDecoder
+
+				//case (x, _) => s"$x is not well formed type".asLeft
+				case _ => avroSchemaDecoder[A]
+			}
+		}
+
+
+		def unionDecoder: Decoder[A] = {
+
+			Decoder.instance { c: HCursor =>
+
+				val tunion: (List[A], String) => AvroSchema_S[A] = (tpe, name) => {
+
+					// case 1 = empty tpe list
+					// Not supposed to happen, throw error
+
+					// case 2 = tpe.length >=1
+					AvroSchema_S.union[A](NonEmptyList.fromList(tpe).get, Some(name))
+
+					//AvroSchema_S.union[A](NonEmptyList.of(tpe.head, tpe.tail:_*), Some(name))
+				}
+
+				val resultArgs: Result[(List[A], String)] =
+					for {
+
+						tpe: List[A] <- c.downField("type").as[Option[List[A]]].map(_.getOrElse(List.empty))
+
+						name: String <- c.downField("name").as[Option[String]].map(_.getOrElse(""))
+
+					} yield (tpe, name)
+
+
+				val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (tpe, name) => tunion(tpe, name) }
+				val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+				println(s"\n\nINSIDE makeAvroCirceUnion (avro -> avro):")
+				println(s"result (not embed) = $result_noEmbed")
+				println(s"result (embed) = $result_embed")
+
+				result_embed
+			}
+		}
+
+		unionIdentifier
+	}
+
+
+	private def fixedAvroSchemaDecoder[A: Embed[AvroSchema_S, *] : Project[AvroSchema_S, *]]: Decoder[A] = {
+
+		def fixedIdentifier: Decoder[A] = {
+
+			Decoder.forProduct3[(String, String, Int), String, String, Int]("type", "name", "size")(Tuple3.apply).flatMap {
+
+				case (tpe: String, name: String, size: Int) => fixedDecoder
+
+				//case (x, _) => s"$x is not well formed type".asLeft
+				case _ => avroSchemaDecoder[A]
+			}
+		}
+
+
+		def fixedDecoder: Decoder[A] = {
+
+			Decoder.instance { c: HCursor =>
+
+				val tfixed: (String, Option[String], List[String], Int) => AvroSchema_S[A] = (name, namespace, aliases, size) => AvroSchema_S.fixed[A](name = name, namespace = namespace, aliases = aliases, size = size)
+
+				val resultArgs: Result[(String, Option[String], List[String], Int)] =
+					for {
+
+						name: String <- c.downField("name").as[Option[String]].map(_.getOrElse(""))
+
+						namespace: Option[String] <- c.downField("namespace").as[Option[Option[String]]].map(_.getOrElse(None))
+
+						aliases: List[String] <- c.downField("aliases").as[Option[List[String]]].map(_.getOrElse(List.empty))
+
+						size: Int <- c.downField("size").as[Option[Int]].map(_.getOrElse(0)) // TODO what is min/max for size?
+
+					} yield (name, namespace, aliases, size)
+
+
+				val result_noEmbed: Result[AvroSchema_S[A]] = resultArgs.map { case (name, namespace, aliases, size) => tfixed(name, namespace, aliases, size) }
+				val result_embed: Result[A] = result_noEmbed.map(_.embed)
+
+				println(s"\n\nINSIDE makeAvroCirceFixed (avro -> avro):")
+				println(s"result (not embed) = $result_noEmbed")
+				println(s"result (embed) = $result_embed")
+
+				result_embed
+			}
+		}
+
+		fixedIdentifier
 	}
 }
