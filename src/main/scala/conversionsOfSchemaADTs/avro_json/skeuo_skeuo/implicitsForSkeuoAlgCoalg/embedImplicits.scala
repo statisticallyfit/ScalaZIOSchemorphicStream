@@ -32,8 +32,10 @@ import higherkindness.skeuomorph.openapi.{JsonSchemaF ⇒ JsonSchema_S}
 
 
 import higherkindness.skeuomorph.avro.AvroF.{Field ⇒ FieldAvro}
-import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
 
+
+import utilMain.utilAvroJson.utilSkeuoSkeuo.FieldToPropertyConversions._
+import utilMain.utilAvroJson.utilSkeuoSkeuo.ADTSimpleNames._
 
 /**
  *
@@ -199,16 +201,32 @@ object embedImplicits {
 			case TUnion(options: NonEmptyList[Fix[JsonSchema_S]], name: Option[String]) => {
 
 				// TODO use the ADTSimpleNames file to convert each adt to string so can create property name here
-				Fix(ObjectNamedF(name = name, properties = List(
-					Property(name = "", tpe = Fix(TString())
-				)))
+
+				val nameTypePairs: List[(String, Fix[JsonSchema_S])] = options.toList.map(skj => (skeuoJsonToString(skj), skj))
+
+				val props: List[Property[Fix[JsonSchema_S]]] = nameTypePairs.map(pair => Property(name = pair._1, tpe = pair._2))
+
+				name.isDefined match {
+					case true => Fix(ObjectNamedF(name = name.get, properties = props, required = List()))
+					case false => Fix(ObjectF(properties = props, required = List()))
+				}
 			}
 
 
 
 
 			// Help avro fixed to json?
-			case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) => ???
+			case TFixed(name: String, namespace: Option[String], aliases: List[String], size: Int) => {
+
+				Fix(ObjectNamedF(name = name,
+					properties = List(
+						Property(name = "fixed", tpe = StringF()),
+						Property(name = "name", tpe = StringF()),
+						Property(name = "size", tpe = IntegerF())
+					),
+					required = List()
+				))
+			}
 		}
 	}
 
@@ -257,7 +275,7 @@ object embedImplicits {
 				)
 
 				val result: Fix[AvroSchema_S] = if (props.isEmpty && reqs.isEmpty) {
-					Fix(TNull()) // TODO make tnamedtype
+					Fix(TNamedType(namespace = "", name = name))
 				} else {
 					Fix(
 						TRecord(name = name, namespace = None, aliases = List(), doc = None,
@@ -304,7 +322,6 @@ object embedImplicits {
 					s"\nadditionalProperties = $additionalProperties"
 				)
 
-				// TODO what about name now?
 				Fix(TMap(additionalProperties.tpe))
 			}
 
@@ -315,7 +332,6 @@ object embedImplicits {
 					s"\nadditionalProperties = $additionalProperties"
 				)
 
-				// TODO what about name now?
 				Fix(TMap(additionalProperties.tpe))
 			}
 
@@ -323,7 +339,10 @@ object embedImplicits {
 
 			// TODO Make named enum here in json schema?
 			case EnumF(cases: List[String], name: Option[String]) => Fix(TEnum(name = name.getOrElse("NO_NAME"), namespace = None, aliases = List(), doc = None, symbols = cases))
+
+
 		}
+		// TODO parsing ObjectF if contains TUnion (canonical names) or TFixed ("fixed" in "tyhpe") 
 	}
 
 }
