@@ -1,4 +1,4 @@
-package TEMP_Zio_JsonCodecSpecTryOuts
+package ToFindCommonJsonADT.TEMP_Zio_JsonCodecSpecTryOuts
 
 /**
  *
@@ -11,7 +11,7 @@ import scala.annotation.StaticAnnotation
 
 
 object SharedTestData {
-	
+
 	def staticAnnotationToSchemaEnum(s: StaticAnnotation): Schema.Enum3[String, String, String, String] = {
 		val caseA = Schema.Case[String, String](
 			"A",
@@ -34,14 +34,14 @@ object SharedTestData {
 			identity,
 			_.isInstanceOf[String]
 		)
-		
-		
-		
+
+
+
 		// NOTE: returning an Enum3 (zio) containing the three cases.
-		
+
 		Schema.Enum3(TypeId.Structural, caseA, caseB, caseC, Chunk(s))
 	}
-	
+
 	def makeSchemaEnumSimple: Schema.Enum3[String, String, String, String] = {
 		val caseA = Schema.Case[String, String](
 			"A",
@@ -64,11 +64,11 @@ object SharedTestData {
 			identity,
 			_.isInstanceOf[String]
 		)
-		
-		
-		
+
+
+
 		// NOTE: returning an Enum3 (zio) containing the three cases.
-		
+
 		Schema.Enum3(TypeId.Structural, caseA, caseB, caseC /*, Chunk(s)*/)
 	}
 }

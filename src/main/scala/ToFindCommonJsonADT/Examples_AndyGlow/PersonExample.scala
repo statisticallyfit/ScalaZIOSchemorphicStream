@@ -1,30 +1,31 @@
-package Examples_AndyGlow
-
+package ToFindCommonJsonADT.Examples_AndyGlow
 
 import com.github.andyglow.json.JsonFormatter
 import com.github.andyglow.jsonschema.AsValue
+
+import json.{Schema => JsonSchema_G}
 
 
 /**
  *
  */
 object PersonExample extends App {
-	
-	
+
+
 	// Create the scala case classes that we want to convert into json schemas
 	sealed trait Gender
-	
+
 	object Gender {
-		
+
 		case object Male extends Gender
-		
+
 		case object Female extends Gender
 	}
-	
+
 	case class Company(name: String)
-	
+
 	case class Car(name: String, manufacturer: Company)
-	
+
 	case class Person(
 					  firstName: String,
 					  middleName: Option[String],
@@ -34,19 +35,19 @@ object PersonExample extends App {
 					  company: Company,
 					  cars: Seq[Car]
 				  )
-	
-	
+
+
 	// -------------------------------------------------------------------------------------
 	// Now Create the json schema:
-	
+
 	import json._
-	
-	
-	val personSchema: json.Schema[Person] = Json.schema[Person]
-	
-	
+	import json.{Json => JsonG}
+
+	val personSchema: JsonSchema_G[Person] = JsonG.schema[Person]
+
+
 	println(JsonFormatter.format(AsValue.schema(personSchema, json.schema.Version.Draft06(id = "some id here"))))
-	
+
 	/*
 	{
 	"$schema": "http://json-schema.org/draft-04/schema#",
