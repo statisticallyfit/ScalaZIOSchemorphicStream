@@ -49,7 +49,7 @@ object ParseADTToCirceToADT {
 		val libToJson: Fix[AvroSchema_S] ⇒ JsonDialect = scheme.cata(AvroSchema_S.toJson).apply(_)
 
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsEmbedProject._
 		//import embedImplicits.skeuoEmbed_AJ
 		import projectImplicits.skeuoProject_AA
 
@@ -58,7 +58,7 @@ object ParseADTToCirceToADT {
 		val libToJsonAltered: Fix[AvroSchema_S] ⇒ AvroDialect = scheme.cata(toCirceAvroDialect_fromAvroSkeuo).apply(_) //scheme.cata(toCirceJsonDialect_fromAvroSkeuo).apply(_)
 
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsEmbedProject._
 		//import embedImplicits.skeuoEmbed_AJ
 		import projectImplicits.skeuoProject_JJ
 
@@ -348,7 +348,7 @@ object ParseADTToCirceToADT {
 		import conversionsOfSchemaADTs.avro_avro.skeuo_apache.Skeuo_Apache
 
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsEmbedProject._
 		//import embedImplicits.skeuoEmbed_AA
 		import projectImplicits.skeuoProject_AA
 
@@ -528,7 +528,7 @@ object ParseADTToCirceToADT {
 
 	object CirceAvroToSkeuoAvro {
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsEmbedProject._
 		import embedImplicits.skeuoEmbed_AA
 		import projectImplicits.skeuoProject_AA
 
@@ -572,7 +572,7 @@ object ParseADTToCirceToADT {
 	object CirceAvroToSkeuoJson {
 
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsEmbedProject._
 		import embedImplicits.skeuoEmbed_AJ
 		import projectImplicits.skeuoProject_AJ
 
@@ -615,7 +615,7 @@ object ParseADTToCirceToADT {
 	object CirceJsonToSkeuoAvro {
 
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsEmbedProject._
 		import embedImplicits.skeuoEmbed_JA
 		//import projectImplicits.skeuoProject_AA
 
@@ -645,7 +645,7 @@ object ParseADTToCirceToADT {
 	object CirceJsonToSkeuoJson {
 
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsEmbedProject._
 		import embedImplicits.skeuoEmbed_JJ
 		//import projectImplicits.skeuoProject_AA
 

@@ -28,6 +28,11 @@ object Skeuo_AndyGlow {
 
 		import Trans_JsonToJson._
 
+
+
+		val jsonToJson_GlowToSkeuo: Fix[JsonSchema_G] => Fix[JsonSchema_S] = scheme.cata(trans_GlowToSkeuo_InnerSkeuo.algebra).apply(_)
+
+		//val jsonToJson_SkeuoToGlow: Fix[JsonSchema_S] => Fix[JsonSchema_S] = scheme.ana(trans_GlowToSkeuo_InnerSkeuo.coalgebra).apply(_)
 	}
 
 

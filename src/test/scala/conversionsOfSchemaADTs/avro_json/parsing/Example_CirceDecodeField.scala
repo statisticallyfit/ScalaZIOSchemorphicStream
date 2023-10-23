@@ -18,9 +18,9 @@ import higherkindness.droste.data._
 
 import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForDialects.Decoder_InputAvroDialect_OutputAvroSkeuo._
 
-import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsForSkeuoAlgCoalg => impl}
-import impl.embedImplicits.skeuoEmbed_AA
-import impl.projectImplicits.skeuoProject_AA
+import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.{implicitsEmbedProject => impl}
+import implicitsEmbedProject.embedImplicits.skeuoEmbed_AA
+import implicitsEmbedProject.projectImplicits.skeuoProject_AA
 
 import higherkindness.skeuomorph.avro.{AvroF => AvroSchema_S}
 import AvroSchema_S.{Field => FieldAvro}

@@ -118,7 +118,7 @@ class AvroToJson_SkeuoSkeuo_Specs extends AnyFunSpec with Matchers with TraitInh
 
 	/*import higherkindness.skeuomorph.openapi.JsonDecoders._
 	import cats.syntax.all._*/
-	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+	import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsEmbedProject._
 	import embedImplicits.skeuoEmbed_JJ
 	//import projectImplicits.skeuoProject_AA
 

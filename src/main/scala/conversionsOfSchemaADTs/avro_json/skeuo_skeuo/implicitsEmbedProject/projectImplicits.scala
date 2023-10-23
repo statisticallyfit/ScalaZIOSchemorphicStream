@@ -1,4 +1,4 @@
-package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg
+package conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsEmbedProject
 
 
 

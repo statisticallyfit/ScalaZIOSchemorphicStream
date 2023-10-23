@@ -75,7 +75,7 @@ object Skeuo_Skeuo {
 
 		*/
 
-		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsForSkeuoAlgCoalg._
+		import conversionsOfSchemaADTs.avro_json.skeuo_skeuo.implicitsEmbedProject._
 		import embedImplicits.skeuoEmbed_AJ
 		import projectImplicits.skeuoProject_JA
 
